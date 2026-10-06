@@ -1,0 +1,232 @@
+{
+ "purpose": "Concordance of the perturbation workflow with SCEPTRE 0.99.0 under its staging rule.",
+ "commit": "7e72355416e18420e96e0b3279a342329e7cb9be",
+ "worktree_dirty": true,
+ "command": "python3 scripts/validate_sceptre_staging.py --work DIR --output validation/SCEPTRE_STAGING.json --sceptre-library LIB",
+ "panels": {
+  "S1_public": {
+   "pairs": 66,
+   "sceptre_discoveries": 32,
+   "screen_0.02": {
+    "discoveries": [
+     31,
+     31,
+     30,
+     32,
+     32,
+     32,
+     30,
+     29,
+     32,
+     31
+    ],
+    "mean_discoveries": 31.0,
+    "jaccard_native_sceptre": {
+     "mean": 0.962784090909091,
+     "min": 0.90625,
+     "max": 1.0
+    },
+    "jaccard_native_native": {
+     "mean": 0.9485246280004346,
+     "min": 0.90625
+    },
+    "stage2_agreement_mean": 0.9666666666666666
+   },
+   "screen_0": {
+    "discoveries": [
+     32,
+     32,
+     32,
+     32,
+     31,
+     32,
+     30,
+     31,
+     33,
+     31
+    ],
+    "mean_discoveries": 31.6,
+    "jaccard_native_sceptre": {
+     "mean": 0.975284090909091,
+     "min": 0.9375,
+     "max": 1.0
+    },
+    "jaccard_native_native": {
+     "mean": 0.957511268599978,
+     "min": 0.90625
+    },
+    "stage2_agreement_mean": 0.5454545454545453
+   },
+   "G1_floor": true,
+   "G2_counts": true
+  },
+  "S2_public": {
+   "pairs": 66,
+   "sceptre_discoveries": 11,
+   "screen_0.02": {
+    "discoveries": [
+     13,
+     11,
+     10,
+     13,
+     14,
+     11,
+     13,
+     14,
+     11,
+     14
+    ],
+    "mean_discoveries": 12.4,
+    "jaccard_native_sceptre": {
+     "mean": 0.8804695304695306,
+     "min": 0.7857142857142857,
+     "max": 1.0
+    },
+    "jaccard_native_native": {
+     "mean": 0.8449284049284049,
+     "min": 0.7142857142857143
+    },
+    "stage2_agreement_mean": 0.9621212121212122
+   },
+   "screen_0": {
+    "discoveries": [
+     13,
+     14,
+     16,
+     16,
+     15,
+     14,
+     15,
+     16,
+     10,
+     15
+    ],
+    "mean_discoveries": 14.4,
+    "jaccard_native_sceptre": {
+     "mean": 0.7589173326673327,
+     "min": 0.6875,
+     "max": 0.9090909090909091
+    },
+    "jaccard_native_native": {
+     "mean": 0.8277761417957494,
+     "min": 0.625
+    },
+    "stage2_agreement_mean": 0.8333333333333334
+   },
+   "G1_floor": true,
+   "G2_counts": true
+  }
+ },
+ "stage_probe": {
+  "pairs": 1500,
+  "stages": {
+   "1": 1469,
+   "2": 31
+  },
+  "promoted_fraction": 0.020666666666666667,
+  "smallest_first_stage_p": 0.024,
+  "first_stage_p_times_500_all_even": true
+ },
+ "sceptre_results_independent_of_r_seed": {
+  "S1_public": true,
+  "S2_public": true
+ },
+ "null_calibration_with_screen": [
+  {
+   "family": "poisson",
+   "predictor": "binary",
+   "calibration": "permutation",
+   "valid": 2400,
+   "rejections_05": 119,
+   "rate_01": 0.012083333333333333,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.01516666666666655,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "poisson",
+   "predictor": "binary",
+   "calibration": "crt",
+   "valid": 2400,
+   "rejections_05": 130,
+   "rate_01": 0.010416666666666666,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.015500000000000014,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "poisson",
+   "predictor": "continuous",
+   "calibration": "permutation",
+   "valid": 2400,
+   "rejections_05": 98,
+   "rate_01": 0.007083333333333333,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.01575,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "nb",
+   "predictor": "binary",
+   "calibration": "permutation",
+   "valid": 2400,
+   "rejections_05": 106,
+   "rate_01": 0.009583333333333333,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.021666666666666667,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "nb",
+   "predictor": "binary",
+   "calibration": "crt",
+   "valid": 2400,
+   "rejections_05": 105,
+   "rate_01": 0.007916666666666667,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.027166666666666617,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "nb",
+   "predictor": "continuous",
+   "calibration": "permutation",
+   "valid": 2400,
+   "rejections_05": 98,
+   "rate_01": 0.007916666666666667,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.01841666666666658,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  }
+ ],
+ "gates": {
+  "G1_floor": true,
+  "G2_counts": true,
+  "G3_null": true
+ },
+ "passed": true
+}

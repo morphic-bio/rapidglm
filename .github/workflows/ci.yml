@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Outer OpenMP loops call BLAS concurrently; see README.
+  OPENBLAS_NUM_THREADS: "1"
+
+jobs:
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Release, OpenMP
+            cmake: -DCMAKE_BUILD_TYPE=Release
+            external: true
+          - name: Release, no OpenMP
+            cmake: -DCMAKE_BUILD_TYPE=Release -DRAPIDGLM_OPENMP=OFF
+          - name: Release, OpenMP, LAPACK solves
+            cmake: -DCMAKE_BUILD_TYPE=Release -DRAPIDGLM_LAPACK_SOLVES=ON
+          - name: ASan/UBSan, OpenMP
+            cmake: -DCMAKE_BUILD_TYPE=RelWithDebInfo -DRAPIDGLM_SANITIZERS=ON
+          - name: ASan/UBSan, no OpenMP
+            cmake: -DCMAKE_BUILD_TYPE=RelWithDebInfo -DRAPIDGLM_SANITIZERS=ON -DRAPIDGLM_OPENMP=OFF
+    env:
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake g++ libboost-dev liblapacke-dev libopenblas-pthread-dev
+      - name: Configure
+        run: cmake -S . -B build ${{ matrix.cmake }}
+      - name: Build
+        run: cmake --build build -j "$(nproc)"
+      - name: Unit tests
+        run: ctest --test-dir build --output-on-failure
+      - name: CLI tests
+        run: python3 tests/test_cli.py build/rapidglm
+      - name: Installed CMake package
+        if: matrix.external
+        run: scripts/check_external.sh
+      - name: Python layer over the C interface
+        if: matrix.external
+        run: |
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-pandas python3-scipy python3-patsy
+          export RAPIDGLM_C_LIBRARY="$PWD/build/librapidglm_c.so" PYTHONPATH="$PWD/bindings/python"
+          python3 bindings/python/tests/test_capi.py build/rapidglm
+          python3 bindings/python/tests/test_deseq.py build/rapidglm
+      - name: RapidGLM as a PyDESeq2 inference back end
+        if: matrix.external
+        run: |
+          python3 -m venv /tmp/pydeseq2 && /tmp/pydeseq2/bin/pip install --quiet pydeseq2
+          RAPIDGLM_C_LIBRARY="$PWD/build/librapidglm_c.so" PYTHONPATH="$PWD/bindings/python" \
+            /tmp/pydeseq2/bin/python bindings/python/tests/test_pydeseq2.py
+      - name: Rust binding and PyDESeq2 port
+        if: matrix.external
+        run: |
+          cd bindings/rust
+          RAPIDGLM_LIB_DIR="$GITHUB_WORKSPACE/build" cargo test --release
+          RAPIDGLM_LIB_DIR="$GITHUB_WORKSPACE/build" cargo clippy --release --all-targets -- -D warnings
+          cargo fmt --check
+
+  arm64:
+    # Standard arm64 runners serve public repositories only, so the tests are
+    # cross-compiled here and run under QEMU, which implements the Arm AES
+    # instructions (scripts/test_arm64.sh).
+    name: arm64 generators and samplers (cross-compiled, QEMU)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build for arm64 and run the tests under QEMU
+        run: docker run --rm -v "$PWD":/src:ro ubuntu:24.04 bash /src/scripts/test_arm64.sh
+
+  container:
+    name: Container (every test suite)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the image
+        run: docker build -t rapidglm .
+      - name: Run the tests in the image
+        run: docker run --rm rapidglm
+
+  format:
+    name: clang-format
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install clang-format
+        run: pipx install clang-format==23.1.1
+      - name: Check formatting
+        run: git ls-files '*.hpp' '*.cpp' '*.h' | xargs clang-format --dry-run --Werror

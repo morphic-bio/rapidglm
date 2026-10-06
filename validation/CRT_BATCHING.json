@@ -1,0 +1,506 @@
+{
+ "description": "CRT resampling speed-ups with byte-identical output, on the Gasperini benchmark panel (207,324 cells, moi high, CRT thinned, budgets 499/4999/19999, screen 0.02, cell_qc false, 32 threads), against the scaling preview of 2026-10-01 (/mnt/pikachu/rapidglm_scaling_preview_20261001, commit 3387bec). Output (rapid.tsv, rapid.qq.tsv and the run record without timing, paths and version) compared byte for byte with the preview's.",
+ "date": "2026-10-02",
+ "host": "pikachu, i9-13900KF (8 P-cores with HT + 16 E-cores, 32 threads), 125 GiB; timed runs held the shared flock; the host was not idled",
+ "baseline_wall_s": {
+  "t10_g100": 8.0,
+  "t50_g100": 35.7,
+  "t200_g100": 122.8,
+  "t10_g1000": 77.2,
+  "t50_g1000": 341.7,
+  "t200_g1000": 1210.9,
+  "t10_g5000": 381.7,
+  "t50_g5000": 1709.5,
+  "t200_g5000": 6199.7,
+  "t100_g7418": 4755.0
+ },
+ "batched": {
+  "note": "step 1: batched thinned draws, packed per-cell score records, blocked scoring, observed statistic on selected cells, map-free sampler build, 2-lane Philox, no floor() per candidate; pairs scheduled as before",
+  "points": {
+   "t10_g100": {
+    "wall_s": 4.95,
+    "output": "IDENTICAL"
+   },
+   "t10_g1000": {
+    "wall_s": 42.15,
+    "output": "IDENTICAL"
+   },
+   "t10_g5000": {
+    "wall_s": 219.34,
+    "output": "IDENTICAL"
+   },
+   "t50_g100": {
+    "wall_s": 15.21,
+    "output": "IDENTICAL"
+   },
+   "t50_g1000": {
+    "wall_s": 135.94,
+    "output": "IDENTICAL"
+   },
+   "t50_g5000": {
+    "wall_s": 688.65,
+    "output": "IDENTICAL"
+   },
+   "t200_g100": {
+    "wall_s": 49.02,
+    "output": "IDENTICAL"
+   },
+   "t200_g1000": {
+    "wall_s": 458.72,
+    "output": "IDENTICAL"
+   }
+  }
+ },
+ "pipelined": {
+  "note": "step 2: all threads on a ring of 8 active pairs, taking 32-draw chunks (response by response, null fits prepared ahead), and per-target CRT samplers shared by a target's pairs (sampler_cache_mb 4096)",
+  "points": {
+   "t10_g100": {
+    "wall_s": 4.68,
+    "output": "IDENTICAL"
+   },
+   "t50_g1000": {
+    "wall_s": 85.67,
+    "output": "IDENTICAL"
+   },
+   "t200_g1000": {
+    "wall_s": 263.21,
+    "output": "IDENTICAL"
+   },
+   "t100_g7418": {
+    "wall_s": 1079.55,
+    "output": "IDENTICAL"
+   }
+  }
+ },
+ "pipelined_avx2_philox": {
+  "note": "step 3: Philox in 8-lane AVX2 (scalar fallback); 50 x 1,000 only",
+  "points": {
+   "t50_g1000": {
+    "wall_s": 81.06,
+    "output": "IDENTICAL"
+   }
+  }
+ },
+ "thread_seconds_per_draw_us_32_threads": {
+  "note": "instrumented copies; draw generation and scoring only",
+  "preview_3387bec": {
+   "resampling": 314
+  },
+  "batched": {
+   "generate": 67,
+   "score": 34
+  },
+  "pipelined": {
+   "generate": 53,
+   "score": 9.8
+  },
+  "pipelined_avx2_philox": {
+   "generate": 47.6,
+   "score": 10.0
+  },
+  "single_thread_batched": {
+   "generate": 25.5,
+   "score": 3.6
+  }
+ },
+ "projection": {
+  "note": "preview cost model scaled by the 100 x 7,418 ratio (4,755 / 1,080 s = 4.4)",
+  "gasperini_all_pairs_28.0M_h": 11.0,
+  "another_panel_29.0M_pairs_h": 12.5,
+  "gasperini_all_pairs_28.0M_reuse_draws_h": 3.2
+ },
+ "not_run": "8/16-thread scaling and the 200 x 5,000 point (stopped at the author's request); the 1-thread identity check ran on 10 x 100 for step 1",
+ "step4_draw_generation": {
+  "note": "word-major Philox output with a two-word fast path, merges through a reusable buffer, draws interleaved in groups of four. 19% fewer instructions per draw (cachegrind); about 10% faster single-threaded (generation 30 -> 27 us per draw on a P-core); no measurable change at 32 threads (50 x 1,000: 78.1 and 77.8 s before, 78.7 and 78.2 s after). 10 x 100 at 1 thread: 38.4 s (preview) -> 23.0 s, identical.",
+  "simd_log_tried": "A 4-lane AVX2 logarithm for the gaps, with each floor checked against a 1e-11 margin and std::log as fallback (so output stays exact), was slower: 36-37 us per draw against 27 us with glibc's log, even with the whole program built for x86-64-v3. Making the logarithm free in a test build changed generation by at most 10%. Not kept.",
+  "limit": "At 32 threads generation runs at about 1.8 times its single-thread cost per draw, close to what 8 hyperthreaded P-cores plus 16 E-cores allow for compute-bound code; further gains need fewer operations per draw, not faster ones."
+ },
+ "reuse_draws": {
+  "note": "opt-in: each target's CRT draws generated once (streams keyed by target) and stored per stage within draw_cache_mb; scored against every gene. P-values differ from the default's.",
+  "wall_s": {
+   "t50_g1000": 33.95,
+   "t200_g1000": 69.24,
+   "t100_g7418_32_threads": 310.3,
+   "t100_g7418_28_threads_cpus_0-7_12-31": [
+    325.9,
+    327.2
+   ]
+  },
+  "default_same_build_wall_s": {
+   "t50_g1000": 72.2,
+   "t100_g7418": 1080
+  },
+  "agreement_with_default_t100_g7418": {
+   "ok_pairs": 721266,
+   "status_mismatches": 0,
+   "observed_statistic_identical": true,
+   "corr_log10_p": 0.9865,
+   "fraction_p_below": {
+    "0.05": [
+     0.0495,
+     0.0494
+    ],
+    "0.01": [
+     0.0102,
+     0.0102
+    ],
+    "0.001": [
+     0.0012,
+     0.0011
+    ]
+   },
+   "bh_0.1_discoveries": {
+    "default": 22,
+    "reuse": 23,
+    "both": 20
+   }
+  },
+  "determinism": "identical output at 28 and 32 threads, with and without stored draws (unit test also covers 1/8/32 threads and a zero cache)",
+  "hardware_crashes": "3 of 5 reuse runs at 32 threads crashed with hardware fault signatures (kernel log: fault address = instruction pointer with one bit flipped; invalid-opcode traps on a valid addsd in libm log1p), on CPUs 8 and 11; ASan, TSan and gdb runs were clean, and 2 of 2 runs pinned away from CPUs 8-11 completed with identical output. An apparmor_parser segfault on CPU 11 on 2026-10-01 fits the same pattern (i9-13900KF, microcode 0x133).",
+  "hardware_follow_up": {
+   "cap_5.5GHz_cpus_8-11_32_threads": "2 of 4 runs crashed (CPU 11, libm)",
+   "cap_3.0GHz_cpus_8-11_32_threads": "0 of 4 crashed, identical output, 6:25 per run",
+   "cpus_8-11_offline_16_threads": "0 of 4 crashed, identical output, 6:25 per run",
+   "stress-ng_cpu_verify_45s_per_cpu": "all 32 CPUs passed",
+   "evidence": "/mnt/pikachu/cpu_fault_evidence_20261002"
+  }
+ },
+ "screens_2026_10_05": {
+  "note": "sequential_screen and shared_screen (opt-in). 16 threads pinned to CPUs 0-7,12-19 (CPUs 8-11 offline), timing lock; provisional: faulty CPU, and the runs after the scheduling fix overlapped a RAID data-check of the array holding the inputs",
+  "point": "100 targets x 7,418 genes (741,800 pairs), Gasperini, high MOI",
+  "default_wall_s": 1462,
+  "default_own_draws": 436113234,
+  "before_scheduling_fix_f8c30d5": {
+   "sequential_wall_s": 1222,
+   "shared_0.05_wall_s": 627,
+   "shared_0.05_sequential_wall_s": 571
+  },
+  "after_scheduling_fix": {
+   "sequential_wall_s": 618,
+   "shared_0.05_sequential_wall_s": 540,
+   "peak_rss_gb": 23.3,
+   "outputs": "byte-identical to the runs before the fix"
+  },
+  "own_draws": {
+   "sequential": 123148181,
+   "shared_0.05": 435292734,
+   "shared_0.05_sequential": 150766778
+  },
+  "against_default": {
+   "sequential": {
+    "identical_records": 15584,
+    "ended_at_a_screen": 705682,
+    "default_continued_of_those": 0,
+    "discoveries": [
+     22,
+     22
+    ],
+    "common": 22
+   },
+   "shared_0.05": {
+    "identical_records": 59265,
+    "ended_at_a_screen": 662001,
+    "default_continued_of_those": 169,
+    "discoveries": [
+     22,
+     22
+    ],
+    "common": 22
+   },
+   "shared_0.05_sequential": {
+    "identical_records": 15480,
+    "ended_at_a_screen": 705786,
+    "default_continued_of_those": 169,
+    "discoveries": [
+     22,
+     22
+    ],
+    "common": 22
+   }
+  },
+  "scheduling_fix": "a screen that may end early is drawn one 32-draw chunk at a time with about one active pair per thread; before, threads drew ahead and the draws beyond a screen's end were discarded",
+  "small_point_50_targets_x_1000_genes_16_threads_wall_s": {
+   "default": 113,
+   "sequential_before": 94,
+   "sequential_after": 53,
+   "shared_sequential_before": 52,
+   "shared_sequential_after": 48
+  },
+  "memory": "freed response state is returned to the system every 256 responses (glibc malloc_trim); without it peak RSS at this point grew from 23.3 GB to 39.6-47.9 GB after the scheduling fix"
+ },
+ "count_matrix_2026_10_05": {
+  "note": "sceptre reads its responses into the compact CountMatrix with a parallel single-pass loader; 16 threads pinned to CPUs 0-7,12-19, timing lock; provisional (faulty CPU; a RAID data-check of the input array was running)",
+  "small_point_50_targets_x_1000_genes_wall_s": {
+   "previous_build": {
+    "default": 118,
+    "sequential": 57,
+    "shared_sequential": 51
+   },
+   "count_matrix": {
+    "default": 110,
+    "sequential": 48,
+    "shared_sequential": 41
+   },
+   "outputs": "byte-identical to the previous build in all three modes",
+   "load_plus_one_pair_s": {
+    "previous_build": 12.2,
+    "count_matrix": 4.0
+   }
+  },
+  "gasperini_full_matrix_load_plus_one_pair": {
+   "file": "responses.mtx, 6.0 GB, 445,060,316 nonzeros, 7,418 x 207,324",
+   "seconds_to_result": 8.3,
+   "previous_seconds": "about 80",
+   "process_wall_s": 22.4,
+   "process_wall_note": "the run record waits for the serial SHA-1 of the file, which a longer run hides",
+   "peak_rss_gb": 12.1,
+   "previous_peak_rss_gb": 23.3,
+   "matrix_gb": 3.6
+  }
+ },
+ "sampler_cache_2026_10_05": {
+  "note": "CRT samplers at 12 bytes per cell, kept for every target by default; 16 threads pinned to CPUs 0-7,12-19, timing lock; provisional (faulty CPU; RAID data-check running)",
+  "small_point_50_targets_x_1000_genes_default_mode_wall_s": {
+   "all_50_samplers_kept": 111,
+   "17_of_50_kept_sampler_cache_mb_41": 132,
+   "outputs": "byte-identical"
+  },
+  "gasperini_100_targets_x_7418_genes_sequential_screen": {
+   "wall_s": 542,
+   "previous_build_wall_s": 618,
+   "peak_rss_gb": 12.1,
+   "previous_peak_rss_gb": 23.3,
+   "samplers_kept": 100,
+   "output": "byte-identical to the earlier sequential run",
+   "note": "the gain here is the loader; 100 targets also fit the old 4 GB default"
+  },
+  "full_panel": "3,776 targets need 9.4 GB of samplers (12.5 GB at 16 bytes); under the old 4 GB default 1,234 were kept and 2,542 rebuilt per pair"
+ },
+ "early_stop_2026_10_05": {
+  "note": "early_stop_p 0.002 with sequential_screen (both opt-in), against sequential_screen alone; 16 threads pinned to CPUs 0-7,12-19, timing lock; provisional (faulty CPU). Default budgets 499/4,999/19,999 and screen 0.02: a pair past the screen stops at 5 extreme draws on the deciding side within 4,999, or 20 within 19,999",
+  "small_point_50_targets_x_1000_genes": {
+   "wall_s": {
+    "sequential_screen": 42.9,
+    "with_early_stop": 32.2
+   },
+   "draws": {
+    "sequential_screen": 8269237,
+    "with_early_stop": 4377023
+   },
+   "pairs_past_the_screen": 1024,
+   "stopped": 922,
+   "records_unchanged": 102,
+   "discoveries": [
+    6,
+    6
+   ],
+   "same_discoveries": true,
+   "sequential_screen_output": "byte-identical to the build before",
+   "with_early_stop_at_5_threads": "byte-identical to 16 threads"
+  },
+  "gasperini_100_targets_x_7418_genes": {
+   "wall_s": {
+    "sequential_screen": 542,
+    "with_early_stop": 362
+   },
+   "user_cpu_s": {
+    "sequential_screen": 7297,
+    "with_early_stop": 5151
+   },
+   "peak_rss_gb": 12.1,
+   "draws": {
+    "sequential_screen": 123148181,
+    "with_early_stop": 65873591
+   },
+   "draws_of_pairs_past_the_screen": {
+    "sequential_screen": 83714943,
+    "with_early_stop": 26440353
+   },
+   "pairs_past_the_screen": 15057,
+   "stopped": 13492,
+   "records_unchanged": 1565,
+   "stopped_pairs": {
+    "draws": {
+     "mean": 1314,
+     "median": 928,
+     "min": 512,
+     "max": 19616
+    },
+    "ended_before_at": {
+     "4999_skew_normal": 12988,
+     "19999": 504
+    },
+    "p_value_range": [
+     0.0021,
+     0.02
+    ],
+    "p_value_before_range": [
+     0.000122,
+     0.0631
+    ],
+    "p_value_before_at_most_0.002": 243,
+    "log2_ratio_to_p_value_before": {
+     "5%": -1.04,
+     "median": -0.19,
+     "95%": 0.89
+    },
+    "note": "a pair stops on its empirical count, so its skew-normal p-value without the option can be below early_stop_p: 243 pairs, 20 at or below 0.001, the smallest 1.2e-4"
+   },
+   "unchanged_pairs_largest_p_value": 0.00672,
+   "discoveries": [
+    22,
+    22
+   ],
+   "same_discoveries": true,
+   "discovery_cut_off_p": 3.05e-06
+  }
+ },
+ "hazard_sampler_2026_10_05": {
+  "note": "crt_draw hazard (opt-in) against thinned; Gasperini propensities; timings under the timing lock, provisional (faulty CPU). Whole runs: 16 threads on CPUs 0-7,12-19 with sequential_screen and early_stop_p 0.002. hazard draws its gaps from ARS-10 (AES instructions) keyed per draw from the draw's Philox stream; the figures marked philox are of the same sampler drawing its gaps from Philox, an intermediate build that was not kept",
+  "generation_us_per_draw_one_performance_core": {
+   "589_expected_treated_cells": {
+    "thinned": 15.4,
+    "hazard_philox": 8.3,
+    "hazard_aes_trial": 6.9
+   },
+   "828_expected_treated_cells": {
+    "thinned": 20.9,
+    "hazard_philox": 11.3
+   },
+   "1203_expected_treated_cells": {
+    "thinned": 29.9,
+    "hazard_philox": 16.2,
+    "hazard_aes_trial": 13.3
+   },
+   "measured_with": "a standalone prototype of the same algorithm, batches of 32 draws; the AES trial used 7 rounds"
+  },
+  "small_point_50_targets_x_1000_genes": {
+   "wall_s": {
+    "thinned": 32.5,
+    "hazard_philox": 28.1,
+    "hazard": 27.3
+   },
+   "user_cpu_s": {
+    "thinned": 424,
+    "hazard_philox": 345,
+    "hazard": 329
+   },
+   "thinned_output": "byte-identical to the build before",
+   "hazard_at_5_threads": "byte-identical to 16 threads"
+  },
+  "gasperini_100_targets_x_7418_genes": {
+   "wall_s": {
+    "thinned": 362,
+    "hazard_philox": 291,
+    "hazard": 279
+   },
+   "user_cpu_s": {
+    "thinned": 5151,
+    "hazard_philox": 3955,
+    "hazard": 3710
+   },
+   "peak_rss_gb": 12.1,
+   "draws": {
+    "thinned": 65873591,
+    "hazard_philox": 65964810,
+    "hazard": 65858180
+   },
+   "discoveries": {
+    "thinned": 22,
+    "hazard_philox": 23,
+    "common_philox": 20,
+    "hazard": 20,
+    "common": 18
+   },
+   "discoveries_note": "the streams differ, so p-values differ as between two seeds. Against hazard: four of the six pairs that differ have p-values within a factor 3.1 of the cut-off (3e-6) in both runs; the other two are the pairs under skew_normal_stage_instability"
+  },
+  "same_law_check": {
+   "design": "400 independent repeats of one pair (the pair repeated in the pairs file), right-sided empirical tail without screen or approximation; 4,999 draws per repeat (19,999 for the last pair)",
+   "tail_probability_thinned_hazard_z": [
+    {
+     "statistic": -2.5,
+     "thinned": 0.991499,
+     "hazard": 0.991544,
+     "z": -0.5
+    },
+    {
+     "statistic": -1.0,
+     "thinned": 0.849989,
+     "hazard": 0.849796,
+     "z": 0.54
+    },
+    {
+     "statistic": 0.5,
+     "thinned": 0.306017,
+     "hazard": 0.305583,
+     "z": 0.94
+    },
+    {
+     "statistic": 1.5,
+     "thinned": 0.074318,
+     "hazard": 0.074173,
+     "z": 0.55
+    },
+    {
+     "statistic": 2.5,
+     "thinned": 0.009055,
+     "hazard": 0.008948,
+     "z": 1.13
+    },
+    {
+     "statistic": 3.5,
+     "thinned": 0.000439,
+     "hazard": 0.000443,
+     "z": -0.19
+    },
+    {
+     "statistic": 7.221,
+     "thinned": 0.000121,
+     "hazard": 0.000123,
+     "z": -0.2
+    }
+   ]
+  },
+  "skew_normal_stage_instability": {
+   "pair": "ENSG00000185222 x chr9.4011_top_two (statistic 7.22)",
+   "default_staging_400_repeats": {
+    "thinned": {
+     "skew_normal_at_4999": 312,
+     "skew_normal_at_19999": 3,
+     "empirical_at_19999": 85
+    },
+    "hazard": {
+     "skew_normal_at_4999": 338,
+     "skew_normal_at_19999": 3,
+     "empirical_at_19999": 59
+    },
+    "skew_normal_p_median": 9.1e-08,
+    "empirical_p_about": 0.0004
+   },
+   "right_tail_probability_over_8M_draws": 0.00012,
+   "note": "the skew-normal fit passes its check in about four repeats in five and then gives a p-value some 3,000 times below the tail counted directly; either sampler shows it. SCEPTRE 0.99.0's Bridges-2 run reports stage 3 and p = 8e-4 for this pair",
+   "second_pair": {
+    "pair": "response 4521 x chr3.4961_top_two",
+    "thinned": {
+     "draws": 4999,
+     "p_value": 9.19e-11,
+     "skew_normal": true
+    },
+    "hazard": {
+     "draws": 19999,
+     "p_value": 0.0001,
+     "skew_normal": false
+    }
+   }
+  },
+  "random_words_ns_per_64_bits_one_performance_core": {
+   "philox": 1.97,
+   "ars_10_keyed_per_draw_600_words": 0.63
+  },
+  "arm64": {
+   "how": "scripts/test_arm64.sh in an ubuntu:24.04 container: cross-compiled with GCC 13, run with qemu-aarch64 -cpu max",
+   "generator_and_sampler_tests": "9 test cases pass; the Arm AES instructions are used and reproduce the Random123 known-answer vectors and the table-lookup words",
+   "compiles": "GCC 13 and clang 18 for aarch64, with and without -march=armv8-a+aes"
+  }
+ }
+}

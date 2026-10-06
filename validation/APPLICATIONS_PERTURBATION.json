@@ -1,0 +1,192 @@
+{
+  "purpose": "Perturbation workflow against SCEPTRE 0.99.0 (docs/BENCHMARK.md)",
+  "commit": "05a4662 (driver fix for the agreement step applied afterwards)",
+  "note": "Rebuilt from the run logs (timings) and the saved output tables: the original runs completed but the agreement step failed (R's float response index) or used SCEPTRE at 1 thread only. Timings and tables are those of the runs of 2026-10-01.",
+  "logs": [
+    "validation/work/benchmark/receipts/sceptre_50k.log",
+    "validation/work/benchmark/receipts/sceptre_full.log"
+  ],
+  "repeats": 1,
+  "perturbation": [
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-cli",
+      "threads": 1,
+      "seconds": 264.24,
+      "load": 1.6,
+      "contended": false,
+      "reference": "sceptre t1",
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 29,
+        "jaccard": 0.8275862068965517,
+        "spearman": 0.9852447429447518
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-cli",
+      "threads": 8,
+      "seconds": 52.78,
+      "load": 1.7,
+      "contended": false,
+      "reference": "sceptre t1",
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 29,
+        "jaccard": 0.8275862068965517,
+        "spearman": 0.9852447429447518
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-python",
+      "threads": 1,
+      "seconds": 244.38,
+      "load": 4.5,
+      "contended": false,
+      "reference": "sceptre t1",
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 29,
+        "jaccard": 0.8275862068965517,
+        "spearman": 0.9852447429447518
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-python",
+      "threads": 8,
+      "seconds": 35.26,
+      "load": 1.5,
+      "contended": false,
+      "reference": "sceptre t1",
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 29,
+        "jaccard": 0.8275862068965517,
+        "spearman": 0.9852447429447518
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-r",
+      "threads": 1,
+      "seconds": 257.76,
+      "load": 4.5,
+      "contended": false,
+      "reference": "sceptre t1",
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 29,
+        "jaccard": 0.8275862068965517,
+        "spearman": 0.9852447429447518
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-r",
+      "threads": 8,
+      "seconds": 38.34,
+      "load": 1.5,
+      "contended": false,
+      "reference": "sceptre t1",
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 29,
+        "jaccard": 0.8275862068965517,
+        "spearman": 0.9852447429447518
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "sceptre",
+      "threads": 1,
+      "seconds": 851.38,
+      "load": 4.4,
+      "contended": false,
+      "reference": "sceptre t1",
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 1.0,
+        "spearman": 0.9999999999999998
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "sceptre",
+      "threads": 8,
+      "seconds": 141.24,
+      "load": 1.2,
+      "contended": false,
+      "reference": "sceptre t1",
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 1.0,
+        "spearman": 0.9999999999999998
+      }
+    },
+    {
+      "dataset": "gasperini",
+      "tool": "rapidglm-cli",
+      "threads": 8,
+      "seconds": 333.26,
+      "load": 7.6,
+      "contended": false,
+      "reference": "sceptre t8",
+      "agreement_with_sceptre": {
+        "pairs": 9718,
+        "discoveries": 101,
+        "jaccard": 0.9238095238095239,
+        "spearman": 0.9861225636519716
+      }
+    },
+    {
+      "dataset": "gasperini",
+      "tool": "rapidglm-python",
+      "threads": 8,
+      "seconds": 252.1,
+      "load": 8.6,
+      "contended": true,
+      "reference": "sceptre t8",
+      "agreement_with_sceptre": {
+        "pairs": 9718,
+        "discoveries": 101,
+        "jaccard": 0.9238095238095239,
+        "spearman": 0.9861225636519716
+      }
+    },
+    {
+      "dataset": "gasperini",
+      "tool": "rapidglm-r",
+      "threads": 8,
+      "seconds": 274.16,
+      "load": 8.4,
+      "contended": true,
+      "reference": "sceptre t8",
+      "agreement_with_sceptre": {
+        "pairs": 9718,
+        "discoveries": 101,
+        "jaccard": 0.9238095238095239,
+        "spearman": 0.9861225636519716
+      }
+    },
+    {
+      "dataset": "gasperini",
+      "tool": "sceptre",
+      "threads": 8,
+      "seconds": 895.77,
+      "load": 8.4,
+      "contended": true,
+      "reference": "sceptre t8",
+      "agreement_with_sceptre": {
+        "pairs": 9718,
+        "discoveries": 101,
+        "jaccard": 1.0,
+        "spearman": 1.0
+      }
+    }
+  ]
+}

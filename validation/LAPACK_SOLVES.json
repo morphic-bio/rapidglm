@@ -1,0 +1,64 @@
+{
+ "purpose": "Why Cholesky and triangular solves are in-house by default, and what the change does to results",
+ "date": "2026-10-05",
+ "blas_finding": {
+  "source": "cloud correctness diagnostic of commit f8c30d5 (Release, OpenMP, GCC 12.3.0) on an Intel Xeon 6975P-C; no timing",
+  "library": "pthread OpenBLAS 0.3.20 (Ubuntu 22.04 0.3.20+ds-1), sha256 1dedc9fee9ca46eb73e1abc9d989093acbb5bf1bb474fe673af7f0591fa4b2d9; LAPACKE 3.10.0",
+  "automatic_kernel": "Cooperlake",
+  "failing_routine": "dtrsm (dtrsv correct)",
+  "max_error_untransposed_by_order": {
+   "17": 1.1e-16,
+   "32": 0.116,
+   "65": 0.345,
+   "129": 0.784
+  },
+  "correct_kernels_same_library": {
+   "SkylakeX": "errors at most 1e-15 at every order",
+   "Haswell": "tests pass"
+  },
+  "rapidglm_tests_default_kernel": "15,450 failed assertions, all in the two Cholesky tests above 16 columns; 20/20 CLI tests pass",
+  "workaround_verified": "OPENBLAS_CORETYPE=SkylakeX: ctest 2/2, CLI 20/20",
+  "not_established": "the upstream defect; behaviour of other OpenBLAS versions"
+ },
+ "change": "in-house Cholesky (factor, solve, inverse, exact condition number) at every order and in-house QR back substitution and (R'R)^-1; CMake option RAPIDGLM_LAPACK_SOLVES restores LAPACK above 16 columns and for the QR triangular solves",
+ "output_comparison": {
+  "host": "local server, pthread OpenBLAS 0.3.20 (Haswell kernel), 12 threads, untimed",
+  "builds": {
+   "previous": "f8c30d5",
+   "default": "this commit",
+   "lapack": "this commit with RAPIDGLM_LAPACK_SOLVES=ON"
+  },
+  "sceptre_gasperini_10_targets_x_1000_genes": {
+   "pairs": 10000,
+   "default_vs_previous": "byte-identical",
+   "lapack_vs_previous": "byte-identical"
+  },
+  "bulk_de_airway": {
+   "genes": 22369,
+   "lapack_vs_previous": "byte-identical",
+   "default_vs_previous": {
+    "rows_differing": 99,
+    "largest_relative_difference": 2.8e-13,
+    "discoveries_at_0.1": [
+     5142,
+     5142
+    ],
+    "discoveries_in_common": 5142
+   }
+  },
+  "bulk_de_thyroid128": {
+   "genes": 28769,
+   "lapack_vs_previous": "byte-identical",
+   "default_vs_previous": {
+    "rows_differing": 1,
+    "largest_relative_difference": 4.6e-14,
+    "discoveries_at_0.1": [
+     463,
+     463
+    ],
+    "discoveries_in_common": 463
+   }
+  }
+ },
+ "tests": "ctest and tests/test_cli.py pass in both configurations; qr_large_system_solution_and_inverse added (65 columns)"
+}

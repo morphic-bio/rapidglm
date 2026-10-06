@@ -1,0 +1,53 @@
+{
+  "scope": "Validation-only harness additions; production headers and CLI unchanged",
+  "checks": [
+    {
+      "command": "cmake --build build -j2",
+      "exit_code": 0
+    },
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 ctest --test-dir build --output-on-failure",
+      "exit_code": 0,
+      "cpp_cases": 32
+    },
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 python3 tests/test_cli.py build/rapidglm",
+      "exit_code": 0,
+      "cli_cases": 6
+    },
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 build-sanitize/rapidglm_calibration_audit validation/work/deviation-audit/e1-sanitize.tsv 1000",
+      "exit_code": 0,
+      "datasets": 1000,
+      "independent_score_and_p_calculation": true
+    },
+    {
+      "command": "Rscript scripts/audit_deviations.R atac validation/work/deviation-audit",
+      "exit_code": 0,
+      "scope": "Final Rcpp bridge build and 18 paired R/native fits"
+    },
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 Rscript: final Rcpp bridge on captured known_dense dataset 1",
+      "exit_code": 0,
+      "scope": "Six paired empirical/staged, known/fitted outputs match original ablation within 1e-14"
+    }
+  ],
+  "sanitizer_pvalues_match_release": true,
+  "source_sha256": {
+    "tests/audit_calibration.cpp": "91c7a464e95b1ec189bf184d3aa17f87e4067171cc3f36295942fcc48d2a75c8",
+    "tests/deviation_bridge.cpp": "2c9b1c7121ea335e0568f0fdba2314c54699fea553f075d5d6171a1e128c4d47",
+    "scripts/audit_deviations.R": "5832a795c576daf086dee1d311211c08f53ba320bbd6e55be17a8697ffbea0e0",
+    "scripts/audit_public_sceptre.R": "d0793d27912b92dea380fe780581d27e85394647ff62d0645fa4ad7d527b1ad6",
+    "scripts/audit_deviations.py": "394e8f56fef9ad39f57599c40ae4c9c6c969dd5333bdfa49b9f59117232f278b"
+  },
+  "artifact_sha256": {
+    "validation/work/deviation-audit/build-check.log": "862135374fa55b2ff2d9f95ce3d03271524a50dd12d8f9bf10bf23faa6f026d1",
+    "validation/work/deviation-audit/test-check.log": "7bd7d5657f8a22cc3eadf7e149f33f89aae0cbe6be2d68b345635fb8aecd32b8",
+    "validation/work/deviation-audit/cli-check.log": "8e83c9e30711d3808140522c0a784c32a4a16bd2d9a482bfdc79f43bb50d7c5e",
+    "validation/work/deviation-audit/sanitize-build.log": "8fc8bc64a7becea299a7b9d943d958dfca8e8cd19b919fda1e24f425fb6b5516",
+    "validation/work/deviation-audit/sanitize-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validation/work/deviation-audit/e1-sanitize.tsv": "b12d0ff04c862f2a46e4350e0ab440545257320af8aafff26e52775600433eac",
+    "validation/work/deviation-audit/atac.log": "de466b940803a8b88f3b65ded681925e4bd9151058eca530c67cc96bda7b7e0d",
+    "validation/work/deviation-audit/bridge-smoke.log": "d18c52658865fc5bbc7ee402b393bf206a23fded41a7c2173c90425d0cb31147"
+  }
+}

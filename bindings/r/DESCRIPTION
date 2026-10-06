@@ -1,0 +1,17 @@
+Package: rapidglm
+Title: Fast and Numerically Stable Generalized Linear Model Fitting
+Version: 1.0.0
+Authors@R: person("Ling-Hong", "Hung", email = "lhhunghimself@gmail.com",
+    role = c("aut", "cre"))
+Description: A fitting method for stats::glm() and a negative binomial fit
+    returning MASS::glm.nb()-compatible objects, backed by the RapidGLM C++
+    engine. Poisson (log), binomial (logit) and negative binomial (log) models
+    are fitted natively; Gaussian and other families use stats::glm.fit().
+    Bulk differential expression by the DESeq2 procedure (bulk_de()) and
+    perturbation screen analysis by the SCEPTRE method (sceptre()) run through
+    the RapidGLM C interface.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Imports: stats, methods, MASS, Matrix
+LinkingTo: cpp11
+SystemRequirements: C++17, Boost headers

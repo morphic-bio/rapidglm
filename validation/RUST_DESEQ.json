@@ -1,0 +1,231 @@
+{
+ "description": "Rust port of PyDESeq2's workflow (bindings/rust, examples/deseq.rs) against PyDESeq2 0.5.2 run as a black box with RapidGLM's inference back end (rapidglm.pydeseq2.RapidGLMInference), contrast = last design column. Produced by bindings/rust/tests/compare_pydeseq2.py.",
+ "date": "2026-10-01",
+ "rapidglm_commit": "ca45620 plus uncommitted bindings/rust",
+ "timing_note": "host load average about 35 (shared machine); times are indicative only. PyDESeq2 with 8 workers; Rust with all cores.",
+ "differences_note": "Differences above 1e-6 come mainly from the dispersion trend, which PyDESeq2 fits by L-BFGS-B to a looser tolerance (trend coefficients differ by about 1e-5 relative); with PyDESeq2's trend coefficients injected (RAPIDGLM_TREND) airway agrees except genes with an all-zero design group (ill-posed fits). On thyroid32 the 42 genes with different missing p-values are Cook's outlier calls, from samples with leverage 1 (13 samples alone in their design cell).",
+ "runs": [
+  {
+   "data": "validation/work/bulk/airway",
+   "samples": 8,
+   "genes": 22369,
+   "pydeseq2_rapidglm_seconds": 5.74,
+   "rust_seconds": 0.34,
+   "columns": {
+    "baseMean": {
+     "max_relative": 7.167681902154538e-16,
+     "over_1e-6": 0,
+     "over_1e-3": 0,
+     "missing_mismatch": 0
+    },
+    "log2FoldChange": {
+     "max_relative": 3.655538825837593,
+     "over_1e-6": 14618,
+     "over_1e-3": 225,
+     "missing_mismatch": 0
+    },
+    "lfcSE": {
+     "max_relative": 0.05051832182294422,
+     "over_1e-6": 22052,
+     "over_1e-3": 1,
+     "missing_mismatch": 0
+    },
+    "stat": {
+     "max_relative": 3.655163658848661,
+     "over_1e-6": 22029,
+     "over_1e-3": 216,
+     "missing_mismatch": 0
+    },
+    "pvalue": {
+     "max_relative": 0.05251184323641492,
+     "over_1e-6": 21813,
+     "over_1e-3": 1650,
+     "missing_mismatch": 0
+    },
+    "padj": {
+     "max_relative": 0.021143157824887713,
+     "over_1e-6": 17694,
+     "over_1e-3": 1546,
+     "missing_mismatch": 0
+    }
+   },
+   "calls": {
+    "rust": 3917,
+    "pydeseq2": 3917,
+    "both": 3917,
+    "jaccard": 1.0
+   },
+   "dataset": "airway"
+  },
+  {
+   "data": "validation/work/benchmark/thyroid32",
+   "samples": 32,
+   "genes": 28769,
+   "pydeseq2_rapidglm_seconds": 7.8,
+   "rust_seconds": 1.2,
+   "columns": {
+    "baseMean": {
+     "max_relative": 2.1023910697032952e-15,
+     "over_1e-6": 0,
+     "over_1e-3": 0,
+     "missing_mismatch": 0
+    },
+    "log2FoldChange": {
+     "max_relative": 1.248124339838423,
+     "over_1e-6": 2760,
+     "over_1e-3": 3,
+     "missing_mismatch": 0
+    },
+    "lfcSE": {
+     "max_relative": 0.6184296725970022,
+     "over_1e-6": 9785,
+     "over_1e-3": 1,
+     "missing_mismatch": 0
+    },
+    "stat": {
+     "max_relative": 1.6502715804113481,
+     "over_1e-6": 9431,
+     "over_1e-3": 3,
+     "missing_mismatch": 0
+    },
+    "pvalue": {
+     "max_relative": 0.13702037282462062,
+     "over_1e-6": 11984,
+     "over_1e-3": 2,
+     "missing_mismatch": 42
+    },
+    "padj": {
+     "max_relative": 0.035590686549035945,
+     "over_1e-6": 28634,
+     "over_1e-3": 13411,
+     "missing_mismatch": 42
+    }
+   },
+   "calls": {
+    "rust": 1232,
+    "pydeseq2": 1252,
+    "both": 1232,
+    "jaccard": 0.9840255591054313
+   },
+   "dataset": "thyroid32"
+  },
+  {
+   "data": "validation/work/benchmark/thyroid128",
+   "samples": 128,
+   "genes": 28769,
+   "pydeseq2_rapidglm_seconds": 9.38,
+   "rust_seconds": 3.47,
+   "columns": {
+    "baseMean": {
+     "max_relative": 0.2387121932791845,
+     "over_1e-6": 1,
+     "over_1e-3": 1,
+     "missing_mismatch": 0
+    },
+    "log2FoldChange": {
+     "max_relative": 0.08491718780385753,
+     "over_1e-6": 292,
+     "over_1e-3": 1,
+     "missing_mismatch": 0
+    },
+    "lfcSE": {
+     "max_relative": 0.050724231903769325,
+     "over_1e-6": 1,
+     "over_1e-3": 1,
+     "missing_mismatch": 0
+    },
+    "stat": {
+     "max_relative": 0.12909326309326968,
+     "over_1e-6": 379,
+     "over_1e-3": 1,
+     "missing_mismatch": 0
+    },
+    "pvalue": {
+     "max_relative": 0.00016247078072505438,
+     "over_1e-6": 1546,
+     "over_1e-3": 0,
+     "missing_mismatch": 0
+    },
+    "padj": {
+     "max_relative": 0.00016247078072522867,
+     "over_1e-6": 1572,
+     "over_1e-3": 0,
+     "missing_mismatch": 0
+    }
+   },
+   "calls": {
+    "rust": 458,
+    "pydeseq2": 458,
+    "both": 458,
+    "jaccard": 1.0
+   },
+   "dataset": "thyroid128"
+  },
+  {
+   "data": "validation/work/benchmark/thyroid",
+   "samples": 647,
+   "genes": 28769,
+   "pydeseq2_rapidglm_seconds": 26.73,
+   "rust_seconds": 19.38,
+   "columns": {
+    "baseMean": {
+     "max_relative": 3.585340219372056e-15,
+     "over_1e-6": 0,
+     "over_1e-3": 0,
+     "missing_mismatch": 0
+    },
+    "log2FoldChange": {
+     "max_relative": 3.0244285992997674e-06,
+     "over_1e-6": 2,
+     "over_1e-3": 0,
+     "missing_mismatch": 0
+    },
+    "lfcSE": {
+     "max_relative": 1.4847827209215086e-08,
+     "over_1e-6": 0,
+     "over_1e-3": 0,
+     "missing_mismatch": 0
+    },
+    "stat": {
+     "max_relative": 3.0115669468174853e-06,
+     "over_1e-6": 2,
+     "over_1e-3": 0,
+     "missing_mismatch": 0
+    },
+    "pvalue": {
+     "max_relative": 9.58315094744659e-07,
+     "over_1e-6": 0,
+     "over_1e-3": 0,
+     "missing_mismatch": 0
+    },
+    "padj": {
+     "max_relative": 9.58315094804929e-07,
+     "over_1e-6": 0,
+     "over_1e-3": 0,
+     "missing_mismatch": 0
+    }
+   },
+   "calls": {
+    "rust": 5516,
+    "pydeseq2": 5516,
+    "both": 5516,
+    "jaccard": 1.0
+   },
+   "dataset": "thyroid"
+  }
+ ],
+ "cooks_leverage_one_thyroid32": {
+  "note": "Genes whose p-value is dropped as a Cook's outlier, against R DESeq2 1.48.2 run as a black box on the same design matrix (results(): NA p-value with baseMean > 0). PyDESeq2 computes 0/0 at leverage-1 samples (5,779 infinite distances); the Rust port sets them to 0; DESeq2's distances at those samples are mostly 0 (median 0, no infinities).",
+  "deseq2": 128,
+  "rust": 110,
+  "pydeseq2_rapidglm": 70,
+  "jaccard_rust_deseq2": 0.845,
+  "jaccard_pydeseq2_deseq2": 0.547,
+  "mismatched_genes": {
+   "total": 42,
+   "rust_only": 41,
+   "pydeseq2_only": 1,
+   "pydeseq2_max_at_leverage_one_sample": 38
+  }
+ }
+}

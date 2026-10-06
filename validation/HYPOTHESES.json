@@ -1,0 +1,223 @@
+{
+ "purpose": "Validation of contrasts and joint (multi-df) hypotheses in bulk-de and pseudobulk-de.",
+ "commit": "09f1ec6f2b2455fa91e7d1c0939552d8b0fe5b69",
+ "worktree_dirty": true,
+ "command": "python3 scripts/validate_hypotheses.py --work DIR --output validation/HYPOTHESES.json",
+ "hypotheses": {
+  "airway_cell_contrast": {
+   "dataset": "airway",
+   "kind": "contrast",
+   "spec": [
+    0,
+    -1,
+    1,
+    0,
+    0
+   ],
+   "bulk": {
+    "discoveries": [
+     2566,
+     2368
+    ],
+    "jaccard": 0.9124031007751938,
+    "pvalue_spearman": 0.9980178870566857,
+    "log2fc_median_abs_diff": 0.00024003288331708728
+   },
+   "ql": {
+    "discoveries": {
+     "rapidglm": 2094,
+     "edgeR_ql": 2375,
+     "glmGamPoi_ql": 2113
+    },
+    "spearman_glmgampoi": 0.999157975913984,
+    "spearman_edger": 0.9966751932614054,
+    "jaccard_glmgampoi": 0.9431870669745959,
+    "jaccard_edger": 0.8512841756420878
+   },
+   "equivalence": {
+    "bulk-de:wald": {
+     "max_rel_diff": 0.5429670764238577,
+     "finite_mismatches": 1,
+     "discovery_jaccard": 0.9992211838006231,
+     "prior_variance": [
+      0.6966966966966966,
+      0.6986986986986987
+     ],
+     "genewise_dispersions_differing": 6
+    },
+    "bulk-de:lrt": {
+     "max_rel_diff": 0.4993869428945223,
+     "finite_mismatches": 1,
+     "discovery_jaccard": 0.999609984399376,
+     "prior_variance": [
+      0.6966966966966966,
+      0.6986986986986987
+     ],
+     "genewise_dispersions_differing": 6
+    },
+    "pseudobulk-de:ql": {
+     "max_rel_diff": 0.08991730781717475,
+     "finite_mismatches": 0,
+     "discovery_jaccard": 0.998093422306959
+    },
+    "pseudobulk-de:lr": {
+     "max_rel_diff": 3.6136093070369375e-10,
+     "finite_mismatches": 0,
+     "discovery_jaccard": 1.0
+    },
+    "pseudobulk-de:wald": {
+     "max_rel_diff": 1.0979254447595006e-06,
+     "finite_mismatches": 0,
+     "discovery_jaccard": 1.0
+    }
+   }
+  },
+  "airway_cells_joint": {
+   "dataset": "airway",
+   "kind": "lrt",
+   "spec": [
+    1,
+    2,
+    3
+   ],
+   "bulk": {
+    "discoveries": [
+     4350,
+     4009
+    ],
+    "jaccard": 0.9080118694362018,
+    "pvalue_spearman": 0.9981749100206823
+   },
+   "ql": {
+    "discoveries": {
+     "rapidglm": 3527,
+     "edgeR_ql": 4041,
+     "glmGamPoi_ql": 3628
+    },
+    "spearman_glmgampoi": 0.9990521316853057,
+    "spearman_edger": 0.9923237856865499,
+    "jaccard_glmgampoi": 0.9406021155410903,
+    "jaccard_edger": 0.8463039765796536
+   },
+   "identical_1_and_4_threads": {
+    "bulk-de": true,
+    "pseudobulk-de": true
+   }
+  },
+  "kang_donor_contrast": {
+   "dataset": "kang",
+   "kind": "contrast",
+   "spec": [
+    0,
+    0,
+    0,
+    1,
+    0,
+    -1,
+    0,
+    0,
+    0
+   ],
+   "bulk": {
+    "discoveries": [
+     3,
+     1
+    ],
+    "jaccard": 0.0,
+    "pvalue_spearman": 0.9895633375633376,
+    "log2fc_median_abs_diff": 0.002442875295591125
+   },
+   "ql": {
+    "discoveries": {
+     "rapidglm": 0,
+     "edgeR_ql": 0,
+     "glmGamPoi_ql": 0
+    },
+    "spearman_glmgampoi": 0.9921268194745942,
+    "spearman_edger": 0.9838808583640273,
+    "jaccard_glmgampoi": null,
+    "jaccard_edger": null
+   },
+   "equivalence": {
+    "bulk-de:wald": {
+     "max_rel_diff": 1.948712643633716e-13,
+     "finite_mismatches": 0,
+     "discovery_jaccard": 1.0,
+     "prior_variance": [
+      0.8213873521448072,
+      0.8213873521447028
+     ],
+     "genewise_dispersions_differing": 0
+    },
+    "bulk-de:lrt": {
+     "max_rel_diff": 2.0132090745086443e-11,
+     "finite_mismatches": 0,
+     "discovery_jaccard": 1.0,
+     "prior_variance": [
+      0.8213873521448072,
+      0.8213873521447028
+     ],
+     "genewise_dispersions_differing": 0
+    },
+    "pseudobulk-de:ql": {
+     "max_rel_diff": 2.4594137445270542e-08,
+     "finite_mismatches": 0,
+     "discovery_jaccard": null
+    },
+    "pseudobulk-de:lr": {
+     "max_rel_diff": 8.428871852620468e-11,
+     "finite_mismatches": 0,
+     "discovery_jaccard": 1.0
+    },
+    "pseudobulk-de:wald": {
+     "max_rel_diff": 0.0,
+     "finite_mismatches": 0,
+     "discovery_jaccard": 1.0
+    }
+   }
+  },
+  "kang_donors_joint": {
+   "dataset": "kang",
+   "kind": "lrt",
+   "spec": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "bulk": {
+    "discoveries": [
+     64,
+     64
+    ],
+    "jaccard": 0.8285714285714286,
+    "pvalue_spearman": 0.9814240774240774
+   },
+   "ql": {
+    "discoveries": {
+     "rapidglm": 20,
+     "edgeR_ql": 36,
+     "glmGamPoi_ql": 11
+    },
+    "spearman_glmgampoi": 0.9784650309410965,
+    "spearman_edger": 0.9762984633548227,
+    "jaccard_glmgampoi": 0.55,
+    "jaccard_edger": 0.5555555555555556
+   },
+   "identical_1_and_4_threads": {
+    "bulk-de": true,
+    "pseudobulk-de": true
+   }
+  }
+ },
+ "gates": {
+  "G1_equivalence": false,
+  "G2_bulk_deseq2": false,
+  "G3_ql_references": true,
+  "G4_threads": true
+ },
+ "passed": false
+}

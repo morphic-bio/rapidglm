@@ -1,0 +1,302 @@
+{
+ "purpose": "Second calibration check for the pseudobulk QL test: simulated null data.",
+ "commit": "09f1ec6f2b2455fa91e7d1c0939552d8b0fe5b69",
+ "worktree_dirty": true,
+ "command": "python3 scripts/validate_ql_simulation.py --work DIR --output validation/QL_SIMULATION.json",
+ "gate": {
+  "rate_0_05": [
+   0.035,
+   0.055
+  ],
+  "rate_0_01": 0.012,
+  "rate_0_001": 0.0015,
+  "valid": 0.995
+ },
+ "configurations": {
+  "A": {
+   "rapidglm_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.049825,
+    "rate_0_01": 0.01,
+    "rate_0_001": 0.001125
+   },
+   "rapidglm_lr": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.117675,
+    "rate_0_01": 0.036475,
+    "rate_0_001": 0.0063
+   },
+   "rapidglm_wald": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.165125,
+    "rate_0_01": 0.083175,
+    "rate_0_001": 0.03795
+   },
+   "rapidglm_bulk-de": {
+    "tests": 40000,
+    "valid": 0.999675,
+    "rate_0_05": 0.044989621627028784,
+    "rate_0_01": 0.011003576162252731,
+    "rate_0_001": 0.002475804636506865
+   },
+   "edgeR_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.050125,
+    "rate_0_01": 0.0098,
+    "rate_0_001": 0.00105
+   },
+   "glmGamPoi_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.050275,
+    "rate_0_01": 0.010025,
+    "rate_0_001": 0.001175
+   },
+   "DESeq2_wald": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.0452,
+    "rate_0_01": 0.011075,
+    "rate_0_001": 0.0025
+   },
+   "design": {
+    "layout": "groups",
+    "per_group_or_donors": 3,
+    "counts": "nb"
+   },
+   "gate_passed": true
+  },
+  "B": {
+   "rapidglm_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.049825,
+    "rate_0_01": 0.010675,
+    "rate_0_001": 0.000925
+   },
+   "rapidglm_lr": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.084775,
+    "rate_0_01": 0.02355,
+    "rate_0_001": 0.0038
+   },
+   "rapidglm_wald": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.109925,
+    "rate_0_01": 0.04525,
+    "rate_0_001": 0.015975
+   },
+   "rapidglm_bulk-de": {
+    "tests": 40000,
+    "valid": 0.999525,
+    "rate_0_05": 0.05007378504789775,
+    "rate_0_01": 0.013081213576448814,
+    "rate_0_001": 0.002451164303043946
+   },
+   "edgeR_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.0508,
+    "rate_0_01": 0.0109,
+    "rate_0_001": 0.0011
+   },
+   "glmGamPoi_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.0501,
+    "rate_0_01": 0.01085,
+    "rate_0_001": 0.00095
+   },
+   "DESeq2_wald": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.05035,
+    "rate_0_01": 0.0132,
+    "rate_0_001": 0.002475
+   },
+   "design": {
+    "layout": "groups",
+    "per_group_or_donors": 5,
+    "counts": "nb"
+   },
+   "gate_passed": true
+  },
+  "C": {
+   "rapidglm_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.0518,
+    "rate_0_01": 0.010075,
+    "rate_0_001": 0.00115
+   },
+   "rapidglm_lr": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.069075,
+    "rate_0_01": 0.01695,
+    "rate_0_001": 0.002
+   },
+   "rapidglm_wald": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.082375,
+    "rate_0_01": 0.026125,
+    "rate_0_001": 0.0059
+   },
+   "rapidglm_bulk-de": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.053825,
+    "rate_0_01": 0.012575,
+    "rate_0_001": 0.0019
+   },
+   "edgeR_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.0526,
+    "rate_0_01": 0.0107,
+    "rate_0_001": 0.001275
+   },
+   "glmGamPoi_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.051725,
+    "rate_0_01": 0.010025,
+    "rate_0_001": 0.00115
+   },
+   "DESeq2_wald": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.054,
+    "rate_0_01": 0.012575,
+    "rate_0_001": 0.001875
+   },
+   "design": {
+    "layout": "groups",
+    "per_group_or_donors": 10,
+    "counts": "nb"
+   },
+   "gate_passed": true
+  },
+  "D": {
+   "rapidglm_ql": {
+    "tests": 40000,
+    "valid": 0.9994,
+    "rate_0_05": 0.049054432659595755,
+    "rate_0_01": 0.009430658395037022,
+    "rate_0_001": 0.0008505103061837102
+   },
+   "rapidglm_lr": {
+    "tests": 40000,
+    "valid": 0.9994,
+    "rate_0_05": 0.19349109465679407,
+    "rate_0_01": 0.08612667600560336,
+    "rate_0_001": 0.028642185311186712
+   },
+   "rapidglm_wald": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.21905,
+    "rate_0_01": 0.115925,
+    "rate_0_001": 0.0537
+   },
+   "rapidglm_bulk-de": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.0475,
+    "rate_0_01": 0.0115,
+    "rate_0_001": 0.00205
+   },
+   "edgeR_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.0491,
+    "rate_0_01": 0.00945,
+    "rate_0_001": 0.000825
+   },
+   "glmGamPoi_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.0494,
+    "rate_0_01": 0.009525,
+    "rate_0_001": 0.0009
+   },
+   "DESeq2_wald": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.047525,
+    "rate_0_01": 0.011525,
+    "rate_0_001": 0.002075
+   },
+   "design": {
+    "layout": "paired",
+    "per_group_or_donors": 8,
+    "counts": "nb"
+   },
+   "gate_passed": true
+  },
+  "E": {
+   "rapidglm_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.05365,
+    "rate_0_01": 0.0118,
+    "rate_0_001": 0.001175
+   },
+   "rapidglm_lr": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.0891,
+    "rate_0_01": 0.024725,
+    "rate_0_001": 0.00355
+   },
+   "rapidglm_wald": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.11765,
+    "rate_0_01": 0.0467,
+    "rate_0_001": 0.0168
+   },
+   "rapidglm_bulk-de": {
+    "tests": 40000,
+    "valid": 0.9994,
+    "rate_0_05": 0.05363217930758455,
+    "rate_0_01": 0.013833299979987992,
+    "rate_0_001": 0.002501500900540324
+   },
+   "edgeR_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.05445,
+    "rate_0_01": 0.01205,
+    "rate_0_001": 0.0013
+   },
+   "glmGamPoi_ql": {
+    "tests": 40000,
+    "valid": 1.0,
+    "rate_0_05": 0.05365,
+    "rate_0_01": 0.011875,
+    "rate_0_001": 0.001225
+   },
+   "DESeq2_wald": {
+    "tests": 40000,
+    "valid": 0.999975,
+    "rate_0_05": 0.05390134753368834,
+    "rate_0_01": 0.013875346883672092,
+    "rate_0_001": 0.002475061876546914
+   },
+   "design": {
+    "layout": "groups",
+    "per_group_or_donors": 5,
+    "counts": "lognormal"
+   }
+  }
+ },
+ "passed": true
+}

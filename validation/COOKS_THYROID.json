@@ -1,0 +1,39 @@
+{
+  "purpose": "Bulk DE agreement with DESeq2 1.48.2 on GTEx thyroid with Cook's-distance filtering disabled in both tools (docs/BULK_DE.md, larger multi-factor designs)",
+  "commands": {
+    "rapidglm": "rapidglm bulk-de with cooks_filter=false, coefficient sex[T.female]",
+    "deseq2": "DESeq(full = design, betaPrior = FALSE) then results(name = 'sex.T.female.', cooksCutoff = FALSE)"
+  },
+  "datasets": {
+    "thyroid128": {
+      "discoveries": [
+        866,
+        884
+      ],
+      "jaccard": 0.9707207207207207,
+      "pvalue_spearman": 0.9932097225518984
+    },
+    "thyroid": {
+      "discoveries": [
+        7050,
+        7180
+      ],
+      "jaccard": 0.9643843180563225,
+      "pvalue_spearman": 0.9819228553241379
+    }
+  },
+  "alpha_rob_black_box": {
+    "method": "alpha_rob = ((y-mu)^2/R^2 - mu)/mu^2 with R^2 = D p (1-h)^2/h from DESeq2's cooks, mu and H assays",
+    "floor": 0.04,
+    "share_at_floor": {
+      "airway": 0.5560820778756315,
+      "thyroid128": 0.02613924710626021
+    },
+    "flags_thyroid128": {
+      "deseq2": 224,
+      "rapidglm": 751,
+      "rapidglm_rule_with_deseq2_alpha_rob": 224,
+      "best_tested_candidate_jaccard": 0.477
+    }
+  }
+}

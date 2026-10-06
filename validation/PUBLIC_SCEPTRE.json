@@ -1,0 +1,242 @@
+{
+  "gate": "G4",
+  "thresholds": "provisional",
+  "command": "python3 scripts/compare_public.py",
+  "data": {
+    "repository": "https://github.com/katsevich-lab/sceptredata",
+    "commit": "ec722d5df90dfd34ace6cc9a5745ab6a5c2a6731",
+    "files": {
+      "lowmoi_example_data.rda": "https://raw.githubusercontent.com/katsevich-lab/sceptredata/ec722d5df90dfd34ace6cc9a5745ab6a5c2a6731/data/lowmoi_example_data.rda",
+      "highmoi_example_data.rda": "https://raw.githubusercontent.com/katsevich-lab/sceptredata/ec722d5df90dfd34ace6cc9a5745ab6a5c2a6731/data/highmoi_example_data.rda",
+      "grna_target_data_frame_highmoi.rda": "https://raw.githubusercontent.com/katsevich-lab/sceptredata/ec722d5df90dfd34ace6cc9a5745ab6a5c2a6731/data/grna_target_data_frame_highmoi.rda"
+    },
+    "data_sha256": {
+      "lowmoi_example_data.rda": "e3f8ad09bb4b1d0deeeec2850a2d96f8f5062fef31a9ab1cc080e60560421b6a",
+      "grna_target_data_frame_highmoi.rda": "3248a73b22795777ab5a08e5b03fff17ace891f882d4430da795d36b29f8f360",
+      "highmoi_example_data.rda": "1bb2ad581238fdd94c925985248b22444471d627b1e24a098febdf577f597f94"
+    }
+  },
+  "panels": [
+    {
+      "panel": "S1_public",
+      "reference": {
+        "version": "0.99.0",
+        "cells": 20729,
+        "features": 299,
+        "discovery_seconds": 1.648,
+        "power_seconds": 0.566,
+        "calibration_seconds": 0.479,
+        "scope": "full public sceptredata example cells; fixed threshold-5 calls; discovery and positive control panels matched; negative control family separately sampled"
+      },
+      "native_run": {
+        "version": "0.1.0",
+        "command": "sceptre",
+        "config_path": "validation/work/public-sceptre/S1_public/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/responses.mtx",
+          "assignments": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/assignments.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/design.tsv",
+          "guides": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/guides.tsv",
+          "pairs": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/pairs.tsv",
+          "output": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/native",
+          "family": "nb",
+          "moi": "low",
+          "control_group": "nt_cells",
+          "resampling_mechanism": "permutations",
+          "cell_qc": false,
+          "seed": 20260926,
+          "budgets": [
+            499,
+            4999
+          ],
+          "threads": 2
+        },
+        "input_sha1": {
+          "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/assignments.mtx": "13c8ad46ff54a9b94df2530ae7b5d5ed330d473b",
+          "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/design.tsv": "1948c49167e837cd5071c1b10b18d9b2bdeb75c0",
+          "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/guides.tsv": "b037bc0586c95364fe375e1d9bbf3dc5e5de75b1",
+          "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/pairs.tsv": "f5b18bfec791d29d7d0f1807c0b80894b4b243af",
+          "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S1_public/responses.mtx": "b8f5cc6798c0cdafe63ee32e1b286341e5331054",
+          "validation/work/public-sceptre/S1_public/config.json": "8f1f472d9d4cbad6c3b773d90674ed446150e047"
+        },
+        "seed": 20260926,
+        "threads": 2,
+        "observations": 20729,
+        "features": 299,
+        "retained_cells": 16783,
+        "invalid_tests_or_fits": 1,
+        "calibration_rejections": 0,
+        "power_rejections": 9,
+        "discovery_rejections": 32,
+        "wall_seconds": 2.990432883,
+        "peak_rss_kib": 61396,
+        "load_average": [
+          13.05859375,
+          12.5205078125,
+          11.8271484375
+        ],
+        "api_frozen": false
+      },
+      "input_sha256": {
+        "guides.tsv": "8d8109c9039fd949755fcc8aaf3b5f2fc6054622abff5c03d6f80dbe1107aaf8",
+        "design.tsv": "2a1735eae9c4cf1f0baa3cb28aa8a992156fdfb52c81238d8f125c72fe36e86e",
+        "assignments.mtx": "80f9dc2d342016230db0305f6dac2c548ad2dd6813faccc07883e0d56c54dfda",
+        "pairs.tsv": "d67e77ac077eaeffc135528bc55e738bdae874c3ef8f5ad2f68fc29e1ad7c6ba",
+        "responses.mtx": "b0c55de6b5163ce615351870f9c528084d00d0a239cd921a93e2299c1f5fe50a"
+      },
+      "discovery": {
+        "requested_native": 66,
+        "reference_pairs": 66,
+        "matched_pairs": 66,
+        "usable": 66,
+        "p_spearman": 0.9948334708137206,
+        "log2fc_correlation": 0.9927921588394893,
+        "native_discoveries": 32,
+        "reference_discoveries": 32,
+        "discovery_jaccard": 1.0,
+        "shared_sign_agreement": 1.0,
+        "qc_treatment_equal": true,
+        "qc_control_equal": true
+      },
+      "power": {
+        "requested_native": 9,
+        "reference_pairs": 9,
+        "matched_pairs": 9,
+        "usable": 9,
+        "p_spearman": 1.0,
+        "log2fc_correlation": 0.9960540883364111,
+        "native_discoveries": 9,
+        "reference_discoveries": 9,
+        "discovery_jaccard": 1.0,
+        "shared_sign_agreement": 1.0,
+        "qc_treatment_equal": true,
+        "qc_control_equal": true
+      },
+      "calibration": {
+        "scope": "different negative-pair samples; diagnostic, not matched-pair qualification",
+        "native_pairs": 72,
+        "reference_pairs": 72,
+        "native_valid": 71,
+        "reference_valid": 72,
+        "native_BH_01": 0,
+        "reference_BH_01": 0,
+        "native_Bonferroni_01": 0,
+        "reference_Bonferroni_01": 0,
+        "native_QQ_points_outside_pointwise_95": 5
+      }
+    },
+    {
+      "panel": "S2_public",
+      "reference": {
+        "version": "0.99.0",
+        "cells": 45919,
+        "features": 526,
+        "discovery_seconds": 1.697,
+        "power_seconds": 2.301,
+        "calibration_seconds": 6.217,
+        "scope": "full public sceptredata example cells; fixed threshold-5 calls; discovery and positive control panels matched; negative control family separately sampled"
+      },
+      "native_run": {
+        "version": "0.1.0",
+        "command": "sceptre",
+        "config_path": "validation/work/public-sceptre/S2_public/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/responses.mtx",
+          "assignments": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/assignments.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/design.tsv",
+          "guides": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/guides.tsv",
+          "pairs": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/pairs.tsv",
+          "output": "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/native",
+          "family": "nb",
+          "moi": "high",
+          "control_group": "complement",
+          "resampling_mechanism": "crt",
+          "cell_qc": false,
+          "seed": 20260926,
+          "budgets": [
+            499,
+            4999
+          ],
+          "threads": 2
+        },
+        "input_sha1": {
+          "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/assignments.mtx": "af021cafeb65779c2f05d60507f27600adc4e876",
+          "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/design.tsv": "b58d699640b1e038b4170d66128224c3dd9f044e",
+          "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/guides.tsv": "d41b2dd4859a121350b148c124e56af424ae9014",
+          "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/pairs.tsv": "edf9ba38e5d3470be05a87660fb576cfae8b6cf8",
+          "/mnt/pikachu/rapidglm/validation/work/public-sceptre/S2_public/responses.mtx": "2a4ce74d423cc7b92ba76d7f4844cd3b5c6e2cb0",
+          "validation/work/public-sceptre/S2_public/config.json": "4260c34978f5027aadf17cb4d8afc49979a01c46"
+        },
+        "seed": 20260926,
+        "threads": 2,
+        "observations": 45919,
+        "features": 526,
+        "retained_cells": 45919,
+        "invalid_tests_or_fits": 0,
+        "calibration_rejections": 0,
+        "power_rejections": 10,
+        "discovery_rejections": 13,
+        "wall_seconds": 46.522059734,
+        "peak_rss_kib": 297320,
+        "load_average": [
+          12.53271484375,
+          12.44873046875,
+          11.8349609375
+        ],
+        "api_frozen": false
+      },
+      "input_sha256": {
+        "guides.tsv": "55d281b9db03cbfa6f2e53e34fba504cc838f5170baa67041c66541b30d05e92",
+        "design.tsv": "95c71cd5e14a36eefedcd4ed0bc1b61d457991ac2d69e850698fffb44d6b18ed",
+        "assignments.mtx": "84f2290b5242700f0b30fbf665b1c6708e934d7629047026a754d7a8bfb3d51f",
+        "pairs.tsv": "fbd1150cefc02f8bc61f9598f05d63ef763490eb0556d03d9b8f1eb6593a6a63",
+        "responses.mtx": "74e138fa8ece4087a8988516238af7d2c44e30c697b8090cdc3ddd1c7e16cb0f"
+      },
+      "discovery": {
+        "requested_native": 66,
+        "reference_pairs": 66,
+        "matched_pairs": 66,
+        "usable": 66,
+        "p_spearman": 0.9911899845231998,
+        "log2fc_correlation": 0.9905841024658752,
+        "native_discoveries": 13,
+        "reference_discoveries": 11,
+        "discovery_jaccard": 0.8461538461538461,
+        "shared_sign_agreement": 1.0,
+        "qc_treatment_equal": true,
+        "qc_control_equal": true
+      },
+      "power": {
+        "requested_native": 10,
+        "reference_pairs": 10,
+        "matched_pairs": 10,
+        "usable": 10,
+        "p_spearman": 0.9264501099011717,
+        "log2fc_correlation": 0.9986815444101548,
+        "native_discoveries": 10,
+        "reference_discoveries": 10,
+        "discovery_jaccard": 1.0,
+        "shared_sign_agreement": 1.0,
+        "qc_treatment_equal": true,
+        "qc_control_equal": true
+      },
+      "calibration": {
+        "scope": "different negative-pair samples; diagnostic, not matched-pair qualification",
+        "native_pairs": 72,
+        "reference_pairs": 72,
+        "native_valid": 72,
+        "reference_valid": 72,
+        "native_BH_01": 0,
+        "reference_BH_01": 0,
+        "native_Bonferroni_01": 0,
+        "reference_Bonferroni_01": 0,
+        "native_QQ_points_outside_pointwise_95": 0
+      }
+    }
+  ],
+  "limitations": [
+    "Discovery and power panels matched; negative-control panels differ.",
+    "Continuous cell QC clipping disabled identically; low-MOI assignment QC enabled.",
+    "No complete matched negative and positive control families on the other panels; no full G4 qualification."
+  ]
+}

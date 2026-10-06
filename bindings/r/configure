@@ -1,0 +1,11 @@
+#!/bin/sh
+# Inside the RapidGLM repository, install the engine headers from ../../include.
+if [ -d ../../include/rapidglm ]; then
+  mkdir -p inst/include
+  rm -rf inst/include/rapidglm
+  cp -R ../../include/rapidglm inst/include/
+fi
+# The C interface the application functions call, compiled into the package.
+if [ -f ../../src/c_api.cpp ]; then
+  cp ../../src/c_api.cpp src/c_api.cpp
+fi

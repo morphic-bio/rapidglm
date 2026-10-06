@@ -1,0 +1,701 @@
+{
+ "description": "Acceptance of the skew-normal fit to null statistics: the KS check of releases before 1.0.0 against the strict check (fit_check, default strict since 1.0.0)",
+ "date": "2026-10-06",
+ "data": "Gasperini et al. 2019 (GSE120861), 207,324 cells; pairs from 100 targets x 7,418 genes; high MOI, CRT with complement controls, crt_draw hazard, seed 20260930",
+ "direct_counts": {
+  "how": "the 25 pairs that were a discovery in any of three earlier runs of the panel and one further pair whose result differed between random streams, each repeated 50 or 200 times in the pairs file (a repeated pair has independent draws), 19,999 null statistics per repeat written by a scratch build of commit e572ec9; the tail beyond the observed statistic counted over all of a pair's draws (1 or 4 million)",
+  "contradicted": "the count beyond the statistic has probability below 1/1,000 as a Poisson count with the expectation of the median KS-accepted skew-normal p-value",
+  "pairs_contradicted": 7,
+  "of_them_discoveries_in_an_earlier_run": 6,
+  "of_them_significant_in_sceptre_0_99_0_bridges2_run": 5,
+  "note": "all contradicted pairs have positive statistics (the null has a heavy right tail); 16 of the 19 others have negative ones",
+  "per_pair_acceptance": "percent of repeats in which the default staging (499 / 4,999 / 19,999, screen 0.02) reported a skew-normal p-value; same draws for both checks",
+  "pairs": [
+   {
+    "response": "ENSG00000084453",
+    "response_index": 4521,
+    "target": "chr3.4961_top_two",
+    "statistic": 9.111,
+    "repeats": 200,
+    "direct_count": {
+     "draws": 3999800,
+     "beyond_on_the_smaller_side": 1,
+     "two_sided_p": 1e-06,
+     "expected_beyond_under_the_skew_normal_p": 0.000266
+    },
+    "skew_normal_p_median": 1.33e-10,
+    "accepted_ks_percent": 39.5,
+    "accepted_strict_percent": 0.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 6.22e-11,
+     "significant": true
+    },
+    "class": "contradicted"
+   },
+   {
+    "response": "ENSG00000185222",
+    "response_index": 3134,
+    "target": "chr9.4011_top_two",
+    "statistic": 7.221,
+    "repeats": 200,
+    "direct_count": {
+     "draws": 3999800,
+     "beyond_on_the_smaller_side": 462,
+     "two_sided_p": 0.000232,
+     "expected_beyond_under_the_skew_normal_p": 0.189
+    },
+    "skew_normal_p_median": 9.44e-08,
+    "accepted_ks_percent": 83.5,
+    "accepted_strict_percent": 0.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 3,
+     "p_value": 0.0008,
+     "significant": false
+    },
+    "class": "contradicted"
+   },
+   {
+    "response": "ENSG00000151690",
+    "response_index": 1196,
+    "target": "chr22.1919_top_two",
+    "statistic": 6.824,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 4,
+     "two_sided_p": 1e-05,
+     "expected_beyond_under_the_skew_normal_p": 0.0498
+    },
+    "skew_normal_p_median": 9.97e-08,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 2.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.68e-07,
+     "significant": true
+    },
+    "class": "contradicted"
+   },
+   {
+    "response": "ENSG00000152422",
+    "response_index": 2043,
+    "target": "chr5.980_top_two",
+    "statistic": 6.523,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 21,
+     "two_sided_p": 4.4e-05,
+     "expected_beyond_under_the_skew_normal_p": 0.0271
+    },
+    "skew_normal_p_median": 5.43e-08,
+    "accepted_ks_percent": 98.0,
+    "accepted_strict_percent": 0.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.96e-07,
+     "significant": true
+    },
+    "class": "contradicted"
+   },
+   {
+    "response": "ENSG00000138772",
+    "response_index": 1837,
+    "target": "chr9.3066_top_two",
+    "statistic": 6.065,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 7,
+     "two_sided_p": 1.6e-05,
+     "expected_beyond_under_the_skew_normal_p": 1.04
+    },
+    "skew_normal_p_median": 2.08e-06,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 42.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.63e-06,
+     "significant": true
+    },
+    "class": "contradicted"
+   },
+   {
+    "response": "ENSG00000083123",
+    "response_index": 2536,
+    "target": "chr6.4971_second_two",
+    "statistic": 5.577,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 15,
+     "two_sided_p": 3.2e-05,
+     "expected_beyond_under_the_skew_normal_p": 0.382
+    },
+    "skew_normal_p_median": 7.65e-07,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 44.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.04e-06,
+     "significant": true
+    },
+    "class": "contradicted"
+   },
+   {
+    "response": "ENSG00000131724",
+    "response_index": 3151,
+    "target": "chrX.2160_top_two",
+    "statistic": 5.009,
+    "repeats": 200,
+    "direct_count": {
+     "draws": 3999800,
+     "beyond_on_the_smaller_side": 1893,
+     "two_sided_p": 0.000947,
+     "expected_beyond_under_the_skew_normal_p": 104.0
+    },
+    "skew_normal_p_median": 5.22e-05,
+    "accepted_ks_percent": 79.5,
+    "accepted_strict_percent": 0.0,
+    "discovery_in_an_earlier_run": false,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 4.7e-05,
+     "significant": false
+    },
+    "class": "contradicted"
+   },
+   {
+    "response": "ENSG00000111640",
+    "response_index": 4475,
+    "target": "chr1.11567_top_two",
+    "statistic": -13.49,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 1.05e-33
+    },
+    "skew_normal_p_median": 2.1e-39,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 100.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.18e-38,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000091640",
+    "response_index": 5747,
+    "target": "chr15.2327_top_two",
+    "statistic": -10.158,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 1.79e-19
+    },
+    "skew_normal_p_median": 3.58e-25,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 100.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.86e-25,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000231500",
+    "response_index": 2406,
+    "target": "chr15.2327_top_two",
+    "statistic": -9.302,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 4.85e-16
+    },
+    "skew_normal_p_median": 9.71e-22,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 100.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 9.83e-23,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000177954",
+    "response_index": 534,
+    "target": "chr15.2327_top_two",
+    "statistic": -9.11,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 7.55e-16
+    },
+    "skew_normal_p_median": 1.51e-21,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 96.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.53e-21,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000256269",
+    "response_index": 4420,
+    "target": "chr1.8792_top_two",
+    "statistic": -8.64,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 3.16e-13
+    },
+    "skew_normal_p_median": 6.33e-19,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 100.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.04e-18,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000152422",
+    "response_index": 2043,
+    "target": "chr12.3309_top_two",
+    "statistic": 7.702,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 4.89e-05
+    },
+    "skew_normal_p_median": 9.79e-11,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 0.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 5.67e-10,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000014216",
+    "response_index": 4245,
+    "target": "chr1.4670_top_two",
+    "statistic": -7.691,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 2.91e-10
+    },
+    "skew_normal_p_median": 5.83e-16,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 78.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 5.51e-16,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000108518",
+    "response_index": 5745,
+    "target": "chr15.2327_top_two",
+    "statistic": -6.621,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 4.52e-05
+    },
+    "skew_normal_p_median": 9.05e-11,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 96.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 5.66e-12,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000066651",
+    "response_index": 2597,
+    "target": "chr1.11567_top_two",
+    "statistic": -6.025,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 0.000332
+    },
+    "skew_normal_p_median": 6.64e-10,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 98.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 9.84e-10,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000111540",
+    "response_index": 4639,
+    "target": "chr20.1393_top_two",
+    "statistic": 5.627,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 0.151
+    },
+    "skew_normal_p_median": 3.02e-07,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 100.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 5.08e-07,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000079462",
+    "response_index": 6966,
+    "target": "chr1.11567_top_two",
+    "statistic": -5.494,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 0.0725
+    },
+    "skew_normal_p_median": 1.45e-07,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 98.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 2.03e-07,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000163191",
+    "response_index": 515,
+    "target": "chr15.2327_top_two",
+    "statistic": -5.125,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 1,
+     "two_sided_p": 4e-06,
+     "expected_beyond_under_the_skew_normal_p": 0.355
+    },
+    "skew_normal_p_median": 7.1e-07,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 98.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.35e-06,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000172345",
+    "response_index": 5341,
+    "target": "chr1.11567_top_two",
+    "statistic": -4.983,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 0.0555
+    },
+    "skew_normal_p_median": 1.11e-07,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 100.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.25e-07,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000111843",
+    "response_index": 2264,
+    "target": "chr15.2327_top_two",
+    "statistic": 4.913,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 0.59
+    },
+    "skew_normal_p_median": 1.18e-06,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 100.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 1.89e-06,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000146457",
+    "response_index": 2650,
+    "target": "chr1.11567_top_two",
+    "statistic": -4.824,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 0.715
+    },
+    "skew_normal_p_median": 1.43e-06,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 100.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 2.15e-06,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000099977",
+    "response_index": 7193,
+    "target": "chr15.2327_top_two",
+    "statistic": -4.774,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 2,
+     "two_sided_p": 6e-06,
+     "expected_beyond_under_the_skew_normal_p": 2.07
+    },
+    "skew_normal_p_median": 4.15e-06,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 98.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 4.29e-06,
+     "significant": false
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000120253",
+    "response_index": 2628,
+    "target": "chr11.1726_top_two",
+    "statistic": -4.722,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 0,
+     "two_sided_p": 2e-06,
+     "expected_beyond_under_the_skew_normal_p": 0.565
+    },
+    "skew_normal_p_median": 1.13e-06,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 96.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 4.75e-07,
+     "significant": true
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000170004",
+    "response_index": 5788,
+    "target": "chr1.4670_top_two",
+    "statistic": -4.453,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 1,
+     "two_sided_p": 4e-06,
+     "expected_beyond_under_the_skew_normal_p": 1.71
+    },
+    "skew_normal_p_median": 3.43e-06,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 100.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 3.23e-06,
+     "significant": false
+    },
+    "class": "not contradicted"
+   },
+   {
+    "response": "ENSG00000125895",
+    "response_index": 6348,
+    "target": "chr9.3149_top_two",
+    "statistic": -4.414,
+    "repeats": 50,
+    "direct_count": {
+     "draws": 999950,
+     "beyond_on_the_smaller_side": 3,
+     "two_sided_p": 8e-06,
+     "expected_beyond_under_the_skew_normal_p": 2.85
+    },
+    "skew_normal_p_median": 5.7e-06,
+    "accepted_ks_percent": 100.0,
+    "accepted_strict_percent": 100.0,
+    "discovery_in_an_earlier_run": true,
+    "sceptre_0_99_0": {
+     "stage": 2,
+     "p_value": 3.35e-06,
+     "significant": false
+    },
+    "class": "not contradicted"
+   }
+  ]
+ },
+ "other_pairs_past_the_screen": {
+  "pairs": 400,
+  "ks": {
+   "skew_normal": 296,
+   "empirical_19999": 11,
+   "ended_at_screen": 93,
+   "draws": 1746100
+  },
+  "strict": {
+   "skew_normal": 290,
+   "empirical_19999": 17,
+   "ended_at_screen": 93,
+   "draws": 1896100
+  },
+  "note": "400 pairs drawn at random from those past the screen, one repeat each"
+ },
+ "end_to_end": {
+  "note": "sequential_screen, early_stop_p 0.002, crt_draw hazard; 16 threads on CPUs 0-7,12-19 under the timing lock; provisional (faulty CPU). The same draws for both checks",
+  "small_point_50_targets_x_1000_genes": {
+   "wall_s": {
+    "ks": 27.3,
+    "strict": 28.5
+   },
+   "draws": {
+    "ks": 4457314,
+    "strict": 4682314
+   },
+   "discoveries": {
+    "ks": 6,
+    "strict": 6,
+    "common": 6
+   }
+  },
+  "gasperini_100_targets_x_7418_genes": {
+   "wall_s": {
+    "ks": 279,
+    "strict": 292
+   },
+   "user_cpu_s": {
+    "ks": 3710,
+    "strict": 3943
+   },
+   "draws": {
+    "ks": 65858180,
+    "strict": 69077832
+   },
+   "pairs_past_the_screen_end_as": {
+    "ks": {
+     "stopped_early": 13489,
+     "skew_normal_at_4999": 1498,
+     "skew_normal_at_19999": 1,
+     "empirical_at_19999": 64
+    },
+    "strict": {
+     "stopped_early": 13493,
+     "skew_normal_at_4999": 1282,
+     "skew_normal_at_19999": 169,
+     "empirical_at_19999": 108
+    }
+   },
+   "discoveries": {
+    "ks": 20,
+    "strict": 15,
+    "common": 14
+   },
+   "no_longer_discoveries": {
+    "contradicted_by_the_direct_count": [
+     "ENSG00000185222 x chr9.4011_top_two",
+     "response 1196 x chr22.1919_top_two",
+     "response 2043 x chr5.980_top_two",
+     "response 1837 x chr9.3066_top_two"
+    ],
+    "not_contradicted": [
+     "response 2043 x chr12.3309_top_two (heavy tail by the check; none of 1 million draws beyond)",
+     "response 4245 x chr1.4670_top_two (rejected in 22% of repeats)"
+    ]
+   },
+   "still_a_discovery_though_contradicted": [
+    "response 2536 x chr6.4971_second_two (accepted in 44% of repeats)"
+   ],
+   "new_discovery": [
+    "response 2264 x chr15.2327_top_two (p 1.2e-6; none of 1 million draws beyond)"
+   ]
+  }
+ },
+ "fit_check_ks": "output byte-identical to commit e572ec9 on the 2,150 repeated pairs",
+ "limits": "a rejected fit gives the empirical p-value of the last budget, at least 1e-4 with 19,999 draws, so such a pair cannot be a discovery at this panel's cut-off (about 2e-6); two contradicted pairs whose skew-normal p-values are 8 and 40 times too small still pass in 42-44% of repeats"
+}

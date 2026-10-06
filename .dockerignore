@@ -1,0 +1,15 @@
+.git
+.specstory
+.vscode
+.cursorindexingignore
+build*
+validation/work
+validation/local-data
+**/__pycache__
+**/*.pyc
+bindings/python/rapidglm/*.so
+bindings/r/inst/include
+bindings/r/src/*.o
+bindings/r/src/*.so
+bindings/r/src/c_api.cpp
+bindings/rust/target

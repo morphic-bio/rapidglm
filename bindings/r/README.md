@@ -1,0 +1,62 @@
+# rapidglm (R)
+
+A fitting method for `stats::glm()` and a `MASS::glm.nb()`-compatible negative
+binomial fit, plus bulk differential expression and SCEPTRE-method
+perturbation analysis, backed by the RapidGLM engine.
+
+## Applications
+
+```r
+res <- rapidglm::bulk_de(counts, ~ cell + dex, col_data, contrast = c("dex", "trt", "untrt"),
+                         lfc_shrink = "normal", threads = 8)   # counts: genes x samples
+attr(res, "run")$size_factors
+pairs_res <- rapidglm::sceptre(responses, grna_calls, ~ log_umi + batch, guides, pairs,
+                               cell_data = covariates, moi = "high", threads = 8)
+```
+
+- `bulk_de()` runs the DESeq2 procedure (written from its paper and
+  documentation). `sceptre()` runs the perturbation workflow.
+- Both call the RapidGLM C interface, which the package compiles in, so they
+  run the same code as the CLI and the Python package.
+- Inputs follow R conventions:
+  - `counts` and `responses` are genes x observations (dense or `Matrix`);
+  - the design is a matrix, or a formula with `col_data`/`cell_data`;
+  - coefficients are given by name or 1-based index;
+  - contrasts are `c(variable, tested, reference)` or a weight vector.
+- Results are data frames whose columns match the CLI tables. Run-level values
+  are in `attr(, "run")`.
+- `tests/applications.R` checks both against the CLI:
+  - `bulk_de()` bit for bit;
+  - `sceptre()` to 1e-10, because R's BLAS can round differently from the
+    CLI's OpenBLAS. Approximation-tail p-values below 1e-12 only need to be
+    small on both sides.
+- On airway, `bulk_de()` took 1.6 s against DESeq2's 9.5 s in the same R
+  session (one thread, shared host).
+
+## glm drop-ins
+
+```r
+fit <- glm(y ~ x + offset(log(depth)), family = poisson, data = d,
+           method = rapidglm::glm_fit)          # any existing glm() call
+fit <- rapidglm::glm(y ~ x, family = binomial, data = d)   # same, as a wrapper
+nb  <- rapidglm::glm_nb(counts ~ group, data = d)          # class "negbin"
+```
+
+The result is an ordinary `glm` (or `negbin`) object, so `summary()`, `anova()`,
+`predict(se.fit = TRUE)`, `vcov()`, `confint()`, `drop1()`, residuals and
+influence measures work unchanged. Poisson (log), binomial (logit) and MASS negative binomial (log) families are
+fitted natively. Gaussian identity fits, which are a single least-squares solve
+that `glm.fit` performs with the QR `glm()` stores anyway, other families and
+links, and supplied `etastart`/`mustart` use `stats::glm.fit()`.
+`library(rapidglm)` masks `stats::glm` with the wrapper.
+
+Differences from `glm.fit`: convergence also requires the coefficients to
+settle (tolerance `min(1e-9, epsilon)`), and standard errors use the working
+weights at the final estimates rather than the weights of the last iteration's
+start. Aliasing uses R's threshold, `min(1e-7, epsilon / 1000)`.
+
+The package uses R's own LAPACK. Inside the RapidGLM repository, install with
+`R CMD INSTALL bindings/r` (the configure script copies the engine headers).
+Boost headers are required. The configure script also copies `src/c_api.cpp`
+and the package builds with OpenMP. Tests: `tests/parity.R` and
+`tests/applications.R` (`RAPIDGLM_CLI=build/rapidglm`).

@@ -1,0 +1,87 @@
+{
+  "recorded_utc": "2026-09-26T17:50:37.937106+00:00",
+  "base_commit": "5bb9404ddd267c30f668690916b9ea897582b206",
+  "status": "PASS",
+  "cpp_test_cases": 24,
+  "new_numerical_cases": 10,
+  "new_generator_cases": 2,
+  "checks": [
+    {
+      "command": "cmake --build build -j 2; ctest --test-dir build --output-on-failure",
+      "result": "passed",
+      "configuration": "Release, OpenMP ON"
+    },
+    {
+      "command": "cmake --build build-sanitize -j 2; ctest --test-dir build-sanitize --output-on-failure",
+      "result": "passed",
+      "configuration": "Debug, OpenMP OFF, address and undefined-behavior sanitizers"
+    },
+    {
+      "command": "build/rapidglm_calibration validation/work/low-level/calibration-{before,after}.tsv 12 99 2 (before and after extraction)",
+      "datasets": 96,
+      "resamples_per_dataset": 99,
+      "byte_identical": true,
+      "sha256_before": "1a21235b30b2aa8e90f934c2e8c2c1d8e32edc5b500a8292e4aa53f6f31f7c97",
+      "sha256_after": "1a21235b30b2aa8e90f934c2e8c2c1d8e32edc5b500a8292e4aa53f6f31f7c97"
+    }
+  ],
+  "generator": {
+    "families": [
+      "gaussian",
+      "poisson",
+      "binomial",
+      "negative_binomial"
+    ],
+    "assignment_laws": [
+      "constant Bernoulli(0.3)",
+      "known logistic propensity"
+    ],
+    "fixed_covariates": [
+      -2,
+      0,
+      2
+    ],
+    "draws_per_setting": 100000,
+    "total_draws": 2400000,
+    "checks": [
+      "support",
+      "conditional mean",
+      "conditional variance",
+      "assignment probability",
+      "conditional response-assignment zero covariance",
+      "seed reproducibility"
+    ],
+    "diagnostic_bound": "seven standard errors, fixed in tests; separate from runbook thresholds",
+    "scope": "E1 generator only; external S6 simulator unchanged"
+  },
+  "limitations": [
+    "Production GLM fitter and numerical backend unchanged by this test change.",
+    "Moment/covariance checks are diagnostics, not proofs of distributional correctness or conditional independence.",
+    "G3/G5 failures and provisional runbook thresholds remain unchanged.",
+    "Existing-package review identifies FastBMA BLAS/LAPACK factorization/solve reuse and applicable incremental-update opportunities; no FastBMA or SLAM source incorporated."
+  ],
+  "versions": {
+    "cxx": "c++ (Ubuntu 12.3.0-1ubuntu1~22.04.3) 12.3.0",
+    "cmake": "cmake version 3.31.1"
+  },
+  "host_load": [
+    6.79248046875,
+    7.28515625,
+    7.830078125
+  ],
+  "source_sha256": {
+    "CMakeLists.txt": "8c9b4a621d4b1d3962b5eaa528083e9417291375b8a0dab73148d5c211a85dc7",
+    "tests/test_engine.cpp": "0435fe1e3e3efbfe5f61ab0dcd4eb063f0968a4e9dd8ed098840b4bd456d6e37",
+    "tests/test_numerics.cpp": "0db30ba7dfc1de65061d09dfd42c383268fcff58c676909ca4a2a011de8815d7",
+    "tests/test_generator.cpp": "55bbd8119aee19855b4da314e2461342776ffc2c79f8576e87cdce305bfead4c",
+    "tests/calibration_data.hpp": "39d81d08acf7f3f22c51f1c891577299ff32898a9cc37eddaa0b911d23198cbb",
+    "tests/calibration.cpp": "e1a79e0239610ed8a47534b49b9676715c43fb64701fe0f89244e2b6c5a199e7",
+    "include/rapidglm/model.hpp": "c05871d2774b9c3d60f69b6f7ec11e59d9935bf8c50c0420902bf11d4a7fbe7c"
+  },
+  "binary_sha256": {
+    "build/rapidglm_tests": "a35131daa746f82a5700fd93dba64e019547974b6cc93f818610580bf4aff49b",
+    "build-sanitize/rapidglm_tests": "91c2946df513eb8db452d2e384f43afd8f6b3837da6e9cfe0b50f8859d9dde22",
+    "build/rapidglm_calibration": "a0e0074620857074ab18c464b1b8faa6a590eb40cee058d964073f29f05fb29e"
+  },
+  "reviewed_fastbma_commit": "a03ce6922b0bc8cf007fbc1a46e0a883a74d0251"
+}

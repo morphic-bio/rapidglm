@@ -1,0 +1,522 @@
+{
+  "recorded_utc": "2026-09-26T18:36:00.228313+00:00",
+  "engine_commit": "8edf0edc6ab1133d1e4a32a0c26c4d9958766943",
+  "scope": "Diagnostic triage; no production numerical or statistical changes; historical failures retained and thresholds provisional.",
+  "G3": {
+    "command": [
+      "build/rapidglm_calibration",
+      "validation/work/correctness-audit/e1-current.tsv",
+      "1000",
+      "499",
+      "8"
+    ],
+    "byte_identical_before_after": true,
+    "old_sha256": "033c826344c8ff4d29bc7e5fe8a25006a0330c11d694b7b5bc8d549efd86f7ba",
+    "new_sha256": "033c826344c8ff4d29bc7e5fe8a25006a0330c11d694b7b5bc8d549efd86f7ba",
+    "poisson_crt": {
+      "valid": 1000,
+      "rejections_05": 46,
+      "max_cdf_above_uniform": 0.0020000000000000018,
+      "max_cdf_below_uniform": 0.05699999999999994,
+      "ks_location": 0.7,
+      "mean_p": 0.5249839999999999
+    },
+    "interpretation": "Uniformity failure lies in the conservative direction. Fixed empirical tails; skew-normal disabled. Mechanism unresolved, not reclassified as passing."
+  },
+  "G8_boundary_case": {
+    "data": {
+      "genes": [
+        "NME7",
+        "MRPS25"
+      ],
+      "original_feature_indices": [
+        399,
+        880
+      ],
+      "design": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ]
+      ],
+      "responses": [
+        [
+          7,
+          8,
+          15,
+          8,
+          7,
+          12,
+          0,
+          0,
+          4,
+          9,
+          4,
+          5,
+          5,
+          12,
+          3,
+          10
+        ],
+        [
+          7,
+          2,
+          19,
+          9,
+          4,
+          2,
+          0,
+          0,
+          3,
+          3,
+          15,
+          1,
+          15,
+          11,
+          3,
+          5
+        ]
+      ],
+      "zero_donor_design_column": 4,
+      "zero_donor_observations_zero_based": [
+        6,
+        7
+      ]
+    },
+    "default_100_iterations": [
+      {
+        "feature": "0",
+        "status": "iteration_limit",
+        "theta": "NA",
+        "theta_boundary": "0",
+        "log_likelihood": "-31.270962142772071",
+        "iterations": "100",
+        "beta0": "-11.521536025067984",
+        "se0": "NA",
+        "wald_p0": "NA",
+        "beta1": "0.20970421561867089",
+        "se1": "NA",
+        "wald_p1": "NA",
+        "beta2": "-0.53808241086969788",
+        "se2": "NA",
+        "wald_p2": "NA",
+        "beta3": "0.1291779854436087",
+        "se3": "NA",
+        "wald_p3": "NA",
+        "beta4": "-88.718314514352215",
+        "se4": "NA",
+        "wald_p4": "NA",
+        "beta5": "-0.76496347160968337",
+        "se5": "NA",
+        "wald_p5": "NA",
+        "beta6": "-0.30765785404665219",
+        "se6": "NA",
+        "wald_p6": "NA",
+        "beta7": "-0.15228697115982609",
+        "se7": "NA",
+        "wald_p7": "NA",
+        "beta8": "0.30767929158263796",
+        "se8": "NA",
+        "wald_p8": "NA"
+      },
+      {
+        "feature": "1",
+        "status": "iteration_limit",
+        "theta": "NA",
+        "theta_boundary": "0",
+        "log_likelihood": "-29.113856664307384",
+        "iterations": "100",
+        "beta0": "-11.496172371114822",
+        "se0": "NA",
+        "wald_p0": "NA",
+        "beta1": "-0.15070658735255599",
+        "se1": "NA",
+        "wald_p1": "NA",
+        "beta2": "0.088737676762594114",
+        "se2": "NA",
+        "wald_p2": "NA",
+        "beta3": "-0.59784887899032779",
+        "se3": "NA",
+        "wald_p3": "NA",
+        "beta4": "-101.42121503602577",
+        "se4": "NA",
+        "wald_p4": "NA",
+        "beta5": "0.16958104770352056",
+        "se5": "NA",
+        "wald_p5": "NA",
+        "beta6": "0.54833494961418716",
+        "se6": "NA",
+        "wald_p6": "NA",
+        "beta7": "-0.12474558204037499",
+        "se7": "NA",
+        "wald_p7": "NA",
+        "beta8": "-0.70124911759865505",
+        "se8": "NA",
+        "wald_p8": "NA"
+      }
+    ],
+    "diagnostic_1000_iterations": [
+      {
+        "feature": "0",
+        "status": "iteration_limit",
+        "theta": "NA",
+        "theta_boundary": "0",
+        "log_likelihood": "-31.270962142772071",
+        "iterations": "1000",
+        "beta0": "-11.521536025067983",
+        "se0": "NA",
+        "wald_p0": "NA",
+        "beta1": "0.20970421561867056",
+        "se1": "NA",
+        "wald_p1": "NA",
+        "beta2": "-0.5380824108696991",
+        "se2": "NA",
+        "wald_p2": "NA",
+        "beta3": "0.12917798544360709",
+        "se3": "NA",
+        "wald_p3": "NA",
+        "beta4": "-1000.8974627810887",
+        "se4": "NA",
+        "wald_p4": "NA",
+        "beta5": "-0.76496347160968403",
+        "se5": "NA",
+        "wald_p5": "NA",
+        "beta6": "-0.30765785404665347",
+        "se6": "NA",
+        "wald_p6": "NA",
+        "beta7": "-0.15228697115982748",
+        "se7": "NA",
+        "wald_p7": "NA",
+        "beta8": "0.30767929158263851",
+        "se8": "NA",
+        "wald_p8": "NA"
+      },
+      {
+        "feature": "1",
+        "status": "converged",
+        "theta": "100000000.00000018",
+        "theta_boundary": "1",
+        "log_likelihood": "-29.113856923457917",
+        "iterations": "2",
+        "beta0": "-11.496172373164899",
+        "se0": "0.34453106984543058",
+        "wald_p0": "4.0486051843090961e-244",
+        "beta1": "-0.15070658041129872",
+        "se1": "0.52741080791874329",
+        "wald_p1": "0.77507114261581711",
+        "beta2": "0.088737678748282242",
+        "se2": "0.38352365187825599",
+        "wald_p2": "0.81702370048816775",
+        "beta3": "-0.59784887597323322",
+        "se3": "0.52732490121643005",
+        "wald_p3": "0.25690398967954031",
+        "beta4": "-1.7032612913868905e+72",
+        "se4": "7.121207954887305e+151",
+        "wald_p4": "1",
+        "beta5": "0.16958103517645737",
+        "se5": "0.41771233573304156",
+        "wald_p5": "0.68476049517304438",
+        "beta6": "0.54833496047469621",
+        "se6": "0.38708057955590069",
+        "wald_p6": "0.1566024694254157",
+        "beta7": "-0.12474557581384554",
+        "se7": "0.48591289319165953",
+        "wald_p7": "0.79739172508748557",
+        "beta8": "-0.70124912015570739",
+        "se8": "0.21399761745841275",
+        "wald_p8": "0.001049529648398876"
+      }
+    ],
+    "cause": "Both samples for the donor represented by design column 4 have zero counts. The unpenalized likelihood improves as this donor coefficient tends to negative infinity. The default NB call returns its failed Poisson pilot before dispersion fitting.",
+    "implementation_bug": "At max_iterations=1000 MRPS25 is labelled converged despite donor beta=-1.7032612913868905e72 and SE=7.121207954887305e151. A valid finite coefficient/covariance fit has not been obtained.",
+    "code_paths": [
+      "include/rapidglm/model.hpp:199",
+      "include/rapidglm/model.hpp:394",
+      "include/rapidglm/model.hpp:449",
+      "include/rapidglm/model.hpp:455"
+    ],
+    "next_step": "Add a count-model zero-stratum/boundary regression test and explicit boundary detection. Do not cure by raising iterations, silently imposing ridge, or dropping samples without specifying the inference contract."
+  },
+  "G5": {
+    "scenario": "known_dense",
+    "actual_native_law": "Fitted logistic propensity and fitted NB response null, despite inherited simulator scenario name.",
+    "datasets": 10000,
+    "alpha": 0.01,
+    "rejections": 107,
+    "rate": 0.0107,
+    "simultaneous_upper": 0.013550141722602448,
+    "recorded_limit": 0.013,
+    "interpretation": "Failed upper-bound check; insufficient evidence to call a numerical defect or attribute it specifically to skew-normal tails.",
+    "next_step": "Paired replay of the same data with known versus fitted propensities and empirical versus skew-normal tails; retain original failed result."
+  },
+  "G4_S2": {
+    "discovery_jaccard": 0.8461538461538461,
+    "provisional_target": 0.9,
+    "discordant_pairs": [
+      {
+        "response_id": "ENSG00000187840",
+        "target": "ENSG00000100316",
+        "p_value_native": 0.0158885929,
+        "p_value_reference": 0.04,
+        "q_native": 0.0806651638,
+        "q_reference": 0.1389473684,
+        "draws": 499,
+        "approximation": 1
+      },
+      {
+        "response_id": "ENSG00000196683",
+        "target": "ENSG00000100316",
+        "p_value_native": 0.0123073632,
+        "p_value_reference": 0.024,
+        "q_native": 0.0738441791,
+        "q_reference": 0.1218461538,
+        "draws": 499,
+        "approximation": 1
+      }
+    ],
+    "reference_exports": "Both discordant reference rows are stage 1 with xi/omega/alpha absent; native uses skew-normal approximation with 499 draws.",
+    "interpretation": "Two additional native discoveries cross BH 0.1. Matched tail-method and resampling comparisons are needed before attributing to fitter accuracy."
+  },
+  "G7": {
+    "direction_disagreements": [
+      "CHD2",
+      "CNOT2",
+      "PQBP1"
+    ],
+    "scope": "Depth-adjusted NB effect versus published normalized descriptive direction; estimands are not identical.",
+    "next_step": "Match response aggregation, normalization, adjustment and cell/control definitions before treating direction disagreement as a numerical defect."
+  },
+  "validation_harness_repair": {
+    "problem": "The S6 Rcpp bridge needed LAPACKE/BLAS linker flags after migration and could otherwise reuse a cached old engine.",
+    "change": "Preserve caller flags; add LAPACKE/BLAS defaults with RAPIDGLM_CPPFLAGS/RAPIDGLM_LIBS overrides; force sourceCpp rebuild.",
+    "smoke_result": "200 datasets executed with zero invalid primary/stress p-values; SMOKE_ONLY, not calibration qualification.",
+    "matched_old_smoke_rows": 200,
+    "max_p_absolute_difference": 9.992007221626409e-16,
+    "receipt": "/mnt/pikachu/rapidglm/validation/work/correctness-audit/s6-smoke/S6.json",
+    "environment": {
+      "RAPIDGLM_CPPFLAGS": "-I/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/include",
+      "RAPIDGLM_LIBS": "/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/liblapacke.a /mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-serial/libopenblas.so -Wl,-rpath,/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-serial",
+      "OPENBLAS_NUM_THREADS": "1"
+    },
+    "command": [
+      "Rscript",
+      "scripts/validate_s6.R",
+      "/mnt/pikachu/perturb-resample",
+      "/mnt/pikachu/rapidglm/validation/work/correctness-audit/s6-smoke",
+      "smoke"
+    ]
+  },
+  "reproduction_commands": [
+    [
+      "build/rapidglm_calibration",
+      "/mnt/pikachu/rapidglm/validation/work/correctness-audit/e1-current.tsv",
+      "1000",
+      "499",
+      "8"
+    ],
+    [
+      "build/rapidglm",
+      "fit",
+      "/mnt/pikachu/rapidglm/validation/work/correctness-audit/failed-genes-default.json"
+    ],
+    [
+      "build/rapidglm",
+      "fit",
+      "/mnt/pikachu/rapidglm/validation/work/correctness-audit/failed-genes-poisson-100.json"
+    ],
+    [
+      "build/rapidglm",
+      "fit",
+      "/mnt/pikachu/rapidglm/validation/work/correctness-audit/failed-genes-nb-1000.json"
+    ]
+  ],
+  "input_and_source_sha256": {
+    "include/rapidglm/model.hpp": "1ddc48a7f612027b0bd8a994cadaf88b5271f94f2362def882b170ffaf311f74",
+    "include/rapidglm/resampling.hpp": "0c0fd19e941e3050736747015c3987c0067acd576794bdeef7a37e620cbc7ae6",
+    "tests/calibration_data.hpp": "39d81d08acf7f3f22c51f1c891577299ff32898a9cc37eddaa0b911d23198cbb",
+    "scripts/validate_s6.R": "64643db74c4f7eac61306d115a32c66e8449cad00f5d1f3462b4daf36186bed8",
+    "validation/work/applications/pseudobulk/responses.mtx": "3ac43d7d2c10cca392240b2c0b120e7d9d864ed585ce11ecb315b74044654f43",
+    "validation/work/applications/pseudobulk/design.tsv": "4424df71a0a0399c2620e88aa0453a1b3ab732387a32883d50d9779eba5540c6",
+    "validation/work/applications/pseudobulk/offset.tsv": "8c98ad9c4113a0883510192cc6184b9a2d7d259ea0ff7aef7f839b31c7e68c93",
+    "validation/work/s6-release/datasets.tsv": "6c2cb41db9699ee4ff319d99870391f6c9542d3c6dd92bf4529c05d17e8b3133"
+  },
+  "artifact_directory": "/mnt/pikachu/rapidglm/validation/work/correctness-audit",
+  "thread_safety_followup": {
+    "recorded_utc": "2026-09-26T19:10:47.376380+00:00",
+    "receipt": "validation/BLAS_THREAD_SAFETY.json",
+    "boundary_receipt": "validation/BOUNDARY_DIAGNOSTIC.json",
+    "note": "Historical observations above are retained. The original serial OpenBLAS build failed a deterministic concurrent-call regression. The local dependency was replaced with pthread OpenBLAS with one internal worker. Earlier small-panel thread checks did not establish backend safety; the extreme parallel boundary results should not be attributed solely to convergence logic. The independent stopping-rule mismatch remains unfixed."
+  }
+}

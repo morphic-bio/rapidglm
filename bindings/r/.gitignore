@@ -1,0 +1,4 @@
+inst/include/
+src/*.o
+src/*.so
+src/c_api.cpp

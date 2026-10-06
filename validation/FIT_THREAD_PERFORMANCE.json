@@ -1,0 +1,451 @@
+{
+  "date": "2026-09-26",
+  "baseline_commit": "246f8a6",
+  "thresholds": "provisional; results reported without changing historical gates",
+  "environment": {
+    "logical_cpus": 32,
+    "threads": 16,
+    "OPENBLAS_NUM_THREADS": 1,
+    "blas": "thread-safe pthread OpenBLAS 0.3.20",
+    "host": "shared; variable unrelated load; diagnostic timings only"
+  },
+  "scope": "Loaded-input NB ML fit batches; native 1/16 threads and single-thread R/MASS; one warmup and three timed repetitions",
+  "summary": [
+    {
+      "panel": "E1_nb",
+      "native_1_seconds": 0.0209999999999999,
+      "native_16_seconds": 0.00600000000000023,
+      "R_MASS_1_seconds": 0.0650000000000004,
+      "native_parallel_speedup": 3.4999999999998495,
+      "native_1_vs_R_1_speedup": 3.095238095238129,
+      "native_16_vs_R_1_speedup": 10.833333333332986
+    },
+    {
+      "panel": "S2_public_nb",
+      "native_1_seconds": 1.769,
+      "native_16_seconds": 0.388999999999999,
+      "R_MASS_1_seconds": 8.687,
+      "native_parallel_speedup": 4.547557840616978,
+      "native_1_vs_R_1_speedup": 4.910684002261164,
+      "native_16_vs_R_1_speedup": 22.33161953727512
+    },
+    {
+      "panel": "S2_public_64genes",
+      "native_1_seconds": 10.976,
+      "native_16_seconds": 2.17699999999999,
+      "R_MASS_1_seconds": 47.397,
+      "native_parallel_speedup": 5.041800643086841,
+      "native_1_vs_R_1_speedup": 4.318239795918367,
+      "native_16_vs_R_1_speedup": 21.77170418006441
+    }
+  ],
+  "checks": {
+    "E1_nb": {
+      "features": 12,
+      "observations": 403,
+      "native_statuses": {
+        "converged": 12
+      },
+      "r_converged": 12,
+      "native_all_repetitions_and_thread_counts_identical": true,
+      "max_beta_abs": 1.0004851291878225e-07,
+      "max_loglik_abs": 2.063416104647331e-11
+    },
+    "S2_public_nb": {
+      "features": 12,
+      "observations": 45919,
+      "native_statuses": {
+        "converged": 12
+      },
+      "r_converged": 12,
+      "native_all_repetitions_and_thread_counts_identical": true,
+      "max_beta_abs": 4.775172319781973e-07,
+      "max_loglik_abs": 1.045464159687981e-09
+    },
+    "S2_public_64genes": {
+      "features": 64,
+      "observations": 45919,
+      "native_statuses": {
+        "converged": 64
+      },
+      "r_converged": 64,
+      "native_all_repetitions_and_thread_counts_identical": true,
+      "max_beta_abs": 4.775172319781973e-07,
+      "max_loglik_abs": 1.045464159687981e-09
+    }
+  },
+  "runs": [
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "0",
+      "seconds": "0.0379999999999994",
+      "load_before": "6.79 4.92 5.65 10/3919 2455208"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "0",
+      "seconds": "0.00699999999999967",
+      "load_before": "6.79 4.92 5.65 10/3919 2455208"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "0",
+      "seconds": "0.0839999999999996",
+      "load_before": "6.79 4.92 5.65 25/3919 2455208"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "1",
+      "seconds": "0.00499999999999989",
+      "load_before": "6.79 4.92 5.65 3/3922 2455220"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "1",
+      "seconds": "0.0209999999999999",
+      "load_before": "6.79 4.92 5.65 18/3922 2455220"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "1",
+      "seconds": "0.0619999999999994",
+      "load_before": "6.79 4.92 5.65 3/3922 2455220"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "2",
+      "seconds": "0.0210000000000008",
+      "load_before": "6.56 4.91 5.64 3/3921 2455226"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "2",
+      "seconds": "0.00699999999999967",
+      "load_before": "6.56 4.91 5.64 9/3920 2455226"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "2",
+      "seconds": "0.172",
+      "load_before": "6.56 4.91 5.64 24/3920 2455226"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "3",
+      "seconds": "0.00600000000000023",
+      "load_before": "6.56 4.91 5.64 10/3924 2455230"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "3",
+      "seconds": "0.0209999999999999",
+      "load_before": "6.56 4.91 5.64 25/3924 2455230"
+    },
+    {
+      "panel": "E1_nb",
+      "features": "12",
+      "observations": "403",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "3",
+      "seconds": "0.0650000000000004",
+      "load_before": "6.56 4.91 5.64 9/3921 2455230"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "0",
+      "seconds": "1.786",
+      "load_before": "6.56 4.91 5.64 9/3921 2455230"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "0",
+      "seconds": "0.610000000000001",
+      "load_before": "6.56 4.91 5.64 9/3913 2455273"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "0",
+      "seconds": "9.764",
+      "load_before": "6.56 4.91 5.64 27/3913 2455282"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "1",
+      "seconds": "0.388999999999999",
+      "load_before": "7.09 5.08 5.68 5/3901 2455703"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "1",
+      "seconds": "1.769",
+      "load_before": "7.09 5.08 5.68 24/3901 2455713"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "1",
+      "seconds": "8.687",
+      "load_before": "7.09 5.08 5.68 9/3921 2455772"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "2",
+      "seconds": "1.748",
+      "load_before": "7.78 5.29 5.75 2/3918 2455970"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "2",
+      "seconds": "0.382000000000001",
+      "load_before": "7.56 5.28 5.74 2/3900 2456009"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "2",
+      "seconds": "8.397",
+      "load_before": "7.56 5.28 5.74 21/3900 2456016"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "3",
+      "seconds": "0.408000000000001",
+      "load_before": "7.03 5.21 5.72 7/3900 2456197"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "3",
+      "seconds": "1.784",
+      "load_before": "7.03 5.21 5.72 17/3933 2456240"
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": "12",
+      "observations": "45919",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "3",
+      "seconds": "9.111",
+      "load_before": "6.87 5.21 5.71 2/3995 2456338"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "0",
+      "seconds": "11.022",
+      "load_before": "8.20 5.53 5.81 3/3997 2456592"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "0",
+      "seconds": "1.92599999999999",
+      "load_before": "7.70 5.52 5.80 2/4007 2456952"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "0",
+      "seconds": "49.323",
+      "load_before": "8.52 5.72 5.87 17/3998 2456975"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "1",
+      "seconds": "2.334",
+      "load_before": "5.99 5.43 5.76 3/4002 2458031"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "1",
+      "seconds": "10.957",
+      "load_before": "5.99 5.43 5.76 18/4003 2458075"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "1",
+      "seconds": "48.001",
+      "load_before": "5.60 5.37 5.74 2/3990 2458312"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "2",
+      "seconds": "11.869",
+      "load_before": "4.02 5.00 5.59 3/4004 2459296"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "2",
+      "seconds": "2.17699999999999",
+      "load_before": "6.87 5.56 5.77 36/4031 2459613"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "2",
+      "seconds": "47.197",
+      "load_before": "8.08 5.83 5.85 17/4024 2459657"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "16",
+      "repetition": "3",
+      "seconds": "2.08500000000001",
+      "load_before": "5.61 5.46 5.72 3/4030 2460621"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "native",
+      "threads": "1",
+      "repetition": "3",
+      "seconds": "10.976",
+      "load_before": "5.56 5.45 5.72 17/4031 2460658"
+    },
+    {
+      "panel": "S2_public_64genes",
+      "features": "64",
+      "observations": "45919",
+      "implementation": "R_MASS",
+      "threads": "1",
+      "repetition": "3",
+      "seconds": "47.397",
+      "load_before": "5.08 5.35 5.68 2/4018 2460870"
+    }
+  ],
+  "source_sha256": {
+    "scripts/audit_deviations.R": "9ec52aa623723dd485272afed2d3f200feaaafeb3f75463b6c4d7a349f6f637d",
+    "tests/deviation_bridge.cpp": "697b5f25550eabf59ce2d08b2fcf70c162eef24ad54171e2befba569d4c0ca52"
+  },
+  "artifact_sha256": {
+    "validation/work/fit-timing16/timing16-E1_nb.rds": "9ec4b59646d75390e8665fe825e3f842372c42cf0114fa1aaf6f7526cfa354b3",
+    "validation/work/fit-timing16/timing16-S2_public_64genes.rds": "0df26ee4556c1fee8d73a9f967d16363b900cacb049721e4f0adc60791d8858f",
+    "validation/work/fit-timing16/timing16-S2_public_nb.rds": "0a3138be1205292850cdc390c1bf39105453c123c46a4c28179672c5922edddf",
+    "validation/work/fit-timing16/timing16-checks.json": "12b1b7b8d2419da2e11c99c01bbd204c5481e480ef7ccf9feb0f96c9c0a38a4f",
+    "validation/work/fit-timing16/timing16-public-features.tsv": "148dfdb04abcff7efccbed5217154d76192a5236ad7e4b74e41111a883a5b70b",
+    "validation/work/fit-timing16/timing16.tsv": "c118614a0e112a1e527968e4b5dc0471aab3cac449bb0b6583fa51c4a8e96af9"
+  }
+}

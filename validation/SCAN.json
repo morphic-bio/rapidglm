@@ -1,0 +1,371 @@
+{
+ "purpose": "Validation of the score scan (rapidglm scan / score_scan).",
+ "commit": "7e72355416e18420e96e0b3279a342329e7cb9be",
+ "worktree_dirty": true,
+ "command": "python3 scripts/validate_scan.py --work DIR --output validation/SCAN.json",
+ "sceptre_equivalence": {
+  "S2_public": {
+   "pairs": 148,
+   "status": 148,
+   "statistic": 148,
+   "p_value": 148,
+   "adjusted_p": 148,
+   "draws": 148,
+   "rejected": 22,
+   "max_log2fc_difference": 6.661338147750939e-16,
+   "exact": true
+  }
+ },
+ "null_calibration": [
+  {
+   "family": "gaussian",
+   "predictor": "binary",
+   "calibration": "asymptotic",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 120,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.016243958059313224,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "gaussian",
+   "predictor": "binary",
+   "calibration": "permutation",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 124,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.012293922556620651,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "gaussian",
+   "predictor": "binary",
+   "calibration": "crt",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 127,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.013096282328439957,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "gaussian",
+   "predictor": "continuous",
+   "calibration": "asymptotic",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 118,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.013602109545210128,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "gaussian",
+   "predictor": "continuous",
+   "calibration": "permutation",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 120,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.015800984912303584,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "poisson",
+   "predictor": "binary",
+   "calibration": "asymptotic",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 124,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.016541230074983204,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "poisson",
+   "predictor": "binary",
+   "calibration": "permutation",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 128,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.01682773945321281,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "poisson",
+   "predictor": "binary",
+   "calibration": "crt",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 138,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.019509829957712277,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "poisson",
+   "predictor": "continuous",
+   "calibration": "asymptotic",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 104,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.01378617148100246,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "poisson",
+   "predictor": "continuous",
+   "calibration": "permutation",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 106,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.012096418217915336,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "nb",
+   "predictor": "binary",
+   "calibration": "asymptotic",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 102,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.023574334284685916,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "nb",
+   "predictor": "binary",
+   "calibration": "permutation",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 120,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.0187723885754576,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "nb",
+   "predictor": "binary",
+   "calibration": "crt",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 110,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.020488088245387476,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "nb",
+   "predictor": "continuous",
+   "calibration": "asymptotic",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 107,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.013353210105014834,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "nb",
+   "predictor": "continuous",
+   "calibration": "permutation",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 105,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.00956996167158669,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "binomial",
+   "predictor": "binary",
+   "calibration": "asymptotic",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 127,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.010265739927868833,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "binomial",
+   "predictor": "binary",
+   "calibration": "permutation",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 133,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.009544134263435478,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "binomial",
+   "predictor": "binary",
+   "calibration": "crt",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 126,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.010588048147347373,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "binomial",
+   "predictor": "continuous",
+   "calibration": "asymptotic",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 120,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.013090131427972773,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  },
+  {
+   "family": "binomial",
+   "predictor": "continuous",
+   "calibration": "permutation",
+   "tests": 2400,
+   "valid": 2400,
+   "rejections_05": 116,
+   "interval_999": [
+    86,
+    157
+   ],
+   "ks": 0.013644921067686333,
+   "ks_critical_999": 0.03971894976744735,
+   "passed": true
+  }
+ ],
+ "null_calibration_note": "Pairs sharing a response are dependent (one null fit, one response), so the binomial and KS bounds treat correlated tests as independent; they screen for gross miscalibration only.",
+ "identical_at_1_and_8_threads": true,
+ "throughput": [
+  {
+   "calibration": "asymptotic",
+   "threads": 1,
+   "observations": 5000,
+   "responses": 200,
+   "predictors": 200,
+   "pairs": 40000,
+   "wall_seconds": 1.181578927,
+   "pairs_per_second": 33853.007265083026
+  },
+  {
+   "calibration": "asymptotic",
+   "threads": 16,
+   "observations": 5000,
+   "responses": 200,
+   "predictors": 200,
+   "pairs": 40000,
+   "wall_seconds": 0.348214784,
+   "pairs_per_second": 114871.63049343706
+  },
+  {
+   "calibration": "permutation",
+   "threads": 1,
+   "observations": 5000,
+   "responses": 200,
+   "predictors": 200,
+   "pairs": 40000,
+   "wall_seconds": 198.800509198,
+   "pairs_per_second": 201.20672809827198
+  },
+  {
+   "calibration": "permutation",
+   "threads": 16,
+   "observations": 5000,
+   "responses": 200,
+   "predictors": 200,
+   "pairs": 40000,
+   "wall_seconds": 14.264753478,
+   "pairs_per_second": 2804.114355126467
+  }
+ ],
+ "passed": true,
+ "load_average": [
+  32.46337890625,
+  28.287109375,
+  19.05908203125
+ ]
+}

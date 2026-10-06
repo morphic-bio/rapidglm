@@ -1,0 +1,7 @@
+# Signac's documented workflow delegates LR to Seurat FindMarkers.
+args<-commandArgs(TRUE);d<-normalizePath(args[1]);suppressPackageStartupMessages(library(Seurat));suppressPackageStartupMessages(library(Signac));suppressPackageStartupMessages(library(Matrix));suppressPackageStartupMessages(library(jsonlite))
+y<-as(readMM(file.path(d,'responses.mtx')),'CsparseMatrix');g<-scan(file.path(d,'group.tsv'),quiet=TRUE);x<-as.matrix(read.table(file.path(d,'design.tsv')));rownames(y)<-paste0('peak-',seq_len(nrow(y))-1);colnames(y)<-paste0('cell_',seq_len(ncol(y)));latent<-data.frame(depth=x[,2],row.names=colnames(y));start<-proc.time()[['elapsed']]
+obj<-CreateSeuratObject(counts=y,meta.data=latent,min.cells=0,min.features=0);obj$group<-ifelse(g==1,'treatment','control');Idents(obj)<-'group';obj<-NormalizeData(obj,verbose=FALSE)
+r<-FindMarkers(obj,ident.1='treatment',ident.2='control',slot='counts',test.use='LR',latent.vars='depth',min.pct=0,logfc.threshold=0,min.cells.feature=0,verbose=FALSE)
+r$feature<-as.integer(sub('peak-','',rownames(r)));write.table(r,file.path(d,'reference.tsv'),sep='\t',row.names=FALSE,quote=FALSE)
+write_json(list(Signac=as.character(packageVersion('Signac')),Seurat=as.character(packageVersion('Seurat')),seconds=proc.time()[['elapsed']]-start,features=nrow(y),cells=ncol(y),group='BRD2 vs explicit NTC target singlets',predictor='raw peak count',covariate='log1p total ATAC counts'),file.path(d,'reference.json'),auto_unbox=TRUE,pretty=TRUE)

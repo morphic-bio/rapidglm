@@ -1,0 +1,189 @@
+{
+  "gate": "G8",
+  "thresholds": "provisional",
+  "command": "python3 scripts/validate_applications.py",
+  "pseudobulk": {
+    "reference": {
+      "source": "https://experimenthub.bioconductor.org/fetch/2259",
+      "accession": "GSE96583 / EH2259",
+      "cell_type": "CD14+ Monocytes",
+      "cells": 5385,
+      "samples": 16,
+      "donors": 8,
+      "genes": 1000,
+      "selection": "first 1000 genes in public feature order with count >=10 in >=4 samples",
+      "normalization": "common raw-library-size offsets; no TMM",
+      "edgeR": {
+        "version": "4.6.2",
+        "seconds": 0.179
+      },
+      "DESeq2": {
+        "version": "1.48.2",
+        "seconds": 0.946
+      }
+    },
+    "comparisons": {
+      "edgeR": {
+        "pairs": 1000,
+        "usable": 998,
+        "statistic_spearman": 0.9906704049995647,
+        "native_discoveries": 808,
+        "reference_discoveries": 762,
+        "discovery_jaccard": 0.9406674907292955,
+        "max_p_absolute_difference": 0.5520364134993984,
+        "log2fc_correlation": 0.9992732736943124
+      },
+      "DESeq2": {
+        "pairs": 1000,
+        "usable": 998,
+        "statistic_spearman": 0.9935540189810013,
+        "native_discoveries": 808,
+        "reference_discoveries": 710,
+        "discovery_jaccard": 0.8763906056860321,
+        "max_p_absolute_difference": 0.4579281650151294,
+        "log2fc_correlation": 0.998783574359091
+      }
+    },
+    "native_run": {
+      "version": "0.1.0",
+      "command": "pseudobulk-de",
+      "config_path": "/mnt/pikachu/rapidglm/validation/work/applications/pseudobulk/config.json",
+      "parameters": {
+        "responses": "/mnt/pikachu/rapidglm/validation/work/applications/pseudobulk/responses.mtx",
+        "design": "/mnt/pikachu/rapidglm/validation/work/applications/pseudobulk/design.tsv",
+        "offset": "/mnt/pikachu/rapidglm/validation/work/applications/pseudobulk/offset.tsv",
+        "family": "nb",
+        "coefficient": 8,
+        "output": "/mnt/pikachu/rapidglm/validation/work/applications/pseudobulk/native",
+        "threads": 2,
+        "test": "wald"
+      },
+      "input_sha1": {
+        "/mnt/pikachu/rapidglm/validation/work/applications/pseudobulk/config.json": "fabea76950bb0620422ba9ff33910a1a2aaf1a98",
+        "/mnt/pikachu/rapidglm/validation/work/applications/pseudobulk/design.tsv": "b63c6593577d766f244cd243958f39fface5498b",
+        "/mnt/pikachu/rapidglm/validation/work/applications/pseudobulk/offset.tsv": "3d4df792af96754676b2b3f3068259b24a42c0d8",
+        "/mnt/pikachu/rapidglm/validation/work/applications/pseudobulk/responses.mtx": "fe17af3a8fe7968ffa52cf987d4ac9c6d7484395"
+      },
+      "seed": 1,
+      "threads": 2,
+      "observations": 16,
+      "features": 1000,
+      "retained_cells": 16,
+      "invalid_tests_or_fits": 2,
+      "calibration_rejections": 0,
+      "power_rejections": 0,
+      "discovery_rejections": 0,
+      "wall_seconds": 0.12778295,
+      "peak_rss_kib": 146996,
+      "load_average": [
+        10.89013671875,
+        11.01318359375,
+        11.4697265625
+      ],
+      "api_frozen": false
+    },
+    "limitations": "Native feature-wise ML dispersion differs from edgeR and DESeq2 moderated dispersion; same explicit library offsets, no automatic shrinkage."
+  },
+  "dose": {
+    "features": 200,
+    "null_features": 100,
+    "effect_features": 100,
+    "dose_coefficient": 0.6,
+    "seed": 20260926,
+    "detected_effects": 100,
+    "false_discoveries": 5,
+    "effect_sign_recovery": 100,
+    "run": {
+      "version": "0.1.0",
+      "command": "dose-trend",
+      "config_path": "/mnt/pikachu/rapidglm/validation/work/applications/dose/config.json",
+      "parameters": {
+        "responses": "/mnt/pikachu/rapidglm/validation/work/applications/dose/responses.mtx",
+        "design": "/mnt/pikachu/rapidglm/validation/work/applications/dose/design.tsv",
+        "output": "/mnt/pikachu/rapidglm/validation/work/applications/dose/native",
+        "family": "nb",
+        "coefficient": 1,
+        "threads": 2
+      },
+      "input_sha1": {
+        "/mnt/pikachu/rapidglm/validation/work/applications/dose/config.json": "837440149a8e0d6ab21772cbba7b6566aaad4dc6",
+        "/mnt/pikachu/rapidglm/validation/work/applications/dose/design.tsv": "4b37dcc68903b2a293bca3f3d3f7264930ddb169",
+        "/mnt/pikachu/rapidglm/validation/work/applications/dose/responses.mtx": "7bdbb5c2911feec4988721dd56dfb11abe427650"
+      },
+      "seed": 1,
+      "threads": 2,
+      "observations": 80,
+      "features": 200,
+      "retained_cells": 80,
+      "invalid_tests_or_fits": 0,
+      "calibration_rejections": 0,
+      "power_rejections": 0,
+      "discovery_rejections": 0,
+      "wall_seconds": 0.068760846,
+      "peak_rss_kib": 152656,
+      "load_average": [
+        10.89013671875,
+        11.01318359375,
+        11.4697265625
+      ],
+      "api_frozen": false
+    }
+  },
+  "da": {
+    "comparison": {
+      "pairs": 100,
+      "usable": 100,
+      "statistic_spearman": 0.9999999999999999,
+      "native_discoveries": 0,
+      "reference_discoveries": 0,
+      "discovery_jaccard": null,
+      "max_p_absolute_difference": 3.2662761384472105e-13
+    },
+    "reference": {
+      "Signac": "1.17.1",
+      "Seurat": "5.3.0",
+      "seconds": 2.074,
+      "features": 100,
+      "cells": 1390,
+      "group": "BRD2 vs explicit NTC target singlets",
+      "predictor": "raw peak count",
+      "covariate": "log1p total ATAC counts"
+    },
+    "run": {
+      "version": "0.1.0",
+      "command": "da-lr",
+      "config_path": "/mnt/pikachu/rapidglm/validation/work/multimodal/da/config.json",
+      "parameters": {
+        "responses": "/mnt/pikachu/rapidglm/validation/work/multimodal/da/responses.mtx",
+        "design": "/mnt/pikachu/rapidglm/validation/work/multimodal/da/design.tsv",
+        "group": "/mnt/pikachu/rapidglm/validation/work/multimodal/da/group.tsv",
+        "output": "/mnt/pikachu/rapidglm/validation/work/multimodal/da/native",
+        "family": "binomial",
+        "threads": "2"
+      },
+      "seed": 1,
+      "threads": 2,
+      "observations": 1390,
+      "features": 100,
+      "retained_cells": 1390,
+      "invalid_tests_or_fits": 0,
+      "calibration_rejections": 0,
+      "power_rejections": 0,
+      "discovery_rejections": 0,
+      "wall_seconds": 0.024496587,
+      "peak_rss_kib": 1158000,
+      "load_average": [
+        15.90625,
+        12.7958984375,
+        12.07958984375
+      ],
+      "api_frozen": false
+    }
+  },
+  "input_sha256": {
+    "Kang_EH2259": "b631d72139ad157cfc7530800268a4a9d1194f81dce0d2b387ca3d600acce485",
+    "pseudobulk_counts": "3ac43d7d2c10cca392240b2c0b120e7d9d864ed585ce11ecb315b74044654f43",
+    "dose_counts": "082df9ec4d3b059fae97e12cbd9c3f75b7cbaae31e22f1c03fe0461042c7da09",
+    "DA_counts": "cd6cf242ee74c91dce3ff1f705c5cc48f5df342206d87df4f03d73b8b2fa2222"
+  }
+}

@@ -1,0 +1,353 @@
+{
+ "purpose": "Check the in-house Cholesky path for systems of at most 16 columns (detail::Cholesky::small) against the previous LAPACK path.",
+ "date": "2026-09-30",
+ "baseline": {
+  "commit": "f4044fcbf90f10e7abacd04aacd096b501b489dd",
+  "cli_sha256": "9bd52c5a963f2e09eba884cff853e0aedd2aac5e84c44bcaba3a91f55a28d09a"
+ },
+ "candidate": {
+  "commit_note": "working tree of the commit that adds bulk-de; this receipt is part of that commit",
+  "cli_sha256": "a2eb5f6987a24d323e04a570fa5365f568f4acaeeaddede481905e6c6a10cd04"
+ },
+ "frozen_panels": {
+  "command": "python3 scripts/compare_binaries.py --baseline <f4044fc CLI> --work DIR --output FILE",
+  "threads": 8,
+  "cases": [
+   {
+    "case": "S1_public",
+    "byte_identical": false,
+    "discoveries": [
+     41,
+     41
+    ],
+    "discovery_jaccard": 1.0,
+    "text_mismatches": 0,
+    "finiteness_mismatches": 0,
+    "max_relative_difference": {
+     "statistic": 3.4642037714413007e-13,
+     "log2fc": 4.977922334252934e-15,
+     "log2fc_se": 1.2436515337125444e-13,
+     "sceptre_mean_ratio": 2.413605468029854e-15,
+     "mean_ratio_log2": 1.1819986344213493e-12
+    },
+    "p_value_max_abs_difference": 3.3861802251067274e-14
+   },
+   {
+    "case": "S1_public-integration=singleton",
+    "byte_identical": false,
+    "discoveries": [
+     127,
+     127
+    ],
+    "discovery_jaccard": 1.0,
+    "text_mismatches": 0,
+    "finiteness_mismatches": 0,
+    "max_relative_difference": {
+     "statistic": 7.368065006489325e-13,
+     "log2fc": 4.335399810308712e-15,
+     "log2fc_se": 4.040497747995323e-14,
+     "sceptre_mean_ratio": 6.410738026137757e-15,
+     "mean_ratio_log2": 1.1819986344213493e-12
+    },
+    "p_value_max_abs_difference": 6.972200594645983e-14
+   },
+   {
+    "case": "S1_public-integration=bonferroni",
+    "byte_identical": false,
+    "discoveries": [
+     37,
+     37
+    ],
+    "discovery_jaccard": 1.0,
+    "text_mismatches": 1,
+    "finiteness_mismatches": 0,
+    "max_relative_difference": {
+     "guide": 0.0,
+     "cells": 0.04032258064516129,
+     "nonzero_treatment": 0.3373015873015873,
+     "statistic": 0.07006017451695713,
+     "log2fc": 0.31176061289393187,
+     "log2fc_se": 0.21994470822018644,
+     "sceptre_mean_ratio": 0.24870789994538184,
+     "mean_ratio_log2": 0.3261983887747292
+    },
+    "p_value_max_abs_difference": 5.284661597215745e-14
+   },
+   {
+    "case": "S1_public-null_model=sceptre",
+    "byte_identical": false,
+    "discoveries": [
+     41,
+     41
+    ],
+    "discovery_jaccard": 1.0,
+    "text_mismatches": 0,
+    "finiteness_mismatches": 0,
+    "max_relative_difference": {
+     "statistic": 3.4642037714413007e-13,
+     "log2fc": 4.977922334252934e-15,
+     "log2fc_se": 1.2436515337125444e-13,
+     "sceptre_mean_ratio": 2.413605468029854e-15,
+     "mean_ratio_log2": 1.1819986344213493e-12
+    },
+    "p_value_max_abs_difference": 3.3861802251067274e-14
+   },
+   {
+    "case": "S2_public",
+    "byte_identical": false,
+    "discoveries": [
+     23,
+     23
+    ],
+    "discovery_jaccard": 1.0,
+    "text_mismatches": 0,
+    "finiteness_mismatches": 0,
+    "max_relative_difference": {
+     "statistic": 7.501385325619999e-11,
+     "log2fc": 1.5684251529867398e-14,
+     "log2fc_se": 1.4543940408830482e-15,
+     "sceptre_mean_ratio": 2.5071293250154695e-15,
+     "mean_ratio_log2": 2.9380107043219734e-12
+    },
+    "p_value_max_abs_difference": 9.547918011776346e-15
+   },
+   {
+    "case": "S2_public-null_model=sceptre",
+    "byte_identical": false,
+    "discoveries": [
+     23,
+     23
+    ],
+    "discovery_jaccard": 1.0,
+    "text_mismatches": 0,
+    "finiteness_mismatches": 0,
+    "max_relative_difference": {
+     "statistic": 7.501385325619999e-11,
+     "log2fc": 1.5684251529867398e-14,
+     "log2fc_se": 1.4543940408830482e-15,
+     "sceptre_mean_ratio": 2.5071293250154695e-15,
+     "mean_ratio_log2": 2.9380107043219734e-12
+    },
+    "p_value_max_abs_difference": 9.547918011776346e-15
+   },
+   {
+    "case": "pseudobulk",
+    "byte_identical": false,
+    "discoveries": [
+     809,
+     809
+    ],
+    "discovery_jaccard": 1.0,
+    "text_mismatches": 0,
+    "finiteness_mismatches": 0,
+    "max_relative_difference": {
+     "statistic": 9.71453584509299e-12,
+     "coefficient": 1.871344812392175e-12,
+     "standard_error": 7.843171243593446e-12,
+     "log2fc": 1.8713405451307725e-12,
+     "log2fc_se": 7.843086932022393e-12,
+     "theta": 6.915993099153392e-09
+    },
+    "p_value_max_abs_difference": 5.19306819768417e-14
+   },
+   {
+    "case": "pseudobulk-test=lr",
+    "byte_identical": false,
+    "discoveries": [
+     803,
+     803
+    ],
+    "discovery_jaccard": 1.0,
+    "text_mismatches": 0,
+    "finiteness_mismatches": 0,
+    "max_relative_difference": {
+     "statistic": 1.8417901204059175e-11,
+     "coefficient": 1.871344812392175e-12,
+     "standard_error": 7.843171243593446e-12,
+     "log2fc": 1.8713405451307725e-12,
+     "log2fc_se": 7.843086932022393e-12,
+     "theta": 6.915993099153392e-09
+    },
+    "p_value_max_abs_difference": 8.055917044558214e-13
+   },
+   {
+    "case": "dose",
+    "byte_identical": false,
+    "discoveries": [
+     105,
+     105
+    ],
+    "discovery_jaccard": 1.0,
+    "text_mismatches": 0,
+    "finiteness_mismatches": 0,
+    "max_relative_difference": {
+     "statistic": 2.1580328252091924e-14,
+     "coefficient": 2.1064012829498337e-14,
+     "standard_error": 2.051301337442911e-15,
+     "log2fc": 2.1055401802675837e-14,
+     "log2fc_se": 2.0114247633458456e-15,
+     "theta": 7.577224568601416e-15
+    },
+    "p_value_max_abs_difference": 1.5543122344752192e-15
+   },
+   {
+    "case": "pseudobulk_fit",
+    "byte_identical": false,
+    "discoveries": null,
+    "discovery_jaccard": null,
+    "text_mismatches": 0,
+    "finiteness_mismatches": 0,
+    "max_relative_difference": {
+     "theta": 6.915993099153392e-09,
+     "log_likelihood": 7.058057538402452e-14,
+     "beta0": 3.8272996008514524e-14,
+     "se0": 4.262162524733376e-12,
+     "beta1": 4.398912107004893e-12,
+     "se1": 2.7320720476188e-12,
+     "beta2": 2.602122267914626e-12,
+     "se2": 6.2756312489535785e-12,
+     "beta3": 2.4238562904972612e-11,
+     "se3": 4.94952231209205e-12,
+     "beta4": 1.1172285169627073e-11,
+     "se4": 2.8766946522113658e-12,
+     "beta5": 1.3271926060830168e-12,
+     "se5": 5.2049512370421065e-12,
+     "beta6": 1.3175392471384141e-12,
+     "se6": 5.2984199785080596e-12,
+     "beta7": 5.094399607232816e-13,
+     "se7": 4.461961595682248e-12,
+     "beta8": 1.871344812392175e-12,
+     "se8": 7.843171243593446e-12
+    },
+    "p_value_max_abs_difference": 2.440714297335944e-12
+   }
+  ],
+  "note": "All discovery sets are unchanged. In S1_public with integration=bonferroni one row reports a different guide: for response 290 / JAK2 the per-guide skew-normal tail of JAK2g2 was 1.1e-56 in the baseline and evaluates to 0 in the candidate (statistic unchanged), so it becomes the minimum-p guide instead of JAK2g4 (4.0e-62). Both rows have p below 1e-55."
+ },
+ "e1": {
+  "command": "build/rapidglm_calibration OUT.tsv 1000 499 8",
+  "output_sha256": "033c826344c8ff4d29bc7e5fe8a25006a0330c11d694b7b5bc8d549efd86f7ba",
+  "identical_to_calibration_receipt": true
+ },
+ "glm_accuracy": {
+  "command": "python3 benchmarks/glm/run_comparison.py validation/work/glm-compare/problems --accuracy --tools rapidglm,rapidglm-singular",
+  "candidate": {
+   "rapidglm": {
+    "problems": 39,
+    "failures": [
+     "binomial-aliased",
+     "gaussian-aliased",
+     "nb-aliased",
+     "poisson-aliased"
+    ],
+    "median_coefficient_error_se": 3.56865820446653e-15,
+    "max_coefficient_error_se": 1.5620302324186027e-05,
+    "median_se_relative_error": 8.511466102993529e-16,
+    "max_se_relative_error": 2.0639339099941687e-07
+   },
+   "rapidglm-singular": {
+    "problems": 39,
+    "failures": [],
+    "median_coefficient_error_se": 3.0610649951001033e-15,
+    "max_coefficient_error_se": 1.5620302324186027e-05,
+    "median_se_relative_error": 8.384204769531277e-16,
+    "max_se_relative_error": 2.0639339099941687e-07
+   }
+  },
+  "recorded_in_GLM_COMPARISON": {
+   "rapidglm": {
+    "problems": 39,
+    "failures": [
+     "binomial-aliased",
+     "gaussian-aliased",
+     "nb-aliased",
+     "poisson-aliased"
+    ],
+    "median_coefficient_error_se": 2.4685731258638635e-11,
+    "max_coefficient_error_se": 1.5620302324186027e-05,
+    "median_se_relative_error": 9.865929448426653e-14,
+    "max_se_relative_error": 2.0639339099941687e-07
+   },
+   "rapidglm-singular": {
+    "problems": 39,
+    "failures": [],
+    "median_coefficient_error_se": 9.593050605920276e-12,
+    "max_coefficient_error_se": 1.5620302324186027e-05,
+    "median_se_relative_error": 7.643007366589111e-14,
+    "max_se_relative_error": 2.0639339099941687e-07
+   }
+  }
+ },
+ "other_receipts": {
+  "scan": "scripts/validate_scan.py reran with the candidate: passed; SCEPTRE equivalence unchanged; only null-calibration KS statistics differ, at the 1e-15 level.",
+  "ql": "scripts/validate_ql.py reran with the candidate: passed; identical rejection counts; three KS statistics differ below 1e-10."
+ },
+ "bulk_de_timing": {
+  "source": "validation/BULK_DE.json as committed in e7caf8a (validate_bulk.py --compare-binary: the same tree with small = 0, i.e. LAPACK for every size; minima of three alternating runs). Later BULK_DE.json runs omit the comparison.",
+  "seconds": {
+   "airway": {
+    "in_house": {
+     "1": 1.3962849285453558,
+     "8": 0.44033283460885286
+    },
+    "lapack": {
+     "1": 1.9247678499668837,
+     "8": 3.0994709338992834
+    }
+   },
+   "kang": {
+    "in_house": {
+     "1": 0.11511959787458181,
+     "8": 0.03699386306107044
+    },
+    "lapack": {
+     "1": 0.13143338914960623,
+     "8": 0.16327769961208105
+    }
+   },
+   "sim3": {
+    "in_house": {
+     "1": 0.1345925498753786,
+     "8": 0.06407396961003542
+    },
+    "lapack": {
+     "1": 0.14729135669767857,
+     "8": 0.14266368187963963
+    }
+   },
+   "sim3b": {
+    "in_house": {
+     "1": 0.13506473787128925,
+     "8": 0.06559657212346792
+    },
+    "lapack": {
+     "1": 0.1490936242043972,
+     "8": 0.141101217828691
+    }
+   },
+   "sim8": {
+    "in_house": {
+     "1": 0.2099125673994422,
+     "8": 0.0926923668012023
+    },
+    "lapack": {
+     "1": 0.23438688274472952,
+     "8": 0.1637415699660778
+    }
+   }
+  },
+  "identical_discoveries": {
+   "airway": false,
+   "kang": true,
+   "sim3": true,
+   "sim3b": true,
+   "sim8": true
+  },
+  "airway_note": "Airway has 3 residual df, so its prior variance comes from the simulated grid search, which moves by grid steps when any trend gene's estimate moves. With LAPACK the prior variance is 0.702 instead of 0.698, the filter threshold 4.50 instead of 3.86, and 39 genes near padj = 0.1 change call; one gene (21614) fits under LAPACK and fails under the in-house path. The other datasets keep identical discoveries and statuses."
+ },
+ "load_average": [
+  5.27978515625,
+  6.45947265625,
+  8.48486328125
+ ]
+}

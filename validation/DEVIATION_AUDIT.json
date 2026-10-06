@@ -1,0 +1,556 @@
+{
+  "thresholds": "provisional; original failures retained",
+  "production_algorithm_changes": false,
+  "all_gates_passed": false,
+  "E1": {
+    "panels": [
+      {
+        "panel": "original1000",
+        "n": 1000,
+        "ks_minus": 0.05699999999999983,
+        "ks_plus": 0.002000000000000099,
+        "original_formula_bound": 0.053704380621108425,
+        "rejections_05": 46,
+        "rejections_01": 8
+      },
+      {
+        "panel": "fresh19000",
+        "n": 19000,
+        "ks_minus": 0.010105263157894742,
+        "ks_plus": 0.001947368421052642,
+        "original_formula_bound": 0.012320629892255564,
+        "rejections_05": 839,
+        "rejections_01": 161
+      },
+      {
+        "panel": "all20000",
+        "n": 20000,
+        "ks_minus": 0.010150000000000006,
+        "ks_plus": 0.0008500000000000174,
+        "original_formula_bound": 0.01200866457583208,
+        "rejections_05": 885,
+        "rejections_01": 169
+      }
+    ],
+    "original_pvalues_identical": true,
+    "independent_score_max_abs": 4.440892098500625e-15,
+    "independent_pvalues_identical": true
+  },
+  "S6": {
+    "original_80000_max_p_absolute_change": 1.1102230246251565e-15,
+    "original_80000_rejections_identical": true,
+    "original_family_fdp_and_power_identical": true,
+    "original_panel": {
+      "scope": "paired diagnostic of original failed known_dense panel; thresholds remain provisional",
+      "seed": 26092512,
+      "seconds": 71.308,
+      "results": [
+        {
+          "law": "fitted",
+          "method": "empirical_499",
+          "alpha": 0.05,
+          "n": 10000,
+          "hits": 453,
+          "upper": 0.050752487627942044,
+          "approximations": 0,
+          "mean_draws": 499,
+          "_row": "fitted.empirical_499.1"
+        },
+        {
+          "law": "fitted",
+          "method": "empirical_499",
+          "alpha": 0.01,
+          "n": 10000,
+          "hits": 82,
+          "upper": 0.010735635404394372,
+          "approximations": 0,
+          "mean_draws": 499,
+          "_row": "fitted.empirical_499.2"
+        },
+        {
+          "law": "known",
+          "method": "empirical_499",
+          "alpha": 0.05,
+          "n": 10000,
+          "hits": 451,
+          "upper": 0.05054165680725997,
+          "approximations": 0,
+          "mean_draws": 499,
+          "_row": "known.empirical_499.1"
+        },
+        {
+          "law": "known",
+          "method": "empirical_499",
+          "alpha": 0.01,
+          "n": 10000,
+          "hits": 91,
+          "upper": 0.01175386746470819,
+          "approximations": 0,
+          "mean_draws": 499,
+          "_row": "known.empirical_499.2"
+        },
+        {
+          "law": "fitted",
+          "method": "empirical_full",
+          "alpha": 0.05,
+          "n": 10000,
+          "hits": 477,
+          "upper": 0.05328034649248414,
+          "approximations": 0,
+          "mean_draws": 4999,
+          "_row": "fitted.empirical_full.1"
+        },
+        {
+          "law": "fitted",
+          "method": "empirical_full",
+          "alpha": 0.01,
+          "n": 10000,
+          "hits": 105,
+          "upper": 0.013326471962139097,
+          "approximations": 0,
+          "mean_draws": 4999,
+          "_row": "fitted.empirical_full.2"
+        },
+        {
+          "law": "known",
+          "method": "empirical_full",
+          "alpha": 0.05,
+          "n": 10000,
+          "hits": 476,
+          "upper": 0.053175094882913165,
+          "approximations": 0,
+          "mean_draws": 4999,
+          "_row": "known.empirical_full.1"
+        },
+        {
+          "law": "known",
+          "method": "empirical_full",
+          "alpha": 0.01,
+          "n": 10000,
+          "hits": 109,
+          "upper": 0.013773585083259432,
+          "approximations": 0,
+          "mean_draws": 4999,
+          "_row": "known.empirical_full.2"
+        },
+        {
+          "law": "fitted",
+          "method": "staged",
+          "alpha": 0.05,
+          "n": 10000,
+          "hits": 485,
+          "upper": 0.0541221294767944,
+          "approximations": 10000,
+          "mean_draws": 499,
+          "_row": "fitted.staged.1"
+        },
+        {
+          "law": "fitted",
+          "method": "staged",
+          "alpha": 0.01,
+          "n": 10000,
+          "hits": 107,
+          "upper": 0.013550141722602493,
+          "approximations": 10000,
+          "mean_draws": 499,
+          "_row": "fitted.staged.2"
+        },
+        {
+          "law": "known",
+          "method": "staged",
+          "alpha": 0.05,
+          "n": 10000,
+          "hits": 478,
+          "upper": 0.05338559167189194,
+          "approximations": 10000,
+          "mean_draws": 499,
+          "_row": "known.staged.1"
+        },
+        {
+          "law": "known",
+          "method": "staged",
+          "alpha": 0.01,
+          "n": 10000,
+          "hits": 109,
+          "upper": 0.013773585083259432,
+          "approximations": 10000,
+          "mean_draws": 499,
+          "_row": "known.staged.2"
+        }
+      ]
+    },
+    "fresh_extension": {
+      "scope": "fixed 30000 fresh keyed datasets, indices 10001:40000",
+      "seed": 26092512,
+      "first_dataset": 10001,
+      "datasets": 30000,
+      "seconds": 175.28,
+      "results": [
+        {
+          "law": "fitted",
+          "method": "empirical_499",
+          "alpha": 0.05,
+          "n": 30000,
+          "hits": 1461,
+          "upper": 0.05188884076092182,
+          "approximations": 0,
+          "mean_draws": 499,
+          "_row": "fitted.empirical_499.1"
+        },
+        {
+          "law": "fitted",
+          "method": "empirical_499",
+          "alpha": 0.01,
+          "n": 30000,
+          "hits": 222,
+          "upper": 0.00872884843046473,
+          "approximations": 0,
+          "mean_draws": 499,
+          "_row": "fitted.empirical_499.2"
+        },
+        {
+          "law": "known",
+          "method": "empirical_499",
+          "alpha": 0.05,
+          "n": 30000,
+          "hits": 1461,
+          "upper": 0.05188884076092182,
+          "approximations": 0,
+          "mean_draws": 499,
+          "_row": "known.empirical_499.1"
+        },
+        {
+          "law": "known",
+          "method": "empirical_499",
+          "alpha": 0.01,
+          "n": 30000,
+          "hits": 230,
+          "upper": 0.009017329474763303,
+          "approximations": 0,
+          "mean_draws": 499,
+          "_row": "known.empirical_499.2"
+        },
+        {
+          "law": "fitted",
+          "method": "empirical_full",
+          "alpha": 0.05,
+          "n": 30000,
+          "hits": 1535,
+          "upper": 0.05442861304712576,
+          "approximations": 0,
+          "mean_draws": 4999,
+          "_row": "fitted.empirical_full.1"
+        },
+        {
+          "law": "fitted",
+          "method": "empirical_full",
+          "alpha": 0.01,
+          "n": 30000,
+          "hits": 288,
+          "upper": 0.011098398758406902,
+          "approximations": 0,
+          "mean_draws": 4999,
+          "_row": "fitted.empirical_full.2"
+        },
+        {
+          "law": "known",
+          "method": "empirical_full",
+          "alpha": 0.05,
+          "n": 30000,
+          "hits": 1550,
+          "upper": 0.054943177351389094,
+          "approximations": 0,
+          "mean_draws": 4999,
+          "_row": "known.empirical_full.1"
+        },
+        {
+          "law": "known",
+          "method": "empirical_full",
+          "alpha": 0.01,
+          "n": 30000,
+          "hits": 290,
+          "upper": 0.011169873417071097,
+          "approximations": 0,
+          "mean_draws": 4999,
+          "_row": "known.empirical_full.2"
+        },
+        {
+          "law": "fitted",
+          "method": "staged",
+          "alpha": 0.05,
+          "n": 30000,
+          "hits": 1551,
+          "upper": 0.05497747867377678,
+          "approximations": 30000,
+          "mean_draws": 499,
+          "_row": "fitted.staged.1"
+        },
+        {
+          "law": "fitted",
+          "method": "staged",
+          "alpha": 0.01,
+          "n": 30000,
+          "hits": 289,
+          "upper": 0.011134138226539081,
+          "approximations": 30000,
+          "mean_draws": 499,
+          "_row": "fitted.staged.2"
+        },
+        {
+          "law": "known",
+          "method": "staged",
+          "alpha": 0.05,
+          "n": 30000,
+          "hits": 1550,
+          "upper": 0.054943177351389094,
+          "approximations": 30000,
+          "mean_draws": 499,
+          "_row": "known.staged.1"
+        },
+        {
+          "law": "known",
+          "method": "staged",
+          "alpha": 0.01,
+          "n": 30000,
+          "hits": 288,
+          "upper": 0.011098398758406902,
+          "approximations": 30000,
+          "mean_draws": 499,
+          "_row": "known.staged.2"
+        }
+      ]
+    },
+    "note": "Confidence bounds use the original .05/8 allocation; ablations are diagnostic, not a new joint qualification gate."
+  },
+  "numerical": [
+    {
+      "panel": "E1_nb",
+      "feature": 0,
+      "original_theta": 0.108292952982165,
+      "native_theta": 0.108293042510925,
+      "refined_theta": 0.108293042510924,
+      "original_theta_score": 0.00045808126117,
+      "native_theta_score": -3.625e-12,
+      "refined_theta_score": 1.24e-13,
+      "refined_beta_max_abs": 3.7e-14,
+      "mass_explicit_tight_theta": 0.108293042510924,
+      "refinement_iterations": 10
+    },
+    {
+      "panel": "S2_public_nb",
+      "feature": 9,
+      "original_theta": 0.048793078866056,
+      "native_theta": 0.04879344741496,
+      "refined_theta": 0.048793447415008,
+      "original_theta_score": 0.005670827067176,
+      "native_theta_score": 7.53854e-10,
+      "refined_theta_score": 1.6139e-11,
+      "refined_beta_max_abs": 2.03e-13,
+      "mass_explicit_tight_theta": 0.048793447415009,
+      "refinement_iterations": 8
+    }
+  ],
+  "pseudobulk": {
+    "edgeR_regular_rows": 998,
+    "edgeR_comparison_on_regular_rows_in_original_1000_test_family": {
+      "native": 761,
+      "reference": 761,
+      "jaccard": 1.0
+    },
+    "edgeR_max_p_abs_regular": 1.0888083301630047e-07,
+    "boundary_rows_retained_without_ordinary_LR": [
+      {
+        "feature": 399,
+        "edge_status": "converged_boundary"
+      },
+      {
+        "feature": 880,
+        "edge_status": "converged_boundary"
+      }
+    ],
+    "DESeq2_matched_dispersion": {
+      "native": 710,
+      "reference": 710,
+      "jaccard": 1.0
+    },
+    "DESeq2_max_p_abs_default": 0.011916382860539976,
+    "DESeq2_max_p_abs_minmu_1e_minus8_tight_fit": 1.9078006540107495e-06,
+    "DESeq2_max_beta_abs_minmu_1e_minus8_tight_fit": 5.5561095599898636e-06
+  },
+  "ATAC": {
+    "testable_pairs": 18,
+    "max_same_model_log2fc_abs": 3.248199487160264e-10,
+    "disputed": [
+      {
+        "target": "CHD2",
+        "cells": 1396,
+        "target_cells": 148,
+        "nt_cells": 1248,
+        "native_log2fc": -0.138278359861336,
+        "r_log2fc": -0.138278359862001,
+        "historical_log2fc": -0.138278359852066,
+        "raw_log2_ratio": -0.110497592283159,
+        "depth_normalized_log2_ratio": -0.150430582944031,
+        "paper_delta": 0.164595475185168,
+        "suite_delta": 0.042247917475506
+      },
+      {
+        "target": "CNOT2",
+        "cells": 1345,
+        "target_cells": 97,
+        "nt_cells": 1248,
+        "native_log2fc": -0.919190214747829,
+        "r_log2fc": -0.919190214808852,
+        "historical_log2fc": -0.919190214733712,
+        "raw_log2_ratio": -0.912482184607898,
+        "depth_normalized_log2_ratio": -1.01439069992719,
+        "paper_delta": 0.018894043266784,
+        "suite_delta": -0.105573968954914
+      },
+      {
+        "target": "PQBP1",
+        "cells": 1305,
+        "target_cells": 57,
+        "nt_cells": 1248,
+        "native_log2fc": 0.046669939989236,
+        "r_log2fc": 0.046669939988308,
+        "historical_log2fc": 0.046669939980639,
+        "raw_log2_ratio": 0.043706659130177,
+        "depth_normalized_log2_ratio": -0.06044836898603,
+        "paper_delta": -0.065372829809579,
+        "suite_delta": -0.021738699062628
+      }
+    ],
+    "scope": "Current frozen calls and NB coefficients differ from the June parity snapshot's calls, peak sets and descriptive effects."
+  },
+  "S2": {
+    "concordance": {
+      "empirical_499": {
+        "native": 8,
+        "reference": 11,
+        "jaccard": 0.7272727272727273
+      },
+      "empirical_full": {
+        "native": 14,
+        "reference": 11,
+        "jaccard": 0.7857142857142857
+      },
+      "staged": {
+        "native": 13,
+        "reference": 11,
+        "jaccard": 0.8461538461538461
+      }
+    },
+    "disputed": [
+      {
+        "law": "fitted",
+        "method": "empirical_499",
+        "p_value": 0.032,
+        "draws": 499,
+        "approximate": false,
+        "statistic": -2.17625758114463,
+        "discrepancy": null,
+        "target": "ENSG00000100316",
+        "response": 515,
+        "response_id": "ENSG00000187840",
+        "q_value": 0.132,
+        "grna_target": "ENSG00000100316",
+        "p_value_r": 0.04
+      },
+      {
+        "law": "fitted",
+        "method": "empirical_full",
+        "p_value": 0.0296,
+        "draws": 4999,
+        "approximate": false,
+        "statistic": -2.17625758114463,
+        "discrepancy": null,
+        "target": "ENSG00000100316",
+        "response": 515,
+        "response_id": "ENSG00000187840",
+        "q_value": 0.114917647058824,
+        "grna_target": "ENSG00000100316",
+        "p_value_r": 0.04
+      },
+      {
+        "law": "fitted",
+        "method": "staged",
+        "p_value": 0.015888592860204,
+        "draws": 499,
+        "approximate": true,
+        "statistic": -2.17625758114463,
+        "discrepancy": 0.028116528150828,
+        "target": "ENSG00000100316",
+        "response": 515,
+        "response_id": "ENSG00000187840",
+        "q_value": 0.080665163751803,
+        "grna_target": "ENSG00000100316",
+        "p_value_r": 0.04
+      },
+      {
+        "law": "fitted",
+        "method": "empirical_499",
+        "p_value": 0.016,
+        "draws": 499,
+        "approximate": false,
+        "statistic": 2.38383522826219,
+        "discrepancy": null,
+        "target": "ENSG00000100316",
+        "response": 522,
+        "response_id": "ENSG00000196683",
+        "q_value": 0.117333333333333,
+        "grna_target": "ENSG00000100316",
+        "p_value_r": 0.024
+      },
+      {
+        "law": "fitted",
+        "method": "empirical_full",
+        "p_value": 0.0176,
+        "draws": 4999,
+        "approximate": false,
+        "statistic": 2.38383522826219,
+        "discrepancy": null,
+        "target": "ENSG00000100316",
+        "response": 522,
+        "response_id": "ENSG00000196683",
+        "q_value": 0.096171428571429,
+        "grna_target": "ENSG00000100316",
+        "p_value_r": 0.024
+      },
+      {
+        "law": "fitted",
+        "method": "staged",
+        "p_value": 0.012307363180392,
+        "draws": 499,
+        "approximate": true,
+        "statistic": 2.38383522826219,
+        "discrepancy": 0.022036332517888,
+        "target": "ENSG00000100316",
+        "response": 522,
+        "response_id": "ENSG00000196683",
+        "q_value": 0.07384417908235,
+        "grna_target": "ENSG00000100316",
+        "p_value_r": 0.024
+      }
+    ],
+    "poisson_pilot_conditional_theta_max_score_abs": 2.3846542496208656e-07,
+    "poisson_pilot_mean_ratio_max_abs": 8.044630073200665e-09,
+    "reference_empirical_tail_recalculation_max_abs": 0.0,
+    "reference_seeds_note": "All three set.seed values gave identical outputs; these are repeatability checks, not independent random-bank replications.",
+    "remaining": "Default SCEPTRE concordance remains below the proposed Jaccard target. Full NB ML, score correction and tail/staging policy differ; matching reference calls would require a separate qualified compatibility policy."
+  },
+  "performance_receipt": "PERFORMANCE_CURRENT.json",
+  "artifacts": {
+    "validation/work/deviation-audit/e1-expanded.tsv": "f09216ec39987aa9e781cafa5c5af0fa7c66af589afc3f0e04327d35f6c83e44",
+    "validation/work/deviation-audit/s6-ablation.tsv": "a8efd2bc53fb40554ca00e29ffd418110205c660c7b63b1162216e7fe4b2480f",
+    "validation/work/deviation-audit/s6-extension/s6-ablation.tsv": "89ae1fdb94284fdf3245c795957aa70bfae64c5bd0aa9d7314bc37ed7b23d69b",
+    "validation/work/deviation-audit/numerical.tsv": "3e1351ec9f9616d1e2a6d2c6b49c1b88ee97221212362927dcfe6c3823656da4",
+    "validation/work/deviation-audit/theta-refined.tsv": "0fff8722a16db475372fe457a02326670fa19b43d059ee80829e5f0f64a5e31f",
+    "validation/work/deviation-audit/pseudobulk-matched.tsv": "64707870ecfd378c51519adbb279091dbbdbbbd04a3ad2782222fded578278ed",
+    "validation/work/deviation-audit/atac-matched.tsv": "f683a50e76a9048a9a3ec24e5898b6ade0c8db761dbae774faec81b31a131593",
+    "validation/work/deviation-audit/s2-tails.tsv": "3ed7362374b23766b90d658a6b0ff74e6ac50976020c7f3ad07a92eb186f3dfb",
+    "validation/work/deviation-audit/s2-score.tsv": "bc286a43b9b23a6a13e83e00651f017d5f88c1f1309f0d3b0e92b05635868dce",
+    "validation/work/deviation-audit/sceptre/sceptre-repeats.tsv": "d36a12a1fd6b10d9c34c3bd59fcb7870c0ee912252690161d48cd19976cb2b20",
+    "validation/work/deviation-audit/timing-refined.tsv": "5eb23c780672def735aa99948314a13e5b881eb4d2491b04ecc7cd32ad0bce2c"
+  }
+}

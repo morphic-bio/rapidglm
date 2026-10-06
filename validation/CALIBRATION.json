@@ -1,0 +1,152 @@
+{
+  "gate": "G3",
+  "scope": "E1 independent null datasets; fixed empirical budget; 95% familywise Monte Carlo bounds across eight scenarios",
+  "command": [
+    "build/rapidglm_calibration",
+    "/mnt/pikachu/rapidglm/validation/work/calibration/null.tsv",
+    "1000",
+    "499",
+    "8"
+  ],
+  "seed": 20260926,
+  "seconds": 3.400575182400644,
+  "host_load_start": [
+    10.15283203125,
+    10.5576171875,
+    11.37353515625
+  ],
+  "binary_sha256": "a0b54c348800bdddbf492f524f4cc9a2a87cbed67b83417a6d5838fd1fe2de42",
+  "output_sha256": "033c826344c8ff4d29bc7e5fe8a25006a0330c11d694b7b5bc8d549efd86f7ba",
+  "scenarios": [
+    {
+      "scenario": 0,
+      "family": "gaussian",
+      "law": "permutation",
+      "datasets": 1000,
+      "valid": 1000,
+      "rejections_05": 44,
+      "rejection_rate_05": 0.044,
+      "simultaneous_binomial_bounds": [
+        32,
+        70
+      ],
+      "ks_statistic": 0.021999999999999992,
+      "ks_dkw_bound": 0.053704380621108425,
+      "within_mc_bounds": true
+    },
+    {
+      "scenario": 1,
+      "family": "poisson",
+      "law": "permutation",
+      "datasets": 1000,
+      "valid": 1000,
+      "rejections_05": 54,
+      "rejection_rate_05": 0.054,
+      "simultaneous_binomial_bounds": [
+        32,
+        70
+      ],
+      "ks_statistic": 0.017999999999999988,
+      "ks_dkw_bound": 0.053704380621108425,
+      "within_mc_bounds": true
+    },
+    {
+      "scenario": 2,
+      "family": "binomial",
+      "law": "permutation",
+      "datasets": 1000,
+      "valid": 1000,
+      "rejections_05": 46,
+      "rejection_rate_05": 0.046,
+      "simultaneous_binomial_bounds": [
+        32,
+        70
+      ],
+      "ks_statistic": 0.020999999999999908,
+      "ks_dkw_bound": 0.053704380621108425,
+      "within_mc_bounds": true
+    },
+    {
+      "scenario": 3,
+      "family": "nb",
+      "law": "permutation",
+      "datasets": 1000,
+      "valid": 1000,
+      "rejections_05": 58,
+      "rejection_rate_05": 0.058,
+      "simultaneous_binomial_bounds": [
+        32,
+        70
+      ],
+      "ks_statistic": 0.04200000000000001,
+      "ks_dkw_bound": 0.053704380621108425,
+      "within_mc_bounds": true
+    },
+    {
+      "scenario": 4,
+      "family": "gaussian",
+      "law": "known_propensity_crt",
+      "datasets": 1000,
+      "valid": 1000,
+      "rejections_05": 32,
+      "rejection_rate_05": 0.032,
+      "simultaneous_binomial_bounds": [
+        32,
+        70
+      ],
+      "ks_statistic": 0.03,
+      "ks_dkw_bound": 0.053704380621108425,
+      "within_mc_bounds": true
+    },
+    {
+      "scenario": 5,
+      "family": "poisson",
+      "law": "known_propensity_crt",
+      "datasets": 1000,
+      "valid": 1000,
+      "rejections_05": 46,
+      "rejection_rate_05": 0.046,
+      "simultaneous_binomial_bounds": [
+        32,
+        70
+      ],
+      "ks_statistic": 0.05699999999999994,
+      "ks_dkw_bound": 0.053704380621108425,
+      "within_mc_bounds": false
+    },
+    {
+      "scenario": 6,
+      "family": "binomial",
+      "law": "known_propensity_crt",
+      "datasets": 1000,
+      "valid": 1000,
+      "rejections_05": 40,
+      "rejection_rate_05": 0.04,
+      "simultaneous_binomial_bounds": [
+        32,
+        70
+      ],
+      "ks_statistic": 0.028000000000000025,
+      "ks_dkw_bound": 0.053704380621108425,
+      "within_mc_bounds": true
+    },
+    {
+      "scenario": 7,
+      "family": "nb",
+      "law": "known_propensity_crt",
+      "datasets": 1000,
+      "valid": 1000,
+      "rejections_05": 47,
+      "rejection_rate_05": 0.047,
+      "simultaneous_binomial_bounds": [
+        32,
+        70
+      ],
+      "ks_statistic": 0.03699999999999998,
+      "ks_dkw_bound": 0.053704380621108425,
+      "within_mc_bounds": true
+    }
+  ],
+  "all_within_mc_bounds": false,
+  "thread_equality": "unit test compares entire null arrays at 1,2,8,16 threads"
+}

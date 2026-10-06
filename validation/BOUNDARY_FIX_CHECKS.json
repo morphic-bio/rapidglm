@@ -1,0 +1,809 @@
+{
+  "recorded_utc": "2026-09-26T19:31:02.581486+00:00",
+  "checks": [
+    {
+      "name": "release",
+      "command": [
+        "build/rapidglm_tests",
+        "--log_level=message",
+        "--color_output=no"
+      ],
+      "exit_code": 0,
+      "log": "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/release.log",
+      "output": "Running 32 test cases...\nConcurrent Cholesky: threads=1 max_error=1.33227e-15\n[context:\n    threads=1]\nConcurrent Cholesky: threads=2 max_error=1.33227e-15\n[context:\n    threads=2]\nConcurrent Cholesky: threads=8 max_error=1.33227e-15\n[context:\n    threads=8]\nConcurrent Cholesky: threads=16 max_error=1.33227e-15\n[context:\n    threads=16]\n\n*** No errors detected\n"
+    },
+    {
+      "name": "sanitize",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build-sanitize",
+        "--output-on-failure"
+      ],
+      "exit_code": 0,
+      "log": "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/sanitize.log",
+      "output": "Internal ctest changing into directory: /mnt/pikachu/rapidglm/build-sanitize\nTest project /mnt/pikachu/rapidglm/build-sanitize\n    Start 1: engine\n1/1 Test #1: engine ...........................   Passed    1.40 sec\n\n100% tests passed, 0 tests failed out of 1\n\nTotal Test time (real) =   1.40 sec\n"
+    },
+    {
+      "name": "cli",
+      "command": [
+        "python3",
+        "tests/test_cli.py",
+        "build/rapidglm"
+      ],
+      "exit_code": 0,
+      "log": "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/cli.log",
+      "output": "......\n----------------------------------------------------------------------\nRan 6 tests in 0.046s\n\nOK\n"
+    },
+    {
+      "name": "external-build",
+      "command": [
+        "scripts/check_external.sh"
+      ],
+      "exit_code": 0,
+      "log": "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/external-build.log",
+      "output": "-- Install configuration: \"Release\"\n-- Installing: /mnt/pikachu/rapidglm/build/install/bin/rapidglm\n-- Set non-toolchain portion of runtime path of \"/mnt/pikachu/rapidglm/build/install/bin/rapidglm\" to \"\"\n-- Up-to-date: /mnt/pikachu/rapidglm/build/install/include\n-- Up-to-date: /mnt/pikachu/rapidglm/build/install/include/rapidglm\n-- Up-to-date: /mnt/pikachu/rapidglm/build/install/include/rapidglm/rapidglm.hpp\n-- Installing: /mnt/pikachu/rapidglm/build/install/include/rapidglm/inference.hpp\n-- Installing: /mnt/pikachu/rapidglm/build/install/include/rapidglm/model.hpp\n-- Up-to-date: /mnt/pikachu/rapidglm/build/install/include/rapidglm/resampling.hpp\n-- Installing: /mnt/pikachu/rapidglm/build/install/include/rapidglm/workflows.hpp\n-- Installing: /mnt/pikachu/rapidglm/build/install/include/rapidglm/sparse.hpp\n-- Up-to-date: /mnt/pikachu/rapidglm/build/install/lib/cmake/rapidglm/rapidglmTargets.cmake\n-- Up-to-date: /mnt/pikachu/rapidglm/build/install/lib/cmake/rapidglm/rapidglmTargets-release.cmake\n-- Up-to-date: /mnt/pikachu/rapidglm/build/install/lib/cmake/rapidglm/rapidglmConfig.cmake\n-- Up-to-date: /mnt/pikachu/rapidglm/build/install/lib/cmake/rapidglm/rapidglmConfigVersion.cmake\n-- Up-to-date: /mnt/pikachu/rapidglm/build/install/lib/cmake/rapidglm/FindLAPACKE.cmake\n-- Configuring done (0.0s)\n-- Generating done (0.0s)\n-- Build files have been written to: /mnt/pikachu/rapidglm/build/external\n[ 50%] Building CXX object CMakeFiles/consumer.dir/main.cpp.o\n[100%] Linking CXX executable consumer\n[100%] Built target consumer\n0.693147 \nCMake Warning (dev) at /home/lhhung/.local/lib/python3.11/site-packages/cmake/data/share/cmake-3.31/Modules/CMakeFindDependencyMacro.cmake:76 (find_package):\n  Policy CMP0167 is not set: The FindBoost module is removed.  Run \"cmake\n  --help-policy CMP0167\" for policy details.  Use the cmake_policy command to\n  set the policy and suppress this warning.\n\nCall Stack (most recent call first):\n  /mnt/pikachu/rapidglm/build/install/lib/cmake/rapidglm/rapidglmConfig.cmake:27 (find_dependency)\n  CMakeLists.txt:3 (find_package)\nThis warning is for project developers.  Use -Wno-dev to suppress it.\n\n"
+    },
+    {
+      "name": "external-public-fit",
+      "command": [
+        "build/external/consumer",
+        "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/design.tsv",
+        "/mnt/pikachu/rapidglm/validation/work/lapack-migration/consumer-response.tsv"
+      ],
+      "exit_code": 0,
+      "log": "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/external-public-fit.log",
+      "output": "-13.0316 -0.717412 3.20428 0.432612 0.40375 \n"
+    },
+    {
+      "name": "sanitize-boundary",
+      "command": [
+        "build-sanitize/rapidglm_boundary_diagnostic",
+        "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/sanitize_manifest.json"
+      ],
+      "exit_code": 0,
+      "log": "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/sanitize-boundary.log",
+      "output": ""
+    }
+  ],
+  "cpp_cases": 32,
+  "cli_cases": 6,
+  "sanitizer_openmp": false,
+  "source_hashes": {
+    "include/rapidglm/model.hpp": "a47d7852f67fc1bc414a38f9fd97ab8e989ca3b0fbc4400cd0c422e86e58e465",
+    "include/rapidglm/inference.hpp": "6f878590c29b27f25e776f66d08645cfca18dab5ebbfff34f86710b882ed9abd",
+    "include/rapidglm/workflows.hpp": "f081801892b0ff657eb710ee79aa7c03407a27ee786fbf79ea232201ff66977c",
+    "include/rapidglm/sparse.hpp": "dbde0d476432bb4eb7c867af54d8f615255124d09a707ed5a30bc761a209adef",
+    "src/io.hpp": "bfe05ea6d303012697438f70afe183708b54c5ada41e41de2a2a39251dfd620e",
+    "tests/test_boundary.cpp": "c5ddf7cd1efe7bb5d38cd972fc5a4490b6b76b83887a441e802bcbd7247aa7da",
+    "tests/test_numerics.cpp": "5a57329f683ca3d36d7c81ed7e1da1e9845086b8e011d00a001198f78b0c069b",
+    "tests/test_cli.py": "a240b5a5fb8728fab32682278cc92e27ddb5f80d42334d3964a932870c2643dd"
+  },
+  "binary_hashes": {
+    "build/rapidglm": "9df25c970f79ab1404dd9f322587ed5766b1941b0a69d670a89b2a808e325586",
+    "build/rapidglm_tests": "675885a3aaafb32f14b68fa5cd270d6e38f201f4564cd4611020fdea1c7ff50a",
+    "build-sanitize/rapidglm_tests": "d3e056b92944fcd458b136a34fc2c50be794e8d4008a878ab9d077591aae1945",
+    "build/external/consumer": "bb666cef92d5e9dd0b185b94f59f85d91c0dd5435c7dc861f4be11e0d512304d"
+  },
+  "revalidation": {
+    "fits": [
+      {
+        "name": "E1_binomial-dose-trend",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "dose-trend",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/E1_binomial-dose-trend.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "statistic": 0.0,
+          "p_value": 0.0,
+          "adjusted_p": 0.0,
+          "coefficient": 0.0,
+          "standard_error": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "1eff9a1a71ca46731f28ed997e6e455ae6afe99ba6b51a80a87e0dad30c1bc95",
+        "new_sha256": "ac3494075e97180506a6279b5a630ff23ddec683f8133ee9227014ef63e92867"
+      },
+      {
+        "name": "E1_binomial-fit",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "fit",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/E1_binomial-fit.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "theta_boundary": 0.0,
+          "log_likelihood": 0.0,
+          "iterations": 0.0,
+          "beta0": 0.0,
+          "se0": 0.0,
+          "wald_p0": 0.0,
+          "beta1": 0.0,
+          "se1": 0.0,
+          "wald_p1": 0.0,
+          "beta2": 0.0,
+          "se2": 0.0,
+          "wald_p2": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "9ff4988e81088df2e1af92be57b494d8e125cc07c08a746a1237978a83a4a509",
+        "new_sha256": "7f7c40c038edd65e7b0284e4310e6bb0044931dc16ed359320e7f85ca610ab2e"
+      },
+      {
+        "name": "E1_gaussian-dose-trend",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "dose-trend",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/E1_gaussian-dose-trend.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "statistic": 0.0,
+          "p_value": 0.0,
+          "adjusted_p": 0.0,
+          "coefficient": 0.0,
+          "standard_error": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "51b1204c47a59a9c2e59ee9e8978d7efd201cc25ff22380e86b0be72a9b2517b",
+        "new_sha256": "de1c4312bdea75c1ec3a364ad2d2062fb680551f6f7054c1df35747912435c1d"
+      },
+      {
+        "name": "E1_gaussian-fit",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "fit",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/E1_gaussian-fit.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "theta_boundary": 0.0,
+          "log_likelihood": 0.0,
+          "iterations": 0.0,
+          "beta0": 0.0,
+          "se0": 0.0,
+          "wald_p0": 0.0,
+          "beta1": 0.0,
+          "se1": 0.0,
+          "wald_p1": 0.0,
+          "beta2": 0.0,
+          "se2": 0.0,
+          "wald_p2": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "c62ea161a9032d6c6e1ef8f6ff12fcd97d415951e01306588873b0215945a252",
+        "new_sha256": "b08493323a64c431a7e0236bd5bcac953429d12091b7f4278d9555d6a7006345"
+      },
+      {
+        "name": "E1_nb-dose-trend",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "dose-trend",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/E1_nb-dose-trend.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "statistic": 0.0,
+          "p_value": 0.0,
+          "adjusted_p": 0.0,
+          "coefficient": 0.0,
+          "standard_error": 0.0,
+          "log2fc": 0.0,
+          "log2fc_se": 0.0,
+          "theta": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "993c7720c022d17f6301b0adc615c91e7eb43dffef7d72d5f3633da074a9d5f6",
+        "new_sha256": "151d0d6cdcf5e3501533e4a028dd9b4ff62a62879ecec741110e287fafcc6ff7"
+      },
+      {
+        "name": "E1_nb-fit",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "fit",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/E1_nb-fit.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "theta": 0.0,
+          "theta_boundary": 0.0,
+          "log_likelihood": 0.0,
+          "iterations": 0.0,
+          "beta0": 0.0,
+          "se0": 0.0,
+          "wald_p0": 0.0,
+          "beta1": 0.0,
+          "se1": 0.0,
+          "wald_p1": 0.0,
+          "beta2": 0.0,
+          "se2": 0.0,
+          "wald_p2": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "c956cb9a6361ac33202bf48324c1762bd9afbee783b73eaf09dd7711a13548c6",
+        "new_sha256": "c7aa750ec217aa87217eba14f286d07bf407225475292fc368897612674db0f2"
+      },
+      {
+        "name": "E1_poisson-dose-trend",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "dose-trend",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/E1_poisson-dose-trend.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "statistic": 0.0,
+          "p_value": 0.0,
+          "adjusted_p": 0.0,
+          "coefficient": 0.0,
+          "standard_error": 0.0,
+          "log2fc": 0.0,
+          "log2fc_se": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "4c5d7138b1fcd42bcc24352b7c1205ec01c15e48edff23b782c3acf89f8e598f",
+        "new_sha256": "37d82b715add4bb735ae9898768f2fe9a5dc833ee53de0faffd51eb964b850d8"
+      },
+      {
+        "name": "E1_poisson-fit",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "fit",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/E1_poisson-fit.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "theta_boundary": 0.0,
+          "log_likelihood": 0.0,
+          "iterations": 0.0,
+          "beta0": 0.0,
+          "se0": 0.0,
+          "wald_p0": 0.0,
+          "beta1": 0.0,
+          "se1": 0.0,
+          "wald_p1": 0.0,
+          "beta2": 0.0,
+          "se2": 0.0,
+          "wald_p2": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "a1577b6862926d2669d1443f259c04803f608c6ad091e3ecf9e159a8c183eb88",
+        "new_sha256": "695110e5fe48eb22bd4a468b58d5c8d624f2644181f3a58dc1573ea13bec3751"
+      },
+      {
+        "name": "S1_nb-dose-trend",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "dose-trend",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/S1_nb-dose-trend.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "statistic": 0.0,
+          "p_value": 0.0,
+          "adjusted_p": 0.0,
+          "coefficient": 0.0,
+          "standard_error": 0.0,
+          "log2fc": 0.0,
+          "log2fc_se": 0.0,
+          "theta": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "0b2641dbf71136df5ed17fa7793aaab794277ba777314d515ec4f032eda016ba",
+        "new_sha256": "e570462dfbe251c03ab68d148facd5f0b383b64cd3ce766a362ee5bddde80ebf"
+      },
+      {
+        "name": "S1_nb-fit",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "fit",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/S1_nb-fit.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "theta": 0.0,
+          "theta_boundary": 0.0,
+          "log_likelihood": 0.0,
+          "iterations": 0.0,
+          "beta0": 0.0,
+          "se0": 0.0,
+          "wald_p0": 0.0,
+          "beta1": 0.0,
+          "se1": 0.0,
+          "wald_p1": 0.0,
+          "beta2": 0.0,
+          "se2": 0.0,
+          "wald_p2": 0.0,
+          "beta3": 0.0,
+          "se3": 0.0,
+          "wald_p3": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "12c57b53ceb36a7d3beecbdaf319ec928a705d05d0cabef8c637600aade093a4",
+        "new_sha256": "4a566ee1b41b960cc2f63dfc5d0fca28712778ef28259acf61030f76fc4fcbfb"
+      },
+      {
+        "name": "S1_public_nb-dose-trend",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "dose-trend",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/S1_public_nb-dose-trend.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "statistic": 0.0,
+          "p_value": 0.0,
+          "adjusted_p": 0.0,
+          "coefficient": 0.0,
+          "standard_error": 0.0,
+          "log2fc": 0.0,
+          "log2fc_se": 0.0,
+          "theta": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "f58e19307e66e3eec9bdc5f3778ae895de0001de2be908132960eeb868b388a9",
+        "new_sha256": "7bab1839d9378026b27db8eab6d63650ba736caf506dafb8b9b4c264046958cf"
+      },
+      {
+        "name": "S1_public_nb-fit",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "fit",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/S1_public_nb-fit.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "theta": 0.0,
+          "theta_boundary": 0.0,
+          "log_likelihood": 0.0,
+          "iterations": 0.0,
+          "beta0": 0.0,
+          "se0": 0.0,
+          "wald_p0": 0.0,
+          "beta1": 0.0,
+          "se1": 0.0,
+          "wald_p1": 0.0,
+          "beta2": 0.0,
+          "se2": 0.0,
+          "wald_p2": 0.0,
+          "beta3": 0.0,
+          "se3": 0.0,
+          "wald_p3": 0.0,
+          "beta4": 0.0,
+          "se4": 0.0,
+          "wald_p4": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "244e498cd605119b649af65efbd2cc8fae9ed320ec31b96b1df0a6d7eff43656",
+        "new_sha256": "02f939e2b65d7edfe2725167498b28463e9abe09525035793020a2c514beead8"
+      },
+      {
+        "name": "S2_nb-dose-trend",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "dose-trend",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/S2_nb-dose-trend.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "statistic": 0.0,
+          "p_value": 0.0,
+          "adjusted_p": 0.0,
+          "coefficient": 0.0,
+          "standard_error": 0.0,
+          "log2fc": 0.0,
+          "log2fc_se": 0.0,
+          "theta": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "4658e90e888fd631516456edc735822578052941f48e40824069b6af5defebde",
+        "new_sha256": "4def3a108bc88359a59f2f222748fb3b77227672ff9af59bb5d33a6afd33a18f"
+      },
+      {
+        "name": "S2_nb-fit",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "fit",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/S2_nb-fit.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "theta": 0.0,
+          "theta_boundary": 0.0,
+          "log_likelihood": 0.0,
+          "iterations": 0.0,
+          "beta0": 0.0,
+          "se0": 0.0,
+          "wald_p0": 0.0,
+          "beta1": 0.0,
+          "se1": 0.0,
+          "wald_p1": 0.0,
+          "beta2": 0.0,
+          "se2": 0.0,
+          "wald_p2": 0.0,
+          "beta3": 0.0,
+          "se3": 0.0,
+          "wald_p3": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "34981795243b36ba8a5086344ae59a0a34706abe4e595a1f966b12c18c07508e",
+        "new_sha256": "cbd88fb91ba135980aaceb69f44be2f72e5094314e3d15ce0318ce2770e8e0a2"
+      },
+      {
+        "name": "S2_public_nb-dose-trend",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "dose-trend",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/S2_public_nb-dose-trend.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "statistic": 0.0,
+          "p_value": 0.0,
+          "adjusted_p": 0.0,
+          "coefficient": 0.0,
+          "standard_error": 0.0,
+          "log2fc": 0.0,
+          "log2fc_se": 0.0,
+          "theta": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "e7b744fa27ccb8915698b06f6088e478ea777924788d351df4d960a6fec930a2",
+        "new_sha256": "9c266ea923fff9e7c024d0a3f55867b427d315dfca72913011c74ef836ab8947"
+      },
+      {
+        "name": "S2_public_nb-fit",
+        "rows": 12,
+        "command": [
+          "build/rapidglm",
+          "fit",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/S2_public_nb-fit.json"
+        ],
+        "max_scaled_errors": {
+          "feature": 0.0,
+          "theta": 0.0,
+          "theta_boundary": 0.0,
+          "log_likelihood": 0.0,
+          "iterations": 0.0,
+          "beta0": 0.0,
+          "se0": 0.0,
+          "wald_p0": 0.0,
+          "beta1": 0.0,
+          "se1": 0.0,
+          "wald_p1": 0.0,
+          "beta2": 0.0,
+          "se2": 0.0,
+          "wald_p2": 0.0,
+          "beta3": 0.0,
+          "se3": 0.0,
+          "wald_p3": 0.0
+        },
+        "nonnumeric_or_nonfinite_mismatches": [],
+        "old_sha256": "a8be8c5922eb3f5a42614412a1dedda8eaaaa69316c8766bd7d772888d8af37c",
+        "new_sha256": "e41b4cfac0280748dbd98914cfe6c1863eb5cbc2d241b83975f1cac6e4c4846e"
+      }
+    ],
+    "calibration": [
+      {
+        "threads": 1,
+        "datasets": 96,
+        "draws": 99,
+        "command": [
+          "build/rapidglm_calibration",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/calibration-1-12.tsv",
+          "12",
+          "99",
+          "1"
+        ],
+        "sha256": "1a21235b30b2aa8e90f934c2e8c2c1d8e32edc5b500a8292e4aa53f6f31f7c97",
+        "previous_sha256": "1a21235b30b2aa8e90f934c2e8c2c1d8e32edc5b500a8292e4aa53f6f31f7c97",
+        "byte_identical": true
+      },
+      {
+        "threads": 2,
+        "datasets": 96,
+        "draws": 99,
+        "command": [
+          "build/rapidglm_calibration",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/calibration-2-12.tsv",
+          "12",
+          "99",
+          "2"
+        ],
+        "sha256": "1a21235b30b2aa8e90f934c2e8c2c1d8e32edc5b500a8292e4aa53f6f31f7c97",
+        "previous_sha256": "1a21235b30b2aa8e90f934c2e8c2c1d8e32edc5b500a8292e4aa53f6f31f7c97",
+        "byte_identical": true
+      },
+      {
+        "threads": 8,
+        "datasets": 96,
+        "draws": 99,
+        "command": [
+          "build/rapidglm_calibration",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/calibration-8-12.tsv",
+          "12",
+          "99",
+          "8"
+        ],
+        "sha256": "1a21235b30b2aa8e90f934c2e8c2c1d8e32edc5b500a8292e4aa53f6f31f7c97",
+        "previous_sha256": "1a21235b30b2aa8e90f934c2e8c2c1d8e32edc5b500a8292e4aa53f6f31f7c97",
+        "byte_identical": true
+      },
+      {
+        "threads": 16,
+        "datasets": 96,
+        "draws": 99,
+        "command": [
+          "build/rapidglm_calibration",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/calibration-16-12.tsv",
+          "12",
+          "99",
+          "16"
+        ],
+        "sha256": "1a21235b30b2aa8e90f934c2e8c2c1d8e32edc5b500a8292e4aa53f6f31f7c97",
+        "previous_sha256": "1a21235b30b2aa8e90f934c2e8c2c1d8e32edc5b500a8292e4aa53f6f31f7c97",
+        "byte_identical": true
+      },
+      {
+        "threads": 8,
+        "datasets": 8000,
+        "draws": 499,
+        "command": [
+          "build/rapidglm_calibration",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/calibration-8-1000.tsv",
+          "1000",
+          "499",
+          "8"
+        ],
+        "sha256": "033c826344c8ff4d29bc7e5fe8a25006a0330c11d694b7b5bc8d549efd86f7ba",
+        "previous_sha256": "033c826344c8ff4d29bc7e5fe8a25006a0330c11d694b7b5bc8d549efd86f7ba",
+        "byte_identical": true
+      }
+    ],
+    "pseudobulk": [
+      {
+        "threads": 1,
+        "command": [
+          "build/rapidglm",
+          "pseudobulk-de",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/pseudobulk-1.json"
+        ],
+        "sha256": "4b75a0c2224cf1154cd5e40f47ff16e49e4be9c0bb59343afec17633825edf85",
+        "statuses": {
+          "converged": 998,
+          "converged_boundary": 2
+        },
+        "valid_tests": 1000,
+        "nonregular_rows": [
+          {
+            "feature": 399,
+            "status": "converged_boundary",
+            "statistic": 1.575228673756891,
+            "p_value": 0.1152036708814218,
+            "adjusted_p": 0.1355337304487315,
+            "coefficient": 0.3076792993043774,
+            "standard_error": 0.1953235770972655,
+            "log2fc": 0.4438873992906164,
+            "log2fc_se": 0.2817923560469181,
+            "theta": 100000000.00000018,
+            "coefficient_boundary": 0
+          },
+          {
+            "feature": 880,
+            "status": "converged_boundary",
+            "statistic": -3.276901530426747,
+            "p_value": 0.0010495296483738,
+            "adjusted_p": 0.0015641276428819,
+            "coefficient": -0.7012491201557073,
+            "standard_error": 0.2139976174579724,
+            "log2fc": -1.011688628076388,
+            "log2fc_se": 0.3087333014686702,
+            "theta": 100000000.00000018,
+            "coefficient_boundary": 0
+          }
+        ],
+        "maximum_absolute_change_on_previously_regular_fits": {
+          "coefficient": 2.7045032879868813e-12,
+          "standard_error": 1.317598807837328e-12,
+          "statistic": 2.943618682138549e-10,
+          "p_value": 2.1316282072803006e-14
+        }
+      },
+      {
+        "threads": 2,
+        "command": [
+          "build/rapidglm",
+          "pseudobulk-de",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/pseudobulk-2.json"
+        ],
+        "sha256": "4b75a0c2224cf1154cd5e40f47ff16e49e4be9c0bb59343afec17633825edf85",
+        "statuses": {
+          "converged": 998,
+          "converged_boundary": 2
+        },
+        "valid_tests": 1000,
+        "nonregular_rows": [
+          {
+            "feature": 399,
+            "status": "converged_boundary",
+            "statistic": 1.575228673756891,
+            "p_value": 0.1152036708814218,
+            "adjusted_p": 0.1355337304487315,
+            "coefficient": 0.3076792993043774,
+            "standard_error": 0.1953235770972655,
+            "log2fc": 0.4438873992906164,
+            "log2fc_se": 0.2817923560469181,
+            "theta": 100000000.00000018,
+            "coefficient_boundary": 0
+          },
+          {
+            "feature": 880,
+            "status": "converged_boundary",
+            "statistic": -3.276901530426747,
+            "p_value": 0.0010495296483738,
+            "adjusted_p": 0.0015641276428819,
+            "coefficient": -0.7012491201557073,
+            "standard_error": 0.2139976174579724,
+            "log2fc": -1.011688628076388,
+            "log2fc_se": 0.3087333014686702,
+            "theta": 100000000.00000018,
+            "coefficient_boundary": 0
+          }
+        ],
+        "maximum_absolute_change_on_previously_regular_fits": {
+          "coefficient": 2.7045032879868813e-12,
+          "standard_error": 1.317598807837328e-12,
+          "statistic": 2.943618682138549e-10,
+          "p_value": 2.1316282072803006e-14
+        }
+      },
+      {
+        "threads": 8,
+        "command": [
+          "build/rapidglm",
+          "pseudobulk-de",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/pseudobulk-8.json"
+        ],
+        "sha256": "4b75a0c2224cf1154cd5e40f47ff16e49e4be9c0bb59343afec17633825edf85",
+        "statuses": {
+          "converged": 998,
+          "converged_boundary": 2
+        },
+        "valid_tests": 1000,
+        "nonregular_rows": [
+          {
+            "feature": 399,
+            "status": "converged_boundary",
+            "statistic": 1.575228673756891,
+            "p_value": 0.1152036708814218,
+            "adjusted_p": 0.1355337304487315,
+            "coefficient": 0.3076792993043774,
+            "standard_error": 0.1953235770972655,
+            "log2fc": 0.4438873992906164,
+            "log2fc_se": 0.2817923560469181,
+            "theta": 100000000.00000018,
+            "coefficient_boundary": 0
+          },
+          {
+            "feature": 880,
+            "status": "converged_boundary",
+            "statistic": -3.276901530426747,
+            "p_value": 0.0010495296483738,
+            "adjusted_p": 0.0015641276428819,
+            "coefficient": -0.7012491201557073,
+            "standard_error": 0.2139976174579724,
+            "log2fc": -1.011688628076388,
+            "log2fc_se": 0.3087333014686702,
+            "theta": 100000000.00000018,
+            "coefficient_boundary": 0
+          }
+        ],
+        "maximum_absolute_change_on_previously_regular_fits": {
+          "coefficient": 2.7045032879868813e-12,
+          "standard_error": 1.317598807837328e-12,
+          "statistic": 2.943618682138549e-10,
+          "p_value": 2.1316282072803006e-14
+        }
+      },
+      {
+        "threads": 16,
+        "command": [
+          "build/rapidglm",
+          "pseudobulk-de",
+          "/mnt/pikachu/rapidglm/validation/work/boundary-fix-regression/pseudobulk-16.json"
+        ],
+        "sha256": "4b75a0c2224cf1154cd5e40f47ff16e49e4be9c0bb59343afec17633825edf85",
+        "statuses": {
+          "converged": 998,
+          "converged_boundary": 2
+        },
+        "valid_tests": 1000,
+        "nonregular_rows": [
+          {
+            "feature": 399,
+            "status": "converged_boundary",
+            "statistic": 1.575228673756891,
+            "p_value": 0.1152036708814218,
+            "adjusted_p": 0.1355337304487315,
+            "coefficient": 0.3076792993043774,
+            "standard_error": 0.1953235770972655,
+            "log2fc": 0.4438873992906164,
+            "log2fc_se": 0.2817923560469181,
+            "theta": 100000000.00000018,
+            "coefficient_boundary": 0
+          },
+          {
+            "feature": 880,
+            "status": "converged_boundary",
+            "statistic": -3.276901530426747,
+            "p_value": 0.0010495296483738,
+            "adjusted_p": 0.0015641276428819,
+            "coefficient": -0.7012491201557073,
+            "standard_error": 0.2139976174579724,
+            "log2fc": -1.011688628076388,
+            "log2fc_se": 0.3087333014686702,
+            "theta": 100000000.00000018,
+            "coefficient_boundary": 0
+          }
+        ],
+        "maximum_absolute_change_on_previously_regular_fits": {
+          "coefficient": 2.7045032879868813e-12,
+          "standard_error": 1.317598807837328e-12,
+          "statistic": 2.943618682138549e-10,
+          "p_value": 2.1316282072803006e-14
+        }
+      }
+    ],
+    "pseudobulk_reference_comparisons": {
+      "edgeR": {
+        "pairs": 1000,
+        "usable": 1000,
+        "statistic_spearman": 0.9907036147036148,
+        "native_discoveries": 809,
+        "reference_discoveries": 762,
+        "discovery_jaccard": 0.9419035846724351,
+        "max_p_absolute_difference": 0.5520364134993988
+      },
+      "DESeq2": {
+        "pairs": 1000,
+        "usable": 1000,
+        "statistic_spearman": 0.9935690975690976,
+        "native_discoveries": 809,
+        "reference_discoveries": 710,
+        "discovery_jaccard": 0.8776266996291718,
+        "max_p_absolute_difference": 0.45792816501512895
+      }
+    },
+    "pseudobulk_all_thread_outputs_identical": true,
+    "maximum_scaled_ordinary_fit_difference": 0.0,
+    "all_ordinary_status_fields_match": true
+  },
+  "boundary_diagnostic_receipt": "validation/BOUNDARY_FIX.json",
+  "scope": "Count-family deviance stopping with a finite-coefficient precision guard and explicit boundary inference protection. Gaussian/binomial rules and historical calibration failures unchanged. Provisional acceptance thresholds not altered.",
+  "limitations": [
+    "Boundary certification checks a projected IRLS recession direction; it is not an exhaustive LP separation detector. Uncertified nonstationary directions remain subject to the coefficient guard and iteration limit.",
+    "Ordinary LR and score inference reject boundary fits. Wald inference remains available for unflagged finite coefficients.",
+    "No changes to count data, weights, offsets, generator, resampling, or BLAS configuration.",
+    "ASan/UBSan checks use the existing OpenMP-disabled sanitizer build; thread-count identity is tested in release."
+  ],
+  "backend_provenance": "validation/BLAS_THREAD_SAFETY.json: pthread OpenBLAS 0.3.20, one internal worker; unchanged by this fix.",
+  "boundary_diagnostic_receipt_sha256": "aa4d2de25f3e8873966f773fc48ae1bbda72a726e2b613088555518d9f339430"
+}

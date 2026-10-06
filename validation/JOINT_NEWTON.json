@@ -1,0 +1,309 @@
+{
+ "purpose": "Evidence for the joint (beta, log theta) Newton NB ML fit against the alternation.",
+ "commit": "09913698fa0f58bdf4dbd4827197e8262fea061b",
+ "worktree_dirty": true,
+ "commit_note": "Measured with the joint-Newton changes uncommitted on top of 0991369; they were committed with this receipt as 3507db9.",
+ "baseline": "commit 0991369 (alternating NB ML): its CLI and rapidglm_glm_compare, and benchmarks/glm/rapidglm_batch.cpp compiled against its include/",
+ "command": "python3 scripts/validate_joint_newton.py --work DIR --output validation/JOINT_NEWTON.json --baseline-cli B/rapidglm --baseline-compare B/rapidglm_glm_compare --baseline-batch BATCH --r-library validation/local-data/R_glmgampoi:validation/local-data/R_library",
+ "panels": [
+  {
+   "case": "S1_public",
+   "table": ".tsv",
+   "byte_identical": false,
+   "discoveries": [
+    41,
+    41
+   ],
+   "discovery_jaccard": 1.0,
+   "text_or_finiteness_mismatches": 0,
+   "max_relative_difference": 1.5090188894167678e-10
+  },
+  {
+   "case": "S1_public",
+   "table": ".qq.tsv",
+   "byte_identical": true
+  },
+  {
+   "case": "S1_public-integration=singleton",
+   "table": ".tsv",
+   "byte_identical": false,
+   "discoveries": [
+    127,
+    127
+   ],
+   "discovery_jaccard": 1.0,
+   "text_or_finiteness_mismatches": 0,
+   "max_relative_difference": 1.826353651113931e-10
+  },
+  {
+   "case": "S1_public-integration=singleton",
+   "table": ".qq.tsv",
+   "byte_identical": true
+  },
+  {
+   "case": "S1_public-integration=bonferroni",
+   "table": ".tsv",
+   "byte_identical": false,
+   "discoveries": [
+    37,
+    37
+   ],
+   "discovery_jaccard": 1.0,
+   "text_or_finiteness_mismatches": 0,
+   "max_relative_difference": 6.186276742501351e-11
+  },
+  {
+   "case": "S1_public-integration=bonferroni",
+   "table": ".qq.tsv",
+   "byte_identical": true
+  },
+  {
+   "case": "S1_public-null_model=sceptre",
+   "table": ".tsv",
+   "byte_identical": false,
+   "discoveries": [
+    41,
+    41
+   ],
+   "discovery_jaccard": 1.0,
+   "text_or_finiteness_mismatches": 0,
+   "max_relative_difference": 1.5090188894167678e-10
+  },
+  {
+   "case": "S1_public-null_model=sceptre",
+   "table": ".qq.tsv",
+   "byte_identical": true
+  },
+  {
+   "case": "S2_public",
+   "table": ".tsv",
+   "byte_identical": false,
+   "discoveries": [
+    23,
+    23
+   ],
+   "discovery_jaccard": 1.0,
+   "text_or_finiteness_mismatches": 0,
+   "max_relative_difference": 1.2005362558256542e-10
+  },
+  {
+   "case": "S2_public",
+   "table": ".qq.tsv",
+   "byte_identical": true
+  },
+  {
+   "case": "S2_public-null_model=sceptre",
+   "table": ".tsv",
+   "byte_identical": false,
+   "discoveries": [
+    23,
+    23
+   ],
+   "discovery_jaccard": 1.0,
+   "text_or_finiteness_mismatches": 0,
+   "max_relative_difference": 1.2005362558256542e-10
+  },
+  {
+   "case": "S2_public-null_model=sceptre",
+   "table": ".qq.tsv",
+   "byte_identical": true
+  },
+  {
+   "case": "pseudobulk",
+   "table": ".tsv",
+   "byte_identical": false,
+   "discoveries": [
+    809,
+    809
+   ],
+   "discovery_jaccard": 1.0,
+   "text_or_finiteness_mismatches": 0,
+   "max_relative_difference": 1.0587993850084184e-06
+  },
+  {
+   "case": "pseudobulk-test=lr",
+   "table": ".tsv",
+   "byte_identical": false,
+   "discoveries": [
+    803,
+    803
+   ],
+   "discovery_jaccard": 1.0,
+   "text_or_finiteness_mismatches": 0,
+   "max_relative_difference": 1.0587993850084184e-06
+  },
+  {
+   "case": "dose",
+   "table": ".tsv",
+   "byte_identical": false,
+   "discoveries": [
+    105,
+    105
+   ],
+   "discovery_jaccard": 1.0,
+   "text_or_finiteness_mismatches": 0,
+   "max_relative_difference": 5.785250585283759e-09
+  },
+  {
+   "case": "pseudobulk_fit",
+   "table": ".tsv",
+   "byte_identical": false,
+   "discoveries": null,
+   "discovery_jaccard": null,
+   "text_or_finiteness_mismatches": 0,
+   "max_relative_difference": 1.0587993850084184e-06
+  }
+ ],
+ "identical_at_1_and_16_threads": {
+  "pseudobulk_fit": true,
+  "dose": true
+ },
+ "e1": {
+  "sha256": "033c826344c8ff4d29bc7e5fe8a25006a0330c11d694b7b5bc8d549efd86f7ba",
+  "unchanged": true
+ },
+ "accuracy_rapidglm_singular": {
+  "problems": 39,
+  "failures": [],
+  "median_coefficient_error_se": 3.0610649951001033e-15,
+  "max_coefficient_error_se": 1.5620302324186027e-05,
+  "median_se_relative_error": 8.384204769531277e-16,
+  "max_se_relative_error": 2.0639339099941687e-07
+ },
+ "speed_nb": [
+  {
+   "problem": "speed-nb-n10000-p20",
+   "baseline_seconds": 0.014233918,
+   "joint_seconds": 0.007540512,
+   "loglik_difference": 0.0,
+   "max_rel_coefficient_difference": 2.22474795303179e-11,
+   "iterations": [
+    11,
+    3
+   ]
+  },
+  {
+   "problem": "speed-nb-n10000-p5",
+   "baseline_seconds": 0.008786246,
+   "joint_seconds": 0.004259143,
+   "loglik_difference": 0.0,
+   "max_rel_coefficient_difference": 1.0373762998569844e-12,
+   "iterations": [
+    11,
+    4
+   ]
+  },
+  {
+   "problem": "speed-nb-n10000-p50",
+   "baseline_seconds": 0.041460123,
+   "joint_seconds": 0.024921578,
+   "loglik_difference": 0.0,
+   "max_rel_coefficient_difference": 4.446028314825223e-11,
+   "iterations": [
+    13,
+    4
+   ]
+  },
+  {
+   "problem": "speed-nb-n100000-p20",
+   "baseline_seconds": 0.130005919,
+   "joint_seconds": 0.078362319,
+   "loglik_difference": 0.0,
+   "max_rel_coefficient_difference": 7.287134669753751e-14,
+   "iterations": [
+    8,
+    3
+   ]
+  },
+  {
+   "problem": "speed-nb-n100000-p5",
+   "baseline_seconds": 0.075375641,
+   "joint_seconds": 0.041665203,
+   "loglik_difference": 0.0,
+   "max_rel_coefficient_difference": 2.4849721728149996e-14,
+   "iterations": [
+    8,
+    4
+   ]
+  },
+  {
+   "problem": "speed-nb-n100000-p50",
+   "baseline_seconds": 0.407777678,
+   "joint_seconds": 0.259324849,
+   "loglik_difference": 0.0,
+   "max_rel_coefficient_difference": 2.438971411032905e-12,
+   "iterations": [
+    10,
+    3
+   ]
+  }
+ ],
+ "batches": [
+  {
+   "batch": "general",
+   "n": 5000,
+   "p": 5,
+   "responses": 1000,
+   "baseline_seconds_1_threads": 3.7548,
+   "joint_seconds_1_threads": 1.83375,
+   "joint_seconds_4_threads": 0.471798,
+   "joint_seconds_16_threads": 0.206919,
+   "interior_fits": 955,
+   "theta_at_bound_both": 45,
+   "theta_at_bound_one": 0,
+   "loglik_joint_minus_baseline": [
+    -1.0868461686186492e-10,
+    2.696651790756732e-10
+   ],
+   "max_rel_coefficient_difference": 4.666909746471232e-11,
+   "glmgampoi_seconds": 3.114
+  },
+  {
+   "batch": "four_groups",
+   "n": 5000,
+   "p": 4,
+   "responses": 1000,
+   "baseline_seconds_1_threads": 2.90114,
+   "joint_seconds_1_threads": 1.39304,
+   "joint_seconds_4_threads": 0.359241,
+   "joint_seconds_16_threads": 0.156411,
+   "interior_fits": 963,
+   "theta_at_bound_both": 37,
+   "theta_at_bound_one": 0,
+   "loglik_joint_minus_baseline": [
+    -4.18367562815547e-11,
+    2.637534635141492e-10
+   ],
+   "max_rel_coefficient_difference": 1.2450913445447197e-11,
+   "glmgampoi_seconds": 1.67
+  },
+  {
+   "batch": "intercept",
+   "n": 5000,
+   "p": 1,
+   "responses": 1000,
+   "baseline_seconds_1_threads": 2.39099,
+   "joint_seconds_1_threads": 1.23279,
+   "joint_seconds_4_threads": 0.318235,
+   "joint_seconds_16_threads": 0.141352,
+   "interior_fits": 961,
+   "theta_at_bound_both": 39,
+   "theta_at_bound_one": 0,
+   "loglik_joint_minus_baseline": [
+    -3.4151526051573455e-10,
+    3.019522409886122e-10
+   ],
+   "max_rel_coefficient_difference": 2.5712356833172964e-12,
+   "glmgampoi_seconds": 1.647
+  }
+ ],
+ "ql": {
+  "sha256": "2148afa14ba1c3e1120f47ae9eab4428c047985d3080ff4b8af5300155b5a72e",
+  "unchanged": true
+ },
+ "load_average": [
+  5.1826171875,
+  8.23291015625,
+  10.95654296875
+ ]
+}

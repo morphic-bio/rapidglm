@@ -1,0 +1,11 @@
+[package]
+name = "rapidglm"
+version = "1.0.0"
+edition = "2021"
+license = "MIT"
+description = "Rust bindings to the RapidGLM C interface, and PyDESeq2's workflow on the RapidGLM engine"
+repository = "https://github.com/morphic-bio/rapidglm"
+links = "rapidglm_c"
+
+[dependencies]
+libm = "0.2"

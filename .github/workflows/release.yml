@@ -1,0 +1,90 @@
+name: Release
+
+# Pushing a tag such as v1.0.0 builds and tests that commit, then publishes a
+# GitHub release with the header-only library (headers and CMake package) and a
+# Linux x86_64 CLI build, plus the source archive.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  OPENBLAS_NUM_THREADS: "1"
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake g++ libboost-dev liblapacke-dev libopenblas-pthread-dev
+      - name: Check the tag matches the project version
+        run: |
+          version=$(sed -n 's/^project(rapidglm VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          test "v$version" = "$GITHUB_REF_NAME" || {
+            echo "tag $GITHUB_REF_NAME does not match CMake version $version"; exit 1; }
+          header=$(sed -n 's/.*version = "\([0-9.]*\)".*/\1/p' include/rapidglm/rapidglm.hpp)
+          test "$header" = "$version" || { echo "rapidglm.hpp version $header differs from CMake $version"; exit 1; }
+          grep -q "^Version: $version$" bindings/r/DESCRIPTION || { echo "R package version differs"; exit 1; }
+          grep -q "^__version__ = \"$version\"" bindings/python/rapidglm/__init__.py || { echo "Python version differs"; exit 1; }
+      - name: Build and test
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build -j "$(nproc)"
+          ctest --test-dir build --output-on-failure
+          python3 tests/test_cli.py build/rapidglm
+          scripts/check_external.sh
+      - name: Package
+        run: |
+          name="rapidglm-${GITHUB_REF_NAME#v}"
+          mkdir -p dist
+          cmake --install build --prefix "stage/$name-linux-x86_64"
+          cp LICENSE README.md CHANGELOG.md DEPENDENCIES.md "stage/$name-linux-x86_64/"
+          tar -C stage -czf "dist/$name-linux-x86_64.tar.gz" "$name-linux-x86_64"
+          git archive --format=tar.gz --prefix="$name/" -o "dist/$name-source.tar.gz" HEAD
+          (cd dist && sha256sum * > SHA256SUMS)
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* --title "RapidGLM ${GITHUB_REF_NAME#v}" \
+            --notes "Header-only C++ library, C interface library (librapidglm_c), CMake package and Linux x86_64 CLI, built on Ubuntu 24.04 against system LAPACKE and pthread OpenBLAS (run with OPENBLAS_NUM_THREADS=1). Changes: CHANGELOG.md. Benchmarks and documentation: README.md. Python and R packages and a Dockerfile are in the source archive."
+
+  # Multi-arch container on ghcr.io, as for RapidMACS. Off until the public
+  # release: set the repository variable PUBLISH_CONTAINER to "true" to enable.
+  container:
+    if: vars.PUBLISH_CONTAINER == 'true'
+    needs: release
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tags and labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+      - name: Build and push (amd64 + arm64)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

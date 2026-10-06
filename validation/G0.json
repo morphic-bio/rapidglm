@@ -1,0 +1,15 @@
+{
+  "gate": "G0",
+  "status": "PASS",
+  "date": "2026-09-26",
+  "commands": ["scripts/ci.sh"],
+  "compiler": "GNU 12.3.0",
+  "boost": "1.74.0",
+  "openmp": "4.5",
+  "tests": {"passed": 1, "failed": 0, "scope": "initial version smoke"},
+  "method_contract": "METHODS.md",
+  "dependency_licences": "DEPENDENCIES.md",
+  "thresholds": "provisional per author",
+  "host_load_1_5_15": [10.93, 11.68, 13.49],
+  "timing_scope": "build/test only; no benchmark claim"
+}

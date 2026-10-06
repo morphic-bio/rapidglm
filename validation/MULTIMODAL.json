@@ -1,0 +1,266 @@
+{
+  "gate": "G7",
+  "source": "/mnt/pikachu/catatac_gse288996/qc_endpoint/catatac_dmso1_trimodal_fdr.h5mu",
+  "source_sha256": "15883ed76c81fb8525f63f79b1248e71e4ba697ba2d304452bfdc95402016d5e",
+  "annotation": "/mnt/pikachu/refdata-cellranger-arc-GRCh38-2020-A-2.0.0/genes/genes.gtf.gz",
+  "annotation_sha256": "299c16cbcbcb75792a7cfebe239a674059e1f099ec5339c552529372f12902ae",
+  "window_bp": 50000,
+  "targets": [
+    "ADNP",
+    "BRD2",
+    "CHD2",
+    "CNOT2",
+    "GPBP1L1",
+    "HIC2",
+    "KMT2B",
+    "MNT",
+    "PHF6",
+    "PIAS1",
+    "PLAGL2",
+    "PQBP1",
+    "SIN3A",
+    "SLTM",
+    "TSC22D4",
+    "UBE2L3",
+    "YEATS4",
+    "ZBED6",
+    "ZFPM2",
+    "ZNF330",
+    "ZNF669"
+  ],
+  "peaks_per_locus": [
+    9,
+    14,
+    10,
+    3,
+    7,
+    11,
+    13,
+    12,
+    5,
+    5,
+    5,
+    9,
+    5,
+    2,
+    16,
+    11,
+    6,
+    7,
+    6,
+    2,
+    10
+  ],
+  "command": "python3 scripts/validate_multimodal.py",
+  "scope": "DMSO1 frozen target-singlet calls; depth-adjusted NB effect vs published normalized descriptive direction; no DASA claim",
+  "results": [
+    {
+      "modality": "rna",
+      "tested": 21,
+      "valid": 15,
+      "paper_direction_agreement": 13,
+      "differences": [
+        {
+          "target": "KMT2B",
+          "status": "failed_pair_qc",
+          "log2fc": null,
+          "paper_delta": -0.1003837327404507,
+          "suite_delta": -0.0880508156627114
+        },
+        {
+          "target": "PHF6",
+          "status": "failed_pair_qc",
+          "log2fc": null,
+          "paper_delta": null,
+          "suite_delta": -0.1647701206064318
+        },
+        {
+          "target": "PLAGL2",
+          "status": "ok",
+          "log2fc": 0.0022420824849271,
+          "paper_delta": null,
+          "suite_delta": -0.0269263313129646
+        },
+        {
+          "target": "PQBP1",
+          "status": "failed_pair_qc",
+          "log2fc": null,
+          "paper_delta": -0.0631996944683179,
+          "suite_delta": -0.0341680457678747
+        },
+        {
+          "target": "TSC22D4",
+          "status": "failed_pair_qc",
+          "log2fc": null,
+          "paper_delta": -0.0577039463376786,
+          "suite_delta": -0.0567543266161558
+        },
+        {
+          "target": "UBE2L3",
+          "status": "ok",
+          "log2fc": -1.9720755532060452,
+          "paper_delta": null,
+          "suite_delta": -0.9325239968768116
+        },
+        {
+          "target": "ZBED6",
+          "status": "failed_pair_qc",
+          "log2fc": null,
+          "paper_delta": -0.0048902552688222,
+          "suite_delta": -0.0146531147565548
+        },
+        {
+          "target": "ZFPM2",
+          "status": "failed_pair_qc",
+          "log2fc": null,
+          "paper_delta": null,
+          "suite_delta": null
+        }
+      ],
+      "run": {
+        "version": "0.1.0",
+        "command": "sceptre",
+        "config_path": "/mnt/pikachu/rapidglm/validation/work/multimodal/rna/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/multimodal/rna/responses.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/multimodal/rna/design.tsv",
+          "assignments": "/mnt/pikachu/rapidglm/validation/work/multimodal/assignments.mtx",
+          "guides": "/mnt/pikachu/rapidglm/validation/work/multimodal/guides.tsv",
+          "pairs": "/mnt/pikachu/rapidglm/validation/work/multimodal/rna/pairs.tsv",
+          "output": "/mnt/pikachu/rapidglm/validation/work/multimodal/rna/native",
+          "moi": "low",
+          "cell_qc": "false",
+          "family": "nb",
+          "threads": "2",
+          "seed": "20260926",
+          "budgets": [
+            "499",
+            "4999"
+          ]
+        },
+        "seed": 20260926,
+        "threads": 2,
+        "observations": 12220,
+        "features": 21,
+        "retained_cells": 4709,
+        "invalid_tests_or_fits": 6,
+        "calibration_rejections": 0,
+        "power_rejections": 13,
+        "discovery_rejections": 0,
+        "wall_seconds": 34.538802994,
+        "peak_rss_kib": 1092432,
+        "load_average": [
+          15.90625,
+          12.7958984375,
+          12.07958984375
+        ],
+        "api_frozen": false
+      },
+      "result_sha256": "fc7811833ec64600076b0b8fa3a2749cd20ab9526c9bb524a4d348f42205bbd2"
+    },
+    {
+      "modality": "atac",
+      "tested": 21,
+      "valid": 18,
+      "paper_direction_agreement": 13,
+      "differences": [
+        {
+          "target": "CHD2",
+          "status": "ok",
+          "log2fc": -0.1382783598520657,
+          "paper_delta": 0.1645954751851684,
+          "suite_delta": 0.0422479174755061
+        },
+        {
+          "target": "CNOT2",
+          "status": "ok",
+          "log2fc": -0.9191902147337118,
+          "paper_delta": 0.0188940432667844,
+          "suite_delta": -0.1055739689549141
+        },
+        {
+          "target": "PHF6",
+          "status": "failed_pair_qc",
+          "log2fc": null,
+          "paper_delta": null,
+          "suite_delta": -0.0737760635372942
+        },
+        {
+          "target": "PLAGL2",
+          "status": "ok",
+          "log2fc": -0.979939197575822,
+          "paper_delta": null,
+          "suite_delta": -0.1089472548351289
+        },
+        {
+          "target": "PQBP1",
+          "status": "ok",
+          "log2fc": 0.0466699399806386,
+          "paper_delta": -0.0653728298095795,
+          "suite_delta": -0.0217386990626276
+        },
+        {
+          "target": "UBE2L3",
+          "status": "ok",
+          "log2fc": -0.4503289712435694,
+          "paper_delta": null,
+          "suite_delta": -0.1808416939398227
+        },
+        {
+          "target": "ZFPM2",
+          "status": "failed_pair_qc",
+          "log2fc": null,
+          "paper_delta": null,
+          "suite_delta": null
+        },
+        {
+          "target": "ZNF330",
+          "status": "failed_pair_qc",
+          "log2fc": null,
+          "paper_delta": -0.0682649046149373,
+          "suite_delta": -0.0846146593346836
+        }
+      ],
+      "run": {
+        "version": "0.1.0",
+        "command": "sceptre",
+        "config_path": "/mnt/pikachu/rapidglm/validation/work/multimodal/atac/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/multimodal/atac/responses.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/multimodal/atac/design.tsv",
+          "assignments": "/mnt/pikachu/rapidglm/validation/work/multimodal/assignments.mtx",
+          "guides": "/mnt/pikachu/rapidglm/validation/work/multimodal/guides.tsv",
+          "pairs": "/mnt/pikachu/rapidglm/validation/work/multimodal/atac/pairs.tsv",
+          "output": "/mnt/pikachu/rapidglm/validation/work/multimodal/atac/native",
+          "moi": "low",
+          "cell_qc": "false",
+          "family": "nb",
+          "threads": "2",
+          "seed": "20260926",
+          "budgets": [
+            "499",
+            "4999"
+          ]
+        },
+        "seed": 20260926,
+        "threads": 2,
+        "observations": 12220,
+        "features": 21,
+        "retained_cells": 4709,
+        "invalid_tests_or_fits": 3,
+        "calibration_rejections": 0,
+        "power_rejections": 11,
+        "discovery_rejections": 0,
+        "wall_seconds": 0.147371462,
+        "peak_rss_kib": 1093324,
+        "load_average": [
+          15.90625,
+          12.7958984375,
+          12.07958984375
+        ],
+        "api_frozen": false
+      },
+      "result_sha256": "8fd39b5d7d3010e2626e34f3add658afb8f579d314df18d4215e6b6db017c0c2"
+    }
+  ]
+}

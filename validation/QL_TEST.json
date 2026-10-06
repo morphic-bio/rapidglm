@@ -1,0 +1,178 @@
+{
+  "purpose": "Gate for the pseudobulk quasi-likelihood test (test=ql).",
+  "gate": {
+    "null_rate_0_05": 0.055,
+    "null_rate_0_01": 0.012,
+    "null_rate_0_001": 0.0015,
+    "null_bh_discoveries_per_split": 0.5,
+    "null_valid_fraction": 0.995,
+    "contrast_jaccard_glmgampoi": 0.8,
+    "contrast_count_ratio": [
+      0.8,
+      1.25
+    ]
+  },
+  "commands": [
+    "python3 scripts/validate_ql.py --work DIR --output validation/QL_TEST.json --r-library validation/local-data/R_glmgampoi:validation/local-data/R_library"
+  ],
+  "G1_null": {
+    "checks": {
+      "rate_0_05": true,
+      "rate_0_01": true,
+      "rate_0_001": true,
+      "bh": true,
+      "valid": true
+    },
+    "native_ql": {
+      "method": "native_ql",
+      "tests": 70000,
+      "valid": 69962,
+      "rate_p_le_0_05": 0.040093193447871704,
+      "rate_p_le_0_01": 0.007303965009576628,
+      "rate_p_le_0_001": 0.0010434235727966612,
+      "ks_statistic": 0.024209569331507447,
+      "bh_0_05_discoveries_per_split_mean": 0.14285714285714285,
+      "splits_with_any_bh_0_05_discovery": 6,
+      "splits": 70
+    },
+    "references": {
+      "DESeq2_wald": {
+        "method": "DESeq2_wald",
+        "tests": 70000,
+        "valid": 70000,
+        "rate_p_le_0_05": 0.025514285714285715,
+        "rate_p_le_0_01": 0.005828571428571429,
+        "rate_p_le_0_001": 0.0014,
+        "ks_statistic": 0.0860487216124764,
+        "bh_0_05_discoveries_per_split_mean": 0.4857142857142857,
+        "splits_with_any_bh_0_05_discovery": 17,
+        "splits": 70
+      },
+      "edgeR_lrt": {
+        "method": "edgeR_lrt",
+        "tests": 70000,
+        "valid": 70000,
+        "rate_p_le_0_05": 0.05107142857142857,
+        "rate_p_le_0_01": 0.012971428571428571,
+        "rate_p_le_0_001": 0.0026857142857142856,
+        "ks_statistic": 0.019226682113472615,
+        "bh_0_05_discoveries_per_split_mean": 1.1142857142857143,
+        "splits_with_any_bh_0_05_discovery": 30,
+        "splits": 70
+      },
+      "edgeR_ql": {
+        "method": "edgeR_ql",
+        "tests": 70000,
+        "valid": 70000,
+        "rate_p_le_0_05": 0.046842857142857144,
+        "rate_p_le_0_01": 0.00877142857142857,
+        "rate_p_le_0_001": 0.001142857142857143,
+        "ks_statistic": 0.0037393246471394276,
+        "bh_0_05_discoveries_per_split_mean": 0.15714285714285714,
+        "splits_with_any_bh_0_05_discovery": 7,
+        "splits": 70
+      },
+      "glmGamPoi_ql": {
+        "method": "glmGamPoi_ql",
+        "tests": 70000,
+        "valid": 70000,
+        "rate_p_le_0_05": 0.03861428571428571,
+        "rate_p_le_0_01": 0.007242857142857143,
+        "rate_p_le_0_001": 0.0011142857142857144,
+        "ks_statistic": 0.027693095209205293,
+        "bh_0_05_discoveries_per_split_mean": 0.14285714285714285,
+        "splits_with_any_bh_0_05_discovery": 6,
+        "splits": 70
+      },
+      "native_ml_lr": {
+        "method": "native_ml_lr",
+        "tests": 70000,
+        "valid": 69962,
+        "rate_p_le_0_05": 0.07435464966696206,
+        "rate_p_le_0_01": 0.016123038220748405,
+        "rate_p_le_0_001": 0.0019439124095937796,
+        "ks_statistic": 0.05233770098907825,
+        "bh_0_05_discoveries_per_split_mean": 0.14285714285714285,
+        "splits_with_any_bh_0_05_discovery": 5,
+        "splits": 70
+      },
+      "native_ml_wald": {
+        "method": "native_ml_wald",
+        "tests": 70000,
+        "valid": 69962,
+        "rate_p_le_0_05": 0.0959092078556931,
+        "rate_p_le_0_01": 0.032760641491095165,
+        "rate_p_le_0_001": 0.009033475315171093,
+        "ks_statistic": 0.065201406226953,
+        "bh_0_05_discoveries_per_split_mean": 6.071428571428571,
+        "splits_with_any_bh_0_05_discovery": 60,
+        "splits": 70
+      },
+      "native_shared_wald": {
+        "method": "native_shared_wald",
+        "tests": 70000,
+        "valid": 69962,
+        "rate_p_le_0_05": 0.07727051828135273,
+        "rate_p_le_0_01": 0.027386295417512363,
+        "rate_p_le_0_001": 0.00969097510076899,
+        "ks_statistic": 0.03118938805847582,
+        "bh_0_05_discoveries_per_split_mean": 7.514285714285714,
+        "splits_with_any_bh_0_05_discovery": 65,
+        "splits": 70
+      }
+    }
+  },
+  "G2_contrast": {
+    "checks": {
+      "jaccard": true,
+      "count_ratio": true
+    },
+    "discoveries": {
+      "native_ql": 728,
+      "edgeR_ql": 748,
+      "glmGamPoi_ql": 710
+    },
+    "count_ratio_native_over_glmgampoi": 1.0253521126760563,
+    "concordance": {
+      "native_ql_vs_glmGamPoi_ql": {
+        "jaccard": 0.9725651577503429,
+        "shared": 709
+      },
+      "native_ql_vs_edgeR_ql": {
+        "jaccard": 0.9706275033377837,
+        "shared": 727
+      },
+      "glmGamPoi_ql_vs_edgeR_ql": {
+        "jaccard": 0.9491978609625669,
+        "shared": 710
+      }
+    },
+    "spearman_p_native_vs": {
+      "edgeR_ql": 0.9956122738819527,
+      "glmGamPoi_ql": 0.9972613743545777
+    },
+    "native_run": {
+      "df_prior": 9.504666490776083,
+      "abundance_trend": true,
+      "trend_window": 100,
+      "dispersion_features": 1000,
+      "wall_seconds": 0.264526467
+    }
+  },
+  "G3_threads": {
+    "identical": true,
+    "sha256": "9fa2b5c5ee9095b8a49739554338fb2faecea1c1b4e286daf230f786c0da0002"
+  },
+  "passed": true,
+  "versions": [
+    "edgeR 4.6.2",
+    "DESeq2 1.48.2",
+    "glmGamPoi 1.25.1",
+    "R version 4.5.1 (2025-06-13)"
+  ],
+  "load_average": [
+    28.72314453125,
+    29.21337890625,
+    29.62060546875
+  ]
+}

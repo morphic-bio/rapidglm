@@ -1,0 +1,1318 @@
+{
+  "gates": [
+    "G1",
+    "G2"
+  ],
+  "thresholds": "provisional; author requests measured reporting",
+  "commands": [
+    [
+      "Rscript",
+      "scripts/reference_glm.R",
+      "/mnt/pikachu/rapidglm/validation/work/glm",
+      "<comparator R library>",
+      "validation/local-data/sceptredata"
+    ],
+    "build/rapidglm fit/dose-trend per-panel config.json"
+  ],
+  "host": {
+    "load": [
+      15.12353515625,
+      12.7197265625,
+      11.85302734375
+    ],
+    "uptime": "17:10:35 up 72 days, 22:35,  3 users,  load average: 15.12, 12.72, 11.85",
+    "STAR": ""
+  },
+  "versions": [
+    "R version 4.5.1 (2025-06-13)",
+    "MASS 7.3.55",
+    "Matrix 1.7.3"
+  ],
+  "binary_sha256": "1db12f8f7a8f7736f07adb20a441fbad5488b36baa2d6ee0b5c34bb733f8c6d1",
+  "panels": [
+    {
+      "panel": "E1_binomial",
+      "features": 12,
+      "statuses": {
+        "converged": 12
+      },
+      "errors": {
+        "beta0": {
+          "max_absolute": 5.734412944491396e-12,
+          "max_relative": 6.7121532924051694e-12
+        },
+        "se0": {
+          "max_absolute": 1.449426912936147e-07,
+          "max_relative": 1.0491569914352746e-06
+        },
+        "wald_p0": {
+          "max_absolute": 7.59253139179239e-09,
+          "max_relative": 4.1122899131655045e-05
+        },
+        "beta1": {
+          "max_absolute": 5.664080315881392e-12,
+          "max_relative": 8.939268511033444e-11
+        },
+        "se1": {
+          "max_absolute": 1.6120652783502276e-07,
+          "max_relative": 1.4955516121995986e-06
+        },
+        "wald_p1": {
+          "max_absolute": 6.538331625560723e-07,
+          "max_relative": 1.1379667848225688e-05
+        },
+        "beta2": {
+          "max_absolute": 2.4872992554492157e-11,
+          "max_relative": 6.89677713799901e-11
+        },
+        "se2": {
+          "max_absolute": 3.671622047785039e-07,
+          "max_relative": 1.7683713666700994e-06
+        },
+        "wald_p2": {
+          "max_absolute": 5.663445316050897e-07,
+          "max_relative": 8.732006323301892e-06
+        },
+        "final_se0": {
+          "max_absolute": 1.5429324484728113e-13,
+          "max_relative": 1.1168391126389e-12
+        },
+        "final_se1": {
+          "max_absolute": 3.568256801145253e-13,
+          "max_relative": 3.310352441903875e-12
+        },
+        "final_se2": {
+          "max_absolute": 8.597844658453369e-13,
+          "max_relative": 4.140991426862247e-12
+        },
+        "lr_p": {
+          "max_absolute": 9.225953334635051e-14,
+          "max_relative": 1.403715259243104e-13
+        }
+      },
+      "differences_above_provisional_tolerance": [
+        {
+          "feature": 9,
+          "field": "se0",
+          "native": 0.13815172042362028,
+          "reference": 0.138151575480929,
+          "relative_error": 1.0491569914352746e-06
+        },
+        {
+          "feature": 3,
+          "field": "wald_p0",
+          "native": 1.354733383099713e-09,
+          "reference": 1.3546974645901e-09,
+          "relative_error": 2.651404505572248e-05
+        },
+        {
+          "feature": 4,
+          "field": "wald_p0",
+          "native": 1.0806693574586796e-05,
+          "reference": 1.08066213818421e-05,
+          "relative_error": 6.680417694351613e-06
+        },
+        {
+          "feature": 5,
+          "field": "wald_p0",
+          "native": 0.0006614758658332204,
+          "reference": 0.000661474306949642,
+          "relative_error": 2.3566804665625386e-06
+        },
+        {
+          "feature": 6,
+          "field": "wald_p0",
+          "native": 1.0873101611440987e-08,
+          "reference": 1.08728643173067e-08,
+          "relative_error": 2.1824436262737954e-05
+        },
+        {
+          "feature": 7,
+          "field": "wald_p0",
+          "native": 0.00014741008023863946,
+          "reference": 0.000147409768649849,
+          "relative_error": 2.1137594429588998e-06
+        },
+        {
+          "feature": 9,
+          "field": "wald_p0",
+          "native": 6.248992746879322e-10,
+          "reference": 6.24873578074811e-10,
+          "relative_error": 4.1122899131655045e-05
+        },
+        {
+          "feature": 10,
+          "field": "wald_p0",
+          "native": 3.0839212251567916e-10,
+          "reference": 3.08383486330921e-10,
+          "relative_error": 2.8004692666687508e-05
+        },
+        {
+          "feature": 11,
+          "field": "wald_p0",
+          "native": 1.4166295924514463e-10,
+          "reference": 1.41659306875761e-10,
+          "relative_error": 2.57827703958808e-05
+        },
+        {
+          "feature": 6,
+          "field": "se1",
+          "native": 0.10390973946089462,
+          "reference": 0.103909627093801,
+          "relative_error": 1.081392521161824e-06
+        },
+        {
+          "feature": 10,
+          "field": "se1",
+          "native": 0.10779084293226683,
+          "reference": 0.107790681725739,
+          "relative_error": 1.4955516121995986e-06
+        },
+        {
+          "feature": 11,
+          "field": "se1",
+          "native": 0.10771265390582135,
+          "reference": 0.107712533470737,
+          "relative_error": 1.1181157890274548e-06
+        },
+        {
+          "feature": 2,
+          "field": "wald_p1",
+          "native": 0.001786820412043722,
+          "reference": 0.00178681726734138,
+          "relative_error": 1.7599462460648466e-06
+        },
+        {
+          "feature": 3,
+          "field": "wald_p1",
+          "native": 0.17515020601751494,
+          "reference": 0.175149866597797,
+          "relative_error": 1.9378816811910945e-06
+        },
+        {
+          "feature": 4,
+          "field": "wald_p1",
+          "native": 0.00039230485838038094,
+          "reference": 0.000392300394132199,
+          "relative_error": 1.1379667848225688e-05
+        },
+        {
+          "feature": 5,
+          "field": "wald_p1",
+          "native": 0.0047720280563149494,
+          "reference": 0.00477201045209055,
+          "relative_error": 3.6890582231843336e-06
+        },
+        {
+          "feature": 10,
+          "field": "wald_p1",
+          "native": 0.48384382044621854,
+          "reference": 0.483843166613056,
+          "relative_error": 1.3513328443449165e-06
+        },
+        {
+          "feature": 11,
+          "field": "wald_p1",
+          "native": 0.0061037614736519485,
+          "reference": 0.00610370449790667,
+          "relative_error": 9.334617247345554e-06
+        },
+        {
+          "feature": 6,
+          "field": "se2",
+          "native": 0.1990315449364052,
+          "reference": 0.199031311050751,
+          "relative_error": 1.17511989932767e-06
+        },
+        {
+          "feature": 7,
+          "field": "se2",
+          "native": 0.19612683214422594,
+          "reference": 0.196126604668943,
+          "relative_error": 1.1598389893477036e-06
+        },
+        {
+          "feature": 10,
+          "field": "se2",
+          "native": 0.2076276855517138,
+          "reference": 0.207627318389509,
+          "relative_error": 1.7683713666700994e-06
+        },
+        {
+          "feature": 4,
+          "field": "wald_p2",
+          "native": 0.029229431445948813,
+          "reference": 0.0292293272358908,
+          "relative_error": 3.5652568111612557e-06
+        },
+        {
+          "feature": 6,
+          "field": "wald_p2",
+          "native": 0.3488538253348966,
+          "reference": 0.348853258990365,
+          "relative_error": 1.6234462972889457e-06
+        },
+        {
+          "feature": 7,
+          "field": "wald_p2",
+          "native": 0.009570575412262968,
+          "reference": 0.00957049184266768,
+          "relative_error": 8.732006323301892e-06
+        },
+        {
+          "feature": 9,
+          "field": "wald_p2",
+          "native": 0.0011856051299761869,
+          "reference": 0.00118559603445718,
+          "relative_error": 7.671684741223276e-06
+        },
+        {
+          "feature": 10,
+          "field": "wald_p2",
+          "native": 0.08238945389692465,
+          "reference": 0.0823889117314518,
+          "relative_error": 6.580563591094731e-06
+        }
+      ],
+      "native_run": {
+        "version": "0.1.0",
+        "command": "fit",
+        "config_path": "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/responses.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/design.tsv",
+          "offset": "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/offset.tsv",
+          "weights": "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/weights.tsv",
+          "family": "binomial",
+          "output": "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/native",
+          "threads": 1
+        },
+        "input_sha1": {
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/config.json": "feb354a117d6a52f4704a439b169c6c4cd0d2b84",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/design.tsv": "a8bc51628c0f3fc842081bbc1aed464beb58c18c",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/offset.tsv": "8ad9c7fa9a534312366019d512e528d1b555a9c3",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/responses.mtx": "52841729146a5da5f895caa0affd0009b3d28379",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_binomial/weights.tsv": "c91a98e023d21298b516a93d18752fa8d878fdb0"
+        },
+        "seed": 1,
+        "threads": 1,
+        "observations": 512,
+        "features": 12,
+        "retained_cells": 512,
+        "invalid_tests_or_fits": 0,
+        "calibration_rejections": 0,
+        "power_rejections": 0,
+        "discovery_rejections": 0,
+        "wall_seconds": 0.002223783,
+        "peak_rss_kib": 33024,
+        "load_average": [
+          13.05859375,
+          12.5205078125,
+          11.8271484375
+        ],
+        "api_frozen": false
+      },
+      "R_full_and_null_seconds": 0.0209999999999999,
+      "input_sha256": {
+        "design.tsv": "6197e819d7fa96da0ab78e0e93514bd9ca9c90e0e3c9d371ee420e851af3a94d",
+        "weights.tsv": "bea0f220b720bd6037d25a078ca3ac4d4662edeb6b0711b9c8129be46fa09460",
+        "offset.tsv": "a57460cb2c4d268fc21811cdff600a89a204bf02324d5980c1a07925f6344874",
+        "responses.mtx": "015fdab68ef6e17a03c171a8aca6993671b0dad531a0566646aec53ca79b9a9c",
+        "reference.tsv": "7980c0c1d987a62fc4ca67ab2dd34f13116e3b62a822b97f690e3ac997747484"
+      }
+    },
+    {
+      "panel": "E1_gaussian",
+      "features": 12,
+      "statuses": {
+        "converged": 12
+      },
+      "errors": {
+        "beta0": {
+          "max_absolute": 8.881784197001252e-16,
+          "max_relative": 1.2317607297657038e-15
+        },
+        "se0": {
+          "max_absolute": 8.326672684688674e-17,
+          "max_relative": 1.5186502295073247e-15
+        },
+        "wald_p0": {
+          "max_absolute": 5.412216898540318e-26,
+          "max_relative": 4.6228365509862506e-14
+        },
+        "beta1": {
+          "max_absolute": 6.661338147750939e-16,
+          "max_relative": 2.8086076548431785e-15
+        },
+        "se1": {
+          "max_absolute": 4.85722573273506e-17,
+          "max_relative": 1.111784061585419e-15
+        },
+        "wald_p1": {
+          "max_absolute": 1.474514954580286e-17,
+          "max_relative": 5.1127822738061974e-14
+        },
+        "beta2": {
+          "max_absolute": 1.1657341758564144e-15,
+          "max_relative": 7.330203121285992e-15
+        },
+        "se2": {
+          "max_absolute": 8.326672684688674e-17,
+          "max_relative": 1.0551776936944856e-15
+        },
+        "wald_p2": {
+          "max_absolute": 1.887379141862766e-15,
+          "max_relative": 3.508905598960869e-14
+        },
+        "final_se0": {
+          "max_absolute": 4.85722573273506e-17,
+          "max_relative": 9.058506577331534e-16
+        },
+        "final_se1": {
+          "max_absolute": 4.85722573273506e-17,
+          "max_relative": 1.111784061585419e-15
+        },
+        "final_se2": {
+          "max_absolute": 5.551115123125783e-17,
+          "max_relative": 7.162738226967598e-16
+        },
+        "lr_p": {
+          "max_absolute": 5.551115123125783e-16,
+          "max_relative": 6.104115012219022e-14
+        }
+      },
+      "differences_above_provisional_tolerance": [],
+      "native_run": {
+        "version": "0.1.0",
+        "command": "fit",
+        "config_path": "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/responses.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/design.tsv",
+          "offset": "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/offset.tsv",
+          "weights": "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/weights.tsv",
+          "family": "gaussian",
+          "output": "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/native",
+          "threads": 1
+        },
+        "input_sha1": {
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/config.json": "5eb42ef70789d0db74230df178bd2d099fbedcea",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/design.tsv": "a8bc51628c0f3fc842081bbc1aed464beb58c18c",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/offset.tsv": "8ad9c7fa9a534312366019d512e528d1b555a9c3",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/responses.mtx": "ab63ff7eb641fa95c9895747f51b6b238e80d855",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_gaussian/weights.tsv": "c91a98e023d21298b516a93d18752fa8d878fdb0"
+        },
+        "seed": 1,
+        "threads": 1,
+        "observations": 512,
+        "features": 12,
+        "retained_cells": 512,
+        "invalid_tests_or_fits": 0,
+        "calibration_rejections": 0,
+        "power_rejections": 0,
+        "discovery_rejections": 0,
+        "wall_seconds": 0.424835977,
+        "peak_rss_kib": 33024,
+        "load_average": [
+          12.8935546875,
+          12.4951171875,
+          11.822265625
+        ],
+        "api_frozen": false
+      },
+      "R_full_and_null_seconds": 0.026,
+      "input_sha256": {
+        "design.tsv": "6197e819d7fa96da0ab78e0e93514bd9ca9c90e0e3c9d371ee420e851af3a94d",
+        "weights.tsv": "bea0f220b720bd6037d25a078ca3ac4d4662edeb6b0711b9c8129be46fa09460",
+        "offset.tsv": "a57460cb2c4d268fc21811cdff600a89a204bf02324d5980c1a07925f6344874",
+        "responses.mtx": "f3b2c57c209437249e800fa5aef759fb3cdd2d2c705a15e5ff337841497e7a5b",
+        "reference.tsv": "751f4efe24324e39bb029b67f4b0c0baafac5b28beaa9b30110de727ba479a67"
+      }
+    },
+    {
+      "panel": "E1_nb",
+      "features": 12,
+      "statuses": {
+        "converged": 12
+      },
+      "errors": {
+        "beta0": {
+          "max_absolute": 5.178354384183237e-09,
+          "max_relative": 5.4358616084112735e-08
+        },
+        "se0": {
+          "max_absolute": 7.43100400379948e-08,
+          "max_relative": 3.687634089196668e-07
+        },
+        "wald_p0": {
+          "max_absolute": 1.427251448138378e-07,
+          "max_relative": 1.288927355448277e-06
+        },
+        "beta1": {
+          "max_absolute": 7.51921493125085e-09,
+          "max_relative": 1.2398509299891657e-07
+        },
+        "se1": {
+          "max_absolute": 5.6302789486206706e-08,
+          "max_relative": 3.662216881292206e-07
+        },
+        "wald_p1": {
+          "max_absolute": 1.4274031678862542e-07,
+          "max_relative": 2.1260323765084013e-07
+        },
+        "beta2": {
+          "max_absolute": 6.1892407631283786e-09,
+          "max_relative": 1.3818393372528117e-06
+        },
+        "se2": {
+          "max_absolute": 1.0692933666289761e-07,
+          "max_relative": 3.6837778217033994e-07
+        },
+        "wald_p2": {
+          "max_absolute": 2.1545512707277226e-08,
+          "max_relative": 7.506009526798125e-08
+        },
+        "theta": {
+          "max_absolute": 8.953143920686912e-08,
+          "max_relative": 8.26752219267287e-07
+        },
+        "final_se0": {
+          "max_absolute": 7.432958004649493e-08,
+          "max_relative": 3.6886037613275497e-07
+        },
+        "final_se1": {
+          "max_absolute": 5.631023647367783e-08,
+          "max_relative": 3.6627012706713344e-07
+        },
+        "final_se2": {
+          "max_absolute": 1.0693211566215055e-07,
+          "max_relative": 3.683873559808233e-07
+        },
+        "lr_p": {
+          "max_absolute": 1.7926637951859448e-10,
+          "max_relative": 1.8146392239904877e-10
+        }
+      },
+      "differences_above_provisional_tolerance": [
+        {
+          "feature": 5,
+          "field": "wald_p0",
+          "native": 3.993594810950837e-10,
+          "reference": 3.99359995841107e-10,
+          "relative_error": 1.288927355448277e-06
+        },
+        {
+          "feature": 0,
+          "field": "beta2",
+          "native": 0.004478993432021823,
+          "reference": 0.00447898724278106,
+          "relative_error": 1.3818393372528117e-06
+        }
+      ],
+      "native_run": {
+        "version": "0.1.0",
+        "command": "fit",
+        "config_path": "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/responses.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/design.tsv",
+          "offset": "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/offset.tsv",
+          "weights": "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/weights.tsv",
+          "family": "nb",
+          "output": "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/native",
+          "threads": 1
+        },
+        "input_sha1": {
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/config.json": "4ee31c394fde72b2c08c862a5f3e9aab4834353d",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/design.tsv": "a8bc51628c0f3fc842081bbc1aed464beb58c18c",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/offset.tsv": "8ad9c7fa9a534312366019d512e528d1b555a9c3",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/responses.mtx": "66784949d0c421f380b57e9f8dda79cc42f770c3",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_nb/weights.tsv": "c91a98e023d21298b516a93d18752fa8d878fdb0"
+        },
+        "seed": 1,
+        "threads": 1,
+        "observations": 512,
+        "features": 12,
+        "retained_cells": 512,
+        "invalid_tests_or_fits": 0,
+        "calibration_rejections": 0,
+        "power_rejections": 0,
+        "discovery_rejections": 0,
+        "wall_seconds": 0.235352123,
+        "peak_rss_kib": 33024,
+        "load_average": [
+          12.90234375,
+          12.50390625,
+          11.82861328125
+        ],
+        "api_frozen": false
+      },
+      "R_full_and_null_seconds": 0.151,
+      "input_sha256": {
+        "design.tsv": "6197e819d7fa96da0ab78e0e93514bd9ca9c90e0e3c9d371ee420e851af3a94d",
+        "weights.tsv": "bea0f220b720bd6037d25a078ca3ac4d4662edeb6b0711b9c8129be46fa09460",
+        "offset.tsv": "a57460cb2c4d268fc21811cdff600a89a204bf02324d5980c1a07925f6344874",
+        "responses.mtx": "a8e4d39be69032470df861c2c8b2b10cbab65c2c3b658c4c2a9d398b43a4e8c4",
+        "reference.tsv": "10873190684f64b89d35b281f626c085fcb782ab40c54f6761d398cb2088e9bf"
+      }
+    },
+    {
+      "panel": "E1_poisson",
+      "features": 12,
+      "statuses": {
+        "converged": 12
+      },
+      "errors": {
+        "beta0": {
+          "max_absolute": 4.450412260936787e-12,
+          "max_relative": 1.9501106090189766e-11
+        },
+        "se0": {
+          "max_absolute": 7.527857542877214e-08,
+          "max_relative": 1.3913791886550532e-06
+        },
+        "wald_p0": {
+          "max_absolute": 6.411790768564077e-10,
+          "max_relative": 2.6023119021342906e-05
+        },
+        "beta1": {
+          "max_absolute": 2.101374629859265e-12,
+          "max_relative": 7.38379308036279e-12
+        },
+        "se1": {
+          "max_absolute": 3.089016268470468e-08,
+          "max_relative": 7.850508637506835e-07
+        },
+        "wald_p1": {
+          "max_absolute": 1.9793125484926522e-13,
+          "max_relative": 2.235849057223224e-05
+        },
+        "beta2": {
+          "max_absolute": 3.2301383789956617e-12,
+          "max_relative": 1.0897698577397628e-11
+        },
+        "se2": {
+          "max_absolute": 5.9301256044586026e-08,
+          "max_relative": 8.193455744605821e-07
+        },
+        "wald_p2": {
+          "max_absolute": 2.5213454685202308e-08,
+          "max_relative": 1.4484138233690852e-05
+        },
+        "final_se0": {
+          "max_absolute": 1.1762812945903534e-13,
+          "max_relative": 2.174125940583443e-12
+        },
+        "final_se1": {
+          "max_absolute": 4.788530683086378e-14,
+          "max_relative": 1.2169690512919088e-12
+        },
+        "final_se2": {
+          "max_absolute": 9.213463325608018e-14,
+          "max_relative": 1.2729922972259564e-12
+        },
+        "lr_p": {
+          "max_absolute": 9.43689570931383e-16,
+          "max_relative": 1.1386926445037766e-13
+        }
+      },
+      "differences_above_provisional_tolerance": [
+        {
+          "feature": 0,
+          "field": "se0",
+          "native": 0.05410364103733783,
+          "reference": 0.0541035657587624,
+          "relative_error": 1.3913791886550532e-06
+        },
+        {
+          "feature": 0,
+          "field": "wald_p0",
+          "native": 2.4639466230391556e-05,
+          "reference": 2.46388250513147e-05,
+          "relative_error": 2.6023119021342906e-05
+        },
+        {
+          "feature": 1,
+          "field": "wald_p0",
+          "native": 1.278520863448039e-08,
+          "reference": 1.27849455166093e-08,
+          "relative_error": 2.0580288805237578e-05
+        },
+        {
+          "feature": 0,
+          "field": "wald_p1",
+          "native": 4.734396028670059e-13,
+          "reference": 4.73419801730946e-13,
+          "relative_error": 1.980113605988969e-05
+        },
+        {
+          "feature": 1,
+          "field": "wald_p1",
+          "native": 2.682148967220005e-12,
+          "reference": 2.68208899975839e-12,
+          "relative_error": 2.235849057223224e-05
+        },
+        {
+          "feature": 2,
+          "field": "wald_p1",
+          "native": 3.978541342312215e-08,
+          "reference": 3.97852154918673e-08,
+          "relative_error": 4.974995168487283e-06
+        },
+        {
+          "feature": 3,
+          "field": "wald_p1",
+          "native": 1.730829941308024e-08,
+          "reference": 1.7308261591622e-08,
+          "relative_error": 2.185167935069621e-06
+        },
+        {
+          "feature": 5,
+          "field": "wald_p1",
+          "native": 7.381703801924965e-09,
+          "reference": 7.38167403655798e-09,
+          "relative_error": 4.032332887909076e-06
+        },
+        {
+          "feature": 0,
+          "field": "wald_p2",
+          "native": 4.215623596498769e-05,
+          "reference": 4.21556253770824e-05,
+          "relative_error": 1.4484138233690852e-05
+        },
+        {
+          "feature": 1,
+          "field": "wald_p2",
+          "native": 0.0006010230262283879,
+          "reference": 0.000601019687976208,
+          "relative_error": 5.55431418750085e-06
+        },
+        {
+          "feature": 2,
+          "field": "wald_p2",
+          "native": 0.002602675948202059,
+          "reference": 0.00260267176638766,
+          "relative_error": 1.6067390644909226e-06
+        },
+        {
+          "feature": 5,
+          "field": "wald_p2",
+          "native": 6.489730120534737e-06,
+          "reference": 6.48971473425149e-06,
+          "relative_error": 2.3708720454939745e-06
+        },
+        {
+          "feature": 6,
+          "field": "wald_p2",
+          "native": 3.088452165699858e-09,
+          "reference": 3.0884375437365e-09,
+          "relative_error": 4.734420933231871e-06
+        }
+      ],
+      "native_run": {
+        "version": "0.1.0",
+        "command": "fit",
+        "config_path": "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/responses.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/design.tsv",
+          "offset": "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/offset.tsv",
+          "weights": "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/weights.tsv",
+          "family": "poisson",
+          "output": "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/native",
+          "threads": 1
+        },
+        "input_sha1": {
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/config.json": "c7f58bd02d5378cf8ba73b6581f8f6108dd21261",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/design.tsv": "a8bc51628c0f3fc842081bbc1aed464beb58c18c",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/offset.tsv": "8ad9c7fa9a534312366019d512e528d1b555a9c3",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/responses.mtx": "a31e4c794b2e8e5271896aa2db197ac0f7c70667",
+          "/mnt/pikachu/rapidglm/validation/work/glm/E1_poisson/weights.tsv": "c91a98e023d21298b516a93d18752fa8d878fdb0"
+        },
+        "seed": 1,
+        "threads": 1,
+        "observations": 512,
+        "features": 12,
+        "retained_cells": 512,
+        "invalid_tests_or_fits": 0,
+        "calibration_rejections": 0,
+        "power_rejections": 0,
+        "discovery_rejections": 0,
+        "wall_seconds": 0.003565185,
+        "peak_rss_kib": 33024,
+        "load_average": [
+          12.830078125,
+          12.4951171875,
+          11.82958984375
+        ],
+        "api_frozen": false
+      },
+      "R_full_and_null_seconds": 0.0459999999999998,
+      "input_sha256": {
+        "design.tsv": "6197e819d7fa96da0ab78e0e93514bd9ca9c90e0e3c9d371ee420e851af3a94d",
+        "weights.tsv": "bea0f220b720bd6037d25a078ca3ac4d4662edeb6b0711b9c8129be46fa09460",
+        "offset.tsv": "a57460cb2c4d268fc21811cdff600a89a204bf02324d5980c1a07925f6344874",
+        "responses.mtx": "16b383f82c22fc088a676c12a21cdc2e6e3417297cfb5888c3fad9efbf906233",
+        "reference.tsv": "fc3bfdd3fd2e3d3d60bb750942b9ddc2c77be124156d6187c55cc7b4925b7971"
+      }
+    },
+    {
+      "panel": "S1_nb",
+      "features": 12,
+      "statuses": {
+        "converged": 12
+      },
+      "errors": {
+        "beta0": {
+          "max_absolute": 4.5796166858735887e-10,
+          "max_relative": 1.6492214024120176e-10
+        },
+        "se0": {
+          "max_absolute": 4.818124121896972e-09,
+          "max_relative": 2.4006948279266177e-09
+        },
+        "wald_p0": {
+          "max_absolute": 5.246117429358321e-10,
+          "max_relative": 1.1519759113270633e-08
+        },
+        "beta1": {
+          "max_absolute": 1.1596523741275178e-10,
+          "max_relative": 1.5476380854692052e-10
+        },
+        "se1": {
+          "max_absolute": 7.796520096192694e-10,
+          "max_relative": 2.4523178656337034e-09
+        },
+        "wald_p1": {
+          "max_absolute": 9.901114372823372e-10,
+          "max_relative": 7.578622095100078e-09
+        },
+        "beta2": {
+          "max_absolute": 1.4835157061132698e-10,
+          "max_relative": 3.3988298309553586e-08
+        },
+        "se2": {
+          "max_absolute": 1.3766578987883804e-09,
+          "max_relative": 2.4232522634272872e-09
+        },
+        "wald_p2": {
+          "max_absolute": 1.1580831293933613e-09,
+          "max_relative": 3.1599861599561067e-09
+        },
+        "beta3": {
+          "max_absolute": 1.281629663507644e-11,
+          "max_relative": 2.7453827010602844e-10
+        },
+        "se3": {
+          "max_absolute": 2.442537977431769e-10,
+          "max_relative": 2.437259591542871e-09
+        },
+        "wald_p3": {
+          "max_absolute": 7.21176229845355e-10,
+          "max_relative": 1.3185308885569326e-09
+        },
+        "theta": {
+          "max_absolute": 7.74416819560031e-09,
+          "max_relative": 8.10609398403686e-09
+        },
+        "final_se0": {
+          "max_absolute": 4.81996442758259e-09,
+          "max_relative": 2.401611784862322e-09
+        },
+        "final_se1": {
+          "max_absolute": 7.795270540178478e-10,
+          "max_relative": 2.451924830216306e-09
+        },
+        "final_se2": {
+          "max_absolute": 1.3756779049245438e-09,
+          "max_relative": 2.421527236210993e-09
+        },
+        "final_se3": {
+          "max_absolute": 2.4430379941264846e-10,
+          "max_relative": 2.4377585276877398e-09
+        },
+        "lr_p": {
+          "max_absolute": 3.5427216715788745e-13,
+          "max_relative": 5.494333052691079e-13
+        }
+      },
+      "differences_above_provisional_tolerance": [],
+      "native_run": {
+        "version": "0.1.0",
+        "command": "fit",
+        "config_path": "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/responses.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/design.tsv",
+          "offset": "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/offset.tsv",
+          "weights": "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/weights.tsv",
+          "family": "nb",
+          "output": "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/native",
+          "threads": 1
+        },
+        "input_sha1": {
+          "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/config.json": "8739cb7a2db2b075bb0eb10b696e6edc9420778e",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/design.tsv": "ed60b28c8287b1598820264317737c3dc7e57d05",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/offset.tsv": "6f81b87e8c7dfd9e6c319645ab32a2db94081929",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/responses.mtx": "1643eda012cf87e19c882b21e4d58e85892ceda0",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S1_nb/weights.tsv": "9fb9728fe065c7afdec36e6688af5650e21c87c8"
+        },
+        "seed": 1,
+        "threads": 1,
+        "observations": 1000,
+        "features": 12,
+        "retained_cells": 1000,
+        "invalid_tests_or_fits": 0,
+        "calibration_rejections": 0,
+        "power_rejections": 0,
+        "discovery_rejections": 0,
+        "wall_seconds": 0.635377771,
+        "peak_rss_kib": 33024,
+        "load_average": [
+          12.60302734375,
+          12.45361328125,
+          11.8193359375
+        ],
+        "api_frozen": false
+      },
+      "R_full_and_null_seconds": 0.312,
+      "input_sha256": {
+        "design.tsv": "b04bc4a5acc6a18f77fa33edc6415841d8ee744d8349a2f32def42ef86105484",
+        "weights.tsv": "459458f1c26bc6ed31c9f2193d86ea9ef325157db37eeec8949895ce58923aab",
+        "offset.tsv": "3483258d9211812dc7e2430da02a4f04da80b709668e336e5934e9dd223d13ff",
+        "responses.mtx": "24353ab8806672fa354ebc66a90a836a5a82efdca271f41932ff84b789ac9d8c",
+        "reference.tsv": "f04d6b969658b72c3d3192883b332a94e90e615900bca4448a14756c5460f6f5"
+      }
+    },
+    {
+      "panel": "S1_public_nb",
+      "features": 12,
+      "statuses": {
+        "converged": 12
+      },
+      "errors": {
+        "beta0": {
+          "max_absolute": 1.168581675869973e-08,
+          "max_relative": 6.529906997129671e-10
+        },
+        "se0": {
+          "max_absolute": 1.0317002141491116e-08,
+          "max_relative": 5.25950333257884e-09
+        },
+        "wald_p0": {
+          "max_absolute": 3.634218451701692e-26,
+          "max_relative": 3.634218451701692e-14
+        },
+        "beta1": {
+          "max_absolute": 2.548938948798707e-09,
+          "max_relative": 3.5113183219839313e-09
+        },
+        "se1": {
+          "max_absolute": 3.0170336229318195e-09,
+          "max_relative": 6.31696526399322e-09
+        },
+        "wald_p1": {
+          "max_absolute": 1.0718982923485498e-09,
+          "max_relative": 8.339423288649001e-09
+        },
+        "beta2": {
+          "max_absolute": 4.801590236525044e-10,
+          "max_relative": 1.239747124340118e-10
+        },
+        "se2": {
+          "max_absolute": 5.540833347694729e-09,
+          "max_relative": 5.95042937503608e-09
+        },
+        "wald_p2": {
+          "max_absolute": 1.0166797959065832e-11,
+          "max_relative": 1.0609120833128983e-07
+        },
+        "beta3": {
+          "max_absolute": 2.3139734572907855e-10,
+          "max_relative": 9.707322463209228e-10
+        },
+        "se3": {
+          "max_absolute": 1.2366050128331807e-09,
+          "max_relative": 5.405559849489242e-09
+        },
+        "wald_p3": {
+          "max_absolute": 2.338982341143492e-10,
+          "max_relative": 5.3496977294545214e-08
+        },
+        "beta4": {
+          "max_absolute": 3.512414803452657e-10,
+          "max_relative": 6.089127447466182e-10
+        },
+        "se4": {
+          "max_absolute": 1.3163806988902849e-09,
+          "max_relative": 5.523480920510545e-09
+        },
+        "wald_p4": {
+          "max_absolute": 4.279984977539897e-10,
+          "max_relative": 4.621233383745858e-08
+        },
+        "theta": {
+          "max_absolute": 9.288267044382792e-09,
+          "max_relative": 4.190517114984667e-08
+        },
+        "final_se0": {
+          "max_absolute": 1.0311812070895598e-08,
+          "max_relative": 5.256857487102065e-09
+        },
+        "final_se1": {
+          "max_absolute": 3.0184366117680383e-09,
+          "max_relative": 6.319902795620575e-09
+        },
+        "final_se2": {
+          "max_absolute": 5.5434933310394285e-09,
+          "max_relative": 5.953285992794447e-09
+        },
+        "final_se3": {
+          "max_absolute": 1.236594021625237e-09,
+          "max_relative": 5.405511803725703e-09
+        },
+        "final_se4": {
+          "max_absolute": 1.3175366908591002e-09,
+          "max_relative": 5.528331416688512e-09
+        },
+        "lr_p": {
+          "max_absolute": 4.450002519251761e-11,
+          "max_relative": 4.869284024707068e-09
+        }
+      },
+      "differences_above_provisional_tolerance": [],
+      "native_run": {
+        "version": "0.1.0",
+        "command": "fit",
+        "config_path": "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/responses.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/design.tsv",
+          "offset": "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/offset.tsv",
+          "weights": "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/weights.tsv",
+          "family": "nb",
+          "output": "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/native",
+          "threads": 1
+        },
+        "input_sha1": {
+          "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/config.json": "f8ad55d90f7bef95dc8e606fe52e5253d926c96a",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/design.tsv": "1948c49167e837cd5071c1b10b18d9b2bdeb75c0",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/offset.tsv": "c27deacb83366918e6923837cee7848e3458aa08",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/responses.mtx": "2f15657fddee1d7b36031f77acfd227dcd546c5a",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S1_public_nb/weights.tsv": "9c9f821d7d54a93f122a07aa15e2e74acc50565e"
+        },
+        "seed": 1,
+        "threads": 1,
+        "observations": 20729,
+        "features": 12,
+        "retained_cells": 20729,
+        "invalid_tests_or_fits": 0,
+        "calibration_rejections": 0,
+        "power_rejections": 0,
+        "discovery_rejections": 0,
+        "wall_seconds": 0.668934128,
+        "peak_rss_kib": 33024,
+        "load_average": [
+          12.51025390625,
+          12.43798828125,
+          11.8212890625
+        ],
+        "api_frozen": false
+      },
+      "R_full_and_null_seconds": 12.137,
+      "input_sha256": {
+        "design.tsv": "2a1735eae9c4cf1f0baa3cb28aa8a992156fdfb52c81238d8f125c72fe36e86e",
+        "weights.tsv": "0b013f3d2ece6cb751f2c96160a57b89e6f591cdf6d83c9bdf6c130264427c3e",
+        "offset.tsv": "fd6d6d388fe82f411cd2d0714fa741edee3b8d45f12b556ed23252d969221fd5",
+        "responses.mtx": "e19dd347d384a272d9e2dc44f75766bd9c8124342e1f7a42131da679392e86e0",
+        "reference.tsv": "dd9867e69f4f228af6a26fdddbcfbddbea824092ee9445b6f5b2f06e534bd16e"
+      }
+    },
+    {
+      "panel": "S2_nb",
+      "features": 12,
+      "statuses": {
+        "converged": 12
+      },
+      "errors": {
+        "beta0": {
+          "max_absolute": 5.768863164945515e-09,
+          "max_relative": 1.4592592934014818e-09
+        },
+        "se0": {
+          "max_absolute": 6.6243588392467245e-09,
+          "max_relative": 1.0508950342774034e-09
+        },
+        "wald_p0": {
+          "max_absolute": 2.316394853707493e-10,
+          "max_relative": 5.056953487374415e-10
+        },
+        "beta1": {
+          "max_absolute": 7.585638783780269e-10,
+          "max_relative": 1.2052769046776936e-09
+        },
+        "se1": {
+          "max_absolute": 7.934489731908911e-10,
+          "max_relative": 1.0572065216402527e-09
+        },
+        "wald_p1": {
+          "max_absolute": 1.834759393026797e-10,
+          "max_relative": 9.272620628397785e-09
+        },
+        "beta2": {
+          "max_absolute": 4.755822402557897e-10,
+          "max_relative": 3.754475404900617e-10
+        },
+        "se2": {
+          "max_absolute": 1.7519632411477915e-09,
+          "max_relative": 1.0674476709756532e-09
+        },
+        "wald_p2": {
+          "max_absolute": 2.6622923310348767e-10,
+          "max_relative": 3.4761031989914367e-09
+        },
+        "beta3": {
+          "max_absolute": 3.6044611739782795e-11,
+          "max_relative": 9.27545846876235e-10
+        },
+        "se3": {
+          "max_absolute": 3.169725593110684e-10,
+          "max_relative": 1.0380718388640542e-09
+        },
+        "wald_p3": {
+          "max_absolute": 2.7278462821911376e-10,
+          "max_relative": 3.887794465446191e-09
+        },
+        "theta": {
+          "max_absolute": 9.20908160839673e-09,
+          "max_relative": 1.1584647631090666e-08
+        },
+        "final_se0": {
+          "max_absolute": 6.63550903112764e-09,
+          "max_relative": 1.0526639120738684e-09
+        },
+        "final_se1": {
+          "max_absolute": 7.933950163518944e-10,
+          "max_relative": 1.0571346285205418e-09
+        },
+        "final_se2": {
+          "max_absolute": 1.7537131746792056e-09,
+          "max_relative": 1.0685138819706114e-09
+        },
+        "final_se3": {
+          "max_absolute": 3.171285456460282e-10,
+          "max_relative": 1.0385826875689174e-09
+        },
+        "lr_p": {
+          "max_absolute": 4.402700426453521e-12,
+          "max_relative": 4.552186504211689e-12
+        }
+      },
+      "differences_above_provisional_tolerance": [],
+      "native_run": {
+        "version": "0.1.0",
+        "command": "fit",
+        "config_path": "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/responses.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/design.tsv",
+          "offset": "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/offset.tsv",
+          "weights": "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/weights.tsv",
+          "family": "nb",
+          "output": "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/native",
+          "threads": 1
+        },
+        "input_sha1": {
+          "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/config.json": "c397f9e13c1411e7df99cca08aa4c0baccd322a0",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/design.tsv": "e640185200f5bb2da2e0a9925ffa8a10dc95b153",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/offset.tsv": "96918b24233a33ef616ea855d5570ccdcc8b0626",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/responses.mtx": "bb7aabd81c00e7cbfa1860a81802740ea1efff20",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S2_nb/weights.tsv": "f0672e70430e7585061cb258a49a2ff252dc0d72"
+        },
+        "seed": 1,
+        "threads": 1,
+        "observations": 500,
+        "features": 12,
+        "retained_cells": 500,
+        "invalid_tests_or_fits": 0,
+        "calibration_rejections": 0,
+        "power_rejections": 0,
+        "discovery_rejections": 0,
+        "wall_seconds": 0.025081025,
+        "peak_rss_kib": 33792,
+        "load_average": [
+          12.51025390625,
+          12.43798828125,
+          11.8212890625
+        ],
+        "api_frozen": false
+      },
+      "R_full_and_null_seconds": 0.217,
+      "input_sha256": {
+        "design.tsv": "bdbfec2a702bfdc66ef92e0ac323059608d7bc696cf50a81910f7517be8248f3",
+        "weights.tsv": "6f48a8dbabd52982b01077ed0d3e56102c57356b9556ce7e8af743afb89b22fc",
+        "offset.tsv": "af2a7b9426a7e290244f7d94d5909dd041aa3c7486b1f850babf7580b45cffa6",
+        "responses.mtx": "71e3c0c238b49244527f093882d4549188be3fd7c03f9fe7fa14c1740315f85e",
+        "reference.tsv": "bace9b10d0353db87cc123b52b1e3618d23c9427896efc11447329963c0dcdf7"
+      }
+    },
+    {
+      "panel": "S2_public_nb",
+      "features": 12,
+      "statuses": {
+        "converged": 12
+      },
+      "errors": {
+        "beta0": {
+          "max_absolute": 1.8324783024326052e-07,
+          "max_relative": 5.388090563417947e-08
+        },
+        "se0": {
+          "max_absolute": 6.741565126144877e-07,
+          "max_relative": 7.684343488228714e-07
+        },
+        "wald_p0": {
+          "max_absolute": 1.3872233320144948e-09,
+          "max_relative": 1.3095638644101478e-05
+        },
+        "beta1": {
+          "max_absolute": 3.8345545061435615e-07,
+          "max_relative": 4.482878547601804e-07
+        },
+        "se1": {
+          "max_absolute": 1.765868391234715e-07,
+          "max_relative": 7.331244029909425e-07
+        },
+        "wald_p1": {
+          "max_absolute": 6.1128006626767414e-09,
+          "max_relative": 1.594145024197412e-05
+        },
+        "beta2": {
+          "max_absolute": 4.7601743502490024e-07,
+          "max_relative": 3.4633530832450964e-07
+        },
+        "se2": {
+          "max_absolute": 3.102260874299212e-07,
+          "max_relative": 7.945404284694406e-07
+        },
+        "wald_p2": {
+          "max_absolute": 6.530353431892944e-09,
+          "max_relative": 1.5142200033910051e-05
+        },
+        "beta3": {
+          "max_absolute": 2.5205055473320748e-09,
+          "max_relative": 6.878258179516e-08
+        },
+        "se3": {
+          "max_absolute": 6.807503212524768e-08,
+          "max_relative": 6.557590708250351e-07
+        },
+        "wald_p3": {
+          "max_absolute": 1.5533499231334957e-07,
+          "max_relative": 2.145232516832238e-07
+        },
+        "theta": {
+          "max_absolute": 3.6854836554106596e-07,
+          "max_relative": 7.553291862325111e-06
+        },
+        "final_se0": {
+          "max_absolute": 6.74166437675261e-07,
+          "max_relative": 7.684456618512393e-07
+        },
+        "final_se1": {
+          "max_absolute": 1.7659176312911917e-07,
+          "max_relative": 7.331448456585394e-07
+        },
+        "final_se2": {
+          "max_absolute": 3.1023718544131995e-07,
+          "max_relative": 7.94568852293493e-07
+        },
+        "final_se3": {
+          "max_absolute": 6.807529012720082e-08,
+          "max_relative": 6.557615561269855e-07
+        },
+        "lr_p": {
+          "max_absolute": 3.959887973081777e-11,
+          "max_relative": 5.4687188301304176e-11
+        }
+      },
+      "differences_above_provisional_tolerance": [
+        {
+          "feature": 9,
+          "field": "wald_p0",
+          "native": 0.00010592879073246599,
+          "reference": 0.000105930177955798,
+          "relative_error": 1.3095638644101478e-05
+        },
+        {
+          "feature": 9,
+          "field": "wald_p1",
+          "native": 0.00038344712199861735,
+          "reference": 0.00038345323479928,
+          "relative_error": 1.594145024197412e-05
+        },
+        {
+          "feature": 9,
+          "field": "wald_p2",
+          "native": 0.0004312619390412801,
+          "reference": 0.000431268469394712,
+          "relative_error": 1.5142200033910051e-05
+        },
+        {
+          "feature": 9,
+          "field": "theta",
+          "native": 0.04879344741499054,
+          "reference": 0.048793078866625,
+          "relative_error": 7.553291862325111e-06
+        }
+      ],
+      "native_run": {
+        "version": "0.1.0",
+        "command": "fit",
+        "config_path": "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/config.json",
+        "parameters": {
+          "responses": "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/responses.mtx",
+          "design": "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/design.tsv",
+          "offset": "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/offset.tsv",
+          "weights": "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/weights.tsv",
+          "family": "nb",
+          "output": "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/native",
+          "threads": 1
+        },
+        "input_sha1": {
+          "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/config.json": "930695519694fe1028c2b53e5f85ef035755d22b",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/design.tsv": "b58d699640b1e038b4170d66128224c3dd9f044e",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/offset.tsv": "e811ee5a5f0e20883699478e9d97e6da773a1ec9",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/responses.mtx": "294fd283fb83b9d179c38f69401058e9e392d186",
+          "/mnt/pikachu/rapidglm/validation/work/glm/S2_public_nb/weights.tsv": "e1cb0737a2bb7c542427b2bade9ba31f2e890c45"
+        },
+        "seed": 1,
+        "threads": 1,
+        "observations": 45919,
+        "features": 12,
+        "retained_cells": 45919,
+        "invalid_tests_or_fits": 0,
+        "calibration_rejections": 0,
+        "power_rejections": 0,
+        "discovery_rejections": 0,
+        "wall_seconds": 2.425303343,
+        "peak_rss_kib": 33792,
+        "load_average": [
+          12.5791015625,
+          12.45654296875,
+          11.833984375
+        ],
+        "api_frozen": false
+      },
+      "R_full_and_null_seconds": 20.695,
+      "input_sha256": {
+        "design.tsv": "95c71cd5e14a36eefedcd4ed0bc1b61d457991ac2d69e850698fffb44d6b18ed",
+        "weights.tsv": "9fd67ff5326bdd6a34d0b400ab8bf87f40284fac4e5617736639035b1bdafbd1",
+        "offset.tsv": "846ca7759002996720fe8fead3dd8558e6f4ffec6f13c8bef40ba0ae44713a8e",
+        "responses.mtx": "de10741abd05a2f95350ed4a5730355b76abccb324ef9f24625ccfdc2c138ae6",
+        "reference.tsv": "1c0e38e8e8ac5ddf2e42d0b69f4b269c7afb924d4501be4b586894fb31b2dc7b"
+      }
+    }
+  ],
+  "reference_log": ""
+}

@@ -1,0 +1,49 @@
+{
+ "purpose": "Grouped-design batch benchmark: 1,000 NB responses, 5,000 observations.",
+ "command": "python3 benchmarks/glm/grouped.py --work DIR --output validation/GROUPED_SOLVER.json --baseline-batch BASELINE --r-library validation/local-data/R_glmgampoi:validation/local-data/R_library",
+ "baseline": "benchmarks/glm/rapidglm_batch.cpp of this commit compiled against include/ of aa86c75 (engine NB path unchanged in 34bf0c1)",
+ "timing": "minimum of three runs, one thread, shared host",
+ "results": [
+  {
+   "design": "oneway",
+   "family": "nb",
+   "p": 4,
+   "rapidglm_seconds": 2.90497,
+   "baseline_seconds": 3.34792,
+   "max_rel_coefficient_difference": 1.0136049353737546e-15,
+   "max_abs_log_theta_difference": 3.4087399570252084e-11,
+   "glmgampoi_seconds": 1.674
+  },
+  {
+   "design": "oneway",
+   "family": "poisson",
+   "p": 4,
+   "rapidglm_seconds": 0.424428,
+   "baseline_seconds": 0.671971,
+   "max_rel_coefficient_difference": 1.4504660822324243e-15
+  },
+  {
+   "design": "intercept",
+   "family": "nb",
+   "p": 1,
+   "rapidglm_seconds": 2.3915,
+   "baseline_seconds": 2.64177,
+   "max_rel_coefficient_difference": 1.2256926627376374e-16,
+   "max_abs_log_theta_difference": 2.1519452886332565e-12,
+   "glmgampoi_seconds": 1.678
+  },
+  {
+   "design": "intercept",
+   "family": "poisson",
+   "p": 1,
+   "rapidglm_seconds": 0.350113,
+   "baseline_seconds": 0.541286,
+   "max_rel_coefficient_difference": 1.4800123464261974e-16
+  }
+ ],
+ "load_average": [
+  14.68505859375,
+  15.5966796875,
+  14.1845703125
+ ]
+}
