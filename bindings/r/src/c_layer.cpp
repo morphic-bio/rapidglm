@@ -195,6 +195,8 @@ rapidglm_sceptre_(cpp11::doubles_matrix<> design, cpp11::integers yp, cpp11::int
     real("max_mito", s.max_mito);
     if (has(o, "min_nonzero"))
         s.min_nonzero = static_cast<size_t>(number(o, "min_nonzero"));
+    if (has(o, "confirm_draws"))
+        s.confirm_draws = static_cast<size_t>(number(o, "confirm_draws"));
     if (has(o, "seed"))
         s.seed = static_cast<uint64_t>(number(o, "seed"));
     std::vector<size_t> budgets;

@@ -697,5 +697,51 @@
   }
  },
  "fit_check_ks": "output byte-identical to commit e572ec9 on the 2,150 repeated pairs",
- "limits": "a rejected fit gives the empirical p-value of the last budget, at least 1e-4 with 19,999 draws, so such a pair cannot be a discovery at this panel's cut-off (about 2e-6); two contradicted pairs whose skew-normal p-values are 8 and 40 times too small still pass in 42-44% of repeats"
+ "limits": "a rejected fit gives the empirical p-value of the last budget, at least 1e-4 with 19,999 draws, so such a pair cannot be a discovery at this panel's cut-off (about 2e-6); two contradicted pairs whose skew-normal p-values are 8 and 40 times too small still pass in 42-44% of repeats",
+ "confirmation_draws_2026_10_06": {
+  "note": "confirm_draws 199999 (the default from 1.1.0: ten times the last budget) with the default budgets (499 / 4,999 / 19,999), strict check, sequential_screen, early_stop_p 0.002, crt_draw hazard; 16 threads on CPUs 0-7,12-19 under the timing lock; provisional (faulty CPU). The same draws as the runs under end_to_end",
+  "gasperini_100_targets_x_7418_genes": {
+   "draws": {
+    "no_confirmation": 69077832,
+    "confirm_199999": 78977832,
+    "four_budgets_to_199999": 98327306
+   },
+   "wall_s": {
+    "no_confirmation_1.0.0": 292,
+    "confirm_199999": 289,
+    "four_budgets_to_199999_1.0.0": 405
+   },
+   "wall_note": "the build with confirm_draws also draws long stages with several threads; the same build without confirmation was not timed on this panel",
+   "pairs_drawing_beyond_19999": {
+    "confirm_199999": 55,
+    "four_budgets_to_199999": 163
+   },
+   "confirmation_outcomes": {
+    "fit_confirmed": 50,
+    "fit_rejected_empirical_p": 5
+   },
+   "discoveries": {
+    "no_confirmation": 15,
+    "confirm_199999": 13,
+    "four_budgets_to_199999": 13,
+    "confirm_and_four_budgets_in_common": 13
+   },
+   "no_longer_discoveries": [
+    "response 2536 x chr6.4971_second_two: empirical p 7.0e-5 from 199,999 draws; direct count 3.2e-5",
+    "response 4639 x chr20.1393_top_two: empirical p 2.0e-5 (one draw beyond in 199,999); none of 1 million draws beyond in the direct count"
+   ],
+   "pairs_ending_within_19999_draws": "identical records with and without confirmation"
+  },
+  "small_point_50_targets_x_1000_genes": {
+   "wall_s": {
+    "no_confirmation": 27.2,
+    "confirm_199999": 29.0
+   },
+   "draws": {
+    "no_confirmation": 4682314,
+    "confirm_199999": 5762314
+   },
+   "outputs": "without confirm_draws byte-identical to 1.0.0; with it identical whether long stages are drawn by one thread or several"
+  }
+ }
 }

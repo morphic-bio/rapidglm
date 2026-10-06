@@ -513,9 +513,13 @@ struct PairDraws {
 // and the next pairs (samplers). Draw k of a pair always uses its own key and
 // is written to slot k, so results are those of any other schedule.
 // A stage that may end early (ResampleOptions::sequential_screen, early_stop)
-// is drawn one chunk at a time, up to its next check, since draws beyond its
-// end would be wasted; with such stages (`sequential_stages`) about one pair
-// per thread is kept active, and threads without such a chunk of their own help
+// starts one chunk at a time, up to its next check, since draws beyond its end
+// would be wasted. Once a stage has gone 1,024 draws without ending, one more
+// chunk may be in flight for each further 1,024 draws: a stage that then ends
+// has generated at most about 3% more draws than it used, and a long stage (a
+// test with a small p-value, or one drawing confirmation draws) is drawn by
+// several threads. With such stages (`sequential_stages`) about one pair per
+// thread is kept active, and threads without such a chunk of their own help
 // the pairs in the other stages.
 template <class PrepareResponse, class PreparePair, class Draws, class Finish>
 inline void pair_pipeline(const std::vector<std::vector<std::size_t>> &batches, int threads,
@@ -618,7 +622,8 @@ inline void pair_pipeline(const std::vector<std::vector<std::size_t>> &batches, 
                         if (!slot.running || slot.next >= slot.end)
                             continue;
                         const bool sequential = slot.stages->sequential();
-                        if (sequential && slot.inflight > 0)
+                        if (sequential &&
+                            slot.inflight > (slot.written - slot.stages->begin()) / 1024)
                             continue;
                         test = slot.stages->test_id();
                         first = slot.next;

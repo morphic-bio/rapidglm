@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(rapidglm VERSION 1.0.0 LANGUAGES C CXX)
+project(rapidglm VERSION 1.1.0 LANGUAGES C CXX)
 option(RAPIDGLM_OPENMP "Enable OpenMP" ON)
 option(RAPIDGLM_TESTS "Build tests" ON)
 option(RAPIDGLM_SANITIZERS "Enable address and undefined behavior sanitizers" OFF)

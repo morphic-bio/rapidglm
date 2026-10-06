@@ -727,7 +727,21 @@ inline FitCheck fit_check(const Tree &c) {
     require(name == "strict" || name == "ks", "fit_check must be strict/ks");
     return name == "ks" ? FitCheck::ks : FitCheck::strict;
 }
-// Resampling keys shared by scan: budgets, approximation, fit_check, side and seed.
+// Confirmation draws for small skew-normal p-values: the configured number, or
+// by default ten times the last budget with the strict check (0: off). Call
+// after the budgets, the approximation and the fit check are set.
+inline std::size_t confirm_draws(const Tree &c, const ResampleOptions &o) {
+    require(!o.budgets.empty(), "empty resampling budget");
+    if (!c.count("confirm_draws"))
+        return o.confirmation_draws();
+    const auto draws = c.get<std::size_t>("confirm_draws");
+    require(draws == 0 || (o.approximate && o.fit_check == FitCheck::strict),
+            "confirm_draws needs approximation skew_normal and fit_check strict");
+    require(draws == 0 || draws > o.budgets.back(),
+            "confirm_draws must exceed the last budget; 0 turns it off");
+    return draws;
+}
+// Resampling keys shared by scan: budgets, approximation, fit_check, confirm_draws, side and seed.
 inline ResampleOptions resample_options(const Tree &c, std::uint64_t seed) {
     ResampleOptions o;
     auto side = c.get<std::string>("side", "both");
@@ -744,6 +758,7 @@ inline ResampleOptions resample_options(const Tree &c, std::uint64_t seed) {
             o.budgets.push_back(v.second.get_value<std::size_t>());
     }
     o.screen = c.get<double>("screen", 0);
+    o.confirm = confirm_draws(c, o);
     return o;
 }
 inline void bulk_table(std::ostream &out, const std::vector<BulkGene> &genes, bool shrunk = false) {

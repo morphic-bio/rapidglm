@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.1.0 (2026-10-06)
+
+- Small skew-normal p-values are confirmed on more draws by default
+  (`confirm_draws`; `ResampleOptions::confirm`; C, Python and R interfaces).
+  With the strict fit check, a fit that is sound on the last budget but whose
+  p-value that budget cannot check (fewer than half a draw expected beyond the
+  statistic: a p-value below about 5e-5 with 19,999 draws) is no longer
+  reported from there. The pair draws on to ten times the last budget in all,
+  199,999 for the default budgets, and the fit made on those draws is reported
+  if it is sound, the empirical p-value otherwise. A fit rejected on the last
+  budget ends there as before, so only candidates for very small p-values draw
+  more. `confirm_draws` sets another number; 0 gives the results of 1.0.0. On
+  100 targets x 7,418 genes of the Gasperini screen, 55 of 721,266 pairs draw
+  the confirmation (14% more draws); 50 fits are confirmed and 5 rejected,
+  among them the discovery that direct counts contradict, and the 13
+  discoveries that remain are the ones a four-budget run to 199,999 finds
+  ([validation/SKEW_NORMAL_CHECK.json](validation/SKEW_NORMAL_CHECK.json)).
+  P-values of pairs that draw the confirmation change; a tiled plan includes
+  the setting, so a checkpoint written by 1.0.0 is not resumed.
+- A stage that can end early is drawn by several threads once it has gone
+  1,024 draws without ending (one more chunk in flight per further 1,024
+  draws; at most about 3% of draws generated beyond a stage's end). Long
+  stages no longer run on one thread: that panel takes 289 s with the
+  confirmation draws, against 292 s without them in 1.0.0. Results do not
+  depend on it.
+
 ## 1.0.0 (2026-10-06)
 
 - Tiled, checkpointed `sceptre` runs (`checkpoint_dir`, `tile_targets`,

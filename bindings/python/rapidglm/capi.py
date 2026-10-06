@@ -118,6 +118,7 @@ class _SceptreOptions(ctypes.Structure):
         ("bonferroni", ctypes.c_int),
         ("crt_draw", ctypes.c_int),
         ("fit_check", ctypes.c_int),
+        ("confirm_draws", _size),
     ]
 
 
@@ -141,6 +142,7 @@ class _ScanOptions(ctypes.Structure):
         ("threads", ctypes.c_int),
         ("crt_draw", ctypes.c_int),
         ("fit_check", ctypes.c_int),
+        ("confirm_draws", _size),
     ]
 
 
@@ -596,8 +598,8 @@ def _budgets(o, budgets):
 def sceptre(design, responses, assignments, guides, pairs, moi="low", control_group=None,
             resampling_mechanism=None, integration="union", side="both",
             approximation="skew_normal", budgets=None, screen=None, null_model="sceptre",
-            effect_fits="significant", crt_draw="thinned", fit_check="strict", cell_qc=True,
-            assignment_qc=True,
+            effect_fits="significant", crt_draw="thinned", fit_check="strict",
+            confirm_draws=None, cell_qc=True, assignment_qc=True,
             min_nonzero=None, alpha=None, qc_lower=None, qc_upper=None, max_mito=None,
             qc_total=None, qc_detected=None, qc_mito=None, adjustment="BH", family="nb",
             dispersion="ml", theta=None, tolerance=None, max_iterations=None, offset=None,
@@ -611,7 +613,9 @@ def sceptre(design, responses, assignments, guides, pairs, moi="low", control_gr
 
     fit_check: acceptance of the skew-normal fit. "strict" (default) also
     checks the tail where the statistic lies and confirms small p-values on
-    the last budget; "ks" is the check of releases before 1.0.0.
+    confirm_draws draws (default: ten times the last budget, 199,999 for
+    the default budgets; 0 turns the confirmation off);
+    "ks" is the check of releases before 1.0.0.
 
     Columns: response, target, guide, kind, status, cells, nonzero_treatment,
     nonzero_control, draws, approximation, statistic, p_value, adjusted_p,
@@ -659,6 +663,8 @@ def sceptre(design, responses, assignments, guides, pairs, moi="low", control_gr
     o.effect_fits = _choice("effect_fits", effect_fits, _EFFECT_FITS)
     o.crt_draw = _choice("crt_draw", crt_draw, _CRT_DRAWS)
     o.fit_check = _choice("fit_check", fit_check, _FIT_CHECKS)
+    if confirm_draws is not None:
+        o.confirm_draws = int(confirm_draws)
     o.cell_qc, o.assignment_qc = int(bool(cell_qc)), int(bool(assignment_qc))
     for field, value in (("alpha", alpha), ("lower_quantile", qc_lower),
                          ("upper_quantile", qc_upper), ("max_mito", max_mito)):
@@ -697,7 +703,7 @@ def scan(design, responses, predictors, pairs=None, family="nb", dispersion="ml"
          tolerance=None, ridge=None, max_iterations=None, offset=None, weights=None,
          null_model="direct", calibration="permutation", side="both", approximation="skew_normal",
          budgets=None, screen=None, effect_fits="significant", crt_draw="thinned",
-         fit_check="strict", strata=None,
+         fit_check="strict", confirm_draws=None, strata=None,
          alpha=None, min_nonzero=None, adjustment="BH", seed=1, threads=1):
     """Score scan: each response's null model is fitted once and tested against
     many predictors. pairs: None (every response x predictor) or a DataFrame
@@ -732,6 +738,8 @@ def scan(design, responses, predictors, pairs=None, family="nb", dispersion="ml"
     o.effect_fits = _choice("effect_fits", effect_fits, _EFFECT_FITS)
     o.crt_draw = _choice("crt_draw", crt_draw, _CRT_DRAWS)
     o.fit_check = _choice("fit_check", fit_check, _FIT_CHECKS)
+    if confirm_draws is not None:
+        o.confirm_draws = int(confirm_draws)
     o.strata, a = _sizes(strata, x.rows, "strata")
     keep.append(a)
     if alpha is not None:

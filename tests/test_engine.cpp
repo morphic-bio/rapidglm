@@ -367,6 +367,7 @@ BOOST_AUTO_TEST_CASE(strict_fit_check_confirms_small_p_values_on_the_last_budget
     const auto run = [](const Vector &draws, double statistic, FitCheck check) {
         ResampleOptions o;
         o.budgets = {4999, 19999};
+        o.confirm = 0; // the confirmation draws have their own test
         o.fit_check = check;
         detail::NullStages stages(o, statistic);
         do
@@ -420,6 +421,76 @@ BOOST_AUTO_TEST_CASE(strict_fit_check_confirms_small_p_values_on_the_last_budget
     BOOST_TEST(confirmed > samples * 8 / 10);
     BOOST_TEST(rejected >= samples * 9 / 10);
     BOOST_TEST(ks_small > samples / 2);
+}
+BOOST_AUTO_TEST_CASE(confirmation_draws_recheck_small_p_values) {
+    const std::size_t confirm = 199999;
+    const auto run = [](const Vector &draws, double statistic, std::size_t confirmation) {
+        ResampleOptions o;
+        o.budgets = {4999, 19999};
+        o.confirm = confirmation;
+        detail::NullStages stages(o, statistic);
+        do
+            std::copy(draws.begin() + static_cast<std::ptrdiff_t>(stages.begin()),
+                      draws.begin() + static_cast<std::ptrdiff_t>(stages.end()),
+                      stages.null() + stages.begin());
+        while (!stages.next());
+        return stages.result();
+    };
+    const std::size_t samples = 12;
+    std::size_t confirmed = 0, passed = 0, caught = 0, ended = 0;
+    for (std::size_t k = 0; k < samples; ++k) {
+        const auto sound = skewed_sample(confirm, 2000 + k, 0);
+        // A p-value within reach of the budgets is reported as without the option.
+        const auto near = run(sound, 2.5, 0), near_confirm = run(sound, 2.5, confirm);
+        BOOST_TEST(near_confirm.p_value == near.p_value);
+        BOOST_TEST(near_confirm.draws == near.draws);
+        BOOST_TEST(near.draws <= 19999u);
+        // One beyond the last budget's reach is accepted there without the
+        // option, and with it only from the fit on the confirmation draws.
+        const auto far = run(sound, 5.5, 0), far_confirm = run(sound, 5.5, confirm);
+        BOOST_TEST(far.draws == 19999u);
+        BOOST_TEST(far_confirm.draws == confirm);
+        confirmed += far.used_approximation && far_confirm.used_approximation;
+        // One draw in 100,000 jumps: 19,999 draws rarely hold a jump, 199,999
+        // nearly always, and the fit is then rejected for the empirical p-value.
+        const auto mild = skewed_sample(confirm, 3000 + k, 1e-5);
+        const auto mild_last = run(mild, 5.0, 0), mild_confirm = run(mild, 5.0, confirm);
+        if (mild_last.used_approximation) {
+            ++passed;
+            BOOST_TEST(mild_confirm.draws == confirm);
+            if (!mild_confirm.used_approximation) {
+                ++caught;
+                BOOST_TEST(mild_confirm.p_value == empirical_tail(mild, 5.0, Side::both));
+            }
+        }
+        // A fit rejected on the last budget ends there: no confirmation draws.
+        const auto heavy = skewed_sample(confirm, k, 0.0005);
+        const auto heavy_confirm = run(heavy, 5.0, confirm);
+        if (!heavy_confirm.used_approximation && heavy_confirm.draws == 19999) {
+            ++ended;
+            BOOST_TEST(
+                heavy_confirm.p_value ==
+                empirical_tail(Vector(heavy.begin(), heavy.begin() + 19999), 5.0, Side::both));
+        }
+    }
+    BOOST_TEST_MESSAGE("confirmation: sound confirmed "
+                       << confirmed << ", mild tail passed 19,999 " << passed << " and caught "
+                       << caught << ", heavy ended at 19,999 " << ended << " of " << samples);
+    BOOST_TEST(confirmed >= samples * 3 / 4);
+    BOOST_TEST(passed >= samples / 2);
+    BOOST_TEST(caught * 2 >= passed);
+    BOOST_TEST(ended >= samples * 3 / 4);
+    // By default ten times the last budget confirms: 199,999 draws for 19,999.
+    // A number not above the last budget turns the confirmation off.
+    ResampleOptions defaults;
+    BOOST_TEST(defaults.confirmation_draws() == confirm);
+    defaults.budgets = {99, 999};
+    BOOST_TEST(defaults.confirmation_draws() == 9999u);
+    defaults.fit_check = FitCheck::ks;
+    BOOST_TEST(defaults.confirmation_draws() == 0u);
+    const auto sound = skewed_sample(confirm, 2000, 0);
+    BOOST_TEST(run(sound, 5.5, 19999).draws == 19999u);
+    BOOST_TEST(run(sound, 5.5, 19999).p_value == run(sound, 5.5, 0).p_value);
 }
 BOOST_AUTO_TEST_CASE(exponential_ziggurat_matches_the_exponential_law) {
     const auto &ziggurat = detail::exponential_ziggurat();

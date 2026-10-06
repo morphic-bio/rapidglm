@@ -25,8 +25,9 @@ seconds; one / eight threads). Jaccard is the overlap of discoveries with the
 reference tool at a false-discovery rate of 0.1. RapidGLM times are for its R
 package; the CLI and Python package take similar times. Since then the
 perturbation workflow has become faster ([CHANGELOG.md](CHANGELOG.md)), and
-from 1.0.0 it accepts skew-normal p-values by a stricter check; the SCEPTRE
-rows correspond to `fit_check: "ks"`
+from 1.0.0 it accepts skew-normal p-values by a stricter check, with
+confirmation draws from 1.1.0; the SCEPTRE rows correspond to
+`fit_check: "ks"`
 ([docs/CLI.md](docs/CLI.md#perturbation-workflow)).
 
 | Analysis | Reference (1 / 8) | RapidGLM (1 / 8) | Speed-up (1 thread) | Jaccard |
@@ -194,6 +195,7 @@ level 0.01, an upper limit of 0.0136 against 0.013;
 Skew-normal p-values of the perturbation workflow are extrapolations beyond
 the resampled draws. From 1.0.0 they are accepted by a stricter check, after
 direct counts over millions of draws contradicted some that the earlier check
-accepted ([SKEW_NORMAL_CHECK.json](validation/SKEW_NORMAL_CHECK.json));
-the check reduces such cases and does not remove them
+accepted, and from 1.1.0 the smallest are confirmed on 199,999 draws
+([SKEW_NORMAL_CHECK.json](validation/SKEW_NORMAL_CHECK.json)). The checks
+reduce such cases; they cannot rule them out
 ([METHODS.md](METHODS.md#resampling)).

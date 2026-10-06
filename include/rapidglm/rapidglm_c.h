@@ -180,6 +180,7 @@ enum { RAPIDGLM_CRT_THINNED = 0, RAPIDGLM_CRT_DIRECT = 1, RAPIDGLM_CRT_HAZARD = 
 /* Acceptance of the skew-normal fit: strict also checks the tail on the
  * statistic's side; ks is the check of releases before 1.0.0. */
 enum { RAPIDGLM_FIT_CHECK_STRICT = 0, RAPIDGLM_FIT_CHECK_KS = 1 };
+#define RAPIDGLM_CONFIRM_AUTO ((size_t)-1)
 
 typedef struct {
     size_t struct_size;
@@ -201,6 +202,11 @@ typedef struct {
     int bonferroni; /* Bonferroni instead of BH adjustment of discovery pairs */
     int crt_draw;   /* default RAPIDGLM_CRT_THINNED */
     int fit_check;  /* default RAPIDGLM_FIT_CHECK_STRICT */
+    /* Draws on which a skew-normal p-value too small for the last budget to
+     * check is confirmed (strict check). Default RAPIDGLM_CONFIRM_AUTO: ten
+     * times the last budget (199999 for the default budgets). Off when 0 or not
+     * above the last budget. */
+    size_t confirm_draws;
 } rapidglm_sceptre_options;
 /* high_moi selects the MOI-dependent defaults (control group, mechanism). */
 void rapidglm_sceptre_options_init(rapidglm_sceptre_options *options, int high_moi);
@@ -240,8 +246,9 @@ typedef struct {
     int bonferroni;
     uint64_t seed;
     int threads;
-    int crt_draw;  /* default RAPIDGLM_CRT_THINNED */
-    int fit_check; /* default RAPIDGLM_FIT_CHECK_STRICT */
+    int crt_draw;         /* default RAPIDGLM_CRT_THINNED */
+    int fit_check;        /* default RAPIDGLM_FIT_CHECK_STRICT */
+    size_t confirm_draws; /* as for rapidglm_sceptre_options */
 } rapidglm_scan_options;
 void rapidglm_scan_options_init(rapidglm_scan_options *options);
 

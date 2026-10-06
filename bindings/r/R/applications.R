@@ -109,8 +109,11 @@ bulk_de <- function(counts, design, col_data = NULL, coefficient = NULL, contras
 #' @param pairs data frame with response (gene name or 1-based index), target and kind
 #'   (discovery, negative or positive).
 #' @param fit_check acceptance of the skew-normal fit: "strict" (default) also checks the
-#'   tail where the statistic lies and confirms small p-values on the last budget; "ks" is
-#'   the check of releases before 1.0.0.
+#'   tail where the statistic lies and confirms small p-values on `confirm_draws` draws;
+#'   "ks" is the check of releases before 1.0.0.
+#' @param confirm_draws draws on which a skew-normal p-value too small for the last budget
+#'   to check is confirmed (strict check only). Default: ten times the last budget, 199,999
+#'   for the default budgets; 0 turns it off.
 #' @return A data frame per pair with run-level values in `attr(, "run")`.
 sceptre <- function(responses, assignments, design, guides, pairs, cell_data = NULL,
                     moi = c("low", "high"), control_group = NULL, resampling_mechanism = NULL,
@@ -120,6 +123,7 @@ sceptre <- function(responses, assignments, design, guides, pairs, cell_data = N
                     screen = 0.02, null_model = c("sceptre", "direct"),
                     effect_fits = c("significant", "all", "none"),
                     crt_draw = c("thinned", "direct", "hazard"), fit_check = c("strict", "ks"),
+                    confirm_draws = NULL,
                     cell_qc = TRUE, assignment_qc = TRUE, min_nonzero = 7, alpha = 0.1,
                     qc_lower = 0.01, qc_upper = 0.99, max_mito = 0.2, adjustment = c("BH", "bonferroni"),
                     family = c("nb", "poisson"), seed = 1, threads = 1) {
@@ -147,6 +151,7 @@ sceptre <- function(responses, assignments, design, guides, pairs, cell_data = N
             screen = screen, cell_qc = as.numeric(cell_qc), assignment_qc = as.numeric(assignment_qc),
             min_nonzero = min_nonzero, alpha = alpha, lower_quantile = qc_lower,
             upper_quantile = qc_upper, max_mito = max_mito, seed = seed, threads = threads)
+  if (!is.null(confirm_draws)) o$confirm_draws <- confirm_draws
   if (!is.null(control_group))
     o$nt_controls <- choice(control_group, c(complement = 0, nt_cells = 1), "control_group")
   if (!is.null(resampling_mechanism))

@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
               "tile", "tile_targets", "tile_responses"})
             io::require(command == "sceptre" || !config.count(key),
                         std::string(key) + " is a sceptre setting");
-        for (const char *key : {"effect_fits", "crt_draw", "fit_check"})
+        for (const char *key : {"effect_fits", "crt_draw", "fit_check", "confirm_draws"})
             io::require(command == "sceptre" || command == "scan" || !config.count(key),
                         std::string(key) + " is a scan or sceptre setting");
         if (crt_draw == "hazard" && !aes_instructions())
@@ -177,7 +177,8 @@ int main(int argc, char **argv) {
                         !config.count(key),
                     "coefficients and contrast are bulk-de, pseudobulk-de and dose-trend settings");
         std::optional<Hypothesis> tested;
-        double screen = 0; // empirical screen of resampled tests (scan, sceptre)
+        double screen = 0;       // empirical screen of resampled tests (scan, sceptre)
+        std::size_t confirm = 0; // their confirmation draws in effect
         require(command == "scan" || command == "sceptre" || !config.count("screen"),
                 "screen is a scan or sceptre setting");
         for (const char *key :
@@ -213,6 +214,7 @@ int main(int argc, char **argv) {
                                                            : EffectFits::none;
             o.resampling = io::resample_options(config, seed);
             screen = o.resampling.screen;
+            confirm = o.resampling.confirm;
             for (double v : io::read_vector(config.get<std::string>("strata", ""))) {
                 require(v >= 0 && std::floor(v) == v, "strata must be nonnegative integers");
                 o.strata.push_back(static_cast<std::size_t>(v));
@@ -380,6 +382,8 @@ int main(int argc, char **argv) {
             }
             o.resampling.screen = config.get<double>("screen", o.resampling.screen);
             screen = o.resampling.screen;
+            o.resampling.confirm = io::confirm_draws(config, o.resampling);
+            confirm = o.resampling.confirm;
             o.cell_qc = config.get<bool>("cell_qc", true);
             o.assignment_qc = config.get<bool>("assignment_qc", true);
             o.parallel_draws = config.get<bool>("parallel_draws", true);
@@ -472,6 +476,8 @@ int main(int argc, char **argv) {
                 // checkpoint written under another default is not resumed.
                 if (!config.count("fit_check"))
                     parts.push_back("default:fit_check=strict");
+                if (!config.count("confirm_draws"))
+                    parts.push_back("default:confirm_draws=" + std::to_string(confirm));
                 finish_hashes();
                 for (const auto &entry : hashes)
                     if (entry.first != argv[2])
@@ -645,6 +651,7 @@ int main(int argc, char **argv) {
             io::quoted(record, effect_fits);
             record << ",\n  \"fit_check\": ";
             io::quoted(record, config.get<std::string>("fit_check", "strict"));
+            record << ",\n  \"confirm_draws\": " << confirm;
             record << ",\n  \"crt_draw\": ";
             io::quoted(record, crt_draw);
             // hazard needs the processor's AES instructions; without them it is thinned.

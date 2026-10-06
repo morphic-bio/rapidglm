@@ -292,7 +292,18 @@ that the current budget cannot check (fewer than half a draw expected beyond
 the statistic) only on the last budget (METHODS.md, Resampling;
 [SKEW_NORMAL_CHECK.json](../validation/SKEW_NORMAL_CHECK.json)). A pair whose
 fit fails there reports the empirical p-value of the last budget, which with
-19,999 draws is at least 1e-4. Skew-normal tail probabilities are clamped to [0, 1]; far in
+19,999 draws is at least 1e-4.
+
+`confirm_draws` (with `fit_check: "strict"`; default ten times the last
+budget, 199,999 for the default budgets) confirms the smallest p-values. The
+last budget cannot check a p-value below about 5e-5 (19,999 draws), and a
+mildly heavy tail can pass its check there. A pair whose fit is sound on the
+last budget but whose p-value is beyond that budget's reach therefore draws on
+to `confirm_draws` in all; the fit made on those draws is reported if it is
+sound, and their empirical p-value (at least 1e-5 with 199,999) otherwise. A
+fit that is rejected on the last budget ends there, so only a few dozen pairs
+per hundred targets draw the confirmation. `confirm_draws: 0` turns it off and
+gives the results of 1.0.0; the run record states the number in effect. Skew-normal tail probabilities are clamped to [0, 1]; far in
 a tail the CDF can round to a tiny negative value. SCEPTRE does not document
 its staging. The screen reproduces what its outputs show; the random draws
 themselves differ, so borderline pairs can differ within Monte Carlo noise

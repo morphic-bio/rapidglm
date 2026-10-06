@@ -1,6 +1,6 @@
 name: Release
 
-# Pushing a tag such as v1.0.0 builds and tests that commit, then publishes a
+# Pushing a tag such as v1.1.0 builds and tests that commit, then publishes a
 # GitHub release with the header-only library (headers and CMake package) and a
 # Linux x86_64 CLI build, plus the source archive.
 on:

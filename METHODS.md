@@ -441,7 +441,12 @@ test. Each comparison is made at the 1% level:
 
 A p-value that the budget cannot check, one for which the fit expects fewer
 than half a draw beyond the statistic, is in addition accepted only on the
-last budget, where the fit is made and checked again on all the draws. The
+last budget, where the fit is made and checked again on all the draws. Since
+1.1.0 it is not accepted there either: the test draws on to `confirm_draws` in
+all, by default ten times the last budget (199,999), and the fit made on those
+draws is reported if it is sound, the empirical p-value otherwise. Tests whose
+fit is rejected on the last budget do not draw the confirmation;
+`confirm_draws=0` turns it off. The
 checks look for a tail heavier than the fit: a lighter one makes the p-value
 conservative.
 

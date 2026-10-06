@@ -458,6 +458,7 @@ void rapidglm_sceptre_options_init(rapidglm_sceptre_options *o, int high_moi) {
     o->approximate = 1;
     o->effect_fits = RAPIDGLM_EFFECTS_SIGNIFICANT;
     o->screen = d.resampling.screen;
+    o->confirm_draws = d.resampling.confirm;
     o->cell_qc = d.cell_qc;
     o->assignment_qc = d.assignment_qc;
     o->min_nonzero = d.min_nonzero;
@@ -516,6 +517,7 @@ int rapidglm_sceptre(const rapidglm_dense *design, const rapidglm_sparse *respon
         o.resampling.side = side(c.side);
         o.resampling.approximate = c.approximate != 0;
         o.resampling.fit_check = fit_check(c.fit_check);
+        o.resampling.confirm = c.confirm_draws;
         budgets(o.resampling, c.budgets, c.n_budgets);
         o.resampling.screen = c.screen;
         o.resampling.seed = c.seed;
@@ -595,6 +597,7 @@ void rapidglm_scan_options_init(rapidglm_scan_options *o) {
     o->approximate = 1;
     o->effect_fits = RAPIDGLM_EFFECTS_SIGNIFICANT;
     o->screen = d.resampling.screen;
+    o->confirm_draws = d.resampling.confirm;
     o->alpha = d.alpha;
     o->min_nonzero = d.min_nonzero;
     o->seed = 1;
@@ -631,6 +634,7 @@ int rapidglm_scan(const rapidglm_dense *design, const rapidglm_sparse *responses
         o.resampling.side = side(c.side);
         o.resampling.approximate = c.approximate != 0;
         o.resampling.fit_check = fit_check(c.fit_check);
+        o.resampling.confirm = c.confirm_draws;
         budgets(o.resampling, c.budgets, c.n_budgets);
         o.resampling.screen = c.screen;
         o.resampling.seed = c.seed;

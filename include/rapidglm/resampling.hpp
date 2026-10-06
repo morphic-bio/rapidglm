@@ -1070,6 +1070,27 @@ struct ResampleOptions {
     // accepted gave p-values a hundred to a few thousand times below the tail
     // counted over millions of draws (validation/SKEW_NORMAL_CHECK.json).
     FitCheck fit_check = FitCheck::strict;
+    // Confirmation draws for FitCheck::strict. A fit that is sound on the last
+    // budget but whose p-value that budget cannot check is not accepted there:
+    // the draws continue to `confirm` in all, and the fit made on those is
+    // reported if it is sound, the empirical p-value of the `confirm` draws
+    // otherwise. A fit that is rejected on the last budget ends there with its
+    // empirical p-value, so only candidates for very small p-values draw more.
+    // By default (automatic_confirm) the number is ten times the last budget:
+    // 199,999 for 19,999. With 19,999 draws a mildly heavy tail can pass the
+    // check and give a p-value tens of times too small; on the Gasperini panel
+    // 199,999 draws rejected those fits (validation/SKEW_NORMAL_CHECK.json).
+    // 0, or a number not above the last budget, turns the confirmation off.
+    static constexpr std::size_t automatic_confirm = std::numeric_limits<std::size_t>::max();
+    std::size_t confirm = automatic_confirm;
+    // The confirmation draws in effect for these budgets (0: none).
+    std::size_t confirmation_draws() const {
+        if (!approximate || fit_check != FitCheck::strict || budgets.empty())
+            return 0;
+        const std::size_t draws =
+            confirm == automatic_confirm ? 10 * (budgets.back() + 1) - 1 : confirm;
+        return draws > budgets.back() ? draws : 0;
+    }
     // Shared prescreen (0: off). When positive, the first budget is drawn first
     // from the stream prescreen_test_id, which several tests may share. A test
     // whose empirical p-value there is above `prescreen` ends with it; every
@@ -1279,6 +1300,7 @@ inline void check_budgets(const ResampleOptions &o) {
     require(o.prescreen_test_id <= UINT32_MAX, "prescreen test ID exceeds RNG range");
     require(std::isfinite(o.early_stop) && o.early_stop >= 0 && o.early_stop < 1,
             "the early stop must be in [0, 1)");
+    require(o.confirmation_draws() <= UINT32_MAX, "confirmation draws must fit uint32");
     for (std::size_t i = 0; i < o.budgets.size(); ++i)
         require(o.budgets[i] <= UINT32_MAX && (i == 0 || o.budgets[i] > o.budgets[i - 1]),
                 "budgets must be increasing and fit uint32");
@@ -1298,6 +1320,9 @@ class NullStages {
     ResampleResult out_;
     Vector null_;
     std::size_t index_ = 0;
+    // The budgets before the confirmation draws (ResampleOptions::confirm),
+    // which are appended to o_.budgets as one more stage.
+    std::size_t counting_ = 0;
     bool screened_ = false, prescreening_ = false;
     // Sequential stages: draws counted so far, those at most and at least the
     // statistic, the count that decides the stage, and where it was decided.
@@ -1373,7 +1398,10 @@ class NullStages {
     }
     NullStages(const ResampleOptions &o, double statistic) : o_(o) {
         out_.statistic = statistic;
+        counting_ = o_.budgets.size();
         null_.reserve(o_.budgets.back());
+        if (const std::size_t confirmation = o_.confirmation_draws())
+            o_.budgets.push_back(confirmation);
         null_.resize(o_.budgets.front());
         prescreening_ = o_.prescreen > 0;
         open_stage(true);
@@ -1435,13 +1463,14 @@ class NullStages {
                 out_.null_statistics = std::move(null_);
             return true;
         }
-        const std::size_t budget = o_.budgets[index_];
+        // The last budget, and the last stage (the confirmation draws if any).
+        const bool last_budget = index_ + 1 == counting_, last = index_ + 1 == o_.budgets.size();
         out_.draws = null_.size();
-        bool stop = false;
+        bool stop = false, beyond_reach = false;
         if (o_.screen > 0 && !screened_) {
             screened_ = true;
             const double p = empirical_tail(null_, out_.statistic, o_.side);
-            if (p > o_.screen || budget == o_.budgets.back()) {
+            if (p > o_.screen || last_budget) {
                 out_.p_value = p;
                 stop = true;
             }
@@ -1452,12 +1481,16 @@ class NullStages {
             out_.fit_discrepancy = sf.discrepancy;
             bool accepted = sf.valid;
             if (accepted && strict) {
-                // A p-value that this budget cannot check (the fit expects less
-                // than half a draw beyond the statistic) waits for the last one.
+                // A p-value that this stage cannot check (the fit expects less
+                // than half a draw beyond the statistic) waits for the next
+                // one; on the last stage it is accepted.
                 double expected_beyond = 0;
                 accepted = detail::skew_normal_tail_is_sound(sf, sorted, out_.statistic, o_.side,
-                                                             expected_beyond) &&
-                           (budget == o_.budgets.back() || expected_beyond >= 0.5);
+                                                             expected_beyond);
+                if (accepted && !last && expected_beyond < 0.5) {
+                    accepted = false;
+                    beyond_reach = true;
+                }
             }
             if (accepted) {
                 out_.p_value = skew_normal_tail(sf, out_.statistic, o_.side);
@@ -1465,7 +1498,9 @@ class NullStages {
                 stop = true;
             }
         }
-        if (!stop && index_ + 1 < o_.budgets.size()) {
+        // After the last budget only a sound fit beyond its reach draws on, to
+        // be confirmed; a rejected fit ends with the empirical p-value.
+        if (!stop && !last && (!last_budget || beyond_reach)) {
             ++index_;
             null_.resize(o_.budgets[index_]);
             open_stage(false);

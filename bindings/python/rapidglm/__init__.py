@@ -13,7 +13,7 @@ import numpy as np
 from .capi import bulk_de, fit_batch, library_version, scan, sceptre
 
 __all__ = ["bulk_de", "sceptre", "scan", "fit_batch", "fit", "library_version"]
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 
 def fit(

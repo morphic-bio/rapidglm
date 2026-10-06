@@ -180,11 +180,16 @@ BOOST_AUTO_TEST_CASE(empirical_screen_stops_or_continues_at_the_first_budget) {
     ResampleOptions ro;
     ro.budgets = {499, 1999};
     ro.screen = 0.02;
+    ro.confirm = 0; // this test is about the screen
     // A strong predictor passes the screen and is drawn to the second budget; a
     // null one stops with its empirical first-stage p-value.
     const auto strong = resample_permutation(score, d.g.column(2), {}, ro);
     BOOST_REQUIRE(strong.valid);
     BOOST_TEST(strong.draws == 1999u);
+    // By default its small p-value is confirmed on ten times the last budget.
+    auto confirmed = ro;
+    confirmed.confirm = ResampleOptions::automatic_confirm;
+    BOOST_TEST(resample_permutation(score, d.g.column(2), {}, confirmed).draws == 19999u);
     const auto weak = resample_permutation(score, d.g.column(3), {}, ro);
     BOOST_REQUIRE(weak.valid);
     BOOST_TEST(weak.draws == 499u);
