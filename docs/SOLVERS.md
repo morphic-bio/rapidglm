@@ -38,6 +38,12 @@ Levenberg–Marquardt. Both solve the same problems. Receipt:
 - Every gene gets the same counts, log size-factor offsets and dispersions
   (from `bulk_de`, not timed).
 - Ceres starts from the intercept-only fit; RapidGLM uses its own start.
+- RapidGLM is timed two ways. In the "RapidGLM" columns its fits share what
+  they derive from the design alone (X'X, its rank check and the rows' nonzero
+  entries), computed once and not timed, as `fit_batch` and `bulk_de` do
+  (`FitOptions::design`). In the "plain `fit`" columns each gene is fitted on its
+  own. The estimates are the same. The benchmark's last argument chooses
+  (`shared`, `plain` or `both`).
 - One thread per solver.
 - Every answer is scored by the same log likelihood. It is evaluated stably at
   large θ: `lgamma` and `digamma` differences are replaced by power sums above
@@ -49,39 +55,56 @@ relative to the log likelihood.
 
 ## Results
 
-These runs are from a shared host (1-minute load 3–13). Times are wall seconds
-for all genes. Each cell gives the time and either the largest shortfall or the
-number of genes worse than the best answer.
+These runs are from version 1.2.0 (2026-10-06), each on one efficiency core of
+an Intel Core i9-13900KF (see [BENCHMARK.md](BENCHMARK.md#host)). Times are
+wall seconds for all genes. Each cell gives the time and either the largest
+shortfall or the number of genes worse than the best answer.
 
 **Fixed dispersion** (DESeq2's final GLM):
 
-| Data (samples × columns, genes) | RapidGLM | LM default | LM tight | Dogleg tight | L-BFGS default | L-BFGS tight |
-|---|---|---|---|---|---|---|
-| airway (8 × 5, 22,369) | 0.38 s; max 1e-9 | 0.33 s; max 3e-6 | 0.46 s; max 5e-8 | 0.69 s | 0.42 s; 9,260 worse | 0.59 s |
-| simulation (5,000 × 5, 1,000) | 1.50 s; max 9e-11 | 1.24 s; max 3e-3 | 2.34 s; max 3e-9 | 2.44 s | 2.31 s; 386 worse | 2.89 s |
-| GTEx thyroid (647 × 12, 28,769) | 7.94 s; max 8e-8 | 5.85 s; max 7e-4 | 9.50 s; max 5e-8 | 9.94 s | 8.07 s; 23,130 worse | 17.8 s; 3 worse |
+| Data (samples × columns, genes) | RapidGLM | RapidGLM, plain `fit` | LM default | LM tight | Dogleg tight | L-BFGS default | L-BFGS tight |
+|---|---|---|---|---|---|---|---|
+| airway (8 × 5, 22,369) | 0.21 s; max 2e-9 | 0.23 s | 0.33 s; max 3e-6 | 0.47 s; max 1e-9 | 0.70 s | 0.45 s; 9,254 worse | 0.59 s |
+| simulation (5,000 × 5, 1,000) | 1.60 s; max 9e-11 | 1.66 s | 2.37 s; max 3e-3 | 4.28 s; max 3e-9 | 4.41 s | 4.08 s; 386 worse | 5.28 s |
+| GTEx thyroid (647 × 12, 28,769) | 7.43 s; max 8e-8 | 8.25 s | 10.2 s; max 7e-4 | 15.3 s; max 3e-8 | 15.8 s | 15.9 s; 23,162 worse | 32.0 s; 3 worse |
 
 **Maximum-likelihood dispersion:**
 
-| Data | RapidGLM joint Newton | BFGS default | BFGS tight | L-BFGS tight |
-|---|---|---|---|---|
-| airway | 0.98 s; 198 worse, max 6e-4 (θ at its 1e8 bound) | 0.73 s; 17,804 worse, max 28 | 1.27 s; 6 worse, max 0.33 | 1.44 s; 8 worse |
-| simulation | 2.09 s; max 1e-5 | 6.30 s; 120 worse, max 42 | 8.12 s; max 9e-6 | 7.99 s |
-| GTEx thyroid | 20.6 s; max 1e-5 | 23.4 s; 21,364 worse, max 8.4e3 | 47.4 s; 2 worse, max 22 | 49.9 s; 3 worse |
+| Data | RapidGLM joint Newton | RapidGLM, plain `fit` | BFGS default | BFGS tight | L-BFGS tight |
+|---|---|---|---|---|---|
+| airway | 1.12 s; 198 worse, max 6e-4 (θ at its 1e8 bound) | 1.22 s | 1.24 s; 17,804 worse, max 28 | 1.92 s; 6 worse, max 0.33 | 2.17 s; 8 worse |
+| simulation | 3.20 s; max 1e-5 | 3.32 s | 11.2 s; 120 worse, max 42 | 14.0 s; max 9e-6 | 14.3 s |
+| GTEx thyroid | 15.4 s; max 1e-5 | 17.1 s | 43.3 s; 21,364 worse, max 8.4e3 | 87.6 s; 2 worse, max 22 | 92.3 s; 3 worse |
 
 Summary:
-- **Fixed dispersion:** at equal accuracy, RapidGLM is 1.2–1.6× faster than
-  Levenberg–Marquardt and dogleg. Levenberg–Marquardt at Ceres's default
-  tolerances is faster still, but stops up to 3e-3 short of the optimum.
-- **Maximum-likelihood dispersion:** RapidGLM is 1.3–3.8× faster than BFGS or
-  L-BFGS at tight tolerances. On airway and thyroid it is also more accurate:
-  tight BFGS still misses on a few genes, by up to 22 in log likelihood.
+- **Fixed dispersion:** at equal accuracy, RapidGLM is 2.1–2.7× faster than
+  Levenberg–Marquardt and 2.1–3.4× faster than dogleg. It is also 1.4–1.6×
+  faster than Levenberg–Marquardt at Ceres's default tolerances, which stops
+  up to 3e-3 short of the optimum. Both take a median of 3 to 5 iterations;
+  RapidGLM's are cheaper.
+- **Maximum-likelihood dispersion:** RapidGLM is 4.4–6.0× faster than BFGS or
+  L-BFGS at tight tolerances on the simulation and thyroid, and 1.7–1.9× faster
+  on airway. On airway and thyroid it is also more accurate: tight BFGS still
+  misses on a few genes, by up to 22 in log likelihood.
 - **Default tolerances:** the quasi-Newton methods stop far from the optimum on
   most genes, as much as 8,400 log-likelihood units short on thyroid.
 - **The θ bound:** RapidGLM keeps θ ≤ 1e8. For near-Poisson genes that costs
   at most 6e-4 in log likelihood against an unbounded θ.
+- **Plain `fit`:** fitting each gene on its own takes 3–11% longer than sharing
+  the design-only work. Against plain `fit`, tight Levenberg–Marquardt takes
+  1.9–2.6× as long and tight BFGS 1.6–5.1×.
 - **Simplicity:** RapidGLM's methods reuse the factorizations the fitter
   already needs for standard errors, and need no external optimizer.
+- **Core type:** three of the runs were repeated on a performance core
+  (`performance_core_control` in the receipt). RapidGLM took 0.11 s, 0.63 s
+  and 3.67 s (airway fixed, airway ML, thyroid fixed), 1.8–2.0× less than
+  above; the tight Ceres methods gained 1.7–2.0×. There RapidGLM is 2.1× and
+  2.4× faster than tight Levenberg–Marquardt (airway, thyroid) and 1.8×
+  faster than tight BFGS on airway.
+- **Before 1.2.0** a fixed-dispersion fit spent about two thirds of its time
+  outside the Newton iterations (response-only likelihood terms, a
+  confirming iteration and per-fit design work; [CHANGELOG.md](../CHANGELOG.md)).
+  RapidGLM then took as long as tight Levenberg–Marquardt on thyroid.
 
 ## Defects the comparison found
 

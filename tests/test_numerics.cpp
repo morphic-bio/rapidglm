@@ -1,5 +1,6 @@
 #include <array>
 #include <boost/test/unit_test.hpp>
+#include <random>
 #include <rapidglm/rapidglm.hpp>
 
 using namespace rapidglm;
@@ -430,4 +431,165 @@ BOOST_AUTO_TEST_CASE(hc0_covariance_matches_group_mean_influence_variance) {
         BOOST_REQUIRE(test.valid);
         near(test.standard_error, std::sqrt(variance[0] + variance[1]), 1e-9);
     }
+}
+BOOST_AUTO_TEST_CASE(response_only_terms_match_direct_gamma_functions) {
+    // Counts on both sides of 64 (histogram and Stirling's series) and theta on
+    // both sides of the counts and of 65 (the forms of nb_constant and polygamma).
+    std::mt19937_64 rng(31);
+    for (double scale : {40.0, 130.0, 3000.0, 2e5})
+        for (double theta : {1e-6, 0.3, 7.0, 64.5, 65.0, 800.0, 1e5, 1e8}) {
+            Vector y(200), a(200);
+            for (std::size_t i = 0; i < y.size(); ++i) {
+                y[i] = std::floor(scale * std::generate_canonical<double, 53>(rng));
+                a[i] = i % 7 ? 1 : 0.5;
+            }
+            const detail::CountTerms terms(y, a);
+            const long double t = theta;
+            long double constant = 0, factorial = 0, first = 0, second = 0, counts = 0;
+            for (std::size_t i = 0; i < y.size(); ++i) {
+                const long double v = y[i];
+                constant += a[i] * (std::lgamma(t + v) - std::lgamma(t) - std::lgamma(v + 1));
+                factorial += a[i] * std::lgamma(v + 1);
+                first += a[i] * (boost::math::digamma(t + v) - boost::math::digamma(t));
+                second += a[i] * (boost::math::trigamma(t + v) - boost::math::trigamma(t));
+                counts += a[i] * v;
+            }
+            // The direct sums lose digits where their terms cancel (theta far
+            // above the counts): compare within the rounding of those terms.
+            const long double rounding =
+                64 * std::numeric_limits<long double>::epsilon() * counts * std::log(t + scale + 2);
+            BOOST_TEST(std::abs(terms.nb_constant(theta) - constant) <=
+                       1e-13L * std::abs(constant) + rounding + 1e-12L);
+            BOOST_TEST(std::abs(terms.log_factorial - factorial) <= 1e-14L * factorial + 1e-12L);
+            const auto [digamma, trigamma] = terms.polygamma(theta);
+            BOOST_TEST(std::abs(digamma - first) <= 1e-9L * std::abs(first));
+            BOOST_TEST(std::abs(trigamma - second) <= 1e-9L * std::abs(second));
+        }
+    for (double r :
+         {0.0, 1e-300, 1e-17, 3e-16, 1e-9, 1e-3, 0.5, 1.0, 40.0, 1e8, 1e300, -0.5, -1e-9})
+        BOOST_TEST(std::abs(detail::log1p_by_log(r) - std::log1p(r)) <=
+                   4 * std::numeric_limits<double>::epsilon() * std::abs(std::log1p(r)));
+}
+BOOST_AUTO_TEST_CASE(sparse_rows_give_the_dense_products) {
+    // A design of factors is used through its nonzero entries; a dense one is not.
+    std::mt19937_64 rng(5);
+    const std::size_t n = 203, p = 9;
+    Matrix factors(n, p), dense(n, p);
+    Vector w(n), v(n), b(p);
+    for (std::size_t i = 0; i < n; ++i) {
+        factors(i, 0) = 1;
+        factors(i, 1 + rng() % 4) = 1;
+        factors(i, 5 + rng() % 4) = 0.5 + double(rng() % 3);
+        for (std::size_t j = 0; j < p; ++j)
+            dense(i, j) = std::generate_canonical<double, 53>(rng) - 0.5;
+        w[i] = i % 11 ? std::generate_canonical<double, 53>(rng) : 0;
+        v[i] = std::generate_canonical<double, 53>(rng) - 0.3;
+    }
+    for (double &e : b)
+        e = std::generate_canonical<double, 53>(rng) - 0.5;
+    const detail::SparseRows rows(factors), none(dense);
+    BOOST_TEST(rows.sparse);
+    BOOST_TEST(!none.sparse);
+    const auto a = detail::crossprod(factors, w), s = detail::crossprod(factors, w, &rows);
+    for (std::size_t j = 0; j < p; ++j)
+        for (std::size_t k = 0; k < p; ++k) {
+            BOOST_TEST(std::abs(a(j, k) - s(j, k)) <= 1e-13 * (1 + std::abs(a(j, k))));
+            BOOST_TEST(s(j, k) == s(k, j));
+        }
+    const auto u = detail::xtv(factors, v), us = detail::xtv(factors, v, &rows);
+    for (std::size_t j = 0; j < p; ++j)
+        BOOST_TEST(std::abs(u[j] - us[j]) <= 1e-13 * (1 + std::abs(u[j])));
+    const auto e = detail::matvec(factors, b), es = detail::matvec(factors, b, &rows);
+    for (std::size_t i = 0; i < n; ++i)
+        BOOST_TEST(std::abs(e[i] - es[i]) <= 1e-13 * (1 + std::abs(e[i])));
+    // Without sparse rows the dense products are returned as they are.
+    BOOST_TEST(detail::crossprod(dense, w, &none).values == detail::crossprod(dense, w).values);
+}
+BOOST_AUTO_TEST_CASE(a_shared_design_summary_changes_no_result) {
+    std::mt19937_64 rng(9);
+    const std::size_t n = 120, p = 4;
+    for (bool sparse : {false, true}) {
+        Matrix x(n, p);
+        Vector offset(n);
+        for (std::size_t i = 0; i < n; ++i) {
+            x(i, 0) = 1;
+            if (sparse) {
+                // One factor of four levels, the last the reference.
+                const unsigned level = rng() % 4;
+                if (level < 3)
+                    x(i, 1 + level) = 1;
+            } else
+                for (std::size_t j = 1; j < p; ++j)
+                    x(i, j) = std::generate_canonical<double, 53>(rng) - 0.5;
+            offset[i] = 0.2 * (std::generate_canonical<double, 53>(rng) - 0.5);
+        }
+        const auto summary = prepare_design(x);
+        BOOST_TEST(summary->nonzero.sparse == sparse);
+        for (Family family : {Family::poisson, Family::negative_binomial})
+            for (unsigned gene = 0; gene < 6; ++gene) {
+                Vector y(n);
+                for (std::size_t i = 0; i < n; ++i)
+                    y[i] = double(std::poisson_distribution<long>(
+                        gene == 0 ? 0.4 : 30.0 * gene * std::exp(x(i, 1)))(rng));
+                FitOptions o;
+                o.family = family;
+                o.dispersion = gene % 2 ? Dispersion::fixed : Dispersion::ml;
+                o.theta = 5;
+                o.offset = offset;
+                const auto plain = fit(x, y, o);
+                o.design = summary;
+                const auto shared = fit(x, y, o);
+                BOOST_REQUIRE(plain.ok());
+                BOOST_TEST(shared.coefficients == plain.coefficients);
+                BOOST_TEST(shared.standard_errors == plain.standard_errors);
+                BOOST_TEST(shared.log_likelihood == plain.log_likelihood);
+                BOOST_TEST(shared.iterations == plain.iterations);
+                // A summary of another design, or prior weights, are not used.
+                Matrix other = x;
+                other(0, 1) += 0.25;
+                o.weights.assign(n, 1);
+                o.weights[3] = 2;
+                BOOST_TEST(fit(other, y, o).ok());
+            }
+    }
+}
+BOOST_AUTO_TEST_CASE(convergence_by_the_chord_step_matches_further_iterations) {
+    // The estimate at the default tolerance agrees with a fit iterated far beyond
+    // it, to well within that tolerance.
+    std::mt19937_64 rng(17);
+    const std::size_t n = 300, p = 5;
+    Matrix x(n, p);
+    for (std::size_t i = 0; i < n; ++i) {
+        x(i, 0) = 1;
+        for (std::size_t j = 1; j < p; ++j)
+            x(i, j) = std::generate_canonical<double, 53>(rng) - 0.5;
+    }
+    for (Family family : {Family::poisson, Family::negative_binomial, Family::binomial})
+        for (unsigned gene = 0; gene < 20; ++gene) {
+            Vector y(n);
+            for (std::size_t i = 0; i < n; ++i) {
+                const double eta = 0.2 * gene + x(i, 1) - 0.5 * x(i, 2);
+                y[i] = family == Family::binomial
+                           ? double(std::bernoulli_distribution(1 / (1 + std::exp(-eta + 2)))(rng))
+                           : double(std::poisson_distribution<long>(std::exp(eta))(rng));
+            }
+            FitOptions o;
+            o.family = family;
+            o.dispersion = Dispersion::fixed;
+            o.theta = 3;
+            const auto f = fit(x, y, o);
+            o.tolerance = 1e-14;
+            const auto exact = fit(x, y, o);
+            BOOST_REQUIRE(f.ok());
+            BOOST_REQUIRE(exact.ok());
+            BOOST_TEST(f.iterations <= exact.iterations);
+            for (std::size_t j = 0; j < p; ++j) {
+                BOOST_TEST(std::abs(f.coefficients[j] - exact.coefficients[j]) <=
+                           1e-10 * (1 + std::abs(exact.coefficients[j])));
+                BOOST_TEST(std::abs(f.standard_errors[j] - exact.standard_errors[j]) <=
+                           1e-9 * exact.standard_errors[j]);
+            }
+            BOOST_TEST(std::abs(f.log_likelihood - exact.log_likelihood) <=
+                       1e-10 * (1 + std::abs(exact.log_likelihood)));
+        }
 }

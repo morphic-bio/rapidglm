@@ -19,7 +19,7 @@ RAPIDGLM_C_LIBRARY="$PWD/$build/librapidglm_c.so" PYTHONPATH="$PWD/bindings/pyth
   python3 bindings/python/tests/test_deseq.py "$build/rapidglm"
 library="$(mktemp -d)"
 trap 'rm -rf "$library"' EXIT
-R CMD INSTALL --no-test-load --library="$library" bindings/r
+R CMD INSTALL --preclean --no-test-load --library="$library" bindings/r
 R_LIBS="$library${R_LIBS:+:$R_LIBS}" Rscript bindings/r/tests/parity.R
 cmake --build "$build" --target rapidglm_cli -j "${BUILD_JOBS:-2}"
 R_LIBS="$library${R_LIBS:+:$R_LIBS}" RAPIDGLM_CLI="$PWD/$build/rapidglm" Rscript bindings/r/tests/applications.R

@@ -233,34 +233,39 @@ BOOST_AUTO_TEST_CASE(bulk_de_reports_zero_genes_and_infinite_changes) {
 BOOST_AUTO_TEST_CASE(cooks_outliers_are_flagged_or_replaced) {
     // One extreme count in a steady gene. With three replicates per group it is
     // flagged (no p-value); with seven it is replaced and the gene is tested.
-    for (std::size_t reps : {3u, 7u}) {
-        auto b = simulate(4, reps, 300);
-        auto &y = b.y[1]; // not a changed gene
-        y.assign(2 * reps, 0);
-        for (std::size_t i = 0; i < y.size(); ++i)
-            y[i] = 200 + 10 * (i % 3);
-        y[reps + 1] = 5000;
-        BulkOptions o;
-        o.coefficient = 1;
-        auto r = bulk_de(b.x, dense_columns(b.y), o);
-        const auto &g = r.genes[1];
-        if (reps == 3) {
-            BOOST_TEST(g.max_cooks > r.cooks_cutoff);
-            BOOST_TEST(g.status == "cooks_outlier");
-            BOOST_TEST(std::isnan(g.p_value));
-            BOOST_TEST(!g.replaced);
-        } else {
-            BOOST_TEST(g.replaced);
-            BOOST_TEST(g.status == "ok");
-            BOOST_TEST(g.p_value > 0.05);
-            BOOST_TEST(r.replaced_genes >= 1u);
-            // Without replacement the same sample is flagged instead.
-            o.min_replicates_for_replace = 0;
-            r = bulk_de(b.x, dense_columns(b.y), o);
-            BOOST_TEST(r.genes[1].status == "cooks_outlier");
-            BOOST_TEST(r.replaced_genes == 0u);
+    // Both robust dispersions do so: DESeq2's as implemented in PyDESeq2, the
+    // default, and RapidGLM's own.
+    BOOST_TEST(BulkOptions().legacy_cooks);
+    for (bool legacy : {true, false})
+        for (std::size_t reps : {3u, 7u}) {
+            auto b = simulate(4, reps, 300);
+            auto &y = b.y[1]; // not a changed gene
+            y.assign(2 * reps, 0);
+            for (std::size_t i = 0; i < y.size(); ++i)
+                y[i] = 200 + 10 * (i % 3);
+            y[reps + 1] = 5000;
+            BulkOptions o;
+            o.coefficient = 1;
+            o.legacy_cooks = legacy;
+            auto r = bulk_de(b.x, dense_columns(b.y), o);
+            const auto &g = r.genes[1];
+            if (reps == 3) {
+                BOOST_TEST(g.max_cooks > r.cooks_cutoff);
+                BOOST_TEST(g.status == "cooks_outlier");
+                BOOST_TEST(std::isnan(g.p_value));
+                BOOST_TEST(!g.replaced);
+            } else {
+                BOOST_TEST(g.replaced);
+                BOOST_TEST(g.status == "ok");
+                BOOST_TEST(g.p_value > 0.05);
+                BOOST_TEST(r.replaced_genes >= 1u);
+                // Without replacement the same sample is flagged instead.
+                o.min_replicates_for_replace = 0;
+                r = bulk_de(b.x, dense_columns(b.y), o);
+                BOOST_TEST(r.genes[1].status == "cooks_outlier");
+                BOOST_TEST(r.replaced_genes == 0u);
+            }
         }
-    }
 }
 BOOST_AUTO_TEST_CASE(weighted_quantile_scales_weights_to_the_sample_size) {
     // Equal weights give R's type-7 quantile.

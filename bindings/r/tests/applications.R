@@ -71,7 +71,7 @@ cases <- list(
   list(cli = list(coefficient = 2, lfc_shrink = "normal", threads = 3),
        r = list(coefficient = "groupB", lfc_shrink = "normal", threads = 3)),
   list(cli = list(contrast = c(0, 1, -1)), r = list(contrast = c(0, 1, -1))),
-  list(cli = list(coefficient = 2, legacy_cooks = TRUE), r = list(coefficient = "groupB", legacy_cooks = TRUE)),
+  list(cli = list(coefficient = 2, legacy_cooks = FALSE), r = list(coefficient = "groupB", legacy_cooks = FALSE)),
   list(cli = list(coefficients = c(1, 2), test = "lrt"), r = list(coefficients = c("batchy", "groupB"), test = "lrt")),
   list(cli = list(coefficient = 2, size_factors = "poscounts", trend = "local"),
        r = list(coefficient = 3, size_factors = "poscounts", trend = "local")))

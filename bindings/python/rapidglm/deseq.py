@@ -178,7 +178,7 @@ class DeseqDataSet:
         inference=None,
         quiet=False,
         low_memory=False,
-        legacy_cooks=False,
+        legacy_cooks=True,
     ):
         if adata is not None:
             if counts is not None or metadata is not None:

@@ -2,12 +2,59 @@
  "n": 5000,
  "p": 5,
  "m": 1000,
+ "cpus_allowed": [
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30,
+  31
+ ],
+ "cpus_by_threads": {
+  "1": [
+   16
+  ],
+  "4": [
+   16,
+   17,
+   18,
+   19
+  ],
+  "16": [
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31
+  ]
+ },
  "results": [
   {
    "tool": "rapidglm fit_batch",
    "family": "poisson",
-   "load": 2.0029296875,
-   "seconds": 0.728038,
+   "load": 7.61328125,
+   "seconds": 1.07414,
    "threads": 1,
    "failed": 0,
    "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
@@ -15,8 +62,8 @@
   {
    "tool": "rapidglm fit_batch",
    "family": "poisson",
-   "load": 2.0029296875,
-   "seconds": 0.186216,
+   "load": 7.24365234375,
+   "seconds": 0.291624,
    "threads": 4,
    "failed": 0,
    "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
@@ -24,8 +71,8 @@
   {
    "tool": "rapidglm fit_batch",
    "family": "poisson",
-   "load": 2.0029296875,
-   "seconds": 0.065605,
+   "load": 7.24365234375,
+   "seconds": 0.0779502,
    "threads": 16,
    "failed": 0,
    "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
@@ -34,85 +81,85 @@
    "tool": "R glm.fit",
    "family": "poisson",
    "threads": 1,
-   "load": 1.92236328125,
-   "seconds": 2.942,
+   "load": 6.43701171875,
+   "seconds": 5.614,
    "max_rel_coef_diff_vs_R": 0.0
   },
   {
    "tool": "R rapidglm::glm_fit",
    "family": "poisson",
    "threads": 1,
-   "load": 1.92236328125,
-   "seconds": 1.731,
+   "load": 6.482421875,
+   "seconds": 3.091,
    "max_rel_coef_diff_vs_R": 1.8416019677704892e-06
   },
   {
    "tool": "Python statsmodels",
    "family": "poisson",
    "threads": 1,
-   "load": 4.3310546875,
-   "seconds": 3.59662941750139,
+   "load": 6.283203125,
+   "seconds": 5.003965080715716,
    "responses_timed": 1000,
-   "max_rel_coef_diff_vs_R": 1.841601779732937e-06
+   "max_rel_coef_diff_vs_R": 1.841601901742036e-06
   },
   {
    "tool": "Python rapidglm.fit",
    "family": "poisson",
    "threads": 1,
-   "load": 4.3310546875,
-   "seconds": 0.7805954925715923,
+   "load": 6.283203125,
+   "seconds": 1.1460622185841203,
    "responses_timed": 1000,
    "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
   },
   {
    "tool": "rapidglm fit_batch",
    "family": "nb",
-   "load": 4.3310546875,
-   "seconds": 1.96022,
+   "load": 6.02001953125,
+   "seconds": 3.02176,
    "threads": 1,
    "failed": 0,
-   "max_rel_coef_diff_vs_R": 0.0009165957712547821
+   "max_rel_coef_diff_vs_R": 0.0009165957712542424
   },
   {
    "tool": "rapidglm fit_batch",
    "family": "nb",
-   "load": 4.30419921875,
-   "seconds": 0.495711,
+   "load": 5.85791015625,
+   "seconds": 0.789532,
    "threads": 4,
    "failed": 0,
-   "max_rel_coef_diff_vs_R": 0.0009165957712547821
+   "max_rel_coef_diff_vs_R": 0.0009165957712542424
   },
   {
    "tool": "rapidglm fit_batch",
    "family": "nb",
-   "load": 4.30419921875,
-   "seconds": 0.166443,
+   "load": 7.07080078125,
+   "seconds": 0.210259,
    "threads": 16,
    "failed": 0,
-   "max_rel_coef_diff_vs_R": 0.0009165957712547821
+   "max_rel_coef_diff_vs_R": 0.0009165957712542424
   },
   {
    "tool": "R glm.nb",
    "family": "nb",
    "threads": 1,
-   "load": 2.40234375,
-   "seconds": 71.776,
+   "load": 3.5224609375,
+   "seconds": 143.372,
    "max_rel_coef_diff_vs_R": 0.0
   },
   {
    "tool": "R rapidglm::glm_nb",
    "family": "nb",
    "threads": 1,
-   "load": 2.2900390625,
-   "seconds": 6.148,
-   "max_rel_coef_diff_vs_R": 0.0009165957712620676
+   "load": 3.3681640625,
+   "seconds": 10.51,
+   "max_rel_coef_diff_vs_R": 0.0009165957712558615
   },
   {
    "tool": "R glmGamPoi::glm_gp",
    "family": "nb",
    "threads": 1,
-   "load": 2.00390625,
-   "seconds": 3.154,
+   "load": 2.701171875,
+   "seconds": 5.858,
    "glmgampoi_version": "1.25.1",
    "max_rel_coef_diff_vs_R": 0.029732091914182555
   },
@@ -120,19 +167,24 @@
    "tool": "Python statsmodels",
    "family": "nb",
    "threads": 1,
-   "load": 4.486328125,
-   "seconds": 19.81546781025827,
+   "load": 2.7255859375,
+   "seconds": 23.16005623433739,
    "responses_timed": 200,
-   "max_rel_coef_diff_vs_R": 0.00901468743197966
+   "max_rel_coef_diff_vs_R": 0.009014687429888963
   },
   {
    "tool": "Python rapidglm.fit",
    "family": "nb",
    "threads": 1,
-   "load": 4.486328125,
-   "seconds": 2.0123267862945795,
+   "load": 2.908203125,
+   "seconds": 3.154544479213655,
    "responses_timed": 1000,
-   "max_rel_coef_diff_vs_R": 0.0009165957712547821
+   "max_rel_coef_diff_vs_R": 0.0009165957712542424
   }
- ]
+ ],
+ "version": "1.2.0",
+ "host_note": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-06 and 2026-10-07. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired.",
+ "command": "python3 benchmarks/glm/batch.py --cpus 1:16 4:16-19 16:16-31 --output OUT",
+ "commit": "4446d4249011fa120299376732deec5bb1522409",
+ "commit_note": "the source measured is this commit (v1.2.0-dev.1); it was made while the stages ran, and stages that started before it recorded be60928 with the same source uncommitted"
 }

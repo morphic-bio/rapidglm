@@ -56,7 +56,9 @@ weights at the final estimates rather than the weights of the last iteration's
 start. Aliasing uses R's threshold, `min(1e-7, epsilon / 1000)`.
 
 The package uses R's own LAPACK. Inside the RapidGLM repository, install with
-`R CMD INSTALL bindings/r` (the configure script copies the engine headers).
+`R CMD INSTALL --preclean bindings/r` (the configure script copies the engine
+headers; `--preclean` removes objects of an earlier build, which would
+otherwise be linked in unchanged after the headers change).
 Boost headers are required. The configure script also copies `src/c_api.cpp`
 and the package builds with OpenMP. Tests: `tests/parity.R` and
 `tests/applications.R` (`RAPIDGLM_CLI=build/rapidglm`).

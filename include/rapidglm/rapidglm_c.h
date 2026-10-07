@@ -122,7 +122,8 @@ typedef struct {
     int threads;
     double min_dispersion; /* default 1e-8 */
     double max_dispersion; /* default 0: max(10, samples) */
-    int legacy_cooks;      /* Cook's distances with DESeq2's robust dispersion as in PyDESeq2 */
+    int legacy_cooks;      /* default 1: Cook's distances with DESeq2's robust dispersion as in
+                              PyDESeq2; 0: RapidGLM's own estimator */
 } rapidglm_bulk_options;
 void rapidglm_bulk_options_init(rapidglm_bulk_options *options);
 

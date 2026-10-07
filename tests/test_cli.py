@@ -683,10 +683,12 @@ class CLI(unittest.TestCase):
         self.assertEqual(record["lfc_prior_variance"], [])
         self.assertNotIn("log2FoldChangeShrunk", (self.root / "result.tsv").read_text().splitlines()[0])
         # Normal-prior shrinkage adds the posterior mode and SD; tests are unchanged.
-        r, _ = self.execute("bulk-de", legacy_cooks=True, **panel)
-        self.assertEqual(r.returncode, 0, r.stderr)
-        self.assertEqual(json.loads((self.root / "result.run.json").read_text())["cooks_dispersion"],
-                         "legacy_pydeseq2")
+        # Cook's distances use DESeq2's robust dispersion as in PyDESeq2 unless legacy_cooks is false.
+        self.assertEqual(record["cooks_dispersion"], "legacy_pydeseq2")
+        for legacy, name in ((True, "legacy_pydeseq2"), (False, "rapidglm")):
+            r, _ = self.execute("bulk-de", legacy_cooks=legacy, **panel)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(json.loads((self.root / "result.run.json").read_text())["cooks_dispersion"], name)
         r, _ = self.execute("pseudobulk-de", legacy_cooks=True, **panel)
         self.assertNotEqual(r.returncode, 0)
         self.assertIn("legacy_cooks are bulk-de settings", r.stderr)

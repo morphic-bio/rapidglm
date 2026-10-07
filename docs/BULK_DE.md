@@ -7,6 +7,12 @@ black box. The method is in [METHODS.md](../METHODS.md#bulk-differential-express
 the interface in [CLI.md](CLI.md#bulk-differential-expression) and the receipt
 in [validation/BULK_DE.json](../validation/BULK_DE.json).
 
+The tables of agreement, the mock-comparison null, speed, the thyroid designs
+and Cook's distances are from version 1.2.0 (2026-10-07), whose default Cook's
+distances use DESeq2's robust dispersion as implemented in PyDESeq2
+([below](#legacy-cooks-distances-2026-10-01)). Other figures in sections with a
+date record what was measured then.
+
 ## Gates
 
 The thresholds in `scripts/validate_bulk.py` were set after the development
@@ -41,19 +47,19 @@ Datasets:
 
 | Dataset | BH 0.1 discoveries (RapidGLM / DESeq2) | Jaccard | p-value Spearman | Trend a0, a1 (RapidGLM / DESeq2) | Prior variance |
 |---|---:|---:|---:|---|---|
-| airway | 5,142 / 4,834 | 0.935 | 0.9988 | 0.0102, 3.03 / 0.0097, 3.47 | 0.70 / 0.53 |
-| Kang | 618 / 635 | 0.973 | 0.9980 | 0.037, 1.35 / 0.058, 0.45 | 0.82 / 0.88 |
-| sim3 | 241 / 239 | 0.975 | 0.9993 | 0.0476, 3.17 / 0.0472, 3.22 | 0.25 / 0.25 |
-| sim3b | 200 / 201 | 0.995 | 0.9994 | 0.0483, 3.40 / 0.0479, 3.44 | 0.25 / 0.25 |
-| sim8 | 253 / 253 | 1.000 | 1.0000 | 0.0705, 2.05 / 0.0701, 2.06 | 0.25 / 0.25 |
+| airway | 5,164 / 4,834 | 0.932 | 0.9988 | 0.0102, 3.03 / 0.0097, 3.47 | 0.70 / 0.53 |
+| Kang | 618 / 635 | 0.973 | 0.9980 | 0.0371, 1.35 / 0.0577, 0.45 | 0.82 / 0.88 |
+| sim3 | 240 / 239 | 0.979 | 0.9993 | 0.0476, 3.17 / 0.0472, 3.22 | 0.25 / 0.25 |
+| sim3b | 201 / 201 | 1.000 | 0.9994 | 0.0483, 3.40 / 0.0479, 3.44 | 0.25 / 0.25 |
+| sim8 | 253 / 253 | 1.000 | 0.9999 | 0.0705, 2.05 / 0.0701, 2.06 | 0.25 / 0.25 |
 
 Size factors agree to 4e-15. On the simulations, FDR and power match DESeq2:
 
 | Simulation | FDR (RapidGLM / DESeq2) | Power (RapidGLM / DESeq2) | Outliers caught by Cook's (RapidGLM / DESeq2 / injected) |
 |---|---|---|---|
-| sim3 | 0.124 / 0.117 | 0.508 / 0.508 | 63 / 61 / 69 |
-| sim3b | 0.085 / 0.085 | 0.435 / 0.437 | 86 / 82 / 97 |
-| sim8 | 0.059 / 0.059 | 0.652 / 0.652 | none flagged; counts replaced in 78 / 79 genes, of 79 injected |
+| sim3 | 0.125 / 0.117 | 0.506 / 0.508 | 61 / 61 / 69 |
+| sim3b | 0.085 / 0.085 | 0.437 / 0.437 | 82 / 82 / 97 |
+| sim8 | 0.059 / 0.059 | 0.652 / 0.652 | none flagged; counts replaced in 79 / 79 genes, of 79 injected |
 
 Neither implementation flagged a gene without an injected outlier. With eight
 replicates per group both replace outlier counts and refit instead of
@@ -66,28 +72,33 @@ All 70 four-versus-four donor splits of the Kang panel within a condition
 
 | 70,000 tests | p ≤ 0.05 | p ≤ 0.01 | p ≤ 0.001 | BH (0.05) discoveries per split |
 |---|---:|---:|---:|---:|
-| **RapidGLM bulk-de** | 2.38% | 0.53% | 0.14% | 0.54 |
+| **RapidGLM bulk-de** | 2.38% | 0.53% | 0.15% | 0.56 |
 | DESeq2 1.48.2 | 2.39% | 0.54% | 0.15% | 0.47 |
 
 ## Speed
 
-The table gives minima of three alternating runs. RapidGLM times the whole CLI
-run, including reading counts and writing tables. DESeq2 times only `DESeq()`
-and `results()`, on one thread. The host was heavily loaded (load about 29 on 32
-cores). Both tools slow down under load, DESeq2 more: its airway time was
-3.49 s at load 3–7. The app-note benchmark will re-measure on a quiet host.
+The table gives minima of three alternating runs with version 1.2.0, on
+efficiency cores of the benchmark workstation
+([BENCHMARK.md](BENCHMARK.md#host)). RapidGLM times the whole CLI run,
+including reading counts and writing tables. DESeq2 times only `DESeq()` and
+`results()`, on one thread. The application benchmark
+([BENCHMARK.md](BENCHMARK.md)) times both tools from R.
 
 | Dataset | Genes × samples | RapidGLM, 1 thread | RapidGLM, 8 threads | DESeq2 |
 |---|---|---:|---:|---:|
-| airway | 22,369 × 8 | 1.64 s | 0.43 s | 6.74 s |
-| Kang | 1,000 × 16 | 0.15 s | 0.03 s | 0.95 s |
-| sim3 | 4,000 × 6 | 0.13 s | 0.06 s | 1.28 s |
-| sim3b | 4,000 × 6 | 0.13 s | 0.05 s | 0.98 s |
-| sim8 | 4,000 × 16 | 0.18 s | 0.07 s | 3.03 s |
+| airway | 22,369 × 8 | 1.11 s | 0.35 s | 6.05 s |
+| Kang | 1,000 × 16 | 0.10 s | 0.02 s | 1.15 s |
+| sim3 | 4,000 × 6 | 0.11 s | 0.04 s | 1.32 s |
+| sim3b | 4,000 × 6 | 0.11 s | 0.04 s | 1.31 s |
+| sim8 | 4,000 × 16 | 0.16 s | 0.05 s | 2.75 s |
 
-Six speed-ups on 2026-09-30 cut the airway run from 17.0 to 10.7 billion
-instructions (−37%). Under the same load, alternating runs took 1.29 s against
-1.92 s of CPU time (minima). The biggest single gain was the NB coefficient
+Version 1.2.0 removed work in the fits that the estimates did not need
+([CHANGELOG.md](../CHANGELOG.md)): on one performance core the airway run went
+from 0.98 s to 0.63 s, and the 647-sample thyroid run from 49 s to 21 s.
+
+Earlier, six speed-ups on 2026-09-30 cut the airway run from 17.0 to 10.7
+billion instructions (−37%). Under the same load, alternating runs took 1.29 s
+against 1.92 s of CPU time (minima). The biggest single gain was the NB coefficient
 iterations: Newton steps with the observed information replace Fisher scoring,
 and the mean number of iterations of the final fits fell from 10.4 to 4.5. The
 other five changes:
@@ -100,7 +111,7 @@ other five changes:
 
 The results are byte-identical except for the Newton steps, which move
 estimates within the convergence tolerance. The final fit is also warm-started
-from the initial one; that saves little. The profile of the current build on
+from the initial one; that saves little. The profile of that build on
 airway:
 - 43% in the NB fits for the initial and final means;
 - 33% in the dispersion Newton steps, half of it the Cox-Reid terms;
@@ -162,17 +173,20 @@ they differ from RapidGLM's by 1.4 log2 units at the median.
   These genes enter the trend fit. On airway that raises the prior variance
   (0.70 against 0.53) and lowers a1 (3.03 against 3.47). On Kang it moves the
   trend (a0 0.037 against 0.058, a1 1.35 against 0.45), though the calls still
-  agree with Jaccard 0.973. RapidGLM makes 308 more airway discoveries than
-  DESeq2, and its filter threshold there is lower (3.86 against 4.50; see
-  below). Matching these genes would need DESeq2's line-search constants,
+  agree with Jaccard 0.973. RapidGLM makes 330 more airway discoveries than
+  DESeq2. Matching these genes would need DESeq2's line-search constants,
   which are not documented.
 - **Gene-wise optimum.** Where both are above the floor, RapidGLM returns the
   maximizer of the adjusted likelihood. For 2,297 airway genes this differs
   from DESeq2's value by more than 1% (median ratio 1.04). More than half of
   all genes, most of them at the floor, agree exactly.
-- **Cook's robust dispersion** is a RapidGLM choice (METHODS.md). It was chosen
-  on sim3 and confirmed on sim3b; RapidGLM catches slightly more injected
-  outliers than DESeq2 with no false flags.
+- **Cook's robust dispersion.** From 1.2.0 the default is DESeq2's robust
+  dispersion as implemented in PyDESeq2
+  ([below](#legacy-cooks-distances-2026-10-01)); it flags the genes DESeq2
+  flags on sim3 and sim3b. RapidGLM's own estimator (`legacy_cooks: false`,
+  METHODS.md) was chosen on sim3 and confirmed on sim3b. It catches slightly
+  more injected outliers than DESeq2 (63 and 86 against 61 and 82) with no
+  false flags.
 - **Infinite fold changes.** When the tested coefficient has no finite estimate,
   for example a group of zeros, DESeq2 reports a large finite fold change and a
   Wald p-value. RapidGLM reports the LR test at the final dispersion and a
@@ -190,7 +204,10 @@ they differ from RapidGLM's by 1.4 log2 units at the median.
   in-house one, which changes the arithmetic only at rounding level, airway's
   prior variance moves from 0.698 to 0.702 and its filter threshold from 3.86 to
   4.50 (DESeq2: 4.50). 39 genes near padj = 0.1 change call. The other four
-  datasets keep identical calls.
+  datasets keep identical calls. The numerical changes of 1.2.0 had the same
+  effect: four near-Poisson gene-wise dispersions settle at other values,
+  the prior variance moves from 0.697 to 0.700 and the threshold from 3.86 to
+  4.50, and 40 genes change call (31 gained, 9 lost).
 - **Not implemented:** the `apeglm` and `ashr` shrinkage estimators,
   `betaPrior` with expanded model matrices, shrinkage of contrasts,
   `lfcThreshold` tests, custom filter statistics, observation weights, the
@@ -198,25 +215,36 @@ they differ from RapidGLM's by 1.4 log2 units at the median.
   transforms. Contrasts and joint LR tests are supported
   ([HYPOTHESES.md](HYPOTHESES.md)).
 
-## Larger multi-factor designs (2026-10-01)
+## Larger multi-factor designs
 
-On GTEx v8 thyroid (`~ centre + Hardy scale + age + sex`, sex tested), agreement
-with DESeq2 falls at larger sample sizes. Data and timings:
+On GTEx v8 thyroid (`~ centre + Hardy scale + age + sex`, sex tested), with
+version 1.2.0. Data and timings:
 [validation/APPLICATIONS_BULK.json](../validation/APPLICATIONS_BULK.json)
-([BENCHMARK.md](BENCHMARK.md)).
+([BENCHMARK.md](BENCHMARK.md)); agreement without Cook's filtering:
+[validation/COOKS_THYROID.json](../validation/COOKS_THYROID.json).
 
 | Samples | Discoveries (RapidGLM / DESeq2) | Jaccard | Without Cook's filtering in either: Jaccard (p-value Spearman) |
 |---:|---|---:|---|
-| 32 | 1,590 / 1,615 | 0.963 | — |
+| 32 | 1,631 / 1,615 | 0.984 | — |
+| 128 | 790 / 792 | 0.997 | 1.000 (0.9998) |
+| 647 | 7,177 / 7,177 | 1.000 | 1.000 (1.0000) |
+
+Agreement in these designs depends on the robust dispersion behind Cook's
+distances, which decides the genes set aside and the counts replaced. Before
+1.2.0 RapidGLM used an estimator of its own by default, and agreement fell at
+larger sample sizes (`legacy_cooks: false` still selects it):
+
+| Samples | Discoveries (own estimator / DESeq2) | Jaccard | Without Cook's filtering in either: Jaccard (p-value Spearman) |
+|---:|---|---:|---|
 | 128 | 463 / 792 | 0.579 | 0.971 (0.993) |
 | 647 | 6,577 / 7,177 | 0.904 | 0.964 (0.982) |
 
-The difference is in Cook's-distance flagging alone. On the 128-sample set,
-size factors, dispersions, fold changes and p-values agree with DESeq2's
-(median relative differences 1e-4 or less) and outlier replacement nearly
-matches (281 genes against 283). RapidGLM, however, sets 751 genes aside as
-Cook's outliers against DESeq2's 224. Its Cook's distances are often several
-times larger.
+On the 128-sample set, size factors, dispersions, fold changes and p-values
+agree with DESeq2's (median relative differences 1e-4 or less). With its own
+estimator, however, RapidGLM sets 751 genes aside as Cook's outliers against
+DESeq2's 224, and replaces counts in 281 genes; its Cook's distances are often
+several times larger. Without the filtering the two tools still differ, because
+the distances also choose the counts that are replaced.
 
 DESeq2's paper says only that Cook's distance uses "a method-of-moments
 estimate α_rob, using a robust estimator of variance s²_rob". Its manual pages
@@ -239,34 +267,37 @@ What the values show:
 
 RapidGLM's own estimator was chosen on two-group simulations: squared MADs
 pooled within design cells of at least three samples. With many small cells it
-gives smaller dispersions, so larger distances and more flags. It remains a
-documented difference.
+gives smaller dispersions, so larger distances and more flags.
 
 ## Legacy Cook's distances (2026-10-01)
 
 PyDESeq2 (MIT; Muzellec et al. 2023) implements DESeq2's robust dispersion for
 Cook's distances. With the author's approval, `legacy_cooks` reimplements that
 formula and PyDESeq2's flagging rule (METHODS.md step 9; attribution and licence
-in DEPENDENCIES.md).
+in DEPENDENCIES.md). It was added on 2026-10-01 as an option and is the default
+from 1.2.0.
 
 Its dispersions equal the values recovered from DESeq2's outputs to 1e-12 on
-airway and on the 128-sample thyroid set. Against DESeq2 1.48.2
-([validation/COOKS_LEGACY.json](../validation/COOKS_LEGACY.json)):
+airway and on the 128-sample thyroid set. Against DESeq2 1.48.2, with version
+1.2.0 ([validation/COOKS_LEGACY.json](../validation/COOKS_LEGACY.json)):
 
-| Dataset | DESeq2 discoveries | Default: discoveries, Jaccard | `legacy_cooks`: discoveries, Jaccard |
+| Dataset | DESeq2 discoveries | Default (`legacy_cooks`): discoveries, Jaccard | Own estimator (`legacy_cooks: false`): discoveries, Jaccard |
 |---|---:|---|---|
-| airway | 4,834 | 5,142, 0.935 | 5,142, 0.935 |
+| airway | 4,834 | 5,164, 0.932 | 5,164, 0.932 |
 | Kang | 635 | 618, 0.973 | 618, 0.973 |
-| sim3 | 239 | 241, 0.975 | 240, 0.979 |
-| sim3b | 201 | 200, 0.995 | 201, 1.000 |
+| sim3 | 239 | 240, 0.979 | 241, 0.975 |
+| sim3b | 201 | 201, 1.000 | 200, 0.995 |
 | sim8 | 253 | 253, 1.000 | 253, 1.000 |
-| GTEx thyroid, 128 samples | 792 | 463, 0.579 | 790, 0.997 |
-| GTEx thyroid, 647 samples | 7,177 | 6,577, 0.904 | 7,177, 1.000 |
+| GTEx thyroid, 128 samples | 792 | 790, 0.997 | 463, 0.579 |
+| GTEx thyroid, 647 samples | 7,177 | 7,177, 1.000 | 6,577, 0.904 |
 
-- **Flagged genes:** the option flags 216 genes against DESeq2's 224 on the
-  128-sample set, and 61 and 82 on sim3 and sim3b, as DESeq2 does.
-- **Default:** RapidGLM's own estimator remains the default; the option is
-  opt-in.
+- **Flagged genes:** the default flags 216 genes against DESeq2's 224 on the
+  128-sample set, and 61 and 82 on sim3 and sim3b, as DESeq2 does. The own
+  estimator flags 751, 63 and 86.
+- **Replaced counts:** on the 128-sample set the default replaces counts in 67
+  genes and the own estimator in 281; on the 647-sample set, in 98 and 1,110.
+- **Without Cook's filtering**, the default gives DESeq2's discoveries exactly
+  on both thyroid sets (884 and 7,180 genes).
 - **Remaining differences:** on airway and Kang no gene is flagged by either
   tool, so the remaining differences there come from the dispersion steps
   described above.

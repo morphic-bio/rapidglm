@@ -195,8 +195,9 @@ pub struct BulkOptions {
     pub contrast: Option<Vec<f64>>,
     pub alpha: Option<f64>,
     pub threads: Option<i32>,
-    /// DESeq2's Cook's-distance dispersion as in PyDESeq2.
-    pub legacy_cooks: bool,
+    /// DESeq2's Cook's-distance dispersion as in PyDESeq2 (the default);
+    /// `Some(false)` selects RapidGLM's own estimator.
+    pub legacy_cooks: Option<bool>,
 }
 
 /// RapidGLM's bulk differential expression (DESeq2 procedure), as in the CLI's
@@ -252,7 +253,9 @@ pub fn bulk_de(design: &Matrix, counts: &Matrix, options: &BulkOptions) -> Resul
     if let Some(t) = options.threads {
         o.threads = t;
     }
-    o.legacy_cooks = options.legacy_cooks as c_int;
+    if let Some(legacy) = options.legacy_cooks {
+        o.legacy_cooks = legacy as c_int;
+    }
     let mut raw = std::ptr::null_mut();
     check(unsafe { ffi::rapidglm_bulk_de(&design.view(), &sparse, &o, &mut raw) })?;
     Ok(Table { raw })

@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <cstring>
 #include <limits>
+#include <memory>
 #include <numeric>
 #include <optional>
 #include <stdexcept>
@@ -78,6 +79,9 @@ inline const char *status_name(FitStatus s) {
         return "numerical_failure";
     }
 }
+namespace detail {
+struct DesignSummary;
+}
 struct FitOptions {
     Family family = Family::negative_binomial;
     Dispersion dispersion = Dispersion::ml;
@@ -101,6 +105,11 @@ struct FitOptions {
     // log L - log det(X'WX)/2 at the current means (McCarthy, Chen and Smyth 2012),
     // which reduces the small-sample downward bias of the dispersion.
     bool cox_reid = false;
+    // What a fit derives from the design alone, from prepare_design(x): fits of
+    // many responses to one design then compute it once. Used only for that
+    // design, held unchanged, and only without prior weights; results are the
+    // same with or without it.
+    std::shared_ptr<const detail::DesignSummary> design;
 };
 struct FitResult {
     Family family = Family::gaussian;
@@ -493,6 +502,62 @@ inline Matrix crossprod(const Matrix &x, const Vector &w) {
             a(k, j) = a(j, k);
     return a;
 }
+// The nonzero entries of each design row, by increasing column. A design of
+// factors is mostly zeros (one indicator per factor in each row), and X'WX then
+// needs only the products among each row's nonzero entries. `sparse` says
+// whether that is worth it: at most half of the entries are nonzero.
+struct SparseRows {
+    std::vector<std::size_t> start; // per row, into the two below; rows + 1 entries
+    std::vector<std::uint32_t> column;
+    Vector value;
+    bool sparse = false;
+    SparseRows() = default;
+    explicit SparseRows(const Matrix &x) {
+        const std::size_t n = x.rows, p = x.cols;
+        std::size_t nonzero = 0;
+        for (double v : x.values)
+            nonzero += v != 0;
+        if (p == 0 || 2 * nonzero > n * p)
+            return;
+        start.reserve(n + 1);
+        column.reserve(nonzero);
+        value.reserve(nonzero);
+        for (std::size_t i = 0; i < n; ++i) {
+            start.push_back(column.size());
+            for (std::size_t j = 0; j < p; ++j)
+                if (x(i, j) != 0) {
+                    column.push_back(static_cast<std::uint32_t>(j));
+                    value.push_back(x(i, j));
+                }
+        }
+        start.push_back(column.size());
+        sparse = true;
+    }
+};
+// X' diag(w) X with the rows' nonzero entries when `rows` (of x) says the design
+// is sparse; the dense product otherwise.
+inline Matrix crossprod(const Matrix &x, const Vector &w, const SparseRows *rows) {
+    if (!rows || !rows->sparse)
+        return crossprod(x, w);
+    const std::size_t n = x.rows, p = x.cols;
+    Matrix a(p, p);
+    for (std::size_t i = 0; i < n; ++i) {
+        const double wi = w[i];
+        if (wi == 0)
+            continue;
+        const std::size_t first = rows->start[i], last = rows->start[i + 1];
+        for (std::size_t s = first; s < last; ++s) {
+            const double v = wi * rows->value[s];
+            double *row = &a.values[rows->column[s] * p];
+            for (std::size_t t = first; t <= s; ++t)
+                row[rows->column[t]] += v * rows->value[t];
+        }
+    }
+    for (std::size_t j = 0; j < p; ++j)
+        for (std::size_t k = 0; k < j; ++k)
+            a(k, j) = a(j, k);
+    return a;
+}
 inline Vector xtv(const Matrix &x, const Vector &v) {
     Vector r(x.cols);
     for (std::size_t i = 0; i < x.rows; ++i)
@@ -508,6 +573,26 @@ inline Vector matvec(const Matrix &a, const Vector &b) {
     for (std::size_t i = 0; i < a.rows; ++i)
         for (std::size_t j = 0; j < a.cols; ++j)
             v[i] += a(i, j) * b[j];
+    return v;
+}
+// X'v and X b over the rows' nonzero entries when `rows` (of x) says the design
+// is sparse (see SparseRows); the dense products otherwise.
+inline Vector xtv(const Matrix &x, const Vector &v, const SparseRows *rows) {
+    if (!rows || !rows->sparse)
+        return xtv(x, v);
+    Vector r(x.cols);
+    for (std::size_t i = 0; i < x.rows; ++i)
+        for (std::size_t s = rows->start[i]; s < rows->start[i + 1]; ++s)
+            r[rows->column[s]] += rows->value[s] * v[i];
+    return r;
+}
+inline Vector matvec(const Matrix &x, const Vector &b, const SparseRows *rows) {
+    if (!rows || !rows->sparse)
+        return matvec(x, b);
+    Vector v(x.rows);
+    for (std::size_t i = 0; i < x.rows; ++i)
+        for (std::size_t s = rows->start[i]; s < rows->start[i + 1]; ++s)
+            v[i] += rows->value[s] * b[rows->column[s]];
     return v;
 }
 // Designs whose rows take exactly p = cols distinct values (intercept-only,
@@ -571,6 +656,26 @@ struct RowGroups {
         ok = true;
     }
 };
+// The parts of a fit that depend on the design alone: its validation, its
+// nonzero entries by row, X'X with the factor that checks its rank and gives
+// the least-squares start, and its row groups.
+struct DesignSummary {
+    const double *values; // the storage of the design described
+    std::size_t rows, cols;
+    double rank_tolerance;
+    SparseRows nonzero;
+    Matrix information;
+    Cholesky check;
+    RowGroups groups;
+    DesignSummary(const Matrix &x, double tolerance)
+        : values(x.values.data()), rows(x.rows), cols(x.cols), rank_tolerance(tolerance),
+          nonzero(x), information(crossprod(x, Vector(x.rows, 1), &nonzero)),
+          check(information, tolerance), groups(x) {}
+    bool describes(const Matrix &x, double tolerance) const {
+        return values == x.values.data() && rows == x.rows && cols == x.cols &&
+               rank_tolerance == tolerance;
+    }
+};
 inline double mean_link(double eta, Family family) {
     if (family == Family::gaussian)
         return eta;
@@ -582,8 +687,9 @@ inline double mean_link(double eta, Family family) {
         return std::numeric_limits<double>::infinity();
     return std::exp(std::max(-700.0, eta));
 }
-inline Vector means(const Matrix &x, const Vector &beta, const Vector &offset, Family family) {
-    auto mu = matvec(x, beta);
+inline Vector means(const Matrix &x, const Vector &beta, const Vector &offset, Family family,
+                    const SparseRows *rows = nullptr) {
+    auto mu = matvec(x, beta, rows);
     for (std::size_t i = 0; i < mu.size(); ++i)
         mu[i] = mean_link(mu[i] + offset[i], family);
     return mu;
@@ -596,46 +702,131 @@ inline Vector means(const RowGroups &g, const Vector &beta, const Vector &offset
         mu[i] = mean_link(eta[g.group[i]] + offset[i], family);
     return mu;
 }
+// log(1 + r) for r > -1 from one logarithm: log(u) r / (u - 1) with u = 1 + r
+// rounded cancels the rounding of u (Kahan), and is cheaper than log1p.
+inline double log1p_by_log(double r) {
+    const double u = 1 + r;
+    return u == 1 ? r : std::log(u) * (r / (u - 1));
+}
+// Stirling's series, log Gamma(z) = (z - 1/2) log z - z + log(2 pi)/2 + c(z), for
+// z >= 65 in double: c(z) = 1/(12 z) - 1/(360 z^3) + 1/(1260 z^5); the next term
+// is below 2e-16.
+inline constexpr double half_log_two_pi = 0.91893853320467274178;
+inline double stirling_correction(double z) {
+    const double r = 1 / z, r2 = r * r;
+    return r * (1.0 / 12 - r2 * (1.0 / 360 - r2 / 1260));
+}
+// The same expansion for digamma(z) - log z and trigamma(z) - 1/z, z >= 65:
+// -1/(2z) - 1/(12 z^2) + 1/(120 z^4) - 1/(252 z^6) and
+// 1/(2 z^2) + 1/(6 z^3) - 1/(30 z^5) + 1/(42 z^7); the next terms are below 2e-17.
+inline double digamma_correction(double z) {
+    const double r = 1 / z, r2 = r * r;
+    return -r * (0.5 + r * (1.0 / 12 - r2 * (1.0 / 120 - r2 / 252)));
+}
+inline double trigamma_correction(double z) {
+    const double r = 1 / z, r2 = r * r;
+    return r2 * (0.5 + r * (1.0 / 6 - r2 * (1.0 / 30 - r2 / 42)));
+}
+// log(v!) for v <= 64.
+inline const std::array<long double, 65> &small_log_factorials() {
+    static const std::array<long double, 65> table = [] {
+        std::array<long double, 65> t{};
+        for (std::size_t v = 2; v <= 64; ++v)
+            t[v] = std::lgamma(v + 1.L);
+        return t;
+    }();
+    return table;
+}
 // Response-only terms of the count likelihoods, computed once per response so
-// each evaluation needs only the mean-dependent terms. Sums use long double.
+// each evaluation needs only the mean-dependent terms. Counts up to 64 are
+// handled through their histogram, exactly; larger ones by Stirling's series,
+// one logarithm each. Sums use long double.
 struct CountTerms {
     // above[k]: total weight of observations with k < y <= 64.
     std::array<long double, 64> above{};
-    std::vector<std::pair<double, double>> large; // (y, weight) for y > 64
-    long double log_factorial = 0;                // sum a lgamma(y + 1)
-    long double weight = 0;                       // sum a
+    // A count above 64: y, its weight, log(y + 1) and the Stirling correction at y + 1.
+    struct Large {
+        double count, weight, log_next, correction;
+        double log_factorial() const { // log(y!)
+            return (count + 0.5) * log_next - (count + 1) + half_log_two_pi + correction;
+        }
+    };
+    std::vector<Large> large;
+    long double log_factorial = 0;       // sum a lgamma(y + 1)
+    long double small_log_factorial = 0; // its part from the counts up to 64
+    long double weight = 0;              // sum a
     mutable double cached_theta = std::numeric_limits<double>::quiet_NaN();
-    mutable long double cached_ratio = 0;
+    mutable long double cached_constant = 0;
     CountTerms(const Vector &y, const Vector &a) {
         std::array<long double, 65> small{};
+        long double large_log_factorial = 0;
         for (std::size_t i = 0; i < y.size(); ++i)
             if (a[i] > 0) {
                 weight += a[i];
                 if (y[i] > 64) {
-                    large.emplace_back(y[i], a[i]);
-                    log_factorial += a[i] * std::lgamma(y[i] + 1.L);
+                    const double next = y[i] + 1;
+                    large.push_back({y[i], a[i], std::log(next), stirling_correction(next)});
+                    large_log_factorial += a[i] * large.back().log_factorial();
                 } else
                     small[static_cast<std::size_t>(y[i])] += a[i];
             }
+        const auto &factorials = small_log_factorials();
         for (std::size_t v = 2; v <= 64; ++v)
-            log_factorial += small[v] * std::lgamma(v + 1.L);
+            if (small[v] != 0)
+                small_log_factorial += small[v] * factorials[v];
+        log_factorial = small_log_factorial + large_log_factorial;
         for (std::size_t k = 64; k-- > 0;)
             above[k] = small[k + 1] + (k + 1 < 64 ? above[k + 1] : 0.L);
     }
-    // sum a [lgamma(y + t) - lgamma(t)]. Fits at a fixed theta evaluate it at every
-    // step, so the last value is kept (CountTerms objects are never shared).
-    long double gamma_ratio(double theta) const {
+    // sum a [lgamma(y + t) - lgamma(t) - lgamma(y + 1)], the response-only part of
+    // the NB log likelihood. Fits at a fixed theta need it at every step, so the
+    // last value is kept (CountTerms objects are never shared).
+    //
+    // For a count above 64 the three values are large and nearly cancel, so each
+    // observation uses the form whose terms are of the size of the result, as the
+    // mean-dependent terms do (see likelihood below). With c the Stirling
+    // correction:
+    // - t <= y + 1:  lgamma(y + t) - lgamma(y + 1)
+    //       = (t - 1) log(y + 1) + (y + t - 1/2) log1p((t - 1)/(y + 1)) - (t - 1)
+    //         + c(y + t) - c(y + 1),  and lgamma(t) is subtracted once for all;
+    // - t > y + 1:   lgamma(y + t) - lgamma(t)
+    //       = y log t + (y + t - 1/2) log1p(y/t) - y + c(y + t) - c(t),
+    //   where y log t is summed apart: it cancels against the mean-dependent
+    //   terms in long double (see likelihood), and log(y!) does not depend on t.
+    long double nb_constant(double theta) const {
         if (theta == cached_theta)
-            return cached_ratio;
+            return cached_constant;
         const long double t = theta;
-        long double total = 0;
+        long double total = -small_log_factorial;
         for (unsigned k = 0; k < 64; ++k)
             if (above[k] != 0)
                 total += above[k] * std::log(t + k);
-        for (const auto &[v, w] : large)
-            total += w * (std::lgamma(t + v) - std::lgamma(t));
+        if (!large.empty()) {
+            const double correction = theta >= 65 ? stirling_correction(theta) : 0;
+            long double below = 0, below_weight = 0, beyond = 0, beyond_counts = 0, factorials = 0;
+            for (const auto &e : large) {
+                const double z = theta + e.count;
+                if (theta <= e.count + 1) {
+                    const double shift = theta - 1;
+                    below += e.weight *
+                             (shift * e.log_next + (z - 0.5) * log1p_by_log(shift / (e.count + 1)) -
+                              shift + (stirling_correction(z) - e.correction));
+                    below_weight += e.weight;
+                } else { // theta > y + 1 >= 66
+                    beyond += e.weight * ((z - 0.5) * log1p_by_log(e.count / theta) - e.count +
+                                          (stirling_correction(z) - correction));
+                    beyond_counts += e.weight * e.count;
+                    factorials += e.weight * e.log_factorial();
+                }
+            }
+            if (beyond_counts != 0)
+                total += beyond_counts * std::log(t) - factorials;
+            if (below_weight != 0)
+                total -= below_weight * std::lgamma(t);
+            total += below + beyond;
+        }
         cached_theta = theta;
-        cached_ratio = total;
+        cached_constant = total;
         return total;
     }
     // sum a [digamma(y + t) - digamma(t)] and the trigamma difference.
@@ -648,9 +839,28 @@ struct CountTerms {
                 first += above[k] * inverse;
                 second -= above[k] * inverse * inverse;
             }
-        for (const auto &[v, w] : large) {
-            first += w * (boost::math::digamma(t + v) - boost::math::digamma(t));
-            second += w * (boost::math::trigamma(t + v) - boost::math::trigamma(t));
+        if (!large.empty() && theta >= 65) {
+            // Both arguments are in the range of the expansions; the leading terms
+            // are differenced exactly: log(t + y) - log t = log1p(y/t) and
+            // 1/(t + y) - 1/t = -y / (t (t + y)).
+            const double digamma = digamma_correction(theta), trigamma = trigamma_correction(theta);
+            for (const auto &e : large) {
+                const double z = theta + e.count;
+                first +=
+                    e.weight * (log1p_by_log(e.count / theta) + (digamma_correction(z) - digamma));
+                second += e.weight * (-e.count / (theta * z) + (trigamma_correction(z) - trigamma));
+            }
+        } else if (!large.empty()) {
+            // y > 64 here, so t + y >= 65; the values at t are needed once.
+            long double weights = 0;
+            for (const auto &e : large) {
+                const double z = theta + e.count;
+                first += e.weight * (std::log(z) + digamma_correction(z));
+                second += e.weight * (1 / z + trigamma_correction(z));
+                weights += e.weight;
+            }
+            first -= weights * boost::math::digamma(t);
+            second -= weights * boost::math::trigamma(t);
         }
         return {first, second};
     }
@@ -673,14 +883,14 @@ inline double likelihood(const Vector &y, const Vector &mu, const Vector &a, Fam
             else if (f == Family::poisson)
                 ll += a[i] * ((v > 0 ? v * std::log(m) : 0) - m);
             else {
-                const double shape = theta * std::log1p(m / theta);
+                const double ratio = log1p_by_log(m / theta), shape = theta * ratio;
                 if (v == 0)
                     ll -= a[i] * shape;
                 else if (theta < m)
-                    ll -= a[i] * (v * std::log1p(theta / m) + shape);
+                    ll -= a[i] * (v * log1p_by_log(theta / m) + shape);
                 else {
                     // y log(m/(t+m)) = y log(m) - y log(t) - y log1p(m/t)
-                    ll += a[i] * (v * (std::log(m) - std::log1p(m / theta)) - shape);
+                    ll += a[i] * (v * (std::log(m) - ratio) - shape);
                     log_theta_weight += a[i] * v;
                 }
             }
@@ -688,8 +898,8 @@ inline double likelihood(const Vector &y, const Vector &mu, const Vector &a, Fam
     if (f == Family::poisson)
         ll -= terms.log_factorial;
     else if (f == Family::negative_binomial)
-        ll += terms.gamma_ratio(theta) - terms.log_factorial -
-              log_theta_weight * std::log(static_cast<long double>(theta));
+        ll +=
+            terms.nb_constant(theta) - log_theta_weight * std::log(static_cast<long double>(theta));
     return static_cast<double>(ll);
 }
 inline double likelihood(const Vector &y, const Vector &mu, const Vector &a, Family f,
@@ -698,36 +908,38 @@ inline double likelihood(const Vector &y, const Vector &mu, const Vector &a, Fam
         return likelihood(y, mu, a, f, theta, CountTerms(Vector(), Vector()));
     return likelihood(y, mu, a, f, theta, CountTerms(y, a));
 }
-// Stable r - log(1+r), including nearly saturated fits.
-inline long double log1pmx(long double r) {
-    if (std::abs(r) >= 1e-4L)
-        return r - std::log1p(r);
-    return r * r * (0.5L + r * (-1.L / 3 + r * (0.25L + r * (-0.2L + r / 6))));
+// Stable r - log(1 + r), including nearly saturated fits.
+inline double log1pmx(double r) {
+    if (std::abs(r) >= 1e-3)
+        return r - log1p_by_log(r);
+    return r * r * (0.5 + r * (-1.0 / 3 + r * (0.25 + r * (-0.2 + r / 6))));
 }
-// Zero counts, usually most single-cell observations, need only a double log1p.
-// Positive counts keep long double: their Poisson and NB parts nearly cancel
-// for small theta.
+// The deviance of a count fit, the scale of the relative convergence criterion.
+// The unit deviances are v log(v/m) - (v - m) for Poisson, less
+// (v + t) (d - log(1 + d)) with d = (m - v)/(v + t) for NB; both are written so
+// that nearly saturated fits lose no digits. Double precision throughout: a
+// scale needs few digits, and long double logarithms cost several times more.
 inline double count_deviance(const Vector &y, const Vector &mu, const Vector &a, Family family,
                              double theta) {
-    long double total = 0;
+    double total = 0;
     for (std::size_t i = 0; i < y.size(); ++i) {
         if (a[i] == 0)
             continue;
-        long double term;
+        double term;
         if (y[i] == 0)
-            term = family == Family::poisson ? mu[i] : theta * std::log1p(mu[i] / theta);
+            term = family == Family::poisson ? mu[i] : theta * log1p_by_log(mu[i] / theta);
         else {
-            const long double v = y[i], m = mu[i], t = theta, difference = m - v;
-            term = std::abs(difference) < 0.125L * v ? v * log1pmx(difference / v)
-                                                     : v * std::log(v / m) + difference;
+            const double v = y[i], m = mu[i], difference = m - v;
+            term = std::abs(difference) < 0.125 * v ? v * log1pmx(difference / v)
+                                                    : v * std::log(v / m) + difference;
             if (family == Family::negative_binomial)
-                term -= (v + t) * log1pmx(difference / (v + t));
+                term -= (v + theta) * log1pmx(difference / (v + theta));
         }
         if (!std::isfinite(term))
             return std::numeric_limits<double>::infinity();
-        total += 2 * a[i] * std::max(0.L, term);
+        total += 2 * a[i] * std::max(0.0, term);
     }
-    return static_cast<double>(total);
+    return total;
 }
 
 // LAPACK supplies the null space; no custom decomposition. Column scaling is
@@ -778,11 +990,11 @@ struct NullSpace {
 // Whether the design restricted to positive counts has full rank; if so no
 // coefficient can diverge. Depends only on the data, so fits compute it once.
 inline bool positive_counts_full_rank(const Matrix &x, const Vector &y, const Vector &a,
-                                      double rank_tolerance) {
+                                      double rank_tolerance, const SparseRows *rows = nullptr) {
     Vector positive(x.rows);
     for (std::size_t i = 0; i < x.rows; ++i)
         positive[i] = a[i] > 0 && y[i] > 0;
-    return Cholesky(crossprod(x, positive), rank_tolerance).ok;
+    return Cholesky(crossprod(x, positive, rows), rank_tolerance).ok;
 }
 inline std::vector<unsigned char> count_boundary(const Matrix &x, const Vector &y, const Vector &a,
                                                  const Vector &direction, double /*rank_tolerance*/,
@@ -876,17 +1088,20 @@ struct CoxReid {
     bool ok = false;
 };
 // Factor of the Cox-Reid information X'WX at theta (W the NB working weights).
-inline Cholesky cox_reid_factor(const Matrix &x, const Vector &mu, const Vector &a, double theta) {
+// `rows` (may be null) holds the nonzero entries of x, as for crossprod.
+inline Cholesky cox_reid_factor(const Matrix &x, const Vector &mu, const Vector &a, double theta,
+                                const SparseRows *rows = nullptr) {
     Vector w(x.rows);
     for (std::size_t i = 0; i < x.rows; ++i) {
         const double m = mu[i], d = theta + m;
         w[i] = a[i] * m * (theta / d);
     }
-    return Cholesky(crossprod(x, w), 1e-12, false);
+    return Cholesky(crossprod(x, w, rows), 1e-12, false);
 }
 // With `factor`, the caller supplies cox_reid_factor at the same theta.
 inline CoxReid cox_reid(const Matrix &x, const Vector &mu, const Vector &a, double theta,
-                        bool derivatives, const Cholesky *factor = nullptr) {
+                        bool derivatives, const Cholesky *factor = nullptr,
+                        const SparseRows *rows = nullptr) {
     CoxReid c;
     const std::size_t p = x.cols;
     if (p == 0) {
@@ -903,7 +1118,7 @@ inline CoxReid cox_reid(const Matrix &x, const Vector &mu, const Vector &a, doub
         }
     std::optional<Cholesky> own;
     if (!factor)
-        factor = &own.emplace(cox_reid_factor(x, mu, a, theta));
+        factor = &own.emplace(cox_reid_factor(x, mu, a, theta, rows));
     const Cholesky &ch = *factor;
     if (!ch.ok)
         return c;
@@ -916,7 +1131,7 @@ inline CoxReid cox_reid(const Matrix &x, const Vector &mu, const Vector &a, doub
     if (!c.ok || !derivatives)
         return c;
     const auto inverse = ch.inverse();
-    const auto a1 = crossprod(x, w1), a2 = crossprod(x, w2);
+    const auto a1 = crossprod(x, w1, rows), a2 = crossprod(x, w2, rows);
     Matrix m(p, p);
     for (std::size_t j = 0; j < p; ++j)
         for (std::size_t k = 0; k < p; ++k)
@@ -942,7 +1157,8 @@ struct LogThetaPrior {
 // `prior`, the objective is the log posterior (a MAP estimate).
 inline double estimate_theta(const Vector &y, const Vector &mu, const Vector &a, double theta,
                              const FitOptions &o, const CountTerms &terms,
-                             const Matrix *adjust = nullptr, const LogThetaPrior *prior = nullptr) {
+                             const Matrix *adjust = nullptr, const LogThetaPrior *prior = nullptr,
+                             const SparseRows *rows = nullptr) {
     // The factor of the last objective evaluation is reused by the next Newton
     // step, which starts at that theta.
     std::optional<Cholesky> factor;
@@ -950,9 +1166,9 @@ inline double estimate_theta(const Vector &y, const Vector &mu, const Vector &a,
     const auto objective = [&](double t) {
         double v = likelihood(y, mu, a, Family::negative_binomial, t, terms);
         if (adjust) {
-            factor.emplace(cox_reid_factor(*adjust, mu, a, t));
+            factor.emplace(cox_reid_factor(*adjust, mu, a, t, rows));
             factor_theta = t;
-            const auto c = cox_reid(*adjust, mu, a, t, false, &*factor);
+            const auto c = cox_reid(*adjust, mu, a, t, false, &*factor, rows);
             v = c.ok ? v + c.value : -std::numeric_limits<double>::infinity();
         }
         if (prior) {
@@ -970,12 +1186,12 @@ inline double estimate_theta(const Vector &y, const Vector &mu, const Vector &a,
         for (std::size_t i = 0; i < y.size(); ++i)
             if (a[i] > 0) {
                 const double v = y[i], m = mu[i], tm = t + m;
-                g += a[i] * ((m - v) / tm - std::log1p(m / t));
+                g += a[i] * ((m - v) / tm - log1p_by_log(m / t));
                 h += a[i] * ((v - m) / (tm * tm) - 1 / tm);
             }
         if (adjust) {
-            const auto c =
-                cox_reid(*adjust, mu, a, t, true, factor && factor_theta == t ? &*factor : nullptr);
+            const auto c = cox_reid(*adjust, mu, a, t, true,
+                                    factor && factor_theta == t ? &*factor : nullptr, rows);
             if (!c.ok)
                 break;
             g += c.first;
@@ -1013,17 +1229,19 @@ inline double estimate_theta(const Vector &y, const Vector &mu, const Vector &a,
                              const FitOptions &o) {
     return estimate_theta(y, mu, a, theta, o, CountTerms(y, a));
 }
+// Identifies the response, weights and offset of a fit, so that fits can be
+// checked to share them (not a cryptographic hash). One multiply per value.
 inline std::uint64_t signature(const Vector &y, const Vector &a, const Vector &offset) {
     std::uint64_t h = 1469598103934665603ULL;
-    for (const auto *v : {&y, &a, &offset})
+    for (const auto *v : {&y, &a, &offset}) {
         for (double d : *v) {
             std::uint64_t u;
             std::memcpy(&u, &d, sizeof u);
-            for (unsigned j = 0; j < 8; ++j) {
-                h ^= (u >> (8 * j)) & 255U;
-                h *= 1099511628211ULL;
-            }
+            h = (h ^ u) * 0x9E3779B97F4A7C15ULL;
+            h ^= h >> 29;
         }
+        h = (h ^ v->size()) * 0xBF58476D1CE4E5B9ULL;
+    }
     return h;
 }
 inline Matrix select_columns(const Matrix &x, const std::vector<std::size_t> &columns) {
@@ -1071,13 +1289,25 @@ inline FitResult expand_aliased(FitResult r, const std::vector<std::size_t> &col
 } // namespace detail
 
 inline FitResult fit(const Matrix &x, const Vector &y, const FitOptions &o = {});
+// For FitOptions::design: the design-only part of fits of many responses to x.
+// The design is validated here once; it must stay unchanged, and alive, while
+// the summary is in use.
+inline std::shared_ptr<const detail::DesignSummary> prepare_design(const Matrix &x,
+                                                                   double rank_tolerance = 1e-12) {
+    x.validate();
+    return std::make_shared<const detail::DesignSummary>(x, rank_tolerance);
+}
 namespace detail {
 // The fit itself. For NB ML from a moment start, `start_at_bound` starts theta at
 // the upper bound instead of o.theta when the moment estimate shows no
 // overdispersion; `moment_at_bound` (may be null) reports whether it did.
 inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                           bool start_at_bound, bool *moment_at_bound) {
-    x.validate();
+    const detail::DesignSummary *const shared =
+        o.design && o.weights.empty() && o.design->describes(x, o.rank_tolerance) ? o.design.get()
+                                                                                  : nullptr;
+    if (!shared)
+        x.validate();
     require(x.rows == y.size() && x.rows > 0 && x.cols > 0, "empty or mismatched design/response");
     require(o.max_iterations > 0 && o.max_dispersion_iterations > 0,
             "iteration limits must be positive");
@@ -1102,7 +1332,7 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
     r.parameters = x.cols;
     r.ridge = o.ridge;
     double sumy = 0, suma = 0;
-    bool all_zero = true, all_one = true;
+    bool all_zero = true, all_one = true, zero_count = false;
     for (std::size_t i = 0; i < x.rows; ++i) {
         require(std::isfinite(y[i]) && std::isfinite(offset[i]), "nonfinite response or offset");
         require(std::isfinite(a[i]) && a[i] >= 0, "invalid weight");
@@ -1117,6 +1347,7 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
             suma += a[i];
             all_zero &= y[i] == 0;
             all_one &= y[i] == 1;
+            zero_count |= y[i] == 0;
         }
     }
     require(suma > 0, "all weights zero");
@@ -1126,8 +1357,18 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
     r.boundary_coefficients.assign(x.cols, 0);
     r.aliased.assign(x.cols, 0);
     r.rank = x.cols;
-    const Matrix prior_information = detail::crossprod(x, a);
-    detail::Cholesky design_check(prior_information, o.rank_tolerance);
+    // X'AX and its factor: from the shared summary, or computed here (always so
+    // with prior weights).
+    Matrix own_information;
+    std::optional<detail::Cholesky> own_check;
+    const detail::SparseRows own_rows = shared ? detail::SparseRows() : detail::SparseRows(x);
+    const detail::SparseRows *const rows = shared ? &shared->nonzero : &own_rows;
+    if (!shared) {
+        own_information = detail::crossprod(x, a, rows);
+        own_check.emplace(own_information, o.rank_tolerance);
+    }
+    const Matrix &prior_information = shared ? shared->information : own_information;
+    const detail::Cholesky &design_check = shared ? shared->check : *own_check;
     r.rank_deficient = !design_check.ok;
     // Poorly conditioned or singular designs are checked for aliased columns by QR.
     if (o.ridge == 0 && (o.solver == Solver::qr || !design_check.ok || design_check.rcond < 1e-8)) {
@@ -1167,9 +1408,10 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
         require(std::isfinite(b), "nonfinite warm start");
     const bool count_family = o.family == Family::poisson || o.family == Family::negative_binomial;
     // Grouped designs take per-group Fisher steps; see RowGroups.
-    const detail::RowGroups groups = count_family && o.ridge == 0 && o.solver == Solver::automatic
-                                         ? detail::RowGroups(x)
-                                         : detail::RowGroups();
+    const bool grouped = count_family && o.ridge == 0 && o.solver == Solver::automatic;
+    const detail::RowGroups own_groups =
+        grouped && !shared ? detail::RowGroups(x) : detail::RowGroups();
+    const detail::RowGroups &groups = grouped && shared ? shared->groups : own_groups;
     bool closed_form = false;
     if (groups.ok && o.start.empty()) {
         // The Poisson MLE of a grouped design, exp(b_g) sum_g a e^offset = sum_g a y;
@@ -1202,12 +1444,17 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                                                          : std::log(m);
             z[i] = a[i] * (link - offset[i]);
         }
-        auto h = prior_information;
-        for (std::size_t j = 0; j < x.cols; ++j)
-            h(j, j) += o.ridge;
-        detail::Cholesky ch(h, o.rank_tolerance);
+        // Without a ridge the factor of the rank check is the one needed here.
+        std::optional<detail::Cholesky> ridged;
+        if (o.ridge != 0) {
+            auto h = prior_information;
+            for (std::size_t j = 0; j < x.cols; ++j)
+                h(j, j) += o.ridge;
+            ridged.emplace(h, o.rank_tolerance);
+        }
+        const detail::Cholesky &ch = ridged ? *ridged : design_check;
         if (ch.ok && o.solver != Solver::qr)
-            beta = ch.solve(detail::xtv(x, z));
+            beta = ch.solve(detail::xtv(x, z, rows));
         else {
             detail::WeightedQR qr(x, a, o.alias_tolerance, o.ridge);
             if (qr.ok && qr.rank() == x.cols) {
@@ -1244,13 +1491,20 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
     }
     const auto mean_values = [&](const Vector &b) {
         return groups.ok ? detail::means(groups, b, offset, o.family)
-                         : detail::means(x, b, offset, o.family);
+                         : detail::means(x, b, offset, o.family, rows);
     };
     Vector mu = mean_values(beta), w, s;
     const detail::CountTerms terms =
         count_family ? detail::CountTerms(y, a) : detail::CountTerms(Vector(), Vector());
     bool complete = false;
     int positive_full_rank = -1; // unknown until a boundary check is needed
+    // Without zero counts and prior weights, the design restricted to positive
+    // counts is the design itself, whose cross-product was factored above.
+    const auto positive_rank = [&] {
+        return !zero_count && o.weights.empty()
+                   ? design_check.ok
+                   : detail::positive_counts_full_rank(x, y, a, o.rank_tolerance, rows);
+    };
     // Unpenalized NB ML without the Cox-Reid adjustment maximizes one objective,
     // so (beta, u = log theta) take joint Newton steps with the observed
     // information. For the log link -d2l/deta2 = a theta mu (theta + y)/(theta + mu)^2
@@ -1290,7 +1544,7 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                 s[i] = a[i] * t * (v - m) / d;
                 mixed[i] = a[i] * t * m * (v - m) / (d * d);
                 if (a[i] > 0) {
-                    g += a[i] * ((m - v) / d - std::log1p(m / t));
+                    g += a[i] * ((m - v) / d - log1p_by_log(m / t));
                     h += a[i] * ((v - m) / (d * d) - 1 / d);
                 }
             }
@@ -1322,11 +1576,11 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                 }
             }
             if (c.empty())
-                c = detail::xtv(x, mixed);
+                c = detail::xtv(x, mixed, rows);
             if (delta.empty() && o.solver != Solver::qr) {
-                detail::Cholesky ch(detail::crossprod(x, w), o.rank_tolerance);
+                detail::Cholesky ch(detail::crossprod(x, w, rows), o.rank_tolerance);
                 if (ch.ok && ch.rcond >= 1e-8) {
-                    delta = ch.solve(detail::xtv(x, s));
+                    delta = ch.solve(detail::xtv(x, s, rows));
                     coupling = ch.solve(c);
                     resolution = 100 * std::numeric_limits<double>::epsilon() / std::sqrt(ch.rcond);
                 }
@@ -1363,8 +1617,7 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
             std::iota(all_columns.begin(), all_columns.end(), 0);
             if (!reduced && delta.empty() && !solve_qr(all_columns) && !last_direction.empty()) {
                 if (positive_full_rank < 0)
-                    positive_full_rank =
-                        detail::positive_counts_full_rank(x, y, a, o.rank_tolerance) ? 1 : 0;
+                    positive_full_rank = positive_rank() ? 1 : 0;
                 auto flags = detail::count_boundary(x, y, a, last_direction, o.rank_tolerance,
                                                     positive_full_rank == 1);
                 for (std::size_t j = 0; j < p; ++j)
@@ -1435,7 +1688,7 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                 // whose Newton step promises less than the objective tolerance: the fit
                 // is at the maximum to working precision (seen near the theta bound).
                 const double predicted =
-                    std::abs(detail::dot(detail::xtv(x, s), direction) + gu * du);
+                    std::abs(detail::dot(detail::xtv(x, s, rows), direction) + gu * du);
                 if (previous_stable || predicted < o.tolerance * scale)
                     converged = true;
                 else
@@ -1446,8 +1699,7 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
             previous_stable = objective_stable;
             if (objective_stable) {
                 if (positive_full_rank < 0)
-                    positive_full_rank =
-                        detail::positive_counts_full_rank(x, y, a, o.rank_tolerance) ? 1 : 0;
+                    positive_full_rank = positive_rank() ? 1 : 0;
                 auto flags = detail::count_boundary(x, y, a, direction, o.rank_tolerance,
                                                     positive_full_rank == 1);
                 for (std::size_t j = 0; j < p; ++j)
@@ -1478,6 +1730,20 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                          ? o.max_dispersion_iterations
                          : 1;
     std::vector<double> chain; // log theta iterates since the last extrapolation (Cox-Reid)
+    // Working weights and scores of a coefficient step. NB steps use the observed
+    // information, a theta mu (theta + y) / (theta + mu)^2 > 0 for the log link:
+    // Newton's method converges quadratically where Fisher scoring (the expected
+    // information) converges only linearly. The reported covariance still uses the
+    // expected information.
+    const auto step_weights = [&](const Vector &at, Vector &weights, Vector &scores) {
+        detail::working(y, at, a, o.family, theta, weights, scores);
+        if (o.family == Family::negative_binomial)
+            for (std::size_t i = 0; i < weights.size(); ++i) {
+                const double d = theta + at[i];
+                weights[i] = a[i] * theta * at[i] * (theta + y[i]) / (d * d);
+            }
+    };
+    double final_likelihood = nan; // the log likelihood at the final estimate, when known
     for (std::size_t outer = 0; outer < outer_max; ++outer) {
         bool converged = false;
         double ll = detail::likelihood(y, mu, a, o.family, theta, terms) -
@@ -1487,18 +1753,14 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                                        : nan;
         // Counted per coefficient loop; r.iterations accumulates across dispersion rounds.
         std::size_t iteration = 0;
+        bool have_weights = false; // w and s already hold the step weights at mu
         for (; iteration < o.max_iterations; ++iteration) {
             ++r.iterations;
-            detail::working(y, mu, a, o.family, theta, w, s);
-            // NB steps use the observed information, a theta mu (theta + y) / (theta +
-            // mu)^2 > 0 for the log link: Newton's method converges quadratically where
-            // Fisher scoring (the expected information) converges only linearly. The
-            // reported covariance still uses the expected information.
-            if (o.family == Family::negative_binomial)
-                for (std::size_t i = 0; i < w.size(); ++i) {
-                    const double d = theta + mu[i];
-                    w[i] = a[i] * theta * mu[i] * (theta + y[i]) / (d * d);
-                }
+            if (!have_weights)
+                step_weights(mu, w, s);
+            have_weights = false;
+            std::optional<detail::Cholesky>
+                factor; // of this step's information, if it gave the step
             Vector delta;
             // Relative rounding level of the step, about eps * cond(sqrt(W)X); coefficient
             // changes below it cannot be resolved, so it floors the change criterion.
@@ -1521,19 +1783,21 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                 }
             }
             if (delta.empty() && o.solver != Solver::qr) {
-                Matrix h = detail::crossprod(x, w);
-                auto u = detail::xtv(x, s);
+                Matrix h = detail::crossprod(x, w, rows);
+                auto u = detail::xtv(x, s, rows);
                 for (std::size_t j = 0; j < x.cols; ++j) {
                     h(j, j) += o.ridge;
                     u[j] -= o.ridge * beta[j];
                 }
-                detail::Cholesky ch(h, o.rank_tolerance);
+                factor.emplace(h, o.rank_tolerance);
                 // The fixed point is exact either way, but steps from an ill-conditioned
                 // X'WX converge only linearly; QR keeps Newton's quadratic convergence.
-                if (ch.ok && ch.rcond >= 1e-8) {
-                    delta = ch.solve(u);
-                    resolution = 100 * std::numeric_limits<double>::epsilon() / std::sqrt(ch.rcond);
-                }
+                if (factor->ok && factor->rcond >= 1e-8) {
+                    delta = factor->solve(u);
+                    resolution =
+                        100 * std::numeric_limits<double>::epsilon() / std::sqrt(factor->rcond);
+                } else
+                    factor.reset();
             }
             if (delta.empty()) {
                 detail::WeightedQR qr(x, w, o.alias_tolerance, o.ridge);
@@ -1580,8 +1844,7 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                                                           o.tolerance);
             if (count_family && o.ridge == 0 && objective_stable) {
                 if (positive_full_rank < 0)
-                    positive_full_rank =
-                        detail::positive_counts_full_rank(x, y, a, o.rank_tolerance) ? 1 : 0;
+                    positive_full_rank = positive_rank() ? 1 : 0;
                 auto flags = detail::count_boundary(x, y, a, delta, o.rank_tolerance,
                                                     positive_full_rank == 1);
                 for (std::size_t j = 0; j < x.cols; ++j)
@@ -1610,7 +1873,78 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                 converged = true;
                 break;
             }
+            if (!factor)
+                continue;
+            // A further Newton step from an estimate already within the tolerance would
+            // only confirm it, at the cost of a cross-product, a factorization and a
+            // likelihood. This step's factor predicts that step instead: with the score
+            // at the new estimate, the chord step d = H^-1 u and the deviance change
+            // u'd it promises. The factor is trusted only if no working weight has moved
+            // by more than a quarter. If both are within the tolerance the fit has
+            // converged, and the chord step is taken as a last refinement unless it
+            // lowers the likelihood or a coefficient is at a boundary.
+            Vector next_w, next_s;
+            step_weights(mu, next_w, next_s);
+            bool close = true;
+            for (std::size_t i = 0; i < w.size() && close; ++i)
+                close = std::abs(next_w[i] - w[i]) <= 0.25 * w[i];
+            if (close) {
+                auto u = detail::xtv(x, next_s, rows);
+                for (std::size_t j = 0; j < x.cols; ++j)
+                    u[j] -= o.ridge * beta[j];
+                const Vector chord = factor->solve(u);
+                const double gain = detail::dot(u, chord);
+                const bool stable =
+                    !count_family ||
+                    (std::isfinite(gain) && gain / (0.1 + std::abs(deviance)) < o.tolerance);
+                if (count_family && o.ridge == 0 && stable) {
+                    if (positive_full_rank < 0)
+                        positive_full_rank = positive_rank() ? 1 : 0;
+                    auto flags = detail::count_boundary(x, y, a, chord, o.rank_tolerance,
+                                                        positive_full_rank == 1);
+                    for (std::size_t j = 0; j < x.cols; ++j)
+                        r.boundary_coefficients[j] |= flags[j];
+                }
+                double chord_change = 0;
+                for (std::size_t j = 0; j < beta.size(); ++j)
+                    if (!r.boundary_coefficients[j])
+                        chord_change =
+                            std::max(chord_change, std::abs(chord[j]) / (1 + std::abs(beta[j])));
+                if (stable && std::isfinite(chord_change) &&
+                    chord_change < std::max(o.tolerance, resolution)) {
+                    if (!r.has_boundary()) {
+                        Vector refined(beta.size());
+                        for (std::size_t j = 0; j < beta.size(); ++j)
+                            refined[j] = beta[j] + chord[j];
+                        Vector refined_mu = mean_values(refined);
+                        // The chord step raises the objective by about u'd/2 (it ascends
+                        // while the weights are within a quarter of the factor's). When
+                        // that is below the rounding of the objective, its value is known
+                        // without another evaluation.
+                        const double rise = 0.5 * gain;
+                        const bool known = count_family && rise <= 1e-13 * (1 + std::abs(ll)) &&
+                                           std::all_of(refined_mu.begin(), refined_mu.end(),
+                                                       [](double m) { return std::isfinite(m); });
+                        const double lr =
+                            known ? ll + rise
+                                  : detail::likelihood(y, refined_mu, a, o.family, theta, terms) -
+                                        0.5 * o.ridge * detail::dot(refined, refined);
+                        if (std::isfinite(lr) && lr >= ll - 1e-12 * (1 + std::abs(ll))) {
+                            beta = std::move(refined);
+                            mu = std::move(refined_mu);
+                            ll = lr;
+                        }
+                    }
+                    converged = true;
+                    break;
+                }
+            }
+            w = std::move(next_w);
+            s = std::move(next_s);
+            have_weights = true;
         }
+        if (converged && outer_max == 1 && o.ridge == 0)
+            final_likelihood = ll;
         if (!converged) {
             // Only an exhausted loop is an iteration limit; explicit failures keep their status.
             if (iteration == o.max_iterations)
@@ -1667,7 +2001,9 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
                        (theta <= o.theta_min * 1.00001 || theta >= o.theta_max / 1.00001);
     r.fitted = mu;
     detail::working(y, mu, a, o.family, theta, r.working_weights, r.score_residuals);
-    r.log_likelihood = detail::likelihood(y, mu, a, o.family, theta, terms);
+    r.log_likelihood = std::isnan(final_likelihood)
+                           ? detail::likelihood(y, mu, a, o.family, theta, terms)
+                           : final_likelihood;
     if (o.family == Family::gaussian) {
         double rss = -2 * r.log_likelihood;
         r.scale = rss / static_cast<double>(r.observations - x.cols);
@@ -1680,7 +2016,7 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
             if (ai > 0)
                 r.log_likelihood += 0.5 * std::log(ai);
     }
-    auto h = detail::crossprod(x, r.working_weights);
+    auto h = detail::crossprod(x, r.working_weights, rows);
     for (std::size_t j = 0; j < x.cols; ++j)
         h(j, j) += o.ridge;
     detail::Cholesky ch(h, o.rank_tolerance);
@@ -1731,7 +2067,7 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
             Vector s2 = r.score_residuals;
             for (double &v : s2)
                 v *= v;
-            auto meat = detail::crossprod(x, s2);
+            auto meat = detail::crossprod(x, s2, rows);
             r.robust_covariance = Matrix(x.cols, x.cols);
             for (std::size_t j = 0; j < x.cols; ++j)
                 for (std::size_t k = 0; k < x.cols; ++k)

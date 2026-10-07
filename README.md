@@ -20,38 +20,41 @@ One library serves several interfaces:
 
 ## Benchmarks
 
-Measured on 2026-10-01 with version 0.2.0 on one 32-core server (wall-clock
-seconds; one / eight threads). Jaccard is the overlap of discoveries with the
-reference tool at a false-discovery rate of 0.1. RapidGLM times are for its R
-package; the CLI and Python package take similar times. Since then the
-perturbation workflow has become faster ([CHANGELOG.md](CHANGELOG.md)), and
-from 1.0.0 it accepts skew-normal p-values by a stricter check, with
-confirmation draws from 1.1.0; the SCEPTRE rows correspond to
-`fit_check: "ks"`
+Measured on 2026-10-07 with version 1.2.0 on one workstation (wall-clock
+seconds; one / eight threads, each thread on its own efficiency core of an
+Intel Core i9-13900KF; [docs/BENCHMARK.md](docs/BENCHMARK.md#host)). Jaccard is
+the overlap of discoveries with the reference tool at a false-discovery rate of
+0.1. RapidGLM times are for its R package; the CLI and Python package take
+similar times. The SCEPTRE rows accept the skew-normal fit as SCEPTRE does
+(`fit_check: "ks"`); RapidGLM's default is a stricter check with confirmation
+draws, which takes 25–45% longer on these panels
 ([docs/CLI.md](docs/CLI.md#perturbation-workflow)).
 
 | Analysis | Reference (1 / 8) | RapidGLM (1 / 8) | Speed-up (1 thread) | Jaccard |
 |---|---|---|---:|---:|
-| DESeq2 1.48.2, airway (8 samples) | 3.49 / 1.60 | 0.88 / 0.24 | 4.0× | 0.93 |
-| DESeq2, GTEx thyroid (128 samples) | 61.9 / 17.2 | 11.9 / 1.98 | 5.2× | 0.58 (0.997\*) |
-| DESeq2, GTEx thyroid (647 samples) | 254 / 45.2 | 52.6 / 8.52 | 4.8× | 0.90 (1.000\*) |
-| SCEPTRE 0.99.0, Gasperini screen (50,000 cells) | 851 / 141 | 258 / 38.3 | 3.3× | 0.83 |
-| SCEPTRE, Gasperini screen (207,324 cells) | – / 896 | – / 274 | 3.3× (8 threads) | 0.92 |
+| DESeq2 1.48.2, airway (8 samples) | 6.04 / 2.68 | 0.99 / 0.29 | 6.1× | 0.932 |
+| DESeq2, GTEx thyroid (128 samples) | 119 / 31.3 | 9.49 / 1.72 | 12.5× | 0.997 |
+| DESeq2, GTEx thyroid (647 samples) | 482 / 83.9 | 34.7 / 6.48 | 13.9× | 1.000 |
+| SCEPTRE 0.99.0, Gasperini screen (50,000 cells) | 1,522 / 251 | 371 / 63.8 | 4.1× | 0.83 |
+| SCEPTRE, Gasperini screen (207,324 cells) | – / 1,507 | – / 336 | 4.5× (8 threads) | 0.92 |
 
-\*With `legacy_cooks`, which computes Cook's distances with DESeq2's robust
-dispersion as implemented in PyDESeq2 (MIT; Muzellec et al. 2023). By default
-RapidGLM uses its own estimator, which flags more genes in designs with many
-small groups ([docs/BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01)).
+Bulk DE computes Cook's distances with DESeq2's robust dispersion as
+implemented in PyDESeq2 (MIT; Muzellec et al. 2023), the default from 1.2.0.
+RapidGLM's own estimator (`legacy_cooks: false`) flags more genes in designs
+with many small groups and gives Jaccard 0.58 and 0.90 on the two thyroid sets
+([docs/BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01)). The
+timings are provisional: the workstation's performance cores were not all
+available, and the runs will be repeated when it is repaired.
 
 **Engine:**
 - *Accuracy.* All 39 identifiable problems from a binary128-referenced suite
-  are fitted, with coefficient errors of at most 1.6e-5 standard errors.
-- *Single fits.* Median speed-up over R `glm.fit` 5.2×, statsmodels 9.5× and
-  fastglm 2.7× (one thread, n ≥ 1e5;
+  are fitted, with coefficient errors of at most 6.6e-7 standard errors.
+- *Single fits.* Median speed-up over R `glm.fit` 5.5×, statsmodels 8.5× and
+  fastglm 3.6× (one thread, n ≥ 1e5;
   [docs/GLM_COMPARISON.md](docs/GLM_COMPARISON.md)).
 - *Solvers.* Against Ceres Solver on identical problems, the safeguarded Newton
-  solvers are 1.2–1.6× faster than Levenberg–Marquardt (fixed dispersion) and
-  1.3–3.8× faster than BFGS (estimated dispersion), at equal or better accuracy
+  solvers are 2.1–2.7× faster than Levenberg–Marquardt (fixed dispersion) and
+  1.7–5.7× faster than BFGS (estimated dispersion), at equal or better accuracy
   ([docs/SOLVERS.md](docs/SOLVERS.md)).
 - *Validation datasets.* Bulk DE agrees with DESeq2 at Jaccard 0.93–1.00 on
   five datasets ([docs/BULK_DE.md](docs/BULK_DE.md)). Perturbation analysis

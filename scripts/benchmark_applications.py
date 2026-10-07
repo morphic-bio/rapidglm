@@ -26,6 +26,9 @@ Tools:
   rapidglm-cli      `sceptre` (high MOI, complement controls, CRT), whole process;
   rapidglm-python   rapidglm.sceptre through the C interface (call only);
   rapidglm-r        rapidglm::sceptre in R through the C interface (call only);
+  rapidglm-*-ks     the same three with fit_check = "ks", which accepts a
+                    skew-normal fit as SCEPTRE does (the like-for-like runs; the
+                    plain names run RapidGLM's defaults);
   sceptre           SCEPTRE 0.99.0 run_calibration_check + run_power_check +
                     run_discovery_analysis (parallel = TRUE, n_processors = threads).
 Agreement with SCEPTRE (1 worker) over discovery pairs: Jaccard of BH
@@ -34,7 +37,14 @@ discoveries at 0.1 and Spearman correlation of p-values.
 Each tool runs at 1 and 8 threads (where supported), --repeats times in rotation
 (tools alternate within a repeat); the minimum wall time is reported with the
 host load before each run. Runs with a 1-minute load above a quarter of the
-cores are marked contended. Agreement with DESeq2 (parametric, 1 thread):
+cores are marked contended. --cpus THREADS:LIST confines the runs at a thread
+count to those CPUs (for example 1:16 8:16-23), which matters on processors
+whose cores differ in speed. A confined run starts once other processes use
+less than a fifth of its CPUs (or after --idle-timeout seconds), and the share
+of those CPUs that other processes used during it is recorded (others_cpu; an
+upper bound, since a tool's unreaped worker processes count as others). Such
+runs are marked contended when that share exceeds a fifth, instead of by the
+load. Agreement with DESeq2 (parametric, 1 thread):
 Jaccard index of BH discoveries (padj < 0.1) and Spearman correlation of
 p-values over genes both tested.
 """
@@ -59,6 +69,62 @@ CORES = os.cpu_count()
 
 def load():
     return os.getloadavg()
+
+
+ALLOWED = os.sched_getaffinity(0)
+
+
+def cpu_list(text):
+    """THREADS:LIST, for example 8:0-7 or 1:4,5."""
+    threads, _, spec = text.partition(":")
+    cpus = set()
+    for part in spec.split(","):
+        first, _, last = part.partition("-")
+        cpus.update(range(int(first), int(last or first) + 1))
+    return int(threads), cpus
+
+
+TICKS = os.sysconf("SC_CLK_TCK")
+
+
+def busy_seconds(cpus):
+    """Seconds the given CPUs have spent busy (all but idle and I/O wait), from /proc/stat."""
+    jiffies = 0
+    with open("/proc/stat") as f:
+        for line in f:
+            name, *values = line.split()
+            if name[:3] == "cpu" and name[3:].isdigit() and int(name[3:]) in cpus:
+                values = [int(v) for v in values]
+                jiffies += sum(values[:3]) + sum(values[5:8])
+    return jiffies / TICKS
+
+
+def timed_run(run, threads, args, *arguments):
+    """Runs a tool on the CPUs for its thread count (inherited from this process's
+    affinity). Returns the tool's result and a record of the host around the run."""
+    cpus = dict(args.cpus).get(threads)
+    os.sched_setaffinity(0, cpus or ALLOWED)
+    record = {"load": load()[0]}
+    if cpus:
+        # Wait for other processes to leave these CPUs.
+        start = time.time()
+        while True:
+            before = busy_seconds(cpus)
+            time.sleep(3)
+            if (busy_seconds(cpus) - before) / (3 * len(cpus)) < 0.2 or time.time() - start > args.idle_timeout:
+                break
+        record["waited_for_idle_seconds"] = round(time.time() - start - 3, 1)
+        busy, own = busy_seconds(cpus), os.times()
+    result = run(*arguments)
+    if cpus:
+        after = os.times()
+        ours = sum(after[:4]) - sum(own[:4])  # this process and the children it has waited for
+        wall = after.elapsed - own.elapsed
+        record["others_cpu"] = round(max(0.0, busy_seconds(cpus) - busy - ours) / (wall * len(cpus)), 4)
+        record["contended"] = record["others_cpu"] > 0.2
+    else:
+        record["contended"] = record["load"] > CORES / 4
+    return result, record
 
 
 # Datasets.
@@ -260,19 +326,16 @@ def bulk(args):
             for tool, threads in runs:
                 out = args.work / name / f"{tool}-t{threads}"
                 out.mkdir(parents=True, exist_ok=True)
-                before = load()
-                seconds, table = TOOLS[tool][0](args.binary, data, threads, out)
-                timings[(tool, threads)].append({"seconds": seconds, "load": before[0],
-                                                 "contended": before[0] > CORES / 4})
+                (seconds, table), record = timed_run(TOOLS[tool][0], threads, args, args.binary, data, threads, out)
+                timings[(tool, threads)].append({"seconds": seconds, **record})
                 tables[(tool, threads)] = table
-                print(f"{name} {tool} t{threads} repeat {repeat}: {seconds:.2f} s (load {before[0]:.1f})",
-                      flush=True)
+                print(f"{name} {tool} t{threads} repeat {repeat}: {seconds:.2f} s {record}", flush=True)
         reference = tables.get(("deseq2", 1))
         for (tool, threads), runs_ in timings.items():
             best = min(runs_, key=lambda r: r["seconds"])
             entry = {"dataset": name, "tool": tool, "threads": threads, "seconds": best["seconds"],
                      "all_seconds": [r["seconds"] for r in runs_], "load": best["load"],
-                     "contended": any(r["contended"] for r in runs_)}
+                     "contended": best["contended"], "runs": runs_}
             if reference is not None:
                 entry["agreement_with_deseq2"] = agreement(tables[(tool, threads)], reference)
             results.append(entry)
@@ -334,43 +397,49 @@ PYTHON_SCEPTRE = r"""
 import json, sys, time, numpy as np, pandas as pd, scipy.io
 sys.path.insert(0, sys.argv[1])
 import rapidglm
-d, threads, out = sys.argv[2], int(sys.argv[3]), sys.argv[4]
+d, threads, out, fit_check = sys.argv[2], int(sys.argv[3]), sys.argv[4], sys.argv[5]
 y = scipy.io.mmread(f"{d}/responses.mtx").T.tocsc()
 g = scipy.io.mmread(f"{d}/assignments.mtx").T.tocsc()
 x = np.loadtxt(f"{d}/design.tsv")
 guides = pd.read_csv(f"{d}/guides.tsv", sep="	")
 pairs = pd.read_csv(f"{d}/pairs.tsv", sep="	")
 t = time.perf_counter()
-r = rapidglm.sceptre(x, y, g, guides, pairs, moi="high", cell_qc=False, threads=threads, seed=20260930)
+r = rapidglm.sceptre(x, y, g, guides, pairs, moi="high", cell_qc=False, threads=threads, seed=20260930,
+                     fit_check=fit_check)
 seconds = time.perf_counter() - t
 r.to_csv(out, sep="	", index=False)
 print(json.dumps({"seconds": seconds}))
 """
 
 
-def sceptre_cli(binary, d, threads, out):
-    config = out / "config.json"
-    config.write_text(json.dumps({
-        "responses": str(d / "responses.mtx"), "assignments": str(d / "assignments.mtx"),
-        "design": str(d / "design.tsv"), "guides": str(d / "guides.tsv"), "pairs": str(d / "pairs.tsv"),
-        "moi": "high", "cell_qc": False, "threads": threads, "seed": 20260930, "output": str(out / "rapid"),
-    }))
-    t = time.perf_counter()
-    subprocess.run([binary, "sceptre", config], check=True, env=ENV, capture_output=True)
-    seconds = time.perf_counter() - t
-    return seconds, pd.read_csv(out / "rapid.tsv", sep="\t")
+def sceptre_cli(fit_check):
+    def run(binary, d, threads, out):
+        config = out / "config.json"
+        config.write_text(json.dumps({
+            "responses": str(d / "responses.mtx"), "assignments": str(d / "assignments.mtx"),
+            "design": str(d / "design.tsv"), "guides": str(d / "guides.tsv"), "pairs": str(d / "pairs.tsv"),
+            "moi": "high", "cell_qc": False, "threads": threads, "seed": 20260930, "fit_check": fit_check,
+            "output": str(out / "rapid"),
+        }))
+        t = time.perf_counter()
+        subprocess.run([binary, "sceptre", config], check=True, env=ENV, capture_output=True)
+        seconds = time.perf_counter() - t
+        return seconds, pd.read_csv(out / "rapid.tsv", sep="\t")
+    return run
 
 
-def sceptre_python(binary, d, threads, out):
-    r = subprocess.run(
-        [sys.executable, "-c", PYTHON_SCEPTRE, str(ROOT / "bindings/python"), str(d), str(threads),
-         str(out / "python.tsv")],
-        check=True, env={**ENV, "RAPIDGLM_C_LIBRARY": str(binary.parent / "librapidglm_c.so")},
-        capture_output=True, text=True,
-    )
-    table = pd.read_csv(out / "python.tsv", sep="\t")
-    table["kind"] = table["kind"].map({"discovery": 0, "negative": 1, "positive": 2})
-    return json.loads(r.stdout.splitlines()[-1])["seconds"], table
+def sceptre_python(fit_check):
+    def run(binary, d, threads, out):
+        r = subprocess.run(
+            [sys.executable, "-c", PYTHON_SCEPTRE, str(ROOT / "bindings/python"), str(d), str(threads),
+             str(out / "python.tsv"), fit_check],
+            check=True, env={**ENV, "RAPIDGLM_C_LIBRARY": str(binary.parent / "librapidglm_c.so")},
+            capture_output=True, text=True,
+        )
+        table = pd.read_csv(out / "python.tsv", sep="\t")
+        table["kind"] = table["kind"].map({"discovery": 0, "negative": 1, "positive": 2})
+        return json.loads(r.stdout.splitlines()[-1])["seconds"], table
+    return run
 
 
 def sceptre_r(binary, d, threads, out):
@@ -380,17 +449,22 @@ def sceptre_r(binary, d, threads, out):
     return timing["seconds"], pd.read_csv(out / "discovery.tsv", sep="\t")
 
 
-def sceptre_rapidglm_r(binary, d, threads, out):
-    subprocess.run(["Rscript", str(ROOT / "scripts/rapidglm_r_timing.R"), "sceptre", str(d), str(threads),
-                    str(out), RAPIDGLM_R_LIBS], check=True, env=ENV, capture_output=True)
-    seconds = json.loads((out / "timing.json").read_text())["seconds"]
-    return seconds, pd.read_csv(out / "r.tsv", sep="\t")
+def sceptre_rapidglm_r(fit_check):
+    def run(binary, d, threads, out):
+        subprocess.run(["Rscript", str(ROOT / "scripts/rapidglm_r_timing.R"), "sceptre", str(d), str(threads),
+                        str(out), fit_check, RAPIDGLM_R_LIBS], check=True, env=ENV, capture_output=True)
+        seconds = json.loads((out / "timing.json").read_text())["seconds"]
+        return seconds, pd.read_csv(out / "r.tsv", sep="\t")
+    return run
 
 
 SCEPTRE_TOOLS = {
-    "rapidglm-cli": (sceptre_cli, (1, 8)),
-    "rapidglm-python": (sceptre_python, (1, 8)),
-    "rapidglm-r": (sceptre_rapidglm_r, (1, 8)),
+    "rapidglm-cli": (sceptre_cli("strict"), (1, 8)),
+    "rapidglm-python": (sceptre_python("strict"), (1, 8)),
+    "rapidglm-r": (sceptre_rapidglm_r("strict"), (1, 8)),
+    "rapidglm-cli-ks": (sceptre_cli("ks"), (1, 8)),
+    "rapidglm-python-ks": (sceptre_python("ks"), (1, 8)),
+    "rapidglm-r-ks": (sceptre_rapidglm_r("ks"), (1, 8)),
     "sceptre": (sceptre_r, (1, 8)),
 }
 
@@ -441,13 +515,11 @@ def perturbation(args):
             for tool, threads in runs:
                 out = args.work / name / f"{tool}-t{threads}"
                 out.mkdir(parents=True, exist_ok=True)
-                before = load()
-                seconds, table = SCEPTRE_TOOLS[tool][0](args.binary, d, threads, out)
-                timings[(tool, threads)].append({"seconds": seconds, "load": before[0],
-                                                 "contended": before[0] > CORES / 4})
+                (seconds, table), record = timed_run(SCEPTRE_TOOLS[tool][0], threads, args, args.binary, d, threads,
+                                                     out)
+                timings[(tool, threads)].append({"seconds": seconds, **record})
                 tables[(tool, threads)] = table
-                print(f"{name} {tool} t{threads} repeat {repeat}: {seconds:.2f} s (load {before[0]:.1f})",
-                      flush=True)
+                print(f"{name} {tool} t{threads} repeat {repeat}: {seconds:.2f} s {record}", flush=True)
         # SCEPTRE at one thread, else at the fewest threads run.
         sceptre_runs = sorted(k for k in tables if k[0] == "sceptre")
         reference = tables[sceptre_runs[0]] if sceptre_runs else None
@@ -455,7 +527,7 @@ def perturbation(args):
             best = min(runs_, key=lambda r: r["seconds"])
             entry = {"dataset": name, "tool": tool, "threads": threads, "seconds": best["seconds"],
                      "all_seconds": [r["seconds"] for r in runs_], "load": best["load"],
-                     "contended": any(r["contended"] for r in runs_)}
+                     "contended": best["contended"], "runs": runs_}
             if reference is not None:
                 entry["agreement_with_sceptre"] = sceptre_agreement(tables[(tool, threads)], reference, d)
             results.append(entry)
@@ -473,6 +545,10 @@ def main():
     ap.add_argument("--max-threads", type=int, default=8)
     ap.add_argument("--threads", type=int, nargs="+", default=[1, 8],
                     help="thread counts to run (each tool's supported subset)")
+    ap.add_argument("--cpus", type=cpu_list, nargs="*", default=[], metavar="THREADS:LIST",
+                    help="CPUs for the runs at a thread count, e.g. 1:16 8:16-23 (default: all allowed)")
+    ap.add_argument("--idle-timeout", type=float, default=1200,
+                    help="longest wait, in seconds, for other processes to leave a run's CPUs")
     ap.add_argument("--work", type=pathlib.Path, default=WORK / "runs")
     ap.add_argument("--output", type=pathlib.Path, required=True)
     args = ap.parse_args()
@@ -483,8 +559,10 @@ def main():
     receipt = {
         "started": started,
         "finished": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "host": {"cores": CORES, "uname": " ".join(os.uname())},
+        "host": {"cores": CORES, "cpus_allowed": sorted(ALLOWED),
+                 "cpus_by_threads": {str(t): sorted(c) for t, c in args.cpus}, "uname": " ".join(os.uname())},
         "binary": str(args.binary),
+        "version": subprocess.run([args.binary, "--version"], capture_output=True, text=True).stdout.strip(),
         "commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
                                  text=True).stdout.strip(),
         "repeats": args.repeats,

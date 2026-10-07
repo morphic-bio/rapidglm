@@ -205,6 +205,8 @@ inline std::vector<FitResult> fit_batch(const Matrix &design, const SparseCSC &r
     require(theta_trend.empty() || theta_trend.size() == responses.cols,
             "dispersion trend size mismatch");
     options.retain_observations = false;
+    if (!options.design && options.weights.empty())
+        options.design = prepare_design(design, options.rank_tolerance);
     std::vector<FitResult> out(responses.cols);
     parallel_for(responses.cols, threads, [&](auto j) {
         auto o = options;

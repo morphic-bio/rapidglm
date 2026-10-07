@@ -1,192 +1,600 @@
 {
-  "purpose": "Perturbation workflow against SCEPTRE 0.99.0 (docs/BENCHMARK.md)",
-  "commit": "05a4662 (driver fix for the agreement step applied afterwards)",
-  "note": "Rebuilt from the run logs (timings) and the saved output tables: the original runs completed but the agreement step failed (R's float response index) or used SCEPTRE at 1 thread only. Timings and tables are those of the runs of 2026-10-01.",
-  "logs": [
-    "validation/work/benchmark/receipts/sceptre_50k.log",
-    "validation/work/benchmark/receipts/sceptre_full.log"
+ "purpose": "Perturbation workflow against SCEPTRE 0.99.0 (docs/BENCHMARK.md)",
+ "version": "1.2.0",
+ "commit": "4446d4249011fa120299376732deec5bb1522409",
+ "commit_note": "the source measured is this commit (v1.2.0-dev.1); it was made while the stages ran, and stages that started before it recorded be60928 with the same source uncommitted",
+ "started": "2026-10-07T02:20:29",
+ "finished": "2026-10-07T04:52:01",
+ "host": {
+  "cores": 28,
+  "cpus_allowed": [
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31
   ],
-  "repeats": 1,
-  "perturbation": [
+  "cpus_by_threads": {
+   "1": [
+    16
+   ],
+   "8": [
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+   ]
+  },
+  "uname": "Linux pikachu 6.8.0-124-generic #124~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue May 26 21:05:19 UTC  x86_64"
+ },
+ "host_note": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-06 and 2026-10-07. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired.",
+ "commands": [
+  "python3 scripts/benchmark_applications.py --datasets --sceptre-datasets gasperini50k --repeats 1 --cpus 1:16 8:16-23 --output OUT",
+  "python3 scripts/benchmark_applications.py --datasets --sceptre-datasets gasperini --threads 8 --repeats 1 --cpus 8:16-23 --output OUT"
+ ],
+ "tools_note": "rapidglm-* run RapidGLM's defaults (fit_check strict, with confirmation draws); rapidglm-*-ks accept the skew-normal fit as SCEPTRE does (fit_check ks).",
+ "repeats": 1,
+ "perturbation": [
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-cli",
+   "threads": 1,
+   "seconds": 467.62494115158916,
+   "all_seconds": [
+    467.62494115158916
+   ],
+   "load": 5.64794921875,
+   "contended": false,
+   "runs": [
     {
-      "dataset": "gasperini50k",
-      "tool": "rapidglm-cli",
-      "threads": 1,
-      "seconds": 264.24,
-      "load": 1.6,
-      "contended": false,
-      "reference": "sceptre t1",
-      "agreement_with_sceptre": {
-        "pairs": 8546,
-        "discoveries": 29,
-        "jaccard": 0.8275862068965517,
-        "spearman": 0.9852447429447518
-      }
-    },
-    {
-      "dataset": "gasperini50k",
-      "tool": "rapidglm-cli",
-      "threads": 8,
-      "seconds": 52.78,
-      "load": 1.7,
-      "contended": false,
-      "reference": "sceptre t1",
-      "agreement_with_sceptre": {
-        "pairs": 8546,
-        "discoveries": 29,
-        "jaccard": 0.8275862068965517,
-        "spearman": 0.9852447429447518
-      }
-    },
-    {
-      "dataset": "gasperini50k",
-      "tool": "rapidglm-python",
-      "threads": 1,
-      "seconds": 244.38,
-      "load": 4.5,
-      "contended": false,
-      "reference": "sceptre t1",
-      "agreement_with_sceptre": {
-        "pairs": 8546,
-        "discoveries": 29,
-        "jaccard": 0.8275862068965517,
-        "spearman": 0.9852447429447518
-      }
-    },
-    {
-      "dataset": "gasperini50k",
-      "tool": "rapidglm-python",
-      "threads": 8,
-      "seconds": 35.26,
-      "load": 1.5,
-      "contended": false,
-      "reference": "sceptre t1",
-      "agreement_with_sceptre": {
-        "pairs": 8546,
-        "discoveries": 29,
-        "jaccard": 0.8275862068965517,
-        "spearman": 0.9852447429447518
-      }
-    },
-    {
-      "dataset": "gasperini50k",
-      "tool": "rapidglm-r",
-      "threads": 1,
-      "seconds": 257.76,
-      "load": 4.5,
-      "contended": false,
-      "reference": "sceptre t1",
-      "agreement_with_sceptre": {
-        "pairs": 8546,
-        "discoveries": 29,
-        "jaccard": 0.8275862068965517,
-        "spearman": 0.9852447429447518
-      }
-    },
-    {
-      "dataset": "gasperini50k",
-      "tool": "rapidglm-r",
-      "threads": 8,
-      "seconds": 38.34,
-      "load": 1.5,
-      "contended": false,
-      "reference": "sceptre t1",
-      "agreement_with_sceptre": {
-        "pairs": 8546,
-        "discoveries": 29,
-        "jaccard": 0.8275862068965517,
-        "spearman": 0.9852447429447518
-      }
-    },
-    {
-      "dataset": "gasperini50k",
-      "tool": "sceptre",
-      "threads": 1,
-      "seconds": 851.38,
-      "load": 4.4,
-      "contended": false,
-      "reference": "sceptre t1",
-      "agreement_with_sceptre": {
-        "pairs": 8546,
-        "discoveries": 24,
-        "jaccard": 1.0,
-        "spearman": 0.9999999999999998
-      }
-    },
-    {
-      "dataset": "gasperini50k",
-      "tool": "sceptre",
-      "threads": 8,
-      "seconds": 141.24,
-      "load": 1.2,
-      "contended": false,
-      "reference": "sceptre t1",
-      "agreement_with_sceptre": {
-        "pairs": 8546,
-        "discoveries": 24,
-        "jaccard": 1.0,
-        "spearman": 0.9999999999999998
-      }
-    },
-    {
-      "dataset": "gasperini",
-      "tool": "rapidglm-cli",
-      "threads": 8,
-      "seconds": 333.26,
-      "load": 7.6,
-      "contended": false,
-      "reference": "sceptre t8",
-      "agreement_with_sceptre": {
-        "pairs": 9718,
-        "discoveries": 101,
-        "jaccard": 0.9238095238095239,
-        "spearman": 0.9861225636519716
-      }
-    },
-    {
-      "dataset": "gasperini",
-      "tool": "rapidglm-python",
-      "threads": 8,
-      "seconds": 252.1,
-      "load": 8.6,
-      "contended": true,
-      "reference": "sceptre t8",
-      "agreement_with_sceptre": {
-        "pairs": 9718,
-        "discoveries": 101,
-        "jaccard": 0.9238095238095239,
-        "spearman": 0.9861225636519716
-      }
-    },
-    {
-      "dataset": "gasperini",
-      "tool": "rapidglm-r",
-      "threads": 8,
-      "seconds": 274.16,
-      "load": 8.4,
-      "contended": true,
-      "reference": "sceptre t8",
-      "agreement_with_sceptre": {
-        "pairs": 9718,
-        "discoveries": 101,
-        "jaccard": 0.9238095238095239,
-        "spearman": 0.9861225636519716
-      }
-    },
-    {
-      "dataset": "gasperini",
-      "tool": "sceptre",
-      "threads": 8,
-      "seconds": 895.77,
-      "load": 8.4,
-      "contended": true,
-      "reference": "sceptre t8",
-      "agreement_with_sceptre": {
-        "pairs": 9718,
-        "discoveries": 101,
-        "jaccard": 1.0,
-        "spearman": 1.0
-      }
+     "seconds": 467.62494115158916,
+     "load": 5.64794921875,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0002,
+     "contended": false
     }
-  ]
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 28,
+    "jaccard": 0.7931034482758621,
+    "spearman": 0.9852447317690044
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-cli",
+   "threads": 8,
+   "seconds": 71.69308735243976,
+   "all_seconds": [
+    71.69308735243976
+   ],
+   "load": 2.15771484375,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 71.69308735243976,
+     "load": 2.15771484375,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0024,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 28,
+    "jaccard": 0.7931034482758621,
+    "spearman": 0.9852447317690044
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-python",
+   "threads": 1,
+   "seconds": 453.01126676332206,
+   "all_seconds": [
+    453.01126676332206
+   ],
+   "load": 6.46630859375,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 453.01126676332206,
+     "load": 6.46630859375,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0002,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 28,
+    "jaccard": 0.7931034482758621,
+    "spearman": 0.9852447317690044
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-python",
+   "threads": 8,
+   "seconds": 70.97257538232952,
+   "all_seconds": [
+    70.97257538232952
+   ],
+   "load": 2.357421875,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 70.97257538232952,
+     "load": 2.357421875,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0045,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 28,
+    "jaccard": 0.7931034482758621,
+    "spearman": 0.9852447317690044
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-r",
+   "threads": 1,
+   "seconds": 468.274,
+   "all_seconds": [
+    468.274
+   ],
+   "load": 5.71337890625,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 468.274,
+     "load": 5.71337890625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0002,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 28,
+    "jaccard": 0.7931034482758621,
+    "spearman": 0.9852447317690044
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-r",
+   "threads": 8,
+   "seconds": 79.619,
+   "all_seconds": [
+    79.619
+   ],
+   "load": 2.2900390625,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 79.619,
+     "load": 2.2900390625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0127,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 28,
+    "jaccard": 0.7931034482758621,
+    "spearman": 0.9852447317690044
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-cli-ks",
+   "threads": 1,
+   "seconds": 366.74704066105187,
+   "all_seconds": [
+    366.74704066105187
+   ],
+   "load": 6.4140625,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 366.74704066105187,
+     "load": 6.4140625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0002,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 29,
+    "jaccard": 0.8275862068965517,
+    "spearman": 0.9852447429447518
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-cli-ks",
+   "threads": 8,
+   "seconds": 55.114165659062564,
+   "all_seconds": [
+    55.114165659062564
+   ],
+   "load": 1.65185546875,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 55.114165659062564,
+     "load": 1.65185546875,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0014,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 29,
+    "jaccard": 0.8275862068965517,
+    "spearman": 0.9852447429447518
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-python-ks",
+   "threads": 1,
+   "seconds": 352.1429913928732,
+   "all_seconds": [
+    352.1429913928732
+   ],
+   "load": 6.1240234375,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 352.1429913928732,
+     "load": 6.1240234375,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0002,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 29,
+    "jaccard": 0.8275862068965517,
+    "spearman": 0.9852447429447518
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-python-ks",
+   "threads": 8,
+   "seconds": 54.131302556954324,
+   "all_seconds": [
+    54.131302556954324
+   ],
+   "load": 2.59765625,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 54.131302556954324,
+     "load": 2.59765625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0043,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 29,
+    "jaccard": 0.8275862068965517,
+    "spearman": 0.9852447429447518
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-r-ks",
+   "threads": 1,
+   "seconds": 370.752,
+   "all_seconds": [
+    370.752
+   ],
+   "load": 5.86376953125,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 370.752,
+     "load": 5.86376953125,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0002,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 29,
+    "jaccard": 0.8275862068965517,
+    "spearman": 0.9852447429447518
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "rapidglm-r-ks",
+   "threads": 8,
+   "seconds": 63.798,
+   "all_seconds": [
+    63.798
+   ],
+   "load": 2.8310546875,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 63.798,
+     "load": 2.8310546875,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0159,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 29,
+    "jaccard": 0.8275862068965517,
+    "spearman": 0.9852447429447518
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "sceptre",
+   "threads": 1,
+   "seconds": 1521.894,
+   "all_seconds": [
+    1521.894
+   ],
+   "load": 6.0947265625,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 1521.894,
+     "load": 6.0947265625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0002,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 24,
+    "jaccard": 1.0,
+    "spearman": 0.9999999999999998
+   }
+  },
+  {
+   "dataset": "gasperini50k",
+   "tool": "sceptre",
+   "threads": 8,
+   "seconds": 250.852,
+   "all_seconds": [
+    250.852
+   ],
+   "load": 2.53125,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 250.852,
+     "load": 2.53125,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0075,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 8546,
+    "discoveries": 24,
+    "jaccard": 1.0,
+    "spearman": 0.9999999999999998
+   }
+  },
+  {
+   "dataset": "gasperini",
+   "tool": "rapidglm-cli",
+   "threads": 8,
+   "seconds": 415.307536020875,
+   "all_seconds": [
+    415.307536020875
+   ],
+   "load": 10.193359375,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 415.307536020875,
+     "load": 10.193359375,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0025,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 9718,
+    "discoveries": 101,
+    "jaccard": 0.9238095238095239,
+    "spearman": 0.9861225370264386
+   }
+  },
+  {
+   "dataset": "gasperini",
+   "tool": "rapidglm-python",
+   "threads": 8,
+   "seconds": 419.302864854224,
+   "all_seconds": [
+    419.302864854224
+   ],
+   "load": 9.298828125,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 419.302864854224,
+     "load": 9.298828125,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0066,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 9718,
+    "discoveries": 101,
+    "jaccard": 0.9238095238095239,
+    "spearman": 0.9861225370264386
+   }
+  },
+  {
+   "dataset": "gasperini",
+   "tool": "rapidglm-r",
+   "threads": 8,
+   "seconds": 449.693,
+   "all_seconds": [
+    449.693
+   ],
+   "load": 8.25830078125,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 449.693,
+     "load": 8.25830078125,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.013,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 9718,
+    "discoveries": 101,
+    "jaccard": 0.9238095238095239,
+    "spearman": 0.9861225370264386
+   }
+  },
+  {
+   "dataset": "gasperini",
+   "tool": "rapidglm-cli-ks",
+   "threads": 8,
+   "seconds": 298.1420897934586,
+   "all_seconds": [
+    298.1420897934586
+   ],
+   "load": 8.5810546875,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 298.1420897934586,
+     "load": 8.5810546875,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0041,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 9718,
+    "discoveries": 101,
+    "jaccard": 0.9238095238095239,
+    "spearman": 0.9861225636519716
+   }
+  },
+  {
+   "dataset": "gasperini",
+   "tool": "rapidglm-python-ks",
+   "threads": 8,
+   "seconds": 290.9932313328609,
+   "all_seconds": [
+    290.9932313328609
+   ],
+   "load": 9.77685546875,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 290.9932313328609,
+     "load": 9.77685546875,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0047,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 9718,
+    "discoveries": 101,
+    "jaccard": 0.9238095238095239,
+    "spearman": 0.9861225636519716
+   }
+  },
+  {
+   "dataset": "gasperini",
+   "tool": "rapidglm-r-ks",
+   "threads": 8,
+   "seconds": 336.469,
+   "all_seconds": [
+    336.469
+   ],
+   "load": 11.30859375,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 336.469,
+     "load": 11.30859375,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0147,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 9718,
+    "discoveries": 101,
+    "jaccard": 0.9238095238095239,
+    "spearman": 0.9861225636519716
+   }
+  },
+  {
+   "dataset": "gasperini",
+   "tool": "sceptre",
+   "threads": 8,
+   "seconds": 1507.204,
+   "all_seconds": [
+    1507.204
+   ],
+   "load": 8.47021484375,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 1507.204,
+     "load": 8.47021484375,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0103,
+     "contended": false
+    }
+   ],
+   "agreement_with_sceptre": {
+    "pairs": 9718,
+    "discoveries": 101,
+    "jaccard": 1.0,
+    "spearman": 1.0
+   }
+  }
+ ]
 }

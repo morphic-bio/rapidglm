@@ -41,6 +41,27 @@ existing relative coefficient-change tolerance, retaining ordinary-fit precision
 Gaussian and binomial stopping rules are unchanged. The deviance criterion follows
 [R's documented convention](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/glm.control.html).
 
+From 1.2.0 a step that could only confirm convergence is not taken. After each
+step solved by Cholesky factorization, the score u at the new estimate and that
+step's factor give the chord step d = H^-1 u and the deviance change u'd it
+promises. When both meet the criteria above, and no working weight has moved by
+more than a quarter since the factor was formed, the fit has converged without
+another cross-product, factorization and likelihood. The chord step is then
+applied as a last refinement, unless it would lower the likelihood or a
+coefficient is at a boundary, so the estimate agrees with that of a further
+full step to second order in the step. Steps solved by QR, and grouped designs,
+converge as before. The deviance serves only as the scale of the criterion and
+is evaluated in double precision.
+
+Likelihood terms that depend on the response alone are computed once per
+response: counts up to 64 through their histogram, larger ones by Stirling's
+series with one logarithm each, in the form whose terms are of the size of the
+result (the difference lgamma(y + theta) - lgamma(y + 1) for theta <= y + 1,
+and lgamma(y + theta) - lgamma(theta) less y log theta otherwise). Their sums
+agree with binary128 references to 1e-16 relative. Designs in which at most
+half of the entries are nonzero, such as designs of factors, form X'WX, X'v and
+X b from each row's nonzero entries.
+
 For unpenalized count fits, a candidate boundary direction is projected into the
 null space of the positive-count design using LAPACK SVD. A numerical certificate
 requires zero change on positive counts, nonpositive change on zero counts and
@@ -587,16 +608,12 @@ outputs; they are marked *calibrated* below. Counts are samples × genes
    instead with status `boundary_lrt` and a missing fold change.
 9. **Cook's distance** ([Cook 1977](https://doi.org/10.2307/1268249)):
    D_i = R_i² / p × h_i / (1 − h_i)², with R_i = (y_i − μ_i) / √(μ_i + α_rob μ_i²)
-   and h_i the hat values of the final fit. DESeq2 uses a robust dispersion
-   here that its paper and documentation do not specify in reproducible
-   detail, so α_rob is a RapidGLM choice. RapidGLM pools the squared
-   scaled MADs of the normalized counts within design cells of at least three
-   samples (the ordinary variance if there are none). It converts the pooled
-   variance v to (v − μ̄) / μ̄² and floors that at 0.25 α_tr. The cutoff is the
-   0.99 quantile of F(p, m − p).
-   - With `legacy_cooks`, α_rob is DESeq2's robust dispersion as implemented in
-     PyDESeq2 (MIT; Muzellec et al. 2023, Bioinformatics 39:btad547; see
-     DEPENDENCIES.md):
+   and h_i the hat values of the final fit. The cutoff is the 0.99 quantile
+   of F(p, m − p). DESeq2 uses a robust dispersion α_rob here that its paper
+   and documentation do not specify in reproducible detail.
+   - By default (`legacy_cooks`, from 1.2.0), α_rob is DESeq2's robust
+     dispersion as implemented in PyDESeq2 (MIT; Muzellec et al. 2023,
+     Bioinformatics 39:btad547; see DEPENDENCIES.md):
      - **Variance.** In each cell of at least three samples, take the trimmed
        mean of the normalized counts, then the scaled trimmed mean of their
        squared deviations from it. Trim and scale are 1/3 and 2.04 below 3.5
@@ -607,9 +624,15 @@ outputs; they are marked *calibrated* below. Counts are samples × genes
      - **Flagging.** A gene is not flagged when three or more samples have
        larger counts than the sample with the largest distance.
 
-     These values equal those recovered from DESeq2's outputs to 1e-12, and the
-     option reproduces DESeq2's discoveries
+     These values equal those recovered from DESeq2's outputs to 1e-12, and
+     they reproduce DESeq2's discoveries
      ([BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01)).
+   - With `legacy_cooks: false`, α_rob is RapidGLM's own estimator, the default
+     before 1.2.0. It pools the squared scaled MADs of the normalized counts
+     within design cells of at least three samples (the ordinary variance if
+     there are none), converts the pooled variance v to (v − μ̄) / μ̄² and floors
+     that at 0.25 α_tr. With many small cells it gives smaller dispersions, so
+     larger distances and more flagged genes than DESeq2.
    - In cells with at least 7 replicates, counts above the cutoff become
      floor(s_i × the 20% trimmed mean of normalized counts). Such genes are
      re-estimated from step 3 with the trend and prior kept.

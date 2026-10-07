@@ -93,7 +93,7 @@ class CAPI(unittest.TestCase):
             (dict(coefficient=2, lfc_shrink="normal", threads=3), dict(coefficient=2, lfc_shrink="normal", threads=3)),
             (dict(contrast=[0, 1, -1]), dict(contrast=[0, 1, -1])),
             (dict(coefficients=[1, 2], test="lrt"), dict(coefficients=[1, 2], test="lrt")),
-            (dict(coefficient=2, legacy_cooks=True), dict(coefficient=2, legacy_cooks=True)),
+            (dict(coefficient=2, legacy_cooks=False), dict(coefficient=2, legacy_cooks=False)),
             (dict(test="lrt", size_factors="poscounts", trend="local", coefficient=2),
              dict(test="lrt", size_factors="poscounts", trend="local", coefficient=2)),
         ]
