@@ -1,5 +1,57 @@
 # Changelog
 
+## 1.2.0 (development release 1.2.0-dev.1, 2026-10-07)
+
+The code of 1.2.0 is complete and tagged `v1.2.0-dev.1` for testing. The
+engine, solver and bulk-validation receipts are from it. The application
+benchmark, Cook's-distance, Rust and SCEPTRE-agreement receipts, and the tables
+in README.md and docs/BENCHMARK.md, are still from earlier versions; they are
+replaced in the release.
+
+- `legacy_cooks` is now the default in bulk differential expression (CLI, C,
+  Python, R and the PyDESeq2-style API): Cook's distances use DESeq2's robust
+  dispersion as implemented in PyDESeq2 (MIT; Muzellec et al. 2023), with
+  PyDESeq2's flagging rule. Default discoveries then agree with DESeq2's on GTEx
+  thyroid at Jaccard 0.997 (128 samples) and 1.000 (647 samples), against 0.58
+  and 0.90 with RapidGLM's own estimator, which sets aside more genes in
+  designs with many small groups
+  ([docs/BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01)).
+  `legacy_cooks: false` selects that estimator and gives the tables of 1.1.0.
+  Genes flagged or replaced as Cook's outliers, and so some p-values and
+  adjusted p-values, change for designs with replicated cells.
+- In the Rust binding, `BulkOptions::legacy_cooks` is an `Option<bool>`; `None`
+  keeps the default.
+- Fits are faster, with estimates that agree with 1.1.0's to rounding
+  ([METHODS.md](METHODS.md)). A fixed-dispersion NB fit of 647 observations and
+  12 columns takes 132 to 151 microseconds on one core, against 245; `bulk-de`
+  on GTEx thyroid (647 samples, one thread) takes 21 s against 49 s, and 0.63 s
+  against 0.98 s on airway. The time went into work that the estimates did not
+  need:
+  - A further Newton step is no longer taken only to confirm convergence: the
+    last step's factor predicts it (the chord step), which is then applied as a
+    refinement. Fits report one iteration fewer.
+  - Likelihood terms that depend on the response alone used three long double
+    `lgamma` calls per count above 64; they now take one logarithm each, by
+    Stirling's series in a form without cancellation, and are more accurate
+    near the Poisson limit. The polygamma sums of dispersion estimation
+    likewise.
+  - The deviance that scales the convergence criterion, and the signature that
+    identifies a fit's response, are computed in a fraction of the time.
+  - Designs with at most half their entries nonzero (designs of factors) form
+    their cross-products from the nonzero entries of each row.
+  - Fits of many responses to one design share its cross-product, rank check
+    and row groups (`FitOptions::design`, from `prepare_design`); `fit_batch`,
+    `bulk_de`, score scans and the perturbation workflow do so.
+  - The rank check of the positive-count design is skipped when no count is
+    zero.
+- Results change in the last digits. Where a dispersion estimate lies on a flat
+  likelihood (genes close to Poisson), it can settle at another value. On
+  airway four gene-wise estimates move. The prior variance, a grid choice,
+  moves with them from 0.697 to 0.700, and the independent-filtering threshold
+  from 3.86 to 4.50 (DESeq2's value): 5,164 genes are discoveries against
+  5,142 (31 gained, 9 lost). On GTEx thyroid every column agrees to 3e-10
+  (relative).
+
 ## 1.1.0 (2026-10-06)
 
 - Small skew-normal p-values are confirmed on more draws by default

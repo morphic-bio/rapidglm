@@ -43,7 +43,8 @@ as_frame <- function(result, row_names = NULL) {
 #'   `c(variable, tested_level, reference_level)` for treatment-coded factors.
 #' @param coefficients several columns tested jointly (use `test = "lrt"`).
 #' @param legacy_cooks compute Cook's distances with DESeq2's robust dispersion as
-#'   implemented in PyDESeq2 (MIT; Muzellec et al. 2023); reproduces DESeq2's outlier flags.
+#'   implemented in PyDESeq2 (MIT; Muzellec et al. 2023), which reproduces DESeq2's
+#'   outlier flags (the default); `FALSE` uses RapidGLM's own estimator.
 #' @return A data frame per gene (baseMean, log2FoldChange, lfcSE, stat,
 #'   pvalue, padj, dispersions, Cook's distances, ...) with run-level values
 #'   (size factors, prior variances) in `attr(, "run")`.
@@ -51,7 +52,7 @@ bulk_de <- function(counts, design, col_data = NULL, coefficient = NULL, contras
                     coefficients = NULL, test = c("wald", "lrt"),
                     size_factors = c("ratio", "poscounts"), size_factor_values = NULL,
                     trend = c("parametric", "local", "mean"), lfc_shrink = c("none", "normal"),
-                    alpha = 0.1, cooks_filter = TRUE, legacy_cooks = FALSE, independent_filtering = TRUE,
+                    alpha = 0.1, cooks_filter = TRUE, legacy_cooks = TRUE, independent_filtering = TRUE,
                     min_replicates_for_replace = 7, min_mean = 0.5, outlier_sd = 2,
                     cooks_cutoff = 0, keep_minimum_start = TRUE, min_dispersion = 1e-8,
                     max_dispersion = 0, seed = 1, threads = 1) {

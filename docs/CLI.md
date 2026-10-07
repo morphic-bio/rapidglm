@@ -225,7 +225,7 @@ are rejected.
 | `keep_minimum_start` | Keep the 1e-8 floor for genes whose rough dispersion is at it, as DESeq2's output does (default true) |
 | `outlier_sd` | Dispersion outliers, above the trend by this many residual SDs, keep their gene-wise value (default 2) |
 | `cooks_filter`, `cooks_cutoff` | Flag Cook's outliers (default true); cutoff (default 0: the 0.99 quantile of F(p, m − p)) |
-| `legacy_cooks` | Compute Cook's distances with DESeq2's robust dispersion as implemented in PyDESeq2 (MIT; Muzellec et al. 2023), which reproduces DESeq2's outlier flags (default false: RapidGLM's estimator). Recorded as `cooks_dispersion` in the run record |
+| `legacy_cooks` | Compute Cook's distances with DESeq2's robust dispersion as implemented in PyDESeq2 (MIT; Muzellec et al. 2023), which reproduces DESeq2's outlier flags (default true from 1.2.0; false: RapidGLM's own estimator, which flags more genes in designs with many small groups). Recorded as `cooks_dispersion` in the run record |
 | `min_replicates_for_replace` | Replace outlier counts in design cells with at least this many samples, then refit (default 7; 0 disables) |
 | `independent_filtering`, `alpha` | Filter on the mean normalized count (default true); target FDR (default 0.1) |
 | `lfc_shrink` | `none` (default) or `normal`: also report the tested fold change under DESeq2's normal prior, as `lfcShrink(type = "normal")` does; tests are unchanged |

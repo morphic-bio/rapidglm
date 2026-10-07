@@ -45,8 +45,10 @@ struct BulkOptions {
     // PyDESeq2 (MIT; Muzellec et al. 2023): trimmed within-cell variances with
     // size-dependent trims and scales, their maximum over cells, a 0.04 floor, and
     // no flag when three or more samples have larger counts than the sample with
-    // the largest distance. Off: RapidGLM's pooled-MAD estimator (see METHODS.md).
-    bool legacy_cooks = false;
+    // the largest distance. The default from 1.2.0. Off: RapidGLM's pooled-MAD
+    // estimator (see METHODS.md), which flags more genes in designs with many
+    // small groups.
+    bool legacy_cooks = true;
     double cooks_cutoff = 0; // 0: the 0.99 quantile of F(p, m - p)
     // Samples whose design row has at least this many replicates get outlier
     // counts replaced by the trimmed mean and refitted (0 disables).
@@ -578,6 +580,7 @@ inline NbFixedFits nb_fixed_fits(const Matrix &design, const Matrix &counts,
                 "size factors must be positive");
         offset[i] = std::log(size_factors[i]);
     }
+    const auto summary = prepare_design(design);
     NbFixedFits out;
     out.coefficients = Matrix(genes, p, nan);
     out.fitted = Matrix(m, genes, nan);
@@ -599,6 +602,7 @@ inline NbFixedFits nb_fixed_fits(const Matrix &design, const Matrix &counts,
         fo.offset = offset;
         fo.tolerance = tolerance;
         fo.max_iterations = max_iterations;
+        fo.design = summary;
         const auto f = fit(design, y, fo);
         if (!f.ok() || f.coefficients.size() != p)
             return;
@@ -610,7 +614,8 @@ inline NbFixedFits nb_fixed_fits(const Matrix &design, const Matrix &counts,
             mu[i] = size_factors[i] * std::exp(eta[i]);
             w[i] = mu[i] / (1 + alpha * mu[i]);
         }
-        const detail::Cholesky information(detail::crossprod(design, w), 1e-12, false);
+        const detail::Cholesky information(detail::crossprod(design, w, &summary->nonzero), 1e-12,
+                                           false);
         if (!information.ok)
             return;
         const auto covariance = information.inverse();
@@ -648,6 +653,7 @@ nb_dispersions(const Matrix &design, const Matrix &counts, const Matrix &mu, con
     require(min_dispersion > 0 && max_dispersion > min_dispersion, "invalid dispersion bounds");
     Vector dispersion(genes, nan);
     std::vector<unsigned char> converged(genes, 0);
+    const detail::SparseRows nonzero(design);
     FitOptions options;
     options.theta_min = 1 / max_dispersion;
     options.theta_max = 1 / min_dispersion;
@@ -672,11 +678,12 @@ nb_dispersions(const Matrix &design, const Matrix &counts, const Matrix &mu, con
         }
         const Vector a(m, 1);
         const detail::CountTerms terms(y, a);
-        const bool cr = cox_reid && detail::cox_reid(design, means, a, 1 / s, false).ok;
+        const bool cr =
+            cox_reid && detail::cox_reid(design, means, a, 1 / s, false, nullptr, &nonzero).ok;
         detail::LogThetaPrior prior{-std::log(s), prior_variance};
         const double theta =
             detail::estimate_theta(y, means, a, 1 / s, options, terms, cr ? &design : nullptr,
-                                   prior_variance > 0 ? &prior : nullptr);
+                                   prior_variance > 0 ? &prior : nullptr, &nonzero);
         if (std::isfinite(theta) && theta > 0) {
             dispersion[j] = std::clamp(1 / theta, min_dispersion, max_dispersion);
             converged[j] = 1;
@@ -753,6 +760,9 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
     // Sparse genes with large dispersions approach coefficient boundaries about one
     // unit per iteration, so the fits allow 1000 iterations.
     constexpr std::size_t fit_iterations = 1000;
+    // Every gene is fitted to the same designs: their cross-products, rank checks
+    // and row groups are computed once.
+    const auto design_summary = prepare_design(design);
     // `start` receives the NB coefficients of fits without a boundary, which
     // warm-start the final fit.
     const auto initial_means = [&](const Vector &y, double rough, Vector &start) {
@@ -761,6 +771,7 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
         fo.dispersion = Dispersion::fixed;
         fo.theta = 1 / rough;
         fo.offset = offset;
+        fo.design = design_summary;
         auto f = fit(design, y, fo);
         if (f.ok() && !f.has_boundary())
             start = f.coefficients; // diverging starts can derail the final fit
@@ -802,9 +813,10 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
         }
         const Vector a(m, 1);
         const detail::CountTerms terms(y, a);
-        const bool cr = detail::cox_reid(design, mu, a, 1 / rough, false).ok;
+        const auto *nonzero = &design_summary->nonzero;
+        const bool cr = detail::cox_reid(design, mu, a, 1 / rough, false, nullptr, nonzero).ok;
         const double theta = detail::estimate_theta(y, mu, a, 1 / rough, dispersion_options, terms,
-                                                    cr ? &design : nullptr);
+                                                    cr ? &design : nullptr, nullptr, nonzero);
         g.dispersion_gene = std::clamp(1 / theta, min_disp, max_disp);
     };
     parallel_for(genes, o.threads, [&](auto j) {
@@ -931,16 +943,21 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
         hypothesis.df() == 1 ? Hypothesis::coefficient(p, tested.column) : hypothesis;
     // Designs fitted as given start the final fit from the initial NB fit.
     const bool warm_start = tested.x.values == design.values;
+    const auto tested_summary = prepare_design(tested.x);
+    const auto reduced_summary =
+        reduced.cols > 0 ? prepare_design(reduced) : std::shared_ptr<const detail::DesignSummary>();
     const auto finish = [&](std::size_t j, const Vector &y, const Vector &mu, const Vector &start) {
         auto &g = out.genes[j];
         const Vector a(m, 1);
         const detail::CountTerms terms(y, a);
         auto prior = base_prior;
         prior.center = -std::log(g.dispersion_trend);
-        const bool cr = detail::cox_reid(design, mu, a, 1 / g.dispersion_gene, false).ok;
+        const auto *nonzero = &design_summary->nonzero;
+        const bool cr =
+            detail::cox_reid(design, mu, a, 1 / g.dispersion_gene, false, nullptr, nonzero).ok;
         const double theta =
             detail::estimate_theta(y, mu, a, 1 / g.dispersion_trend, dispersion_options, terms,
-                                   cr ? &design : nullptr, &prior);
+                                   cr ? &design : nullptr, &prior, nonzero);
         g.dispersion_map = std::clamp(1 / theta, min_disp, max_disp);
         g.dispersion_outlier =
             std::log(g.dispersion_gene) > std::log(g.dispersion_trend) + o.outlier_sd * s_lr;
@@ -955,6 +972,8 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
         auto full_options = fo;
         if (warm_start && start.size() == p)
             full_options.start = start;
+        full_options.design = tested_summary;
+        fo.design = reduced_summary;
         auto full = fit(tested.x, y, full_options);
         if (!full.ok()) {
             g.status = std::string("fit_") + status_name(full.status);

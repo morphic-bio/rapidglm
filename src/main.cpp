@@ -281,7 +281,7 @@ int main(int argc, char **argv) {
             o.outlier_sd = config.get<double>("outlier_sd", 2);
             o.cooks_filter = config.get<bool>("cooks_filter", true);
             o.cooks_cutoff = config.get<double>("cooks_cutoff", 0);
-            o.legacy_cooks = config.get<bool>("legacy_cooks", false);
+            o.legacy_cooks = config.get<bool>("legacy_cooks", true);
             o.min_replicates_for_replace = config.get<std::size_t>("min_replicates_for_replace", 7);
             o.independent_filtering = config.get<bool>("independent_filtering", true);
             o.alpha = config.get<double>("alpha", 0.1);
@@ -618,7 +618,7 @@ int main(int argc, char **argv) {
             number("prior_variance", bulk.prior_variance);
             number("cooks_cutoff", bulk.cooks_cutoff);
             record << ",\n  \"cooks_dispersion\": \""
-                   << (config.get<bool>("legacy_cooks", false) ? "legacy_pydeseq2" : "rapidglm")
+                   << (config.get<bool>("legacy_cooks", true) ? "legacy_pydeseq2" : "rapidglm")
                    << "\"";
             number("filter_threshold", bulk.filter_threshold);
             number("filter_theta", bulk.filter_theta);

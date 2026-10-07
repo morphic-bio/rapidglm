@@ -1,8 +1,9 @@
 name: Release
 
-# Pushing a tag such as v1.1.0 builds and tests that commit, then publishes a
+# Pushing a tag such as v1.2.0 builds and tests that commit, then publishes a
 # GitHub release with the header-only library (headers and CMake package) and a
-# Linux x86_64 CLI build, plus the source archive.
+# Linux x86_64 CLI build, plus the source archive. A tag with a suffix, such as
+# v1.2.0-dev.1 or v1.2.0-rc.1, publishes a pre-release of that version.
 on:
   push:
     tags: ["v*"]
@@ -27,7 +28,7 @@ jobs:
       - name: Check the tag matches the project version
         run: |
           version=$(sed -n 's/^project(rapidglm VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
-          test "v$version" = "$GITHUB_REF_NAME" || {
+          test "v$version" = "${GITHUB_REF_NAME%%-*}" || {
             echo "tag $GITHUB_REF_NAME does not match CMake version $version"; exit 1; }
           header=$(sed -n 's/.*version = "\([0-9.]*\)".*/\1/p' include/rapidglm/rapidglm.hpp)
           test "$header" = "$version" || { echo "rapidglm.hpp version $header differs from CMake $version"; exit 1; }
@@ -53,7 +54,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/* --title "RapidGLM ${GITHUB_REF_NAME#v}" \
+          prerelease=
+          case "$GITHUB_REF_NAME" in *-*) prerelease=--prerelease ;; esac
+          gh release create "$GITHUB_REF_NAME" dist/* $prerelease --title "RapidGLM ${GITHUB_REF_NAME#v}" \
             --notes "Header-only C++ library, C interface library (librapidglm_c), CMake package and Linux x86_64 CLI, built on Ubuntu 24.04 against system LAPACKE and pthread OpenBLAS (run with OPENBLAS_NUM_THREADS=1). Changes: CHANGELOG.md. Benchmarks and documentation: README.md. Python and R packages and a Dockerfile are in the source archive."
 
   # Multi-arch container on ghcr.io, as for RapidMACS. Off until the public

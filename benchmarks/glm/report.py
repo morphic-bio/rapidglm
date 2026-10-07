@@ -146,12 +146,16 @@ def main(args):
         commit=subprocess.run(
             ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True
         ).stdout.strip(),
+        version=subprocess.run(
+            [str(ROOT / "build/rapidglm"), "--version"], capture_output=True, text=True
+        ).stdout.strip(),
         commands=[
             "python3 benchmarks/glm/problems.py validation/work/glm-compare/problems",
             "python3 benchmarks/glm/run_comparison.py validation/work/glm-compare/problems --reference --accuracy",
             "python3 benchmarks/glm/run_comparison.py validation/work/glm-compare/problems --speed --budget 15",
             "python3 benchmarks/glm/batch.py --output validation/work/glm-compare/batch.json",
-            "python3 benchmarks/glm/report.py validation/work/glm-compare/problems --output validation/GLM_COMPARISON.json",
+            "python3 benchmarks/glm/report.py validation/work/glm-compare/problems --batch "
+            "validation/work/glm-compare/batch.json --output validation/GLM_COMPARISON.json",
         ],
         reference="Damped Newton in IEEE binary128 (benchmarks/glm/reference.cpp); NB theta by profile bisection over [1e-6, 1e8].",
         accuracy_scope="Problems with a finite, identifiable MLE, excluding relative collinearity 1e-12 (aliased by R's threshold). Failure: error, missing identifiable coefficient, or coefficient error above 1e-3 reference standard errors.",
@@ -160,13 +164,14 @@ def main(args):
         speed_scope="Minimum over up to 7 repeats (15 s budget) of one fit on loaded in-memory data, one thread (OPENBLAS/OMP_NUM_THREADS=1), shared host. Tool defaults unless marked tight.",
         speed=speed,
         batch=batch,
-        engine_regression=engine_regression(),
         environment=dict(
             load_average=os.getloadavg(),
             host_threads=os.cpu_count(),
-            note="Shared host; load averages are recorded per timing in validation/work/glm-compare/speed*.log.",
+            note=args.note,
         ),
     )
+    if args.engine_regression:
+        receipt["engine_regression"] = engine_regression()
     args.output.write_text(json.dumps(receipt, indent=1, default=float) + "\n")
     # Markdown tables for the documentation.
     print(
@@ -238,4 +243,7 @@ if __name__ == "__main__":
     ap.add_argument("root", type=Path)
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--batch", type=Path)
+    ap.add_argument("--note", default="Shared host; the load average before each timing is in the speed log.")
+    ap.add_argument("--engine-regression", action="store_true",
+                    help="include the checks of the 2026-09-29 engine changes (validation/work/glm-compare/engine-check)")
     main(ap.parse_args())

@@ -6,6 +6,7 @@ the rapidglm R drop-ins, statsmodels GLM / NegativeBinomial and rapidglm.fit,
 and (NB) glmGamPoi::glm_gp run as a black box on the whole batch (ML
 overdispersion, no shrinkage, no Cox-Reid adjustment; best of three runs).
 Single-thread timings are sequential; thread counts apply only to RapidGLM.
+--cpus THREADS:LIST confines the runs at a thread count to those CPUs.
 """
 
 import argparse, json, os, subprocess, time
@@ -19,6 +20,7 @@ ENV = {
     "OMP_NUM_THREADS": "1",
     "PYTHONPATH": f"{ROOT / 'bindings/python'}:{ROOT / 'validation/local-data/python'}",
 }
+ALLOWED = os.sched_getaffinity(0)
 LIBS = f"{ROOT / 'validation/local-data/R_rapidglm'}:{ROOT / 'validation/local-data/R_library'}"
 GGP_LIBS = f"{ROOT / 'validation/local-data/R_glmgampoi'}:{ROOT / 'validation/local-data/R_library'}"
 GGP = r"""
@@ -40,6 +42,41 @@ write.table(cbind(fit$Beta, 1 / fit$overdispersions), file.path(args[1], "coef-g
             sep = "\t", row.names = FALSE, col.names = FALSE)
 cat(jsonlite::toJSON(list(seconds = best, version = as.character(packageVersion("glmGamPoi"))), auto_unbox = TRUE), "\n")
 """
+
+
+def cpu_list(text):
+    """THREADS:LIST, for example 16:0-15 or 1:4,5."""
+    threads, _, spec = text.partition(":")
+    cpus = set()
+    for part in spec.split(","):
+        first, _, last = part.partition("-")
+        cpus.update(range(int(first), int(last or first) + 1))
+    return int(threads), cpus
+
+
+def busy_seconds(cpus):
+    """Seconds the given CPUs have spent busy (all but idle and I/O wait), from /proc/stat."""
+    jiffies = 0
+    with open("/proc/stat") as f:
+        for line in f:
+            name, *values = line.split()
+            if name[:3] == "cpu" and name[3:].isdigit() and int(name[3:]) in cpus:
+                values = [int(v) for v in values]
+                jiffies += sum(values[:3]) + sum(values[5:8])
+    return jiffies / os.sysconf("SC_CLK_TCK")
+
+
+def confine(threads, args):
+    """Child processes and the loops below inherit this process's CPU affinity.
+    With --cpus, waits (up to 20 minutes) for other processes to leave those CPUs."""
+    cpus = dict(args.cpus).get(threads)
+    os.sched_setaffinity(0, cpus or ALLOWED)
+    start = time.time()
+    while cpus:
+        before = busy_seconds(cpus)
+        time.sleep(3)
+        if (busy_seconds(cpus) - before) / (3 * len(cpus)) < 0.2 or time.time() - start > 1200:
+            break
 
 
 def generate(d, n, m, seed=20260929):
@@ -101,6 +138,7 @@ def main(args):
     for family in ("poisson", "nb"):
         coefs = {}
         for threads in (1, 4, 16):
+            confine(threads, args)
             r = subprocess.run(
                 [
                     str(ROOT / "build/rapidglm_glm_batch"),
@@ -127,6 +165,7 @@ def main(args):
             )
             coefs["rapidglm"] = np.loadtxt(d / "coef.tsv")
             print(results[-1], flush=True)
+        confine(1, args)  # everything below runs on one thread
         for tool in (
             ["glm.fit", "rapidglm"] if family == "poisson" else ["glm.nb", "rapidglm"]
         ):
@@ -207,7 +246,18 @@ def main(args):
                 ):
                     r["max_rel_coef_diff_vs_R"] = float(np.nanmax(diff))
     (args.output).write_text(
-        json.dumps(dict(n=n, p=p, m=args.m, results=results), indent=1) + "\n"
+        json.dumps(
+            dict(
+                n=n,
+                p=p,
+                m=args.m,
+                cpus_allowed=sorted(ALLOWED),
+                cpus_by_threads={str(t): sorted(c) for t, c in args.cpus},
+                results=results,
+            ),
+            indent=1,
+        )
+        + "\n"
     )
 
 
@@ -217,6 +267,14 @@ if __name__ == "__main__":
         "--work", type=Path, default=ROOT / "validation/work/glm-compare/batch"
     )
     ap.add_argument("--output", type=Path, required=True)
+    ap.add_argument(
+        "--cpus",
+        type=cpu_list,
+        nargs="*",
+        default=[],
+        metavar="THREADS:LIST",
+        help="CPUs for the runs at a thread count, e.g. 1:4-5 4:0-7 (default: all allowed)",
+    )
     ap.add_argument("--n", type=int, default=5000)
     ap.add_argument("--m", type=int, default=1000)
     main(ap.parse_args())

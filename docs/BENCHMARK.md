@@ -9,7 +9,33 @@ Driver: `scripts/benchmark_applications.py`. Data preparation:
 `scripts/prepare_benchmark_data.py`. The receipt, with timings, host load and
 agreement, is written wherever `--output` points. Final numbers need a quiet
 host: runs whose 1-minute load exceeds a quarter of the cores are marked
-`contended`.
+`contended`. With `--cpus THREADS:LIST` the runs at a thread count are confined
+to the listed CPUs. Each run then waits until other processes use less than a
+fifth of those CPUs, records the share others used while it ran (`others_cpu`),
+and is marked `contended` when that share exceeds a fifth.
+
+## Host
+
+The engine and solver results in [GLM_COMPARISON.md](GLM_COMPARISON.md) and
+[SOLVERS.md](SOLVERS.md) were measured on one workstation (Intel Core
+i9-13900KF, 125 GiB) with version 1.2.0. The application results below are
+older (version 0.2.0, another host) and are being re-measured on this host.
+
+- **Cores.** The processor has eight performance cores and sixteen efficiency
+  cores. Four logical CPUs, on two performance cores, were offline after
+  processor faults. Every timed run was therefore confined to efficiency cores,
+  which are identical, with one thread per core: one thread on CPU 16, four on
+  16–19, eight on 16–23 and sixteen on 16–31.
+- **Core type.** Times on an efficiency core are about 1.5 to 1.9 times those
+  on a performance core, and the factor differs between tools. The solver
+  receipt repeats three runs on a performance core
+  ([SOLVERS.md](SOLVERS.md#results)).
+- **Other load.** Timed runs held a lock, one at a time. Desktop services and
+  a RAID consistency check kept every CPU about 7% busy. Another session ran
+  untimed jobs on CPUs 20–31 at times; the receipts record `others_cpu` for
+  every run on those CPUs.
+- **Provisional.** The timings will be repeated when the processor is
+  repaired. Agreement with the reference tools does not depend on the host.
 
 ## Datasets
 
@@ -64,6 +90,11 @@ Perturbation:
 - `rapidglm-cli`: `sceptre`, the whole process.
 - `rapidglm-python`: `rapidglm.sceptre`, the call only.
 - `rapidglm-r`: `rapidglm::sceptre` in R, the call only.
+- `rapidglm-cli-ks`, `rapidglm-python-ks`, `rapidglm-r-ks`: the same three
+  with `fit_check = "ks"`, which accepts the skew-normal fit as SCEPTRE does.
+  These are the like-for-like runs. The plain names run RapidGLM's defaults:
+  the stricter check, with confirmation draws
+  ([CLI.md](CLI.md#perturbation-workflow)).
 - `sceptre`: SCEPTRE 0.99.0, the sum of `run_calibration_check`,
   `run_power_check` and `run_discovery_analysis`, using `parallel = TRUE` at 8
   threads.
@@ -78,6 +109,12 @@ pairs: the Jaccard index of BH discoveries at 0.1 and the Spearman correlation
 of p-values.
 
 ## Results (2026-10-01, quiet host)
+
+These are from version 0.2.0. Since then the fits have become faster (1.2.0),
+the default Cook's distances have changed (1.2.0: `legacy_cooks`, which gives
+Jaccard 0.997 and 1.000 with DESeq2 on the 128- and 647-sample sets in place
+of 0.579 and 0.904), and the perturbation workflow accepts skew-normal
+p-values by a stricter check (1.0.0, 1.1.0).
 
 Receipts:
 - [validation/APPLICATIONS_BULK.json](../validation/APPLICATIONS_BULK.json):

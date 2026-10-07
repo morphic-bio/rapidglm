@@ -12,14 +12,19 @@
 //
 // Every gene sees identical data, offsets and dispersions (from bulk_de, not
 // timed); every answer is scored by the same log likelihood. External solvers
-// start from the intercept-only fit; RapidGLM uses its own start. Results: per
+// start from the intercept-only fit; RapidGLM uses its own start. RapidGLM is
+// timed two ways: rapidglm_newton shares among the genes what a fit derives from
+// the design alone (prepare_design: X'X, its rank check and the rows' nonzero
+// entries, computed once and not timed), as fit_batch and bulk_de do;
+// rapidglm_newton_plain calls fit() for each gene on its own. The last argument
+// chooses one of them or both. Results: per
 // method and tolerance setting, wall time, iterations, solver-reported
 // convergence and the log-likelihood shortfall from the best answer per gene,
 // separately for genes whose MLE is finite and for those RapidGLM reports at a
 // coefficient boundary (diverging estimates, e.g. an all-zero group).
 //
 // Usage: rapidglm_solver_benchmark <dir with x.tsv and counts.mtx> <fixed|joint>
-//        [threads] [max_genes] > result.json
+//        [threads] [max_genes (0: all)] [shared|plain|both (default)] > result.json
 #include "io.hpp"
 #include <rapidglm/rapidglm.hpp>
 
@@ -44,6 +49,9 @@ struct Problem {
     const Matrix *x;
     Vector y, offset;
     double theta; // fixed problems
+    // The design-only part of RapidGLM's fits (prepare_design, not timed), shared
+    // by every gene as in fit_batch and bulk_de.
+    std::shared_ptr<const detail::DesignSummary> design;
 };
 
 // lgamma(y + theta) - lgamma(theta) and digamma(y + theta) - digamma(theta). The
@@ -194,7 +202,7 @@ struct Tolerances {
 const Tolerances defaults{"ceres_default", 1e-6, 1e-10, 1e-8};
 const Tolerances tight{"tight", 1e-12, 1e-12, 1e-10};
 
-Outcome rapidglm_fit(const Problem &q, bool joint) {
+Outcome rapidglm_fit(const Problem &q, bool joint, bool shared) {
     Outcome out;
     const auto t = Clock::now();
     FitOptions fo;
@@ -203,6 +211,8 @@ Outcome rapidglm_fit(const Problem &q, bool joint) {
     fo.theta = joint ? 10 : q.theta;
     fo.offset = q.offset;
     fo.max_iterations = 1000;
+    if (shared)
+        fo.design = q.design;
     const auto f = fit(*q.x, q.y, fo);
     out.seconds = since(t);
     out.converged = f.ok();
@@ -284,12 +294,18 @@ double sample_quantile(Vector v, double p) {
 
 int main(int argc, char **argv) {
     if (argc < 3) {
-        std::cerr << "usage: rapidglm_solver_benchmark <dir> <fixed|joint> [threads] [max_genes]\n";
+        std::cerr << "usage: rapidglm_solver_benchmark <dir> <fixed|joint> [threads] [max_genes] "
+                     "[shared|plain|both]\n";
         return 2;
     }
     const std::string dir = argv[1], mode = argv[2];
     const int threads = argc > 3 ? std::atoi(argv[3]) : 1;
     const std::size_t max_genes = argc > 4 ? std::stoul(argv[4]) : 0;
+    const std::string design = argc > 5 ? argv[5] : "both";
+    if (design != "shared" && design != "plain" && design != "both") {
+        std::cerr << "the last argument must be shared, plain or both\n";
+        return 2;
+    }
     const bool joint = mode == "joint";
     const Matrix x = cli::read_matrix(dir + "/x.tsv");
     auto counts = cli::read_market(dir + "/counts.mtx"); // features x samples (CLI layout)
@@ -308,6 +324,7 @@ int main(int argc, char **argv) {
         bulk = bulk_de(x, counts, bo);
     }
     std::vector<Problem> problems;
+    const auto summary = prepare_design(x);
     Vector offset(x.rows);
     for (std::size_t i = 0; i < x.rows; ++i)
         offset[i] = std::log(bulk.size_factors[i]);
@@ -315,15 +332,20 @@ int main(int argc, char **argv) {
         const auto &g = bulk.genes[j];
         if (g.status == "all_zero" || !(g.dispersion > 0))
             continue;
-        problems.push_back({&x, counts.column(j), offset, 1 / g.dispersion});
+        problems.push_back({&x, counts.column(j), offset, 1 / g.dispersion, summary});
     }
     const double setup_seconds = since(t_setup);
     struct Method {
         std::string name;
         std::function<Outcome(const Problem &)> run;
     };
-    std::vector<Method> methods = {
-        {"rapidglm_newton", [&](const Problem &q) { return rapidglm_fit(q, joint); }}};
+    std::vector<Method> methods;
+    if (design != "plain")
+        methods.push_back(
+            {"rapidglm_newton", [&](const Problem &q) { return rapidglm_fit(q, joint, true); }});
+    if (design != "shared")
+        methods.push_back({"rapidglm_newton_plain",
+                           [&](const Problem &q) { return rapidglm_fit(q, joint, false); }});
     for (const auto *tol : {&defaults, &tight}) {
         const std::string suffix = std::string("/") + tol->name;
         if (!joint) {

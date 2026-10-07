@@ -28,7 +28,8 @@ perturbation workflow has become faster ([CHANGELOG.md](CHANGELOG.md)), and
 from 1.0.0 it accepts skew-normal p-values by a stricter check, with
 confirmation draws from 1.1.0; the SCEPTRE rows correspond to
 `fit_check: "ks"`
-([docs/CLI.md](docs/CLI.md#perturbation-workflow)).
+([docs/CLI.md](docs/CLI.md#perturbation-workflow)). Fits are faster from 1.2.0;
+the table is being re-measured with that version.
 
 | Analysis | Reference (1 / 8) | RapidGLM (1 / 8) | Speed-up (1 thread) | Jaccard |
 |---|---|---|---:|---:|
@@ -38,20 +39,22 @@ confirmation draws from 1.1.0; the SCEPTRE rows correspond to
 | SCEPTRE 0.99.0, Gasperini screen (50,000 cells) | 851 / 141 | 258 / 38.3 | 3.3× | 0.83 |
 | SCEPTRE, Gasperini screen (207,324 cells) | – / 896 | – / 274 | 3.3× (8 threads) | 0.92 |
 
-\*With `legacy_cooks`, which computes Cook's distances with DESeq2's robust
-dispersion as implemented in PyDESeq2 (MIT; Muzellec et al. 2023). By default
-RapidGLM uses its own estimator, which flags more genes in designs with many
-small groups ([docs/BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01)).
+\*With `legacy_cooks`, the default from 1.2.0, which computes Cook's distances
+with DESeq2's robust dispersion as implemented in PyDESeq2 (MIT; Muzellec et
+al. 2023). The first figure is for RapidGLM's own estimator
+(`legacy_cooks: false`), the default when the table was measured; it flags more
+genes in designs with many small groups
+([docs/BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01)).
 
 **Engine:**
 - *Accuracy.* All 39 identifiable problems from a binary128-referenced suite
-  are fitted, with coefficient errors of at most 1.6e-5 standard errors.
-- *Single fits.* Median speed-up over R `glm.fit` 5.2×, statsmodels 9.5× and
-  fastglm 2.7× (one thread, n ≥ 1e5;
+  are fitted, with coefficient errors of at most 6.6e-7 standard errors.
+- *Single fits.* Median speed-up over R `glm.fit` 5.5×, statsmodels 8.5× and
+  fastglm 3.6× (one thread, n ≥ 1e5;
   [docs/GLM_COMPARISON.md](docs/GLM_COMPARISON.md)).
 - *Solvers.* Against Ceres Solver on identical problems, the safeguarded Newton
-  solvers are 1.2–1.6× faster than Levenberg–Marquardt (fixed dispersion) and
-  1.3–3.8× faster than BFGS (estimated dispersion), at equal or better accuracy
+  solvers are 2.1–2.7× faster than Levenberg–Marquardt (fixed dispersion) and
+  1.7–5.7× faster than BFGS (estimated dispersion), at equal or better accuracy
   ([docs/SOLVERS.md](docs/SOLVERS.md)).
 - *Validation datasets.* Bulk DE agrees with DESeq2 at Jaccard 0.93–1.00 on
   five datasets ([docs/BULK_DE.md](docs/BULK_DE.md)). Perturbation analysis

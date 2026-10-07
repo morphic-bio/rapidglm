@@ -1,7 +1,7 @@
 # Timing of the RapidGLM R package (bulk_de, sceptre) for
 # scripts/benchmark_applications.py. Timed: the call only; loading is not timed.
 # Usage: rapidglm_r_timing.R bulk dataset_dir coefficient_index(0-based) threads out_dir libs
-#        rapidglm_r_timing.R sceptre panel_dir threads out_dir libs
+#        rapidglm_r_timing.R sceptre panel_dir threads out_dir fit_check libs
 args <- commandArgs(TRUE)
 mode <- args[1]
 .libPaths(c(normalizePath(strsplit(args[length(args)], ":")[[1]]), .libPaths()))
@@ -16,7 +16,7 @@ if (mode == "bulk") {
   seconds <- proc.time()[["elapsed"]] - t0
   table <- data.frame(pvalue = r$pvalue, padj = r$padj)
 } else {
-  threads <- as.integer(args[3]); out <- args[4]
+  threads <- as.integer(args[3]); out <- args[4]; fit_check <- args[5]
   responses <- readMM(file.path(dir, "responses.mtx"))  # genes x cells
   calls <- readMM(file.path(dir, "assignments.mtx"))
   x <- as.matrix(read.delim(file.path(dir, "design.tsv"), header = FALSE))
@@ -25,7 +25,7 @@ if (mode == "bulk") {
   pairs$response <- pairs$response + 1
   t0 <- proc.time()[["elapsed"]]
   table <- sceptre(responses, calls, x, guides, pairs, moi = "high", cell_qc = FALSE, seed = 20260930,
-                   threads = threads)
+                   fit_check = fit_check, threads = threads)
   seconds <- proc.time()[["elapsed"]] - t0
   table$response <- table$response - 1
   table$kind <- match(table$kind, c("discovery", "negative", "positive")) - 1

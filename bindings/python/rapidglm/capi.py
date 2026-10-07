@@ -455,7 +455,7 @@ def bulk_de(design, counts, coefficient=None, contrast=None, coefficients=None, 
             size_factors="ratio", size_factor_values=None, trend="parametric", min_mean=None,
             keep_minimum_start=None, outlier_sd=None, cooks_filter=None, cooks_cutoff=None,
             min_replicates_for_replace=None, independent_filtering=None, alpha=None,
-            lfc_shrink="none", min_dispersion=None, max_dispersion=None, legacy_cooks=False, seed=None,
+            lfc_shrink="none", min_dispersion=None, max_dispersion=None, legacy_cooks=True, seed=None,
             threads=1):
     """Bulk differential expression by the DESeq2 procedure; counts are
     samples x genes. Tests the last design column unless ``coefficient``
@@ -467,9 +467,11 @@ def bulk_de(design, counts, coefficient=None, contrast=None, coefficients=None, 
     log2FoldChangeShrunk, lfcSEShrunk. ``attrs`` holds size_factors,
     prior_variance and the other run-level values.
 
-    ``legacy_cooks=True`` computes Cook's distances with DESeq2's robust
-    dispersion as implemented in PyDESeq2 (MIT; Muzellec et al. 2023), which
-    reproduces DESeq2's outlier flags; the default is RapidGLM's estimator."""
+    ``legacy_cooks`` (the default) computes Cook's distances with DESeq2's
+    robust dispersion as implemented in PyDESeq2 (MIT; Muzellec et al. 2023),
+    which reproduces DESeq2's outlier flags; ``legacy_cooks=False`` uses
+    RapidGLM's own estimator, which flags more genes in designs with many small
+    groups."""
     lib = _library()
     x, xa = _dense(design)
     y, ya = _sparse(counts, "counts")

@@ -118,6 +118,8 @@ inline std::vector<ScanResult> score_scan(const Matrix &design, const SparseCSC 
     std::vector<FitResult> starts(o.effect_fits == EffectFits::significant ? pairs.size() : 0);
     auto options = o.model;
     options.retain_observations = true;
+    if (options.weights.empty())
+        options.design = prepare_design(design, options.rank_tolerance);
     const bool direct = o.null_model == FitMethod::direct;
     parallel_for(batches.size(), o.threads, [&](auto b) {
         const auto &batch = batches[b];

@@ -165,6 +165,8 @@ inline QuasiLikelihoodResult quasi_likelihood_tests(const Matrix &design,
     auto dispersion_options = options;
     dispersion_options.cox_reid = true;
     dispersion_options.retain_observations = true;
+    if (dispersion_options.weights.empty())
+        dispersion_options.design = prepare_design(design, dispersion_options.rank_tolerance);
     parallel_for(m, threads, [&](auto j) {
         auto f = fit(design, responses.column(j), dispersion_options);
         auto &q = out.features[j];
@@ -937,6 +939,8 @@ sceptre_nulls(const Matrix &design, const Responses &responses, const SparseCSC 
     options.offset = subset(o.model.offset, setup.cells);
     options.weights = subset(o.model.weights, setup.cells);
     options.retain_observations = true;
+    if (options.weights.empty())
+        options.design = prepare_design(x, options.rank_tolerance);
     std::vector<FitResult> nulls(responses.cols);
     for (auto j : which)
         require(j < responses.cols, "unknown response");
@@ -1032,6 +1036,8 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     common_options.offset = subset(o.model.offset, cells);
     common_options.weights = subset(o.model.weights, cells);
     common_options.retain_observations = true;
+    if (common_options.weights.empty())
+        common_options.design = prepare_design(common_design, common_options.rank_tolerance);
     // The target's treated cells, built on first use.
     auto membership = [&](const detail::SceptreTask &task) -> TargetContext & {
         auto &target = *target_contexts[task.target_context];

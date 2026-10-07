@@ -13,6 +13,10 @@ Prints, per result column, the largest relative difference and the numbers of
 genes differing by more than 1e-6 and 1e-3, and the agreement of calls at
 padj < 0.05. Most differences of 1e-6 come from the dispersion trend, which
 PyDESeq2 fits with L-BFGS-B to a looser tolerance.
+
+--deseq2 TABLE adds the genes each tool drops as Cook's outliers, against R
+DESeq2 run as a black box on the same design (TABLE: its baseMean and pvalue
+per gene, in the same gene order).
 """
 
 import argparse
@@ -68,11 +72,36 @@ def rust(data, contrast, workdir):
     return pd.read_csv(path / "results.tsv", sep="\t"), seconds, run.stderr.strip()
 
 
+def cooks_outliers(ours, ref, dds, deseq2):
+    """Genes whose p-value is dropped as a Cook's outlier (missing, with baseMean > 0)."""
+    def dropped(table):
+        return set(np.flatnonzero(table["pvalue"].isna().to_numpy() & (table["baseMean"].to_numpy() > 0)))
+
+    def jaccard(a, b):
+        return len(a & b) / max(len(a | b), 1)
+
+    r, p, d = dropped(ours), dropped(ref), dropped(deseq2)
+    # Samples alone in their design cell have leverage 1.
+    design = dds.obsm["design_matrix"]
+    cells = design.value_counts()
+    single = np.array([cells[tuple(row)] == 1 for row in design.to_numpy()])
+    cooks = np.asarray(dds.layers["cooks"])
+    largest = np.argmax(np.where(np.isnan(cooks), -np.inf, cooks), axis=0)
+    differ = np.array(sorted(r ^ p), dtype=int)
+    return {"deseq2": len(d), "rust": len(r), "pydeseq2_rapidglm": len(p),
+            "jaccard_rust_deseq2": round(jaccard(r, d), 3), "jaccard_pydeseq2_deseq2": round(jaccard(p, d), 3),
+            "leverage_one_samples": int(single.sum()),
+            "pydeseq2_infinite_distances": int(np.isinf(cooks).sum()),
+            "mismatched_genes": {"total": len(differ), "rust_only": len(r - p), "pydeseq2_only": len(p - r),
+                                 "pydeseq2_max_at_leverage_one_sample": int(single[largest[differ]].sum())}}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("data", type=pathlib.Path)
     parser.add_argument("--threads", type=int, default=8)
     parser.add_argument("--json", type=pathlib.Path)
+    parser.add_argument("--deseq2", type=pathlib.Path)
     args = parser.parse_args()
     ref, dds, py_seconds, contrast = pydeseq2(args.data, args.threads)
     with tempfile.TemporaryDirectory() as workdir:
@@ -91,6 +120,8 @@ def main():
     a, b = set(np.flatnonzero(ours.padj < 0.05)), set(np.flatnonzero(ref.padj < 0.05))
     report["calls"] = {"rust": len(a), "pydeseq2": len(b), "both": len(a & b),
                        "jaccard": len(a & b) / max(len(a | b), 1)}
+    if args.deseq2:
+        report["cooks_outliers"] = cooks_outliers(ours, ref, dds, pd.read_csv(args.deseq2, sep="\t"))
     print(json.dumps(report, indent=1))
     if args.json:
         args.json.write_text(json.dumps(report, indent=1) + "\n")

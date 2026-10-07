@@ -21,8 +21,8 @@
 | Bioconductor airway 1.28.0 | bulk DE validation data | LGPL | validation only; data not committed |
 
 PyDESeq2 provenance: with the author's approval (2026-10-01), the robust
-dispersion behind `legacy_cooks` follows PyDESeq2's implementation
-(`pydeseq2/utils.py`, functions `robust_method_of_moments_disp`,
+dispersion behind `legacy_cooks` (the default from 1.2.0) follows PyDESeq2's
+implementation (`pydeseq2/utils.py`, functions `robust_method_of_moments_disp`,
 `trimmed_cell_variance`, `trimmed_variance` and `trimmed_mean`; flagging rule in
 `DeseqDataSet.cooks_outlier`). It is reimplemented in C++ as
 `detail::legacy_cooks_dispersion` in `include/rapidglm/bulk.hpp`. Cite Muzellec
