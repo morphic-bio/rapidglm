@@ -1,6 +1,6 @@
 {
  "purpose": "Accuracy, stability and single-thread speed of RapidGLM against the standard R and Python GLM fitters, and its drop-in interfaces.",
- "commit": "be60928fc0375f31dbf479184610296144f6a484",
+ "commit": "4446d4249011fa120299376732deec5bb1522409",
  "version": "1.2.0",
  "commands": [
   "python3 benchmarks/glm/problems.py validation/work/glm-compare/problems",
@@ -6147,11 +6147,11 @@
  },
  "environment": {
   "load_average": [
-   3.31396484375,
-   3.1708984375,
-   3.1640625
+   6.076171875,
+   8.19775390625,
+   13.34814453125
   ],
   "host_threads": 28,
-  "note": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-06. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired. The load average before each timing is in the speed log."
+  "note": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-06 and 2026-10-07. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired. The load average before each timing is in the speed log."
  }
 }

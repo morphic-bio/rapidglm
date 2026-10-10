@@ -17,11 +17,13 @@ import ctypes
 import ctypes.util
 import os
 import pathlib
+from collections.abc import Mapping
 
 import numpy as np
 import pandas as pd
 
-__all__ = ["bulk_de", "bulk_adjust", "nb_fixed_fits", "nb_dispersions", "sceptre", "scan", "fit_batch", "library_version"]
+__all__ = ["bulk_de", "bulk_adjust", "nb_fixed_fits", "nb_dispersions", "sceptre", "sceptre_grid", "scan",
+           "fit_batch", "library_version"]
 
 _size = ctypes.c_size_t
 _double_p = ctypes.POINTER(ctypes.c_double)
@@ -119,6 +121,10 @@ class _SceptreOptions(ctypes.Structure):
         ("crt_draw", ctypes.c_int),
         ("fit_check", ctypes.c_int),
         ("confirm_draws", _size),
+        ("stream_keys", ctypes.c_int),
+        ("response_ids", _text_p),
+        ("family", ctypes.c_int),
+        ("family_size", _size * 3),
     ]
 
 
@@ -162,6 +168,8 @@ _CRT_DRAWS = {"thinned": 0, "direct": 1, "hazard": 2}
 _FIT_CHECKS = {"strict": 0, "ks": 1}
 _APPROXIMATIONS = {"skew_normal": 1, "no_approximation": 0}
 _ADJUSTMENTS = {"BH": 0, "bonferroni": 1}
+_STREAM_KEYS = {"identity": 0, "position": 1}
+_ADJUSTMENT_FAMILIES = {"tested": 0, "listed": 1}
 
 
 def _choice(name, value, choices):
@@ -271,6 +279,31 @@ def _library():
                 _text_p,
                 _int_p,
                 ctypes.POINTER(_SceptreOptions),
+                ctypes.POINTER(table_p),
+            ],
+        ),
+        "rapidglm_sceptre_grid": (
+            ctypes.c_int,
+            [
+                ctypes.POINTER(_Dense),
+                ctypes.POINTER(_Sparse),
+                ctypes.POINTER(_Sparse),
+                _size,
+                _text_p,
+                _text_p,
+                _int_p,
+                _size,
+                _text_p,
+                _size,
+                _text_p,
+                _size,
+                _size_p,
+                _size,
+                _size_p,
+                _text_p,
+                _int_p,
+                ctypes.POINTER(_SceptreOptions),
+                ctypes.POINTER(table_p),
                 ctypes.POINTER(table_p),
             ],
         ),
@@ -387,16 +420,20 @@ def _fit_options(o, n, family, dispersion, theta, tolerance, ridge, max_iteratio
     return keep
 
 
-def _call(function, *args):
-    table = ctypes.c_void_p()
-    status = function(*args, ctypes.byref(table))
+def _call(function, *args, tables=1):
+    """Call a C function whose last `tables` arguments receive result tables;
+    returns the frame, or the list of frames when there are several."""
+    results = [ctypes.c_void_p() for _ in range(tables)]
+    status = function(*args, *(ctypes.byref(table) for table in results))
     if status != 0:
         message = _library().rapidglm_last_error().decode()
         raise (ValueError if status == 1 else RuntimeError)(message)
     try:
-        return _frame(table)
+        frames = [_frame(table) for table in results]
     finally:
-        _library().rapidglm_table_free(table)
+        for table in results:
+            _library().rapidglm_table_free(table)
+    return frames[0] if tables == 1 else frames
 
 
 def _frame(table):
@@ -597,6 +634,24 @@ def _budgets(o, budgets):
     return a
 
 
+def _family_size(o, family_size):
+    """family_size: a mapping by pair kind, or the three sizes in the order
+    discovery, negative, positive."""
+    if family_size is None:
+        return
+    if isinstance(family_size, Mapping):
+        unknown = [k for k in family_size if k not in _PAIR_KINDS]
+        if unknown:
+            raise ValueError(f"family_size kinds must be {'/'.join(_PAIR_KINDS)}, not {unknown[0]!r}")
+        sizes = [family_size.get(kind, 0) for kind in _PAIR_KINDS]
+    else:
+        sizes = list(family_size)
+        if len(sizes) != 3:
+            raise ValueError("family_size needs three sizes: discovery, negative, positive")
+    for k, size in enumerate(sizes):
+        o.family_size[k] = int(size)
+
+
 def sceptre(design, responses, assignments, guides, pairs, moi="low", control_group=None,
             resampling_mechanism=None, integration="union", side="both",
             approximation="skew_normal", budgets=None, screen=None, null_model="sceptre",
@@ -605,7 +660,8 @@ def sceptre(design, responses, assignments, guides, pairs, moi="low", control_gr
             min_nonzero=None, alpha=None, qc_lower=None, qc_upper=None, max_mito=None,
             qc_total=None, qc_detected=None, qc_mito=None, adjustment="BH", family="nb",
             dispersion="ml", theta=None, tolerance=None, max_iterations=None, offset=None,
-            seed=1, threads=1):
+            seed=1, threads=1, stream_keys="identity", response_ids=None,
+            adjustment_family="tested", family_size=None, *, _grid=None):
     """Perturbation screen analysis by the SCEPTRE method.
 
     responses: cells x genes; assignments: cells x guides (binary calls).
@@ -619,10 +675,32 @@ def sceptre(design, responses, assignments, guides, pairs, moi="low", control_gr
     the default budgets; 0 turns the confirmation off);
     "ks" is the check of releases before 1.0.0.
 
+    stream_keys: what a pair's random stream is keyed by. "identity"
+    (default): the seed, the response and the target (the guide for a
+    per-guide test), so a pair's record is the same wherever it is listed and
+    with whatever other pairs; a pair may then be listed once within a kind.
+    "position": the pair's place in the list (releases before 1.3.0).
+    response_ids: with identity keys, one ID per response column (distinct
+    strings that stay with the response, such as gene names) to identify the
+    responses by; None: their column indices.
+
+    adjustment_family: the family within which p-values of a kind are
+    adjusted. "tested" (default): the pairs that pass pair QC; the other
+    pairs have no adjusted p-value (NaN). "listed": every listed pair, those
+    that fail pair QC counting with p = 1 (releases before 1.3.0).
+    family_size: the number of hypotheses in each kind's family when it is
+    larger than the pairs at hand (the pairs not listed count with p = 1): a
+    mapping by kind, such as {"discovery": 20000}, or the three sizes in the
+    order discovery, negative, positive; None or 0: the pairs at hand.
+
     Columns: response, target, guide, kind, status, cells, nonzero_treatment,
     nonzero_control, draws, approximation, statistic, p_value, adjusted_p,
     log2fc, log2fc_se, sceptre_mean_ratio, mean_ratio_log2. ``attrs`` holds
-    retained_cells and the rejection counts."""
+    retained_cells, the rejection counts, null_fits (null models fitted) and,
+    by kind, pairs_listed_<kind>, pairs_passing_qc_<kind> and
+    family_size_<kind> (the size of the adjustment family)."""
+    # _grid: (discovery targets, negative targets, grid responses) from
+    # sceptre_grid(), which then also gets the tally.
     lib = _library()
     high = _choice("moi", moi, {"low": 0, "high": 1})
     x, xa = _dense(design)
@@ -637,10 +715,15 @@ def sceptre(design, responses, assignments, guides, pairs, moi="low", control_gr
     if len(guides) != g.cols:
         raise ValueError(f"{len(guides)} guides for {g.cols} assignment columns")
     names = _feature_names(responses)
-    response = pairs["response"]
-    if names is not None and not pd.api.types.is_integer_dtype(response):
-        position = {n: i for i, n in enumerate(names)}
-        response = [position[r] for r in response]
+
+    def columns_of(response):
+        """Response columns given by index, or by name with DataFrame responses."""
+        if names is not None and not pd.api.types.is_integer_dtype(response):
+            position = {n: i for i, n in enumerate(names)}
+            return [position[r] for r in response]
+        return response
+
+    response = columns_of(pairs["response"])
     ids, ids_keep = _texts(guides["id"])
     targets, targets_keep = _texts(guides["target"])
     nt = np.ascontiguousarray(np.asarray(guides["non_targeting"]).astype(np.intc))
@@ -681,24 +764,72 @@ def sceptre(design, responses, assignments, guides, pairs, moi="low", control_gr
     o.bonferroni = _choice("adjustment", adjustment, _ADJUSTMENTS)
     o.seed = int(seed)
     o.threads = int(threads)
-    frame = _call(
-        lib.rapidglm_sceptre,
-        ctypes.byref(x),
-        ctypes.byref(y),
-        ctypes.byref(g),
-        g.cols,
-        ids,
-        targets,
-        nt.ctypes.data_as(_int_p),
-        len(pairs),
-        pair_responses,
-        pair_targets,
-        kinds.ctypes.data_as(_int_p),
-        ctypes.byref(o),
-    )
+    o.stream_keys = _choice("stream_keys", stream_keys, _STREAM_KEYS)
+    if response_ids is not None:
+        response_ids = list(response_ids)
+        if len(response_ids) != y.cols:
+            raise ValueError(f"response_ids needs {y.cols} IDs, got {len(response_ids)}")
+        o.response_ids, a = _texts(response_ids)
+        keep.append(a)
+    o.family = _choice("adjustment_family", adjustment_family, _ADJUSTMENT_FAMILIES)
+    _family_size(o, family_size)
+    inputs = (ctypes.byref(x), ctypes.byref(y), ctypes.byref(g), g.cols, ids, targets,
+              nt.ctypes.data_as(_int_p))
+    listed = (len(pairs), pair_responses, pair_targets, kinds.ctypes.data_as(_int_p), ctypes.byref(o))
+    kind_names = list(_PAIR_KINDS)
+    tally = None
+    if _grid is None:
+        frame = _call(lib.rapidglm_sceptre, *inputs, *listed)
+    else:
+        discovery, discovery_keep = _texts(_grid[0])
+        negative, negative_keep = _texts(_grid[1])
+        columns = None if _grid[2] is None else list(_grid[2])
+        if columns is not None and not columns:
+            raise ValueError("grid_responses is empty; None requests every response")
+        grid_responses, gr = _sizes(None if columns is None else columns_of(pd.Series(columns)),
+                                    name="grid responses")
+        frame, tally = _call(lib.rapidglm_sceptre_grid, *inputs, len(discovery_keep), discovery,
+                             len(negative_keep), negative, 0 if gr is None else gr.size, grid_responses,
+                             *listed, tables=2)
+        del discovery_keep, negative_keep, gr
+        tally["kind"] = [kind_names[int(k)] for k in tally["kind"]]
     del xa, ya, ga, ids_keep, targets_keep, pr, pt_keep, keep
-    frame["kind"] = [list(_PAIR_KINDS)[int(k)] for k in frame["kind"]]
-    return _index(frame, "response", names)
+    frame["kind"] = [kind_names[int(k)] for k in frame["kind"]]
+    frame = _index(frame, "response", names)
+    return frame if _grid is None else (frame, tally)
+
+
+def sceptre_grid(design, responses, assignments, guides, discovery_targets, negative_targets=(),
+                 grid_responses=None, pairs=None, **options):
+    """sceptre() for a grid request: every pair of some targets and some
+    responses, without a list of the pairs.
+
+    discovery_targets: targets tested against every grid response as
+    discovery pairs; negative_targets: targets of non-targeting guides tested
+    against them as negative controls. grid_responses: the response columns
+    (distinct indices, or names with DataFrame responses); None: every
+    response. pairs: further pairs listed as for sceptre(), such as positive
+    controls (None: none); a pair of the grid may not be listed again in its
+    kind. options: the keyword arguments of sceptre(); stream_keys must be
+    "identity".
+
+    Pair QC is decided for the whole grid first and only the pairs that pass
+    it get a row: by response in the order requested, then discovery and
+    negative targets in the order given, then the listed pairs. The rows are
+    those sceptre() gives for a list of the same pairs, and the adjustment
+    families those of listing every pair of the grid: with
+    adjustment_family="listed" the pairs that fail pair QC are counted without
+    being listed, and ``attrs`` pairs_listed_<kind> counts every pair of the
+    grid.
+
+    Returns (result, tally): the table of sceptre(), and one row per grid
+    target and kind with the columns target, kind, requested, passing,
+    few_treatment (too few treated cells with a nonzero count) and few_control
+    (enough of those, too few such control cells)."""
+    if pairs is None:
+        pairs = pd.DataFrame(columns=["response", "target", "kind"])
+    return sceptre(design, responses, assignments, guides, pairs, **options,
+                   _grid=(list(discovery_targets), list(negative_targets), grid_responses))
 
 
 def scan(design, responses, predictors, pairs=None, family="nb", dispersion="ml", theta=None,

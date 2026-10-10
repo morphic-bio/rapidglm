@@ -774,9 +774,14 @@ BOOST_AUTO_TEST_CASE(workflow_qc_integration_and_aggregation) {
     BOOST_TEST(b.tests[0].p_value ==
                std::min(1.0, 2 * std::min(s.tests[0].p_value, s.tests[1].p_value)));
     o.min_nonzero = 100;
+    // A pair that fails pair QC is outside the default family (the tested
+    // pairs); in the family of the listed pairs it counts with p = 1.
     auto failed = sceptre(x, responses, calls, guides, pairs, {}, o);
-    BOOST_TEST(failed.tests[0].adjusted_p == 1);
+    BOOST_TEST(std::isnan(failed.tests[0].adjusted_p));
     BOOST_TEST(std::isnan(failed.tests[0].p_value));
+    o.family = AdjustmentFamily::listed;
+    BOOST_TEST(sceptre(x, responses, calls, guides, pairs, {}, o).tests[0].adjusted_p == 1);
+    o.family = AdjustmentFamily::tested;
     std::vector<std::size_t> units(n);
     for (std::size_t i = 0; i < n; ++i)
         units[i] = i / 20;

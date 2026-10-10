@@ -1,12 +1,81 @@
 # Changelog
 
-## 1.2.0 (development release 1.2.0-dev.1, 2026-10-07)
+## 1.3.0 (development release 1.3.0-dev.1, 2026-10-10)
 
-The code of 1.2.0 is complete and tagged `v1.2.0-dev.1` for testing. The
-engine, solver and bulk-validation receipts are from it. The application
-benchmark, Cook's-distance, Rust and SCEPTRE-agreement receipts, and the tables
-in README.md and docs/BENCHMARK.md, are still from earlier versions; they are
-replaced in the release.
+The perturbation workflow (`sceptre`). Bulk DE, single fits, batch fits and
+score scans are unchanged.
+
+The code of 1.3.0 is complete and tagged `v1.3.0-dev.1` for testing. The
+application benchmark and SCEPTRE-agreement receipts, and the tables in
+README.md and docs/BENCHMARK.md, are still those of 1.2.0; they are replaced in
+the release.
+
+**For a user of 1.2.0 who changes no option:** every resampled p-value of
+`sceptre` changes, because a pair's draws are now keyed by the pair itself and
+no longer by its place in the list; the new values are as valid as the old and
+differ from them as two seeds differ, so discoveries can change at the margin.
+Adjusted p-values are now computed over the pairs that pass pair QC, so in a
+list that includes pairs failing pair QC they are smaller, more pairs can be
+discoveries, and the failing pairs report a missing adjusted p-value instead of
+1. A list that holds the same response and target twice within a kind is now
+an error. `stream_keys: "position"` with `adjustment_family: "listed"`
+reproduces the tables of 1.2.0 byte for byte (checked on six runs).
+
+- **Streams keyed by identity** (`stream_keys`, default `identity`; C++
+  `StreamKeys`). A pair's random stream depends only on the seed, its response
+  and its target (its guide for per-guide tests), so its record is the same
+  wherever it is listed, whatever else is listed, and however the run is
+  divided among threads, tiles, shards or separate runs. `response_ids` names
+  the responses (gene or peak names); without it a response is identified by
+  its column. Reused draws and the shared screen are keyed by the target. The
+  keys are FNV-1a hashes of the names, turned into a stream by Philox
+  (`name_key`, `keyed_stream`; [METHODS.md](METHODS.md), Resampling).
+  `position` keeps the keys of earlier releases.
+- **The adjustment family** (`adjustment_family`, default `tested`; C++
+  `AdjustmentFamily`): the pairs that pass pair QC, as in SCEPTRE, whose 101
+  calls on the Gasperini benchmark are BH over the 9,718 pairs passing its
+  pairwise QC and not over the 10,000 listed. `listed` is the family of earlier
+  releases. `family_size_*` gives a family's size to a run that lists only some
+  of its pairs. The run record stores the pairs listed, passing pair QC and in
+  each family.
+- **No work for a pair that cannot be tested.** Pair QC is decided first, from
+  the target's cells and the response's nonzero cells. A response's null model
+  is fitted only when one of its pairs passes (complement controls), a pair's
+  cells are gathered only when it passes (non-targeting controls), and the
+  start saved for a later effect fit is kept only for tested pairs (352 bytes
+  less for every other listed pair). Records are unchanged: with position keys
+  the tables are those of 1.2.0.
+- **Targets and responses without a list** (`sceptre_grid`, `sceptre_pair_qc`;
+  `targets` and `grid_responses` in the CLI; `rapidglm_sceptre_grid` in C;
+  `sceptre_grid` in Python and R). Every named target is tested against every
+  named response. One pass over each response's nonzero cells decides pair QC
+  for all targets; the pairs that pass are tested and get records, and the
+  others are tallied by target and kind (too few treated cells with a nonzero
+  count, or too few control cells with one). The records are those of listing
+  the same pairs.
+- Measured on a synthetic screen in which 5% of the requested pairs pass pair
+  QC (20,000 cells; 12.4 million peak pairs; 12 threads on efficiency cores,
+  with `sequential_screen` and `early_stop_p`;
+  [validation/UNTESTABLE_PAIRS.json](validation/UNTESTABLE_PAIRS.json)):
+
+  | Run | 1.2.0, every pair listed | 1.3.0, every pair listed | 1.3.0, targets and responses named |
+  |---|---|---|---|
+  | High MOI | 202 s, 11.9 GB | 192 s, 7.9 GB | 167 s, 1.1 GB |
+  | Low MOI | 87 s, 11.8 GB | 59 s, 7.5 GB | 37 s, 0.7 GB |
+
+  Listing only the pairs that pass takes the time of the request. A listed pair
+  that is not tested now costs about 0.57 kB of memory in the CLI (0.92 kB in
+  1.2.0), most of it the list itself and the pair's row; in a request it costs
+  none. What remains of a list's time is reading it and writing a row for
+  every pair.
+- Engine: `ResampleOptions::prescreen_seed` (a shared prescreen under its own
+  seed), `adjust_pvalues(p, bonferroni, family_size)`, and
+  `SceptreResult::null_fits`.
+
+## 1.2.0 (2026-10-07)
+
+The library is the code of the development release `v1.2.0-dev.1`; this
+release adds the receipts and documents measured with it.
 
 - `legacy_cooks` is now the default in bulk differential expression (CLI, C,
   Python, R and the PyDESeq2-style API): Cook's distances use DESeq2's robust
@@ -49,8 +118,28 @@ replaced in the release.
   airway four gene-wise estimates move. The prior variance, a grid choice,
   moves with them from 0.697 to 0.700, and the independent-filtering threshold
   from 3.86 to 4.50 (DESeq2's value): 5,164 genes are discoveries against
-  5,142 (31 gained, 9 lost). On GTEx thyroid every column agrees to 3e-10
-  (relative).
+  5,142 (31 gained, 9 lost). On GTEx thyroid and the other four validation
+  datasets every column agrees to 3e-10 (relative), with either setting of
+  `legacy_cooks`.
+- Every benchmark was measured again with this version, each thread on its own
+  efficiency core of one workstation
+  ([docs/BENCHMARK.md](docs/BENCHMARK.md#host)). Bulk DE is 6.1 to 13.9 times
+  faster than DESeq2 on one thread (airway to 647 thyroid samples), and the
+  perturbation workflow 3.9 to 4.5 times faster than SCEPTRE. Against Ceres
+  Solver, fixed-dispersion fits are 2.1 to 2.7 times faster than
+  Levenberg–Marquardt at equal accuracy
+  ([docs/SOLVERS.md](docs/SOLVERS.md)); the solver benchmark also times a plain
+  `fit` per gene (last argument `shared`, `plain` or `both`).
+- New receipt [validation/CRT_SCALING.json](validation/CRT_SCALING.json): the
+  conditional randomization test on panels of the Gasperini screen, with
+  `fit_check: "ks"` and with the defaults
+  (`scripts/prepare_crt_panels.py`). `validation/COOKS_LEGACY.json` and
+  `validation/COOKS_THYROID.json` are written by `scripts/validate_cooks.py`,
+  and the SCEPTRE agreement receipt repeats its seeds under the defaults.
+- Benchmark harnesses can confine runs to listed CPUs and record the share of
+  those CPUs that other processes used (`--cpus`).
+- The release workflow publishes a pre-release for a tag with a suffix, such as
+  `v1.2.0-dev.1`.
 
 ## 1.1.0 (2026-10-06)
 

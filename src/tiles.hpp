@@ -23,9 +23,10 @@ struct TileRun {
     // between the machines that run them).
     bool automatic = false;
     std::string fingerprint;
-    // Filled in: tiles of the run, those computed by this process, and the
-    // targets (summed over those tiles) that rebuilt their sampler per pair.
-    std::size_t tiles = 0, computed = 0, samplers_rebuilt = 0;
+    // Filled in: tiles of the run, those computed by this process, the
+    // targets (summed over those tiles) that rebuilt their sampler per pair,
+    // and the null models this process fitted (response nulls and the tiles').
+    std::size_t tiles = 0, computed = 0, samplers_rebuilt = 0, null_fits = 0;
     double computed_seconds = 0;
 };
 namespace tiles {
@@ -347,6 +348,7 @@ sceptre_tiled(TileRun &t, const Matrix &design, const Responses &responses,
                     "run phase prepare first: " + nulls_path + " is missing");
             nulls = sceptre_nulls(design, responses, assignments, guides, pairs, qc, o, used);
             tiles::write_nulls(nulls_path, nulls);
+            t.null_fits += used.size();
         }
         require(nulls.size() == responses.cols, "null file does not match the responses");
     }
@@ -367,6 +369,7 @@ sceptre_tiled(TileRun &t, const Matrix &design, const Responses &responses,
             auto part = sceptre(design, responses, assignments, guides, pairs, qc, o, s);
             records = std::move(part.tests);
             t.samplers_rebuilt += part.samplers_rebuilt;
+            t.null_fits += part.null_fits;
         }
         const double seconds =
             std::chrono::duration<double>(std::chrono::steady_clock::now() - begin).count();

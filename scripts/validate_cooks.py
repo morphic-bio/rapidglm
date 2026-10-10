@@ -2,7 +2,9 @@
 """Cook's-distance receipts for bulk DE against DESeq2 1.48.2 (black box).
 
 COOKS_THYROID.json: agreement on GTEx thyroid (128 and 647 samples) with
-Cook's-distance filtering disabled in both tools.
+Cook's-distance filtering disabled in both tools, by default and with
+RapidGLM's own estimator. Outlying counts are still replaced, and the
+distances choose them, so the estimator still matters.
 COOKS_LEGACY.json: agreement by default (legacy_cooks: DESeq2's robust
 dispersion as implemented in PyDESeq2) and with RapidGLM's own estimator
 (legacy_cooks false, the default before 1.2.0), on the validation datasets of
@@ -98,14 +100,21 @@ def main(args):
             subprocess.run(["Rscript", str(ROOT / "scripts/reference_bulk_nocooks.R"), str(d), coefficient, R_LIBS,
                             str(reference), str(args.threads)], check=True, env=ENV, stdout=subprocess.DEVNULL)
         b = pd.read_csv(reference, sep="\t")
-        a = bulk_de(args.binary, d, index, work / f"{name}.nocooks", args.threads, cooks_filter=False)
-        ok = a.pvalue.notna() & b.pvalue.notna()
-        thyroid[name] = {"discoveries": [len(calls(a)), len(calls(b))], "jaccard": jaccard(calls(a), calls(b)),
-                         "pvalue_spearman": float(a.pvalue[ok].corr(b.pvalue[ok], method="spearman"))}
+        row = {}
+        for key, extra in (("default", {}), ("own_estimator", {"legacy_cooks": False})):
+            a = bulk_de(args.binary, d, index, work / f"{name}.nocooks.{key}", args.threads, cooks_filter=False,
+                        **extra)
+            run = json.loads((work / f"{name}.nocooks.{key}.run.json").read_text())
+            ok = a.pvalue.notna() & b.pvalue.notna()
+            row[key] = {"discoveries": [len(calls(a)), len(calls(b))], "jaccard": jaccard(calls(a), calls(b)),
+                        "pvalue_spearman": float(a.pvalue[ok].corr(b.pvalue[ok], method="spearman")),
+                        "replaced_genes": run["replaced_genes"]}
+        thyroid[name] = {**row["default"], "own_estimator": row["own_estimator"]}
         print(name, "no Cook's filtering", thyroid[name], flush=True)
     receipt = {
         "purpose": "Bulk DE agreement with DESeq2 1.48.2 on GTEx thyroid with Cook's-distance filtering disabled "
-                   "in both tools (docs/BULK_DE.md, larger multi-factor designs)",
+                   "in both tools (docs/BULK_DE.md, larger multi-factor designs): by default, and under "
+                   "own_estimator with legacy_cooks false. Outlying counts are still replaced in both tools.",
         "commands": {"rapidglm": "rapidglm bulk-de with cooks_filter=false, coefficient sex[T.female] "
                                  "(scripts/validate_cooks.py)",
                      "deseq2": "DESeq(full = design, betaPrior = FALSE) then results(name = 'sex.T.female.', "

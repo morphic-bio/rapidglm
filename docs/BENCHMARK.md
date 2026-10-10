@@ -16,10 +16,9 @@ and is marked `contended` when that share exceeds a fifth.
 
 ## Host
 
-The engine and solver results in [GLM_COMPARISON.md](GLM_COMPARISON.md) and
-[SOLVERS.md](SOLVERS.md) were measured on one workstation (Intel Core
-i9-13900KF, 125 GiB) with version 1.2.0. The application results below are
-older (version 0.2.0, another host) and are being re-measured on this host.
+The results below, and those in [GLM_COMPARISON.md](GLM_COMPARISON.md) and
+[SOLVERS.md](SOLVERS.md), were measured on one workstation (Intel Core
+i9-13900KF, 125 GiB) with version 1.2.0, on 2026-10-06 and 2026-10-07.
 
 - **Cores.** The processor has eight performance cores and sixteen efficiency
   cores. Four logical CPUs, on two performance cores, were offline after
@@ -108,51 +107,76 @@ DESeq2 at 1 thread, or SCEPTRE at 1 thread, over the same genes or discovery
 pairs: the Jaccard index of BH discoveries at 0.1 and the Spearman correlation
 of p-values.
 
-## Results (2026-10-01, quiet host)
-
-These are from version 0.2.0. Since then the fits have become faster (1.2.0),
-the default Cook's distances have changed (1.2.0: `legacy_cooks`, which gives
-Jaccard 0.997 and 1.000 with DESeq2 on the 128- and 647-sample sets in place
-of 0.579 and 0.904), and the perturbation workflow accepts skew-normal
-p-values by a stricter check (1.0.0, 1.1.0).
+## Results (version 1.2.0, 2026-10-07)
 
 Receipts:
 - [validation/APPLICATIONS_BULK.json](../validation/APPLICATIONS_BULK.json):
-  airway and the 32-sample set with three repeats, the 128- and 647-sample sets
-  with one;
+  airway and the 32- and 128-sample sets with three repeats, the 647-sample set
+  with two;
 - [validation/APPLICATIONS_PERTURBATION.json](../validation/APPLICATIONS_PERTURBATION.json):
   one repeat;
 - [validation/ENGINE_BATCH.json](../validation/ENGINE_BATCH.json): 1,000 NB and
-  Poisson responses on 5,000 observations; re-timed 2026-10-01 at load about 2-4
-  with glmGamPoi added (`glm_gp` without Cox-Reid or shrinkage, 3.15 s against
-  1.96 s for `fit_batch` at 1 thread and 0.17 s at 16).
+  Poisson responses on 5,000 observations
+  ([GLM_COMPARISON.md](GLM_COMPARISON.md#many-responses-with-one-design));
+- [validation/CRT_SCALING.json](../validation/CRT_SCALING.json): the
+  conditional randomization test on larger panels.
 
-The 1-minute load was 1–4 during the bulk runs and 2–9 during the perturbation
-runs.
+No run was marked `contended`: other processes used at most 11% of a run's
+CPUs in the bulk runs and 2% in the perturbation runs.
 
 Bulk DE, one thread / eight threads, in seconds:
 
 | Data | RapidGLM (R) | DESeq2 | DESeq2 + glmGamPoi | PyDESeq2 | PyDESeq2 + RapidGLM | Jaccard with DESeq2 (RapidGLM) |
 |---|---|---|---|---|---|---:|
-| airway, 8 samples | 0.88 / 0.24 | 3.49 / 1.60 | 8.19 | 21.5 / 5.83 | 1.97 / 1.84 | 0.935 |
-| thyroid, 32 samples | 4.27 / 0.73 | 17.5 / 4.35 | 21.6 | 41.8 / 9.63 | 5.91 / 3.20 | 0.963 |
-| thyroid, 128 samples | 11.9 / 1.98 | 61.9 / 17.2 | 45.7 | 48.3 / 11.2 | 13.3 / 4.31 | 0.579 |
-| thyroid, 647 samples | 52.6 / 8.52 | 254 / 45.2 | 143 | 78.6 / 17.1 | 50.7 / 11.3 | 0.904 |
+| airway, 8 samples | 0.99 / 0.29 | 6.04 / 2.68 | 15.2 | 53.2 / 12.2 | 3.20 / 3.32 | 0.932 |
+| thyroid, 32 samples | 4.34 / 0.77 | 31.3 / 7.45 | 37.9 | 105 / 20.4 | 7.80 / 5.47 | 0.984 |
+| thyroid, 128 samples | 9.49 / 1.72 | 119 / 31.3 | 86.1 | 115 / 22.9 | 13.8 / 5.52 | 0.997 |
+| thyroid, 647 samples | 34.7 / 6.48 | 482 / 83.9 | 272 | 173 / 35.6 | 43.5 / 13.3 | 1.000 |
 
+- **Speed-up over DESeq2:** 6.1×, 7.2×, 12.5× and 13.9× on one thread, and
+  9.3×, 9.7×, 18.2× and 13.0× on eight.
 - **Interfaces:** the CLI, Python and the PyDESeq2-style API give the same
-  table as R, in similar times.
-- **Thyroid agreement:** the lower Jaccard indices at 128 and 647 samples come
-  from Cook's-distance flagging. Without it, they are 0.971 and 0.964
-  ([BULK_DE.md](BULK_DE.md#larger-multi-factor-designs-2026-10-01)).
+  table as R, in similar times (on the 647-sample set 37.9, 35.1 and 36.1 s on
+  one thread, against 34.7 s from R).
+- **PyDESeq2:** with RapidGLM as its inference back end PyDESeq2 takes 4 to 17
+  times less on one thread. Most of what remains is PyDESeq2's own data
+  handling, which is why eight threads gain little.
+- **Thyroid agreement** depends on the robust dispersion behind Cook's
+  distances. With RapidGLM's own estimator (`legacy_cooks: false`, the default
+  before 1.2.0) the Jaccard indices at 128 and 647 samples are 0.579 and 0.904
+  ([BULK_DE.md](BULK_DE.md#larger-multi-factor-designs)).
 
 Perturbation, in seconds, against SCEPTRE 0.99.0. Agreement is over the
-discovery pairs that both tools tested:
+discovery pairs that both tools tested. Acceptance `ks` accepts the skew-normal
+fit as SCEPTRE does; `default` is RapidGLM's stricter check with confirmation
+draws:
 
-| Data | Threads | RapidGLM (R / Python / CLI) | SCEPTRE | Discoveries (RapidGLM / SCEPTRE) | Jaccard | p-value Spearman |
-|---|---:|---|---:|---|---:|---:|
-| Gasperini, 50,000 cells | 1 | 258 / 244 / 264 | 851 | 29 / 24 | 0.83 | 0.985 |
-| | 8 | 38 / 35 / 53 | 141 | | | |
-| Gasperini, 207,324 cells | 8 | 274 / 252 / 333 | 896 | 101 / 101 | 0.92 | 0.986 |
+| Data | Threads | Acceptance | RapidGLM (R / Python / CLI) | SCEPTRE | Discoveries (RapidGLM / SCEPTRE) | Jaccard | p-value Spearman |
+|---|---:|---|---|---:|---|---:|---:|
+| Gasperini, 50,000 cells | 1 | `ks` | 371 / 352 / 367 | 1,522 | 29 / 24 | 0.83 | 0.985 |
+| | 1 | default | 468 / 453 / 468 | 1,522 | 28 / 24 | 0.79 | 0.985 |
+| | 8 | `ks` | 63.8 / 54.1 / 55.1 | 251 | | | |
+| | 8 | default | 79.6 / 71.0 / 71.7 | 251 | | | |
+| Gasperini, 207,324 cells | 8 | `ks` | 336 / 291 / 298 | 1,507 | 101 / 101 | 0.92 | 0.986 |
+| | 8 | default | 450 / 419 / 415 | 1,507 | 101 / 101 | 0.92 | 0.986 |
 
-The CLI's times include parsing the MatrixMarket input: 1.4 GB for the 50,000
-cells and 6 GB for all cells.
+- **Speed-up over SCEPTRE** with `ks`, from R: 4.1× (50,000 cells, one thread),
+  3.9× (eight threads) and 4.5× (207,324 cells, eight threads). With the
+  defaults: 3.2×, 3.2× and 3.4×.
+- The CLI's times include parsing the MatrixMarket input: 1.4 GB for the 50,000
+  cells and 6 GB for all cells.
+
+The conditional randomization test on panels of the Gasperini screen (207,324
+cells): every pair of T targets and G response genes, both drawn at random with
+a fixed seed (`scripts/prepare_crt_panels.py`), with 16 threads on the 16
+efficiency cores:
+
+| Targets × genes | Pairs tested | Seconds (`ks` / default) | Draws, millions (`ks` / default) | Discoveries (`ks` / default) |
+|---|---:|---|---|---|
+| 50 × 1,000 | 48,596 | 134 / 133 | 29.4 / 31.0 | 6 / 6 |
+| 200 × 1,000 | 193,824 | 416 / 440 | 116.5 / 122.3 | 5 / 5 |
+| 100 × 7,418 | 721,266 | 1,676 / 1,741 | 436.1 / 454.8 | 22 / 14 |
+
+On the largest panel the defaults leave 14 of the 22 discoveries made with
+`ks`. Direct counts of the tail contradict four of the eight that are dropped,
+and none of the 14 ([validation/SKEW_NORMAL_CHECK.json](../validation/SKEW_NORMAL_CHECK.json)).

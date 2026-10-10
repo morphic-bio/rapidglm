@@ -7,11 +7,11 @@ black box. The method is in [METHODS.md](../METHODS.md#bulk-differential-express
 the interface in [CLI.md](CLI.md#bulk-differential-expression) and the receipt
 in [validation/BULK_DE.json](../validation/BULK_DE.json).
 
-The tables of agreement, the mock-comparison null and speed are from version
-1.2.0 (2026-10-07), whose default Cook's distances use DESeq2's robust
-dispersion as implemented in PyDESeq2
-([below](#legacy-cooks-distances-2026-10-01)). Sections with a date record
-what was measured then.
+The tables of agreement, the mock-comparison null, speed, the thyroid designs
+and Cook's distances are from version 1.2.0 (2026-10-07), whose default Cook's
+distances use DESeq2's robust dispersion as implemented in PyDESeq2
+([below](#legacy-cooks-distances-2026-10-01)). Other figures in sections with a
+date record what was measured then.
 
 ## Gates
 
@@ -215,27 +215,36 @@ they differ from RapidGLM's by 1.4 log2 units at the median.
   transforms. Contrasts and joint LR tests are supported
   ([HYPOTHESES.md](HYPOTHESES.md)).
 
-## Larger multi-factor designs (2026-10-01)
+## Larger multi-factor designs
 
-On GTEx v8 thyroid (`~ centre + Hardy scale + age + sex`, sex tested), agreement
-with DESeq2 falls at larger sample sizes when RapidGLM's own estimator of the
-robust dispersion is used (`legacy_cooks: false`; the default before 1.2.0).
-Data and timings:
+On GTEx v8 thyroid (`~ centre + Hardy scale + age + sex`, sex tested), with
+version 1.2.0. Data and timings:
 [validation/APPLICATIONS_BULK.json](../validation/APPLICATIONS_BULK.json)
-([BENCHMARK.md](BENCHMARK.md)).
+([BENCHMARK.md](BENCHMARK.md)); agreement without Cook's filtering:
+[validation/COOKS_THYROID.json](../validation/COOKS_THYROID.json).
 
 | Samples | Discoveries (RapidGLM / DESeq2) | Jaccard | Without Cook's filtering in either: Jaccard (p-value Spearman) |
 |---:|---|---:|---|
-| 32 | 1,590 / 1,615 | 0.963 | — |
+| 32 | 1,631 / 1,615 | 0.984 | — |
+| 128 | 790 / 792 | 0.997 | 1.000 (0.9998) |
+| 647 | 7,177 / 7,177 | 1.000 | 1.000 (1.0000) |
+
+Agreement in these designs depends on the robust dispersion behind Cook's
+distances, which decides the genes set aside and the counts replaced. Before
+1.2.0 RapidGLM used an estimator of its own by default, and agreement fell at
+larger sample sizes (`legacy_cooks: false` still selects it):
+
+| Samples | Discoveries (own estimator / DESeq2) | Jaccard | Without Cook's filtering in either: Jaccard (p-value Spearman) |
+|---:|---|---:|---|
 | 128 | 463 / 792 | 0.579 | 0.971 (0.993) |
 | 647 | 6,577 / 7,177 | 0.904 | 0.964 (0.982) |
 
-The difference is in Cook's-distance flagging alone. On the 128-sample set,
-size factors, dispersions, fold changes and p-values agree with DESeq2's
-(median relative differences 1e-4 or less) and outlier replacement nearly
-matches (281 genes against 283). RapidGLM, however, sets 751 genes aside as
-Cook's outliers against DESeq2's 224. Its Cook's distances are often several
-times larger.
+On the 128-sample set, size factors, dispersions, fold changes and p-values
+agree with DESeq2's (median relative differences 1e-4 or less). With its own
+estimator, however, RapidGLM sets 751 genes aside as Cook's outliers against
+DESeq2's 224, and replaces counts in 281 genes; its Cook's distances are often
+several times larger. Without the filtering the two tools still differ, because
+the distances also choose the counts that are replaced.
 
 DESeq2's paper says only that Cook's distance uses "a method-of-moments
 estimate α_rob, using a robust estimator of variance s²_rob". Its manual pages
@@ -258,36 +267,37 @@ What the values show:
 
 RapidGLM's own estimator was chosen on two-group simulations: squared MADs
 pooled within design cells of at least three samples. With many small cells it
-gives smaller dispersions, so larger distances and more flags. From 1.2.0 it is
-no longer the default (next section).
+gives smaller dispersions, so larger distances and more flags.
 
 ## Legacy Cook's distances (2026-10-01)
 
 PyDESeq2 (MIT; Muzellec et al. 2023) implements DESeq2's robust dispersion for
 Cook's distances. With the author's approval, `legacy_cooks` reimplements that
 formula and PyDESeq2's flagging rule (METHODS.md step 9; attribution and licence
-in DEPENDENCIES.md).
+in DEPENDENCIES.md). It was added on 2026-10-01 as an option and is the default
+from 1.2.0.
 
 Its dispersions equal the values recovered from DESeq2's outputs to 1e-12 on
-airway and on the 128-sample thyroid set. Against DESeq2 1.48.2
-([validation/COOKS_LEGACY.json](../validation/COOKS_LEGACY.json)):
+airway and on the 128-sample thyroid set. Against DESeq2 1.48.2, with version
+1.2.0 ([validation/COOKS_LEGACY.json](../validation/COOKS_LEGACY.json)):
 
-| Dataset | DESeq2 discoveries | Own estimator (`legacy_cooks: false`): discoveries, Jaccard | `legacy_cooks`: discoveries, Jaccard |
+| Dataset | DESeq2 discoveries | Default (`legacy_cooks`): discoveries, Jaccard | Own estimator (`legacy_cooks: false`): discoveries, Jaccard |
 |---|---:|---|---|
-| airway | 4,834 | 5,142, 0.935 | 5,142, 0.935 |
+| airway | 4,834 | 5,164, 0.932 | 5,164, 0.932 |
 | Kang | 635 | 618, 0.973 | 618, 0.973 |
-| sim3 | 239 | 241, 0.975 | 240, 0.979 |
-| sim3b | 201 | 200, 0.995 | 201, 1.000 |
+| sim3 | 239 | 240, 0.979 | 241, 0.975 |
+| sim3b | 201 | 201, 1.000 | 200, 0.995 |
 | sim8 | 253 | 253, 1.000 | 253, 1.000 |
-| GTEx thyroid, 128 samples | 792 | 463, 0.579 | 790, 0.997 |
-| GTEx thyroid, 647 samples | 7,177 | 6,577, 0.904 | 7,177, 1.000 |
+| GTEx thyroid, 128 samples | 792 | 790, 0.997 | 463, 0.579 |
+| GTEx thyroid, 647 samples | 7,177 | 7,177, 1.000 | 6,577, 0.904 |
 
-- **Flagged genes:** the option flags 216 genes against DESeq2's 224 on the
-  128-sample set, and 61 and 82 on sim3 and sim3b, as DESeq2 does.
-- **Default:** `legacy_cooks` is the default from 1.2.0. The table was
-  measured with 1.1.0; with the default of 1.2.0 the airway row reads 5,164
-  discoveries and Jaccard 0.932 ([Known differences](#known-differences),
-  sensitivity at the margin).
+- **Flagged genes:** the default flags 216 genes against DESeq2's 224 on the
+  128-sample set, and 61 and 82 on sim3 and sim3b, as DESeq2 does. The own
+  estimator flags 751, 63 and 86.
+- **Replaced counts:** on the 128-sample set the default replaces counts in 67
+  genes and the own estimator in 281; on the 647-sample set, in 98 and 1,110.
+- **Without Cook's filtering**, the default gives DESeq2's discoveries exactly
+  on both thyroid sets (884 and 7,180 genes).
 - **Remaining differences:** on airway and Kang no gene is flagged by either
   tool, so the remaining differences there come from the dispersion steps
   described above.

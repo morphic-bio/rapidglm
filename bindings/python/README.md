@@ -15,6 +15,10 @@ res.attrs["size_factors"]
 
 # responses: cells x genes; assignments: cells x guides
 res = rapidglm.sceptre(design, responses, assignments, guides, pairs, moi="high", threads=8)
+# every target against every response, without a list: rows for the pairs that
+# pass pair QC, and a tally of the others by target
+res, tally = rapidglm.sceptre_grid(design, responses, assignments, guides,
+                                   discovery_targets, negative_targets, moi="high", threads=8)
 ```
 
 `bulk_de`, `sceptre`, `scan` and `fit_batch` call `librapidglm_c` through

@@ -339,6 +339,21 @@ enum class Integration { union_guides, singleton, bonferroni };
 // The resampling p-value and mean-ratio effect never depend on this choice.
 enum class EffectFits { all, significant, none };
 enum class PairKind { discovery, negative_control, positive_control };
+// What a pair's random stream is keyed by.
+// identity: the seed, the response and the target alone (the guide for a
+// per-guide test), so a pair's record is the same wherever it is listed, with
+// whatever other pairs, and however the run is split. The response is
+// identified by its ID (SceptreOptions::response_ids) or else by its column,
+// the target by its name: FNV-1a keys of the strings (name_key), turned into a
+// stream by keyed_stream(). A pair may be listed once within a kind.
+// position: the pair's place in the list (releases before 1.3.0).
+enum class StreamKeys { identity, position };
+// The family within which p-values of a kind are adjusted.
+// tested: the pairs that pass pair QC (a pair that passes and whose test then
+// fails counts with p = 1); the other pairs get no adjusted p-value.
+// listed: every listed pair, those that fail pair QC counting with p = 1
+// (releases before 1.3.0).
+enum class AdjustmentFamily { tested, listed };
 struct Guide {
     std::string id, target;
     bool non_targeting = false;
@@ -386,6 +401,17 @@ struct SceptreOptions {
     bool shared_screen = false;
     double shared_screen_p = 0.05;
     std::size_t draw_cache_bytes = std::size_t(8) << 30;
+    StreamKeys stream_keys = StreamKeys::identity;
+    // With identity keys: one ID per response column (any distinct strings that
+    // stay with the response, such as gene or peak names). Empty: the column
+    // index, which identifies a response only while the matrix keeps its columns.
+    std::vector<std::string> response_ids;
+    AdjustmentFamily family = AdjustmentFamily::tested;
+    // The number of hypotheses in each kind's family (discovery, negative
+    // control, positive control) when it is larger than the pairs of the family
+    // at hand, for a caller that lists only some of them; 0: those at hand. The
+    // pairs not listed count with p = 1.
+    std::array<std::size_t, 3> family_size{};
     std::size_t min_nonzero = 7;
     double lower_quantile = 0.01, upper_quantile = 0.99, max_mito = 0.2, alpha = 0.1;
     FitOptions model;
@@ -402,6 +428,7 @@ struct PairResult {
     std::string target, guide, status = "not_run";
     PairKind kind = PairKind::discovery;
     std::size_t cells = 0, nonzero_treatment = 0, nonzero_control = 0, draws = 0;
+    // adjusted_p is missing for a pair outside the adjustment family.
     double statistic = nan, p_value = nan, adjusted_p = 1, log2fc = nan, log2fc_se = nan,
            sceptre_mean_ratio = nan, mean_ratio_log2 = nan;
     bool approximation = false;
@@ -414,6 +441,12 @@ struct SceptreResult {
     std::vector<QQPoint> calibration_qq;
     std::size_t retained_cells = 0, calibration_rejections = 0, power_rejections = 0,
                 discovery_rejections = 0;
+    // By kind (discovery, negative control, positive control): the pairs
+    // listed, those that pass pair QC, and the size of the adjustment family.
+    std::array<std::size_t, 3> pairs_listed{}, pairs_passing_qc{}, family_size{};
+    // Null models fitted: one per response with a pair that passes pair QC
+    // (complement controls), or one per such pair (non-targeting controls).
+    std::size_t null_fits = 0;
     // Targets whose CRT sampler was kept for all their pairs, and targets that
     // did not fit SceptreOptions::sampler_cache_bytes and rebuilt it per pair.
     std::size_t samplers_cached = 0, samplers_rebuilt = 0;
@@ -618,7 +651,7 @@ inline void pair_pipeline(const std::vector<std::vector<std::size_t>> &batches, 
                 for (std::size_t k = 0; k < slot_count && !worked; ++k) {
                     auto &slot = slots[(offset + k) % slot_count];
                     std::size_t first, last;
-                    std::uint64_t test;
+                    Stream stream;
                     {
                         std::lock_guard<std::mutex> lock(slot.mutex);
                         if (!slot.running || slot.next >= slot.end)
@@ -627,7 +660,7 @@ inline void pair_pipeline(const std::vector<std::vector<std::size_t>> &batches, 
                         if (sequential &&
                             slot.inflight > (slot.written - slot.stages->begin()) / 1024)
                             continue;
-                        test = slot.stages->test_id();
+                        stream = slot.stages->stream();
                         first = slot.next;
                         last = sequential       ? NullStages::next_checkpoint(first)
                                : parallel_draws ? first + chunk
@@ -638,7 +671,7 @@ inline void pair_pipeline(const std::vector<std::vector<std::size_t>> &batches, 
                     }
                     worked = true;
                     const auto &d = slot.draws;
-                    draw_statistics(*d.workspace, *d.sampler, d.options->seed, test,
+                    draw_statistics(*d.workspace, *d.sampler, stream.seed, stream.test,
                                     d.cache ? d.cache(first) : nullptr, first, last - first,
                                     slot.stages->null() + first, scratch);
                     JobPtr finished;
@@ -758,6 +791,8 @@ struct SceptreTask {
     std::size_t pair_id;
     std::string label;
     std::size_t target_context = 0;
+    // With identity stream keys: the key of the target, or of the guide.
+    std::uint64_t target_key = 0;
 };
 // The cell universe and the task list of a sceptre() call: one task per pair,
 // or per guide with singleton or Bonferroni integration. Tasks sharing a guide
@@ -767,6 +802,8 @@ struct SceptreSetup {
     boost::dynamic_bitset<std::uint64_t> nt;
     std::vector<SceptreTask> tasks;
     std::size_t target_contexts = 0;
+    // With identity stream keys: the key of each response column.
+    std::vector<std::uint64_t> response_keys;
 };
 template <class Responses>
 inline SceptreSetup sceptre_setup(const Matrix &design, const Responses &responses,
@@ -803,6 +840,9 @@ inline SceptreSetup sceptre_setup(const Matrix &design, const Responses &respons
     const auto n = responses.rows;
     std::map<std::string, std::vector<std::size_t>> targets;
     std::set<std::string> guide_ids;
+    const bool identity = o.stream_keys == StreamKeys::identity;
+    require(o.response_ids.empty() || o.response_ids.size() == responses.cols,
+            "response IDs must give one ID per response column");
     Vector guide_count(n), total(n), detected(n);
     // NT membership is built before parallel work and then only read.
     auto &nt = setup.nt;
@@ -852,7 +892,39 @@ inline SceptreSetup sceptre_setup(const Matrix &design, const Responses &respons
               (qc.mitochondrial_fraction.empty() || qc.mitochondrial_fraction[i] <= o.max_mito))))
             cells.push_back(i);
     require(cells.size() > design.cols, "insufficient cells after QC");
+    // Keys of the names, which must tell the names apart.
+    auto distinct_keys = [](const auto &names, const char *message) {
+        std::vector<std::uint64_t> keys;
+        for (const auto &name : names)
+            keys.push_back(name_key(name));
+        auto sorted = keys;
+        std::sort(sorted.begin(), sorted.end());
+        require(std::adjacent_find(sorted.begin(), sorted.end()) == sorted.end(), message);
+        return keys;
+    };
+    std::map<std::string, std::size_t> target_number;
+    std::vector<std::uint64_t> name_keys, guide_keys;
+    if (identity) {
+        setup.response_keys.resize(responses.cols);
+        std::iota(setup.response_keys.begin(), setup.response_keys.end(), 0);
+        if (!o.response_ids.empty())
+            setup.response_keys = distinct_keys(
+                o.response_ids, "response IDs must be distinct (and have distinct keys)");
+        std::vector<std::string> names;
+        for (const auto &entry : targets) {
+            target_number.emplace(entry.first, names.size());
+            names.push_back(entry.first);
+        }
+        name_keys = distinct_keys(names, "two target names have the same stream key");
+        names.clear();
+        for (const auto &guide : guides)
+            names.push_back(guide.id);
+        guide_keys = distinct_keys(names, "two guide IDs have the same stream key");
+    }
     auto &tasks = setup.tasks;
+    // With identity keys a pair is listed once within a kind: listed twice it
+    // would be the same test, with the same draws, counted twice in its family.
+    std::vector<std::uint64_t> listed;
     for (std::size_t k = 0; k < pairs.size(); ++k) {
         const auto &pair = pairs[k];
         require(pair.response < responses.cols && targets.count(pair.target),
@@ -863,11 +935,36 @@ inline SceptreSetup sceptre_setup(const Matrix &design, const Responses &respons
                 require(
                     guides[j].non_targeting,
                     "negative-control target must contain only explicitly non-targeting guides");
-        if (o.integration == Integration::union_guides)
+        const std::size_t number = identity ? target_number.at(pair.target) : 0;
+        if (identity) {
+            require(pair.response <= UINT32_MAX && number < (std::size_t(1) << 30),
+                    "too many responses or targets for identity stream keys");
+            listed.push_back((static_cast<std::uint64_t>(pair.kind) << 62) |
+                             (static_cast<std::uint64_t>(number) << 32) | pair.response);
+        }
+        if (o.integration == Integration::union_guides) {
             tasks.push_back({pair, indices, k, "union"});
-        else
-            for (auto j : indices)
+            if (identity)
+                tasks.back().target_key = name_keys[number];
+        } else
+            for (auto j : indices) {
                 tasks.push_back({pair, {j}, k, guides[j].id});
+                if (identity)
+                    tasks.back().target_key = guide_keys[j];
+            }
+    }
+    if (identity) {
+        auto sorted = listed;
+        std::sort(sorted.begin(), sorted.end());
+        const auto twice = std::adjacent_find(sorted.begin(), sorted.end());
+        if (twice != sorted.end()) {
+            const auto k = static_cast<std::size_t>(
+                std::find(listed.begin(), listed.end(), *twice) - listed.begin());
+            throw std::invalid_argument("a pair is listed twice within a kind: response " +
+                                        std::to_string(pairs[k].response) + ", target " +
+                                        pairs[k].target +
+                                        " (with identity stream keys a pair is listed once)");
+        }
     }
     std::map<std::vector<std::size_t>, std::size_t> target_keys;
     for (auto &task : tasks)
@@ -924,7 +1021,8 @@ inline SceptreLayout sceptre_layout(const Matrix &design, const Responses &respo
     return layout;
 }
 // Response null fits for sceptre() shards (complement controls), by response
-// index; entries for responses not listed are left empty. A fit is kept compact
+// index; entries are left empty for responses not listed and for responses
+// none of whose pairs passes pair QC, which need no null. A fit is kept compact
 // (without per-observation vectors) when rebuilding it gives exactly the fitted
 // state, which is checked here; otherwise it is kept whole.
 template <class Responses>
@@ -944,8 +1042,47 @@ sceptre_nulls(const Matrix &design, const Responses &responses, const SparseCSC 
     std::vector<FitResult> nulls(responses.cols);
     for (auto j : which)
         require(j < responses.cols, "unknown response");
+    // The pairs of each response, and the treated cells of their targets.
+    const std::set<std::size_t> wanted(which.begin(), which.end());
+    std::map<std::size_t, std::vector<std::size_t>> response_tasks;
+    std::vector<std::vector<std::size_t>> positions(setup.target_contexts);
+    std::vector<bool> built(setup.target_contexts);
+    for (std::size_t i = 0; i < setup.tasks.size(); ++i) {
+        const auto &task = setup.tasks[i];
+        if (!wanted.count(task.pair.response))
+            continue;
+        response_tasks[task.pair.response].push_back(i);
+        if (built[task.target_context])
+            continue;
+        built[task.target_context] = true;
+        boost::dynamic_bitset<std::uint64_t> treatment(responses.rows);
+        for (auto j : task.guides)
+            for (auto k = assignments.column_ptr[j]; k < assignments.column_ptr[j + 1]; ++k)
+                if (assignments.values[k])
+                    treatment[assignments.row_index[k]] = 1;
+        for (std::size_t c = 0; c < setup.cells.size(); ++c)
+            if (treatment[setup.cells[c]])
+                positions[task.target_context].push_back(c);
+    }
     parallel_for(which.size(), o.threads, [&](std::size_t k) {
         const auto y = subset(responses.column(which[k]), setup.cells);
+        std::size_t nonzero = 0;
+        for (double v : y)
+            nonzero += v != 0;
+        bool testable = false;
+        const auto listed = response_tasks.find(which[k]);
+        if (listed != response_tasks.end())
+            for (auto i : listed->second) {
+                std::size_t treated = 0;
+                for (auto c : positions[setup.tasks[i].target_context])
+                    treated += y[c] != 0;
+                if (treated >= o.min_nonzero && nonzero - treated >= o.min_nonzero) {
+                    testable = true;
+                    break;
+                }
+            }
+        if (!testable)
+            return;
         auto fit = detail::sceptre_fit_null(o, x, y, options);
         auto compact = fit;
         compact.compact();
@@ -998,12 +1135,12 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         std::vector<std::shared_ptr<const CachedDraws>> stage_draws;
     };
     std::atomic<std::size_t> sampler_cache_used{0}, draw_cache_used{0}, samplers_cached{0},
-        samplers_rebuilt{0};
+        samplers_rebuilt{0}, null_fits{0};
     const bool reuse_draws = o.reuse_draws && o.crt && !o.nt_controls;
     const bool shared_screen = o.shared_screen && o.crt && !o.nt_controls;
     // Shared screen streams are numbered apart from the pairs' own streams.
     constexpr std::uint64_t screen_streams = std::uint64_t(1) << 31;
-    require(!shared_screen ||
+    require(!shared_screen || o.stream_keys != StreamKeys::position ||
                 (tasks.size() <= screen_streams && setup.target_contexts <= screen_streams),
             "too many tests for shared_screen streams");
     std::vector<std::unique_ptr<TargetContext>> target_contexts;
@@ -1030,7 +1167,9 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     std::vector<PairResult> raw =
         shard.results ? *shard.results : std::vector<PairResult>(tasks.size());
     // Deferred effect fits start from the O(p) null state saved by each task.
-    std::vector<FitResult> effect_starts(o.effect_fits == EffectFits::all ? 0 : tasks.size());
+    // Only tested pairs save one: a pointer per task, not a fit.
+    std::vector<std::unique_ptr<FitResult>> effect_starts(
+        o.effect_fits == EffectFits::all ? 0 : tasks.size());
     Matrix common_design = subset_rows(design, cells);
     auto common_options = o.model;
     common_options.offset = subset(o.model.offset, cells);
@@ -1057,22 +1196,75 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     // the shared null fit and score workspace.
     struct ResponseContext {
         Vector full_y, common_y;
-        std::size_t nonzero = 0; // nonzero entries of common_y
+        // Nonzero entries of common_y, and those in non-targeting cells.
+        std::size_t nonzero = 0, nt_nonzero = 0;
         FitResult common_fit;
         std::once_flag common_score_ready;
         std::unique_ptr<ResamplingWorkspace> common_score;
+    };
+    // The cells and the nonzero counts of a pair's two arms, from the target's
+    // treated cells alone, so that pair QC is decided before anything is
+    // gathered or fitted for the pair. With non-targeting controls the pair's
+    // cells are the treated cells and the non-targeting ones, and a treated
+    // cell counts as treated.
+    struct PairCounts {
+        std::size_t cells = 0, treatment = 0, control = 0;
+    };
+    std::size_t nt_cells = 0;
+    for (auto i : cells)
+        nt_cells += nt[i];
+    auto pair_counts = [&](const detail::SceptreTask &task, const ResponseContext &context) {
+        const auto &target = membership(task);
+        PairCounts c;
+        if (o.nt_controls) {
+            std::size_t both = 0, both_nonzero = 0;
+            for (auto position : target.positions) {
+                const bool nonzero = context.common_y[position] != 0;
+                c.treatment += nonzero;
+                if (nt[cells[position]]) {
+                    ++both;
+                    both_nonzero += nonzero;
+                }
+            }
+            c.cells = target.positions.size() + nt_cells - both;
+            c.control = context.nt_nonzero - both_nonzero;
+        } else {
+            for (auto position : target.positions)
+                c.treatment += context.common_y[position] != 0;
+            c.cells = cells.size();
+            c.control = context.nonzero - c.treatment;
+        }
+        return c;
+    };
+    auto passes_pair_qc = [&](const PairCounts &c) {
+        return c.treatment >= o.min_nonzero && c.control >= o.min_nonzero;
     };
     auto prepare_response = [&](std::size_t batch) {
         auto context = std::make_unique<ResponseContext>();
         context->full_y = responses.column(tasks[batches[batch][0]].pair.response);
         context->common_y = subset(context->full_y, cells);
-        for (double v : context->common_y)
-            context->nonzero += v != 0;
+        for (std::size_t i = 0; i < cells.size(); ++i)
+            if (context->common_y[i] != 0) {
+                ++context->nonzero;
+                context->nt_nonzero += nt[cells[i]];
+            }
         if (!o.nt_controls) {
-            const auto *null = shared_null(tasks[batches[batch][0]].pair.response);
-            context->common_fit =
-                null ? detail::rebuild_null(*null, common_design, context->common_y, common_options)
-                     : fit_null(common_design, context->common_y, common_options);
+            // The shared null is fitted only when one of the response's pairs
+            // passes pair QC.
+            bool testable = false;
+            for (auto task_id : batches[batch])
+                if (passes_pair_qc(pair_counts(tasks[task_id], *context))) {
+                    testable = true;
+                    break;
+                }
+            if (testable) {
+                const auto *null = shared_null(tasks[batches[batch][0]].pair.response);
+                context->common_fit =
+                    null ? detail::rebuild_null(*null, common_design, context->common_y,
+                                                common_options)
+                         : fit_null(common_design, context->common_y, common_options);
+                null_fits += !null;
+            }
         }
         return context;
     };
@@ -1109,6 +1301,15 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         r.guide = task.label;
         auto &target = membership(task);
         const auto &treatment = target.treatment;
+        // Pair QC first: nothing is gathered for a pair that fails it.
+        const auto counts = pair_counts(task, context);
+        r.cells = counts.cells;
+        r.nonzero_treatment = counts.treatment;
+        r.nonzero_control = counts.control;
+        if (!passes_pair_qc(counts)) {
+            r.status = "failed_pair_qc";
+            return nullptr;
+        }
         auto job = std::make_unique<PairJob>();
         job->task_id = task_id;
         std::vector<std::size_t> pair_cells;
@@ -1128,30 +1329,14 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
                 g[i] = treatment[use[i]];
             return g;
         };
-        r.cells = use.size();
         if (o.nt_controls) {
             job->g = indicator();
             for (std::size_t i = 0; i < use.size(); ++i)
                 if (job->g[i])
                     job->pair_treated.push_back(i);
             job->treated = &job->pair_treated;
-            for (std::size_t i = 0; i < y.size(); ++i)
-                if (y[i] != 0) {
-                    if (job->g[i])
-                        ++r.nonzero_treatment;
-                    else
-                        ++r.nonzero_control;
-                }
-        } else {
+        } else
             job->treated = &target.positions;
-            for (auto i : target.positions)
-                r.nonzero_treatment += y[i] != 0;
-            r.nonzero_control = context.nonzero - r.nonzero_treatment;
-        }
-        if (r.nonzero_treatment < o.min_nonzero || r.nonzero_control < o.min_nonzero) {
-            r.status = "failed_pair_qc";
-            return nullptr;
-        }
         job->x = o.nt_controls ? &(job->pair_design = subset_rows(design, use)) : &common_design;
         const auto &x = *job->x;
         job->options = common_options;
@@ -1162,6 +1347,7 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         }
         job->null =
             o.nt_controls ? &(job->pair_fit = fit_null(x, y, options)) : &context.common_fit;
+        null_fits += o.nt_controls;
         const auto &null = *job->null;
         if (!null.ok() || null.has_boundary()) {
             r.status = std::string("null_") + status_name(null.status);
@@ -1217,11 +1403,34 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
             job->sampler = std::make_shared<const Sampler>(permutation_sampler(job->g));
         }
         job->resampling = o.resampling;
-        // Streams are keyed by pair, or by target when its draws are reused.
-        job->resampling.test_id = reuse_draws ? task.target_context : task_id;
-        if (shared_screen) {
-            job->resampling.prescreen = o.shared_screen_p;
-            job->resampling.prescreen_test_id = screen_streams + task.target_context;
+        if (o.stream_keys == StreamKeys::position) {
+            // Streams are keyed by the pair's place in the list, or by the
+            // target's (in order of first appearance) when its draws are reused.
+            job->resampling.test_id = reuse_draws ? task.target_context : task_id;
+            if (shared_screen) {
+                job->resampling.prescreen = o.shared_screen_p;
+                job->resampling.prescreen_test_id = screen_streams + task.target_context;
+            }
+        } else {
+            // Streams are keyed by the pair's response and target (or guide), or
+            // by the target alone when its draws are reused; the shared screen's
+            // by the target, in a domain of its own.
+            const std::uint32_t domain = o.integration == Integration::union_guides ? 0 : 3;
+            const Stream own =
+                reuse_draws
+                    ? keyed_stream(o.resampling.seed, domain + 2, 0, task.target_key)
+                    : keyed_stream(o.resampling.seed, domain + 1,
+                                   setup.response_keys[task.pair.response], task.target_key);
+            job->resampling.seed = own.seed;
+            job->resampling.test_id = own.test;
+            if (shared_screen) {
+                const Stream screen =
+                    keyed_stream(o.resampling.seed, domain + 3, 0, task.target_key);
+                job->resampling.prescreen = o.shared_screen_p;
+                job->resampling.prescreen_seeded = true;
+                job->resampling.prescreen_seed = screen.seed;
+                job->resampling.prescreen_test_id = screen.test;
+            }
         }
         job->resampling.retain_null = false;
         job->resampling.parallel_draws = o.parallel_draws;
@@ -1255,8 +1464,11 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
             ++stage;
         if (shared_screen && stage > 0)
             return nullptr;
-        const auto stream =
-            shared_screen ? job.resampling.prescreen_test_id : job.resampling.test_id;
+        const Stream stream =
+            shared_screen ? Stream{job.resampling.prescreen_seeded ? job.resampling.prescreen_seed
+                                                                   : job.resampling.seed,
+                                   job.resampling.prescreen_test_id}
+                          : Stream{job.resampling.seed, job.resampling.test_id};
         auto &state = target.stage_state[stage];
         if (state.load(std::memory_order_acquire) == 2)
             return target.stage_draws[stage].get();
@@ -1265,7 +1477,7 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
             return nullptr;
         const std::size_t begin = stage == 0 ? 0 : budgets[stage - 1];
         auto draws = std::make_shared<const CachedDraws>(
-            *job.sampler, job.resampling.seed, stream, begin, budgets[stage] - begin, job.x->rows);
+            *job.sampler, stream.seed, stream.test, begin, budgets[stage] - begin, job.x->rows);
         const auto bytes = draws->bytes();
         if (draw_cache_used.fetch_add(bytes) + bytes > o.draw_cache_bytes) {
             draw_cache_used -= bytes;
@@ -1312,7 +1524,7 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
                 r, fit_effect_model(*job.x, y, job.g, null, job.options, o.warm_start_effects),
                 job.options, job.x->cols);
         } else
-            effect_starts[job.task_id] = detail::effect_start(null);
+            effect_starts[job.task_id] = std::make_unique<FitResult>(detail::effect_start(null));
     };
     // The null draws of one pair in a single caller, in batches.
     auto run_pair = [&](PairJob &job) {
@@ -1320,10 +1532,7 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         result.statistic = job.statistic;
         detail::staged_null(
             result, job.resampling,
-            [&] {
-                return detail::BinaryDrawBatch(job.score->binary, *job.sampler, job.resampling.seed,
-                                               cache_of(job));
-            },
+            [&] { return detail::BinaryDrawBatch(job.score->binary, *job.sampler, cache_of(job)); },
             256);
         finish_pair(job, result);
     };
@@ -1357,6 +1566,7 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     result.retained_cells = cells.size();
     result.samplers_cached = samplers_cached;
     result.samplers_rebuilt = samplers_rebuilt;
+    result.null_fits = null_fits;
     if (shard.tasks) {
         for (auto i : *shard.tasks)
             result.tests.push_back(std::move(raw[i]));
@@ -1388,14 +1598,26 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     }
     for (auto kind :
          {PairKind::discovery, PairKind::negative_control, PairKind::positive_control}) {
+        const auto family = static_cast<std::size_t>(kind);
         Vector p;
         std::vector<std::size_t> indices;
         for (std::size_t i = 0; i < result.tests.size(); ++i)
             if (result.tests[i].kind == kind) {
+                auto &r = result.tests[i];
+                const bool passes = r.status != "failed_pair_qc" && r.status != "not_run";
+                ++result.pairs_listed[family];
+                result.pairs_passing_qc[family] += passes;
+                if (o.family == AdjustmentFamily::tested && !passes) {
+                    r.adjusted_p = nan;
+                    continue;
+                }
                 indices.push_back(i);
-                p.push_back(result.tests[i].p_value);
+                p.push_back(r.p_value);
             }
-        auto q = adjust_pvalues(p, o.bonferroni_adjustment);
+        require(o.family_size[family] == 0 || o.family_size[family] >= p.size(),
+                "family_size is smaller than the pairs of its family");
+        result.family_size[family] = o.family_size[family] ? o.family_size[family] : p.size();
+        auto q = adjust_pvalues(p, o.bonferroni_adjustment, result.family_size[family]);
         for (std::size_t j = 0; j < q.size(); ++j) {
             result.tests[indices[j]].adjusted_p = q[j];
             if (q[j] <= o.alpha) {
@@ -1452,7 +1674,7 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
             }
             // Shards keep no per-task null state: take it from the response's
             // null (or refit the pair's), which gives the same O(p) start.
-            FitResult start = effect_starts[task_id];
+            FitResult start = effect_starts[task_id] ? *effect_starts[task_id] : FitResult();
             if (shard.results) {
                 const auto *null = o.nt_controls ? nullptr : shared_null(task.pair.response);
                 start = detail::effect_start(null ? *null : fit_null(x, y, options));
@@ -1463,5 +1685,226 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         });
     }
     return result;
+}
+// A request for every pair of some targets and some responses, without a list
+// of the pairs.
+struct SceptreGrid {
+    // Targets tested against every response as discovery pairs, and targets of
+    // non-targeting guides tested against every response as negative controls.
+    std::vector<std::string> discovery_targets, negative_targets;
+    // Response columns (distinct); empty: every response.
+    std::vector<std::size_t> responses;
+    // Further pairs, listed as for sceptre(): positive controls, say. A pair of
+    // the grid may not be listed again in its kind.
+    std::vector<Pair> pairs;
+};
+// The pairs of a target and kind in a grid request, by the outcome of pair QC:
+// requested = passing + few_treatment + few_control. few_treatment: too few
+// treated cells with a nonzero count; few_control: enough of those, too few
+// control cells with one. With per-guide tests a pair passes when one of its
+// guides does, and otherwise counts under few_treatment when no guide has
+// enough treated cells.
+struct PairTally {
+    std::string target;
+    PairKind kind = PairKind::discovery;
+    std::size_t requested = 0, passing = 0, few_treatment = 0, few_control = 0;
+};
+struct SceptrePairQC {
+    // The grid's pairs that pass pair QC: by response in the order requested,
+    // then discovery targets and negative-control targets in the order given.
+    std::vector<Pair> passing;
+    // One entry per target and kind, in that order.
+    std::vector<PairTally> tally;
+    std::size_t retained_cells = 0;
+};
+// Pair QC of a grid request, by the rule sceptre() applies to a listed pair (the
+// same cells, control group and min_nonzero), without a record or any other
+// work per pair: one pass over each response's nonzero cells counts them for
+// every target at once.
+template <class Responses>
+inline SceptrePairQC sceptre_pair_qc(const Matrix &design, const Responses &responses,
+                                     const SparseCSC &assignments, const std::vector<Guide> &guides,
+                                     const SceptreGrid &grid, const CellQC &qc = {},
+                                     const SceptreOptions &o = {}) {
+    const auto setup = detail::sceptre_setup(design, responses, assignments, guides, {}, qc, o);
+    const auto &cells = setup.cells;
+    const auto &nt = setup.nt;
+    const bool per_guide = o.integration != Integration::union_guides;
+    SceptrePairQC out;
+    out.retained_cells = cells.size();
+    std::vector<std::size_t> columns = grid.responses;
+    if (columns.empty()) {
+        columns.resize(responses.cols);
+        std::iota(columns.begin(), columns.end(), 0);
+    }
+    {
+        auto sorted = columns;
+        std::sort(sorted.begin(), sorted.end());
+        require(std::adjacent_find(sorted.begin(), sorted.end()) == sorted.end() &&
+                    (sorted.empty() || sorted.back() < responses.cols),
+                "grid responses must be distinct response columns");
+    }
+    std::map<std::string, std::vector<std::size_t>> target_guides;
+    for (std::size_t j = 0; j < guides.size(); ++j)
+        target_guides[guides[j].target].push_back(j);
+    // A unit is what one test treats: a target's guides together, or one guide.
+    struct Requested {
+        PairKind kind;
+        std::vector<std::size_t> units;
+    };
+    std::vector<Requested> requested;
+    std::vector<std::vector<std::size_t>> unit_guides;
+    for (auto kind : {PairKind::discovery, PairKind::negative_control}) {
+        const auto &names =
+            kind == PairKind::discovery ? grid.discovery_targets : grid.negative_targets;
+        std::set<std::string> seen;
+        for (const auto &name : names) {
+            require(target_guides.count(name) && seen.insert(name).second,
+                    "grid targets must be distinct known targets");
+            const auto &indices = target_guides.at(name);
+            if (kind == PairKind::negative_control)
+                for (auto j : indices)
+                    require(guides[j].non_targeting, "negative-control target must contain only "
+                                                     "explicitly non-targeting guides");
+            Requested r{kind, {}};
+            if (per_guide)
+                for (auto j : indices) {
+                    r.units.push_back(unit_guides.size());
+                    unit_guides.push_back({j});
+                }
+            else {
+                r.units.push_back(unit_guides.size());
+                unit_guides.push_back(indices);
+            }
+            requested.push_back(std::move(r));
+            out.tally.push_back({name, kind, 0, 0, 0, 0});
+        }
+    }
+    // The units that treat each retained cell (by row), as offsets into `treats`.
+    const auto none = std::numeric_limits<std::size_t>::max();
+    std::vector<std::size_t> position(responses.rows, none);
+    for (std::size_t i = 0; i < cells.size(); ++i)
+        position[cells[i]] = i;
+    std::vector<std::vector<std::uint32_t>> cell_units(cells.size());
+    require(unit_guides.size() <= UINT32_MAX, "too many targets in the grid");
+    for (std::size_t u = 0; u < unit_guides.size(); ++u) {
+        boost::dynamic_bitset<std::uint64_t> treated(cells.size());
+        for (auto j : unit_guides[u])
+            for (auto k = assignments.column_ptr[j]; k < assignments.column_ptr[j + 1]; ++k)
+                if (assignments.values[k] && position[assignments.row_index[k]] != none)
+                    treated[position[assignments.row_index[k]]] = 1;
+        for (auto i = treated.find_first(); i != treated.npos; i = treated.find_next(i))
+            cell_units[i].push_back(static_cast<std::uint32_t>(u));
+    }
+    std::vector<std::vector<Pair>> passing(columns.size());
+    std::vector<std::vector<std::array<std::size_t, 3>>> tallies(
+        columns.size()); // passing, few_treatment, few_control by requested target
+    parallel_for(columns.size(), o.threads, [&](std::size_t c) {
+        const auto column = columns[c];
+        std::size_t nonzero = 0, nt_nonzero = 0;
+        std::vector<std::uint32_t> treatment(unit_guides.size()), both(unit_guides.size());
+        responses.for_each(column, [&](std::size_t row, double value) {
+            const auto i = position[row];
+            if (value == 0 || i == none)
+                return;
+            const bool control = nt[row];
+            ++nonzero;
+            nt_nonzero += control;
+            for (auto u : cell_units[i]) {
+                ++treatment[u];
+                both[u] += control;
+            }
+        });
+        auto &tally = tallies[c];
+        tally.resize(requested.size());
+        for (std::size_t r = 0; r < requested.size(); ++r) {
+            bool pass = false, enough_treated = false;
+            for (auto u : requested[r].units) {
+                const std::size_t treated = treatment[u], control = o.nt_controls
+                                                                        ? nt_nonzero - both[u]
+                                                                        : nonzero - treated;
+                enough_treated |= treated >= o.min_nonzero;
+                pass |= treated >= o.min_nonzero && control >= o.min_nonzero;
+            }
+            ++tally[r][pass ? 0 : enough_treated ? 2 : 1];
+            if (pass)
+                passing[c].push_back({column, out.tally[r].target, requested[r].kind});
+        }
+    });
+    for (std::size_t c = 0; c < columns.size(); ++c) {
+        for (auto &pair : passing[c])
+            out.passing.push_back(std::move(pair));
+        for (std::size_t r = 0; r < requested.size(); ++r) {
+            ++out.tally[r].requested;
+            out.tally[r].passing += tallies[c][r][0];
+            out.tally[r].few_treatment += tallies[c][r][1];
+            out.tally[r].few_control += tallies[c][r][2];
+        }
+    }
+    return out;
+}
+struct SceptreGridResult {
+    // Records of the grid's pairs that pass pair QC, in the order of
+    // SceptrePairQC::passing, then of the pairs listed in the request.
+    SceptreResult result;
+    std::vector<PairTally> tally;
+};
+namespace detail {
+// The rows of each kind that listing every pair of a grid request would give:
+// one per pair, or one per guide of its target with singleton integration.
+// Checks that no listed pair repeats a pair of the grid in its kind.
+inline std::array<std::size_t, 3> grid_rows(const std::vector<Guide> &guides,
+                                            const SceptreGrid &grid,
+                                            const std::vector<PairTally> &tally,
+                                            const SceptreOptions &o) {
+    std::map<std::string, std::size_t> target_guides;
+    for (const auto &guide : guides)
+        ++target_guides[guide.target];
+    auto rows_of = [&](const std::string &target) {
+        return o.integration == Integration::singleton ? target_guides.at(target) : 1;
+    };
+    const std::set<std::size_t> columns(grid.responses.begin(), grid.responses.end());
+    const std::set<std::string> discovery(grid.discovery_targets.begin(),
+                                          grid.discovery_targets.end()),
+        negative(grid.negative_targets.begin(), grid.negative_targets.end());
+    std::array<std::size_t, 3> rows{};
+    for (const auto &pair : grid.pairs) {
+        require(!((grid.responses.empty() || columns.count(pair.response)) &&
+                  ((pair.kind == PairKind::discovery && discovery.count(pair.target)) ||
+                   (pair.kind == PairKind::negative_control && negative.count(pair.target)))),
+                "a listed pair repeats a pair of the grid");
+        require(target_guides.count(pair.target), "unknown pair response or target");
+        rows[static_cast<std::size_t>(pair.kind)] += rows_of(pair.target);
+    }
+    for (const auto &entry : tally)
+        rows[static_cast<std::size_t>(entry.kind)] += entry.requested * rows_of(entry.target);
+    return rows;
+}
+} // namespace detail
+// sceptre() for a grid request. The records are those sceptre() gives for a list
+// of the same pairs (streams are keyed by identity), and the adjustment families
+// are those of listing every pair of the grid: with AdjustmentFamily::listed the
+// pairs that fail pair QC are counted without being listed.
+template <class Responses>
+inline SceptreGridResult sceptre_grid(const Matrix &design, const Responses &responses,
+                                      const SparseCSC &assignments,
+                                      const std::vector<Guide> &guides, const SceptreGrid &grid,
+                                      const CellQC &qc = {}, const SceptreOptions &o = {}) {
+    require(o.stream_keys == StreamKeys::identity,
+            "a grid request needs identity stream keys (a list has the positions)");
+    auto checked = sceptre_pair_qc(design, responses, assignments, guides, grid, qc, o);
+    const auto rows = detail::grid_rows(guides, grid, checked.tally, o);
+    auto options = o;
+    if (o.family == AdjustmentFamily::listed)
+        for (std::size_t k = 0; k < 3; ++k)
+            if (!options.family_size[k])
+                options.family_size[k] = rows[k];
+    auto pairs = std::move(checked.passing);
+    pairs.insert(pairs.end(), grid.pairs.begin(), grid.pairs.end());
+    SceptreGridResult out;
+    out.result = sceptre(design, responses, assignments, guides, pairs, qc, options);
+    out.result.pairs_listed = rows;
+    out.tally = std::move(checked.tally);
+    return out;
 }
 } // namespace rapidglm

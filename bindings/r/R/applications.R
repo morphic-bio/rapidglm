@@ -115,7 +115,27 @@ bulk_de <- function(counts, design, col_data = NULL, coefficient = NULL, contras
 #' @param confirm_draws draws on which a skew-normal p-value too small for the last budget
 #'   to check is confirmed (strict check only). Default: ten times the last budget, 199,999
 #'   for the default budgets; 0 turns it off.
-#' @return A data frame per pair with run-level values in `attr(, "run")`.
+#' @param stream_keys what a pair's random stream is keyed by. "identity" (default): the
+#'   seed, the response and the target (the guide for a per-guide test), so a pair's record
+#'   is the same wherever it is listed and with whatever other pairs; a pair may then be
+#'   listed once within a kind. "position": the pair's place in the list (releases before
+#'   1.3.0).
+#' @param response_ids with identity keys, one ID per response (distinct strings that stay
+#'   with the response, such as gene names) to identify the responses by; `NULL`: their
+#'   positions in `responses`.
+#' @param adjustment_family the family within which p-values of a kind are adjusted.
+#'   "tested" (default): the pairs that pass pair QC; the other pairs have no adjusted
+#'   p-value (`NA`). "listed": every listed pair, those that fail pair QC counting with
+#'   p = 1 (releases before 1.3.0).
+#' @param family_size the number of hypotheses in each kind's family when it is larger than
+#'   the pairs at hand (the pairs not listed count with p = 1): sizes named by kind, such as
+#'   `c(discovery = 20000)`, or three sizes in the order discovery, negative, positive;
+#'   `NULL` or 0: the pairs at hand.
+#' @param .grid for `sceptre_grid()`.
+#' @return A data frame per pair (`adjusted_p` is `NA` for a pair outside its adjustment
+#'   family) with run-level values in `attr(, "run")`: retained_cells, the rejection counts,
+#'   null_fits (null models fitted) and, by kind, pairs_listed_<kind>,
+#'   pairs_passing_qc_<kind> and family_size_<kind> (the size of the adjustment family).
 sceptre <- function(responses, assignments, design, guides, pairs, cell_data = NULL,
                     moi = c("low", "high"), control_group = NULL, resampling_mechanism = NULL,
                     integration = c("union", "singleton", "bonferroni"),
@@ -127,7 +147,9 @@ sceptre <- function(responses, assignments, design, guides, pairs, cell_data = N
                     confirm_draws = NULL,
                     cell_qc = TRUE, assignment_qc = TRUE, min_nonzero = 7, alpha = 0.1,
                     qc_lower = 0.01, qc_upper = 0.99, max_mito = 0.2, adjustment = c("BH", "bonferroni"),
-                    family = c("nb", "poisson"), seed = 1, threads = 1) {
+                    family = c("nb", "poisson"), seed = 1, threads = 1,
+                    stream_keys = c("identity", "position"), response_ids = NULL,
+                    adjustment_family = c("tested", "listed"), family_size = NULL, .grid = NULL) {
   y <- as_observations(responses)
   g <- as_observations(assignments != 0)
   x <- as_design(design, cell_data, nrow(y))
@@ -149,6 +171,9 @@ sceptre <- function(responses, assignments, design, guides, pairs, cell_data = N
             crt_draw = choice(match.arg(crt_draw), c(thinned = 0, direct = 1, hazard = 2), "crt_draw"),
             fit_check = choice(match.arg(fit_check), c(strict = 0, ks = 1), "fit_check"),
             bonferroni = choice(match.arg(adjustment), c(BH = 0, bonferroni = 1), "adjustment"),
+            stream_keys = choice(match.arg(stream_keys), c(identity = 0, position = 1), "stream_keys"),
+            adjustment_family = choice(match.arg(adjustment_family), c(tested = 0, listed = 1),
+                                       "adjustment_family"),
             screen = screen, cell_qc = as.numeric(cell_qc), assignment_qc = as.numeric(assignment_qc),
             min_nonzero = min_nonzero, alpha = alpha, lower_quantile = qc_lower,
             upper_quantile = qc_upper, max_mito = max_mito, seed = seed, threads = threads)
@@ -159,15 +184,83 @@ sceptre <- function(responses, assignments, design, guides, pairs, cell_data = N
     o$crt <- choice(resampling_mechanism, c(permutations = 0, crt = 1), "resampling_mechanism")
   if (!is.null(budgets)) o$budgets <- as.numeric(budgets)
   kinds <- c(discovery = 0L, negative = 1L, positive = 2L)
+  if (!is.null(response_ids)) {
+    if (length(response_ids) != ncol(y))
+      stop(sprintf("response_ids needs %d IDs, got %d", ncol(y), length(response_ids)), call. = FALSE)
+    o$response_ids <- as.character(response_ids)
+  }
+  if (!is.null(family_size)) {
+    sizes <- unlist(family_size)
+    if (is.null(names(sizes))) {
+      if (length(sizes) != 3)
+        stop("family_size needs three sizes (discovery, negative, positive) or sizes named by kind",
+             call. = FALSE)
+      names(sizes) <- names(kinds)
+    }
+    if (!all(names(sizes) %in% names(kinds)))
+      stop("family_size kinds must be discovery, negative or positive", call. = FALSE)
+    o$family_size <- as.numeric(replace(0 * kinds, names(sizes), sizes))
+  }
   kind <- kinds[as.character(pairs$kind)]
   if (anyNA(kind)) stop("pair kind must be discovery, negative or positive", call. = FALSE)
-  r <- rapidglm_sceptre_(x, y@p, y@i, y@x, ncol(y), g@p, g@i, g@x, ncol(g),
-                         as.character(guides$id), as.character(guides$target),
-                         as.integer(guides$non_targeting), as.integer(response - 1),
-                         as.character(pairs$target), unname(kind), o)
+  if (is.null(.grid)) {
+    r <- rapidglm_sceptre_(x, y@p, y@i, y@x, ncol(y), g@p, g@i, g@x, ncol(g),
+                           as.character(guides$id), as.character(guides$target),
+                           as.integer(guides$non_targeting), as.integer(response - 1),
+                           as.character(pairs$target), unname(kind), o)
+  } else {
+    columns <- .grid$responses
+    if (is.character(columns)) columns <- match(columns, colnames(y))
+    if (anyNA(columns)) stop("unknown response in grid_responses", call. = FALSE)
+    if (!is.null(columns) && !length(columns))
+      stop("grid_responses is empty; NULL requests every response", call. = FALSE)
+    both <- rapidglm_sceptre_grid_(x, y@p, y@i, y@x, ncol(y), g@p, g@i, g@x, ncol(g),
+                                   as.character(guides$id), as.character(guides$target),
+                                   as.integer(guides$non_targeting), as.character(.grid$discovery),
+                                   as.character(.grid$negative), as.integer(columns - 1),
+                                   as.integer(response - 1), as.character(pairs$target),
+                                   unname(kind), o)
+    r <- both$result
+  }
   frame <- as_frame(r)
   frame$kind <- names(kinds)[frame$kind + 1]
   if (!is.null(colnames(y))) frame$response_id <- colnames(y)[frame$response + 1]
   frame$response <- frame$response + 1
+  if (!is.null(.grid)) {
+    tally <- as.data.frame(both$tally$columns, stringsAsFactors = FALSE)
+    tally$kind <- names(kinds)[tally$kind + 1]
+    attr(frame, "tally") <- tally
+  }
   frame
+}
+
+#' Perturbation screen analysis of a grid of targets and responses
+#'
+#' `sceptre()` for every pair of some targets and some responses, without a list of the
+#' pairs. Pair QC is decided for the whole grid first and only the pairs that pass it get a
+#' row: by response in the order requested, then discovery and negative targets in the order
+#' given, then the listed pairs. The rows are those `sceptre()` gives for a list of the same
+#' pairs, and the adjustment families those of listing every pair of the grid: with
+#' `adjustment_family = "listed"` the pairs that fail pair QC are counted without being
+#' listed, and pairs_listed_<kind> counts every pair of the grid.
+#'
+#' @param responses,assignments,design,guides as for `sceptre()`.
+#' @param discovery_targets targets tested against every grid response as discovery pairs.
+#' @param negative_targets targets of non-targeting guides tested against every grid response
+#'   as negative controls.
+#' @param grid_responses the responses of the grid (distinct gene names or 1-based indices);
+#'   `NULL`: every response.
+#' @param pairs further pairs listed as for `sceptre()`, such as positive controls (`NULL`:
+#'   none). A pair of the grid may not be listed again in its kind.
+#' @param ... further arguments of `sceptre()`; `stream_keys` must be "identity".
+#' @return The data frame of `sceptre()`, with one row per grid target and kind in
+#'   `attr(, "tally")`: target, kind, requested, passing, few_treatment (too few treated
+#'   cells with a nonzero count) and few_control (enough of those, too few such control
+#'   cells).
+sceptre_grid <- function(responses, assignments, design, guides, discovery_targets,
+                         negative_targets = character(), grid_responses = NULL, pairs = NULL, ...) {
+  if (is.null(pairs)) pairs <- data.frame(response = integer(), target = character(), kind = character())
+  sceptre(responses, assignments, design, guides, pairs, ...,
+          .grid = list(discovery = discovery_targets, negative = negative_targets,
+                       responses = grid_responses))
 }

@@ -1,26 +1,22 @@
 {
-  "purpose": "bulk_de with legacy_cooks (DESeq2's Cook's-distance robust dispersion as implemented in PyDESeq2, MIT) against DESeq2 1.48.2",
-  "commit": "a0652a36705116da563edf8cf951d921d155a90e",
-  "worktree_note": "measured with the legacy_cooks change uncommitted on top of this commit; committed with this receipt",
-  "alpha_rob_check": {
-    "method": "legacy formula against alpha_rob recovered from DESeq2's cooks, mu and hat assays (COOKS_THYROID.json)",
-    "max_relative_difference": {
-      "airway": 1.73e-12,
-      "thyroid128": 1.05e-13
-    }
-  },
+  "purpose": "bulk_de against DESeq2 1.48.2 with its default Cook's distances (legacy_cooks: DESeq2's robust dispersion as implemented in PyDESeq2, MIT) and with RapidGLM's own estimator (legacy_cooks false, the default before 1.2.0)",
+  "command": "python3 scripts/validate_cooks.py --thyroid-output validation/COOKS_THYROID.json --legacy-output validation/COOKS_LEGACY.json",
+  "version": "1.2.0",
+  "commit": "4446d4249011fa120299376732deec5bb1522409",
   "datasets": {
     "airway": {
       "deseq2_discoveries": 4834,
       "default": {
-        "discoveries": 5142,
-        "jaccard": 0.934833204034135,
-        "cooks_flagged": 0
+        "discoveries": 5164,
+        "jaccard": 0.9323540780827213,
+        "cooks_flagged": 0,
+        "replaced_genes": 0
       },
-      "legacy": {
-        "discoveries": 5142,
-        "jaccard": 0.934833204034135,
-        "cooks_flagged": 0
+      "own_estimator": {
+        "discoveries": 5164,
+        "jaccard": 0.9323540780827213,
+        "cooks_flagged": 0,
+        "replaced_genes": 0
       }
     },
     "kang": {
@@ -28,38 +24,44 @@
       "default": {
         "discoveries": 618,
         "jaccard": 0.9732283464566929,
-        "cooks_flagged": 0
+        "cooks_flagged": 0,
+        "replaced_genes": 0
       },
-      "legacy": {
+      "own_estimator": {
         "discoveries": 618,
         "jaccard": 0.9732283464566929,
-        "cooks_flagged": 0
+        "cooks_flagged": 0,
+        "replaced_genes": 0
       }
     },
     "sim3": {
       "deseq2_discoveries": 239,
       "default": {
-        "discoveries": 241,
-        "jaccard": 0.9753086419753086,
-        "cooks_flagged": 63
-      },
-      "legacy": {
         "discoveries": 240,
         "jaccard": 0.9793388429752066,
-        "cooks_flagged": 61
+        "cooks_flagged": 61,
+        "replaced_genes": 0
+      },
+      "own_estimator": {
+        "discoveries": 241,
+        "jaccard": 0.9753086419753086,
+        "cooks_flagged": 63,
+        "replaced_genes": 0
       }
     },
     "sim3b": {
       "deseq2_discoveries": 201,
       "default": {
-        "discoveries": 200,
-        "jaccard": 0.9950248756218906,
-        "cooks_flagged": 86
-      },
-      "legacy": {
         "discoveries": 201,
         "jaccard": 1.0,
-        "cooks_flagged": 82
+        "cooks_flagged": 82,
+        "replaced_genes": 0
+      },
+      "own_estimator": {
+        "discoveries": 200,
+        "jaccard": 0.9950248756218906,
+        "cooks_flagged": 86,
+        "replaced_genes": 0
       }
     },
     "sim8": {
@@ -67,39 +69,53 @@
       "default": {
         "discoveries": 253,
         "jaccard": 1.0,
-        "cooks_flagged": 0
+        "cooks_flagged": 0,
+        "replaced_genes": 79
       },
-      "legacy": {
+      "own_estimator": {
         "discoveries": 253,
         "jaccard": 1.0,
-        "cooks_flagged": 0
+        "cooks_flagged": 0,
+        "replaced_genes": 78
       }
     },
     "thyroid128": {
       "deseq2_discoveries": 792,
       "default": {
-        "discoveries": 463,
-        "jaccard": 0.5786163522012578,
-        "cooks_flagged": 751
-      },
-      "legacy": {
         "discoveries": 790,
         "jaccard": 0.9974747474747475,
-        "cooks_flagged": 216
+        "cooks_flagged": 216,
+        "replaced_genes": 67
+      },
+      "own_estimator": {
+        "discoveries": 463,
+        "jaccard": 0.5786163522012578,
+        "cooks_flagged": 751,
+        "replaced_genes": 281
       }
     },
     "thyroid": {
       "deseq2_discoveries": 7177,
       "default": {
-        "discoveries": 6577,
-        "jaccard": 0.9039313399778516,
-        "cooks_flagged": 448
-      },
-      "legacy": {
         "discoveries": 7177,
         "jaccard": 1.0,
-        "cooks_flagged": 5
+        "cooks_flagged": 5,
+        "replaced_genes": 98
+      },
+      "own_estimator": {
+        "discoveries": 6577,
+        "jaccard": 0.9039313399778516,
+        "cooks_flagged": 448,
+        "replaced_genes": 1110
       }
     }
+  },
+  "alpha_rob_check": {
+    "method": "legacy formula against alpha_rob recovered from DESeq2's cooks, mu and hat assays (COOKS_THYROID.json)",
+    "max_relative_difference": {
+      "airway": 1.73e-12,
+      "thyroid128": 1.05e-13
+    },
+    "carried_over": "analysis of 2026-10-01, not recomputed"
   }
 }

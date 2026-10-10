@@ -504,6 +504,309 @@ class CLI(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("phase needs checkpoint_dir", result.stderr)
 
+    def screen(self):
+        # A high-MOI screen: target T0 with two guides, T1 to T3 and a
+        # non-targeting guide; gene 2 rises in the cells of T1, gene 5 has too few
+        # nonzero cells for any pair to pass pair QC and gene 1 none in those of T2.
+        cells, genes = 360, 6
+        counts = [
+            (g, c, 2 * (c % 37 == 0) if g == 5 else
+             (c * (g + 3) * 7919) % (g + 5) // 2 + (3 if g == 2 and c % 6 == 2 else 0))
+            for g in range(genes)
+            for c in range(cells)
+        ]
+        counts = [t for t in counts if t[2] > 0]
+        calls = sorted((c % 6, c) for c in range(cells) if (c // 6) % 3 != 0)
+        guides = [("g0", "T0", 0), ("g1", "T0", 0), ("g2", "T1", 0), ("g3", "T2", 0),
+                  ("g4", "T3", 0), ("g5", "NT", 1)]
+        targets = [("T0", "discovery"), ("T1", "discovery"), ("T2", "discovery"),
+                   ("T3", "discovery"), ("NT", "negative")]
+        # Every pair of the targets and the genes, by gene, and a positive control.
+        pairs = [(g, t, kind) for g in range(genes) for t, kind in targets]
+        positive = [(2, "T1", "positive")]
+        config = dict(
+            responses=self.file(
+                "screen.mtx",
+                f"%%MatrixMarket matrix coordinate integer general\n{genes} {cells} {len(counts)}\n"
+                + "".join(f"{g + 1} {c + 1} {v}\n" for g, c, v in counts),
+            ),
+            design=self.file(
+                "screen_design.tsv", "".join(f"1\t{(c % 7) / 7}\n" for c in range(cells))
+            ),
+            assignments=self.file(
+                "screen_guides.mtx",
+                f"%%MatrixMarket matrix coordinate integer general\n{len(guides)} {cells} {len(calls)}\n"
+                + "".join(f"{g + 1} {c + 1} 1\n" for g, c in calls),
+            ),
+            guides=self.file(
+                "screen_guides.tsv",
+                "id\ttarget\tnon_targeting\n" + "".join(f"{i}\t{t}\t{n}\n" for i, t, n in guides),
+            ),
+            pairs=self.pairs_file("screen_pairs.tsv", pairs + positive),
+            family="nb",
+            moi="high",
+            cell_qc=False,
+            budgets=[99, 499],
+            screen=0.3,
+            alpha=0.5,
+            threads=4,
+            seed=11,
+        )
+        return dict(config=config, cells=cells, genes=genes, counts=counts, targets=targets,
+                    pairs=pairs, positive=positive)
+
+    def pairs_file(self, name, pairs):
+        return self.file(
+            name, "response\ttarget\tkind\n" + "".join(f"{g}\t{t}\t{k}\n" for g, t, k in pairs)
+        )
+
+    def sceptre_run(self, name, config, **kwargs):
+        """Runs sceptre with output prefix `name`; returns the process and, when
+        it wrote them, the rows and the run record."""
+        path = self.root / f"{name}.json"
+        path.write_text(json.dumps(dict(config, output=str(self.root / name), **kwargs)))
+        r = subprocess.run([BINARY, "sceptre", path], capture_output=True, text=True)
+        table = self.root / f"{name}.tsv"
+        if r.returncode != 0 or not table.exists():
+            return r, None, None
+        rows = list(csv.DictReader(table.read_text().splitlines(), delimiter="\t"))
+        return r, rows, json.loads((self.root / f"{name}.run.json").read_text())
+
+    @staticmethod
+    def by_pair(rows):
+        return sorted(rows, key=lambda r: (int(r["response"]), r["target"], r["guide"], r["kind"]))
+
+    def test_sceptre_streams_are_keyed_by_identity(self):
+        screen = self.screen()
+        config, listed = screen["config"], screen["pairs"] + screen["positive"]
+        r, rows, record = self.sceptre_run("identity", config)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual((record["stream_keys"], record["response_ids"]), ("identity", False))
+        self.assertGreater(sum(row["status"] == "ok" for row in rows), 20)
+        self.assertGreater(sum(int(row["draws"]) > 99 for row in rows), 0)
+        # The pairs in another order: the same rows. By position they are other tests.
+        other = self.pairs_file("screen_reordered.tsv", listed[7:][::-1] + listed[:7])
+        r, reordered, _ = self.sceptre_run("reordered", config, pairs=other)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertNotEqual(reordered, rows)
+        self.assertEqual(self.by_pair(reordered), self.by_pair(rows))
+        r, position, record = self.sceptre_run("position", config, stream_keys="position")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(record["stream_keys"], "position")
+        r, moved, _ = self.sceptre_run("position_reordered", config, pairs=other, stream_keys="position")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertNotEqual(self.by_pair(moved), self.by_pair(position))
+        self.assertNotEqual([row["p_value"] for row in position], [row["p_value"] for row in rows])
+        # Response IDs identify the responses whatever their columns.
+        genes, order = screen["genes"], [4, 0, 5, 2, 1, 3]
+        column = {g: k for k, g in enumerate(order)}
+        ids = self.file("ids.txt", "".join(f"gene{g}\n" for g in range(genes)))
+        r, named, record = self.sceptre_run("named", config, response_ids=ids)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertTrue(record["response_ids"])
+        self.assertIn(ids, record["input_sha1"])
+        self.assertNotEqual([row["p_value"] for row in named], [row["p_value"] for row in rows])
+        counts = screen["counts"]
+        moved_config = dict(
+            config,
+            responses=self.file(
+                "screen_moved.mtx",
+                f"%%MatrixMarket matrix coordinate integer general\n{genes} {screen['cells']} {len(counts)}\n"
+                + "".join(f"{column[g] + 1} {c + 1} {v}\n" for g, c, v in counts),
+            ),
+            pairs=self.pairs_file("screen_moved.tsv", [(column[g], t, k) for g, t, k in listed]),
+            response_ids=self.file("moved_ids.txt", "".join(f"gene{g}\n" for g in order)),
+        )
+        r, moved, _ = self.sceptre_run("moved", moved_config)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        for row in moved:
+            row["response"] = str(order[int(row["response"])])
+        self.assertEqual(self.by_pair(moved), self.by_pair(named))
+        # A pair is listed once within a kind; by position the rows are two tests.
+        twice = self.pairs_file("screen_twice.tsv", listed + listed[3:4])
+        r, _, _ = self.sceptre_run("twice", config, pairs=twice)
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("a pair is listed twice within a kind: response 0, target T3", r.stderr)
+        r, both, _ = self.sceptre_run("twice_position", config, pairs=twice, stream_keys="position")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(len(both), len(listed) + 1)
+        for extra, message in [
+            (dict(stream_keys="name"), "stream_keys must be identity/position"),
+            (dict(response_ids=self.file("few.txt", "a\nb\n")), "one ID per response column"),
+            (dict(response_ids=self.file("same.txt", "a\n" * genes)), "response IDs must be distinct"),
+        ]:
+            r, _, _ = self.sceptre_run("bad", config, **extra)
+            self.assertEqual(r.returncode, 2, extra)
+            self.assertIn(message, r.stderr)
+        r, _ = self.execute("fit", stream_keys="identity")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("stream_keys is a sceptre setting", r.stderr)
+        # The keys are part of a tiled plan.
+        tiled = dict(checkpoint_dir=str(self.root / "ck_keys"), tile_targets=2, tile_responses=3)
+        r, rows_tiled, _ = self.sceptre_run("tiled", config, **tiled)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(rows_tiled, rows)
+        for extra in (dict(stream_keys="position"), dict(adjustment_family="listed")):
+            r, _, _ = self.sceptre_run("tiled_other", config, **tiled, **extra)
+            self.assertEqual(r.returncode, 2, extra)
+            self.assertIn("holds a run with other inputs", r.stderr)
+
+    def test_sceptre_adjustment_families(self):
+        screen = self.screen()
+        config = dict(screen["config"], effect_fits="none")
+        r, tested, record = self.sceptre_run("tested", config)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        r, listed, listed_record = self.sceptre_run("listed", config, adjustment_family="listed")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(record["adjustment_family"], "tested")
+        self.assertEqual(listed_record["adjustment_family"], "listed")
+        # Gene 5 fails pair QC with every target, and gene 1 with T2: outside the
+        # tested family, and counted with p = 1 in the listed one.
+        failed = [k for k, row in enumerate(tested) if row["status"] == "failed_pair_qc"]
+        self.assertEqual(len(failed), 6)
+        counts = dict(discovery=24, negative=6, positive=1)
+        passing = dict(discovery=19, negative=5, positive=1)
+        self.assertEqual(record["pairs_listed"], counts)
+        self.assertEqual(record["pairs_passing_qc"], passing)
+        self.assertEqual(record["family_size"], passing)
+        self.assertEqual(listed_record["pairs_passing_qc"], passing)
+        self.assertEqual(listed_record["family_size"], counts)
+        self.assertEqual(record["null_fits"], 5)  # one per gene with a pair to test
+        differ = 0
+        for k, (a, b) in enumerate(zip(tested, listed)):
+            self.assertEqual({**a, "adjusted_p": ""}, {**b, "adjusted_p": ""})
+            if k in failed:
+                self.assertEqual((a["p_value"], a["adjusted_p"], b["adjusted_p"]), ("NA", "NA", "1"))
+            else:
+                self.assertLessEqual(float(a["adjusted_p"]), float(b["adjusted_p"]))
+                differ += a["adjusted_p"] != b["adjusted_p"]
+        self.assertGreater(differ, 0)
+        # The sizes of the listed families, given by a caller who lists the
+        # pairs that pass: the adjusted p-values of the full list.
+        some = self.pairs_file("passing.tsv", [
+            pair for pair, row in zip(screen["pairs"] + screen["positive"], tested)
+            if row["status"] != "failed_pair_qc"])
+        r, sized, sized_record = self.sceptre_run(
+            "sized", config, pairs=some, family_size_discovery=24, family_size_negative=6)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(sized, [row for k, row in enumerate(listed) if k not in failed])
+        self.assertEqual(sized_record["family_size"], counts)
+        self.assertEqual(sized_record["pairs_listed"], passing)
+        r, _, _ = self.sceptre_run("small", config, family_size_discovery=3)
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("family_size is smaller than the pairs of its family", r.stderr)
+        r, _, _ = self.sceptre_run("bad", config, adjustment_family="all")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("adjustment_family must be tested/listed", r.stderr)
+
+    def test_sceptre_grid_request_matches_the_listed_pairs(self):
+        screen = self.screen()
+        config, genes = screen["config"], screen["genes"]
+        targets = self.file(
+            "targets.tsv", "target\tkind\n" + "".join(f"{t}\t{k}\n" for t, k in screen["targets"]))
+        positive = self.pairs_file("positive.tsv", screen["positive"])
+        grid = dict(config, targets=targets, pairs=positive)
+        counts = dict(discovery=24, negative=6, positive=1)
+        for family in ("tested", "listed"):
+            with self.subTest(family=family):
+                r, listed, listed_record = self.sceptre_run(
+                    f"list_{family}", config, adjustment_family=family)
+                self.assertEqual(r.returncode, 0, r.stderr)
+                r, rows, record = self.sceptre_run(f"grid_{family}", grid, adjustment_family=family)
+                self.assertEqual(r.returncode, 0, r.stderr)
+                # The rows of the pairs that pass pair QC, in the order of the list.
+                self.assertEqual(rows, [row for row in listed if row["status"] != "failed_pair_qc"])
+                self.assertEqual(len(rows), 25)
+                self.assertTrue(record["grid"])
+                self.assertNotIn("grid", listed_record)
+                self.assertIn(targets, record["input_sha1"])
+                for key in ("pairs_listed", "pairs_passing_qc", "family_size"):
+                    self.assertEqual(record[key], listed_record[key], key)
+                self.assertEqual(record["pairs_listed"], counts)
+                for key in ("discovery_rejections", "calibration_rejections", "power_rejections"):
+                    self.assertEqual(record[key], listed_record[key], key)
+                # The tallies: every pair of the grid, by target and kind.
+                tally = list(csv.DictReader(
+                    (self.root / f"grid_{family}.tally.tsv").read_text().splitlines(), delimiter="\t"))
+                self.assertEqual(list(tally[0]), ["target", "kind", "requested", "passing",
+                                                  "few_treatment", "few_control"])
+                self.assertEqual([(t["target"], t["kind"]) for t in tally], screen["targets"])
+                for t in tally:
+                    kind = "1" if t["kind"] == "negative" else "0"
+                    mine = [row for row in listed if (row["target"], row["kind"]) == (t["target"], kind)]
+                    self.assertEqual(int(t["requested"]), genes)
+                    self.assertEqual(int(t["passing"]), sum(row["status"] != "failed_pair_qc" for row in mine))
+                    self.assertEqual(int(t["few_treatment"]), 2 if t["target"] == "T2" else 1)
+                    self.assertEqual(int(t["few_control"]), 0)
+                self.assertFalse((self.root / f"list_{family}.tally.tsv").exists())
+                # Tiles and checkpoints run the same pairs: in one process, and in
+                # separate prepare, tile and merge phases.
+                tiled = dict(checkpoint_dir=str(self.root / f"ck_{family}"), tile_targets=2,
+                             tile_responses=2, adjustment_family=family)
+                r, _, tiled_record = self.sceptre_run(f"tiled_{family}", grid, **tiled)
+                self.assertEqual(r.returncode, 0, r.stderr)
+                phases = dict(tiled, checkpoint_dir=str(self.root / f"ph_{family}"))
+                r, rows, _ = self.sceptre_run(f"phases_{family}", grid, **phases, phase="prepare")
+                self.assertEqual((r.returncode, rows), (0, None), r.stderr)
+                self.assertEqual(tiled_record["tiles"]["count"], 9)
+                for k in range(9):
+                    r, _, _ = self.sceptre_run(f"phases_{family}", grid, **phases, phase="tile", tile=k)
+                    self.assertEqual(r.returncode, 0, r.stderr)
+                self.assertFalse((self.root / f"phases_{family}.tally.tsv").exists())
+                r, _, phases_record = self.sceptre_run(f"phases_{family}", grid, **phases, phase="merge")
+                self.assertEqual(r.returncode, 0, r.stderr)
+                for name, other in ((f"tiled_{family}", tiled_record), (f"phases_{family}", phases_record)):
+                    for suffix in ("tsv", "tally.tsv"):
+                        self.assertEqual((self.root / f"{name}.{suffix}").read_bytes(),
+                                         (self.root / f"grid_{family}.{suffix}").read_bytes())
+                    for key in ("pairs_listed", "pairs_passing_qc", "family_size", "grid"):
+                        self.assertEqual(other[key], record[key], key)
+                # Null models: one per response with a pair to test, fitted by the
+                # process that prepares the tiles.
+                self.assertEqual((record["null_fits"], tiled_record["null_fits"],
+                                  phases_record["null_fits"]), (5, 5, 0))
+        # Some of the responses, in the order requested, and no listed pairs.
+        some = self.file("grid_responses.txt", "4\n5\n1\n")
+        grid.pop("pairs")
+        r, rows, record = self.sceptre_run("grid_some", grid, grid_responses=some)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual([(row["response"], row["target"]) for row in rows],
+                         [(g, t) for g in ("4", "1") for t, _ in screen["targets"] if (g, t) != ("1", "T2")])
+        self.assertEqual(record["pairs_listed"], dict(discovery=12, negative=3, positive=0))
+        self.assertEqual(record["family_size"], dict(discovery=7, negative=2, positive=0))
+        reference = {(row["response"], row["target"], row["kind"]): row for row in listed}
+        for row in rows:
+            other = reference[(row["response"], row["target"], row["kind"])]
+            self.assertEqual({**row, "adjusted_p": ""}, {**other, "adjusted_p": ""})
+        for extra, message in [
+            (dict(stream_keys="position"), "a grid request needs identity stream keys"),
+            (dict(pairs=self.pairs_file("again.tsv", [(1, "T2", "discovery")])),
+             "a listed pair repeats a pair of the grid"),
+            (dict(targets=self.file("bad_kind.tsv", "target\tkind\nT1\tpositive\n")),
+             "target kind must be discovery/negative"),
+            (dict(targets=self.file("bad_header.tsv", "target\nT1\n")), "targets header must be"),
+            (dict(targets=self.file("twice.tsv", "target\tkind\nT1\tdiscovery\nT1\tdiscovery\n")),
+             "grid targets must be distinct known targets"),
+            (dict(targets=self.file("not_nt.tsv", "target\tkind\nT1\tnegative\n")),
+             "negative-control target must contain only explicitly non-targeting guides"),
+            (dict(grid_responses=self.file("out_of_range.txt", "6\n")), "invalid response index"),
+            (dict(grid_responses=self.file("repeated.txt", "1\n1\n")),
+             "grid responses must be distinct response columns"),
+        ]:
+            r, _, _ = self.sceptre_run("bad_grid", grid, **extra)
+            self.assertEqual(r.returncode, 2, extra)
+            self.assertIn(message, r.stderr)
+        # A pair of a target outside the grid's kind may be listed.
+        r, rows, _ = self.sceptre_run(
+            "grid_extra", grid, grid_responses=some,
+            pairs=self.pairs_file("extra.tsv", [(0, "T2", "discovery"), (4, "T2", "positive")]))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual([(row["response"], row["target"], row["kind"]) for row in rows[-2:]],
+                         [("0", "T2", "0"), ("4", "T2", "2")])
+        r, _, _ = self.sceptre_run("no_grid", config, grid_responses=some)
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("grid_responses needs targets", r.stderr)
+
     def test_null_model_is_not_silently_ignored_by_fit(self):
         result, _ = self.execute("fit", null_model="sceptre")
         self.assertEqual(result.returncode, 2)

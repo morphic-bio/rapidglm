@@ -1,25 +1,47 @@
 {
-  "purpose": "Bulk DE agreement with DESeq2 1.48.2 on GTEx thyroid with Cook's-distance filtering disabled in both tools (docs/BULK_DE.md, larger multi-factor designs)",
+  "purpose": "Bulk DE agreement with DESeq2 1.48.2 on GTEx thyroid with Cook's-distance filtering disabled in both tools (docs/BULK_DE.md, larger multi-factor designs): by default, and under own_estimator with legacy_cooks false. Outlying counts are still replaced in both tools.",
   "commands": {
-    "rapidglm": "rapidglm bulk-de with cooks_filter=false, coefficient sex[T.female]",
-    "deseq2": "DESeq(full = design, betaPrior = FALSE) then results(name = 'sex.T.female.', cooksCutoff = FALSE)"
+    "rapidglm": "rapidglm bulk-de with cooks_filter=false, coefficient sex[T.female] (scripts/validate_cooks.py)",
+    "deseq2": "DESeq(full = design, betaPrior = FALSE) then results(name = 'sex.T.female.', cooksCutoff = FALSE) (scripts/reference_bulk_nocooks.R)"
   },
+  "version": "1.2.0",
+  "commit": "4446d4249011fa120299376732deec5bb1522409",
   "datasets": {
     "thyroid128": {
       "discoveries": [
-        866,
+        884,
         884
       ],
-      "jaccard": 0.9707207207207207,
-      "pvalue_spearman": 0.9932097225518984
+      "jaccard": 1.0,
+      "pvalue_spearman": 0.9997514891794114,
+      "replaced_genes": 67,
+      "own_estimator": {
+        "discoveries": [
+          866,
+          884
+        ],
+        "jaccard": 0.9707207207207207,
+        "pvalue_spearman": 0.9932097225518984,
+        "replaced_genes": 281
+      }
     },
     "thyroid": {
       "discoveries": [
-        7050,
+        7180,
         7180
       ],
-      "jaccard": 0.9643843180563225,
-      "pvalue_spearman": 0.9819228553241379
+      "jaccard": 1.0,
+      "pvalue_spearman": 0.9999961603402828,
+      "replaced_genes": 98,
+      "own_estimator": {
+        "discoveries": [
+          7050,
+          7180
+        ],
+        "jaccard": 0.9643843180563225,
+        "pvalue_spearman": 0.9819228553241379,
+        "replaced_genes": 1110
+      }
     }
   },
   "alpha_rob_black_box": {
@@ -31,9 +53,11 @@
     },
     "flags_thyroid128": {
       "deseq2": 224,
-      "rapidglm": 751,
       "rapidglm_rule_with_deseq2_alpha_rob": 224,
-      "best_tested_candidate_jaccard": 0.477
-    }
+      "best_tested_candidate_jaccard": 0.477,
+      "rapidglm_default": 216,
+      "rapidglm_own_estimator": 751
+    },
+    "carried_over": "analysis of 2026-10-01, not recomputed"
   }
 }

@@ -53,6 +53,36 @@ inline void philox_blocks(std::uint64_t block, std::uint32_t draw, std::uint32_t
         for (unsigned j = 0; j < 4; ++j)
             out[j * lanes + l] = c[l][j];
 }
+} // namespace detail
+// A random stream: draw k of it is CounterRng(seed, test, k).
+struct Stream {
+    std::uint64_t seed = 1, test = 0;
+};
+// The 64-bit key of a response or target named by a string: FNV-1a of its bytes.
+inline std::uint64_t name_key(const std::string &name) {
+    std::uint64_t h = 14695981039346656037ULL;
+    for (unsigned char c : name) {
+        h ^= c;
+        h *= 1099511628211ULL;
+    }
+    return h;
+}
+// The stream of the test identified by the keys (a, b) within `domain`, for a
+// run seeded with `seed`: it depends on nothing else, so the test draws the same
+// numbers wherever and with whatever other tests it runs. Philox keyed by the
+// seed turns the domain into a key, and Philox with that key turns (a, b) into
+// the stream's own 64-bit seed and 32-bit stream number. Two of N tests share a
+// stream with probability about N^2 / 2^97.
+inline Stream keyed_stream(std::uint64_t seed, std::uint32_t domain, std::uint64_t a,
+                           std::uint64_t b) {
+    std::uint32_t w[4];
+    detail::philox_blocks<1>(domain, UINT32_MAX, UINT32_MAX, seed, w);
+    const std::uint64_t key = w[0] | (static_cast<std::uint64_t>(w[1]) << 32);
+    detail::philox_blocks<1>(a, static_cast<std::uint32_t>(b), static_cast<std::uint32_t>(b >> 32),
+                             key, w);
+    return {w[0] | (static_cast<std::uint64_t>(w[1]) << 32), w[2]};
+}
+namespace detail {
 #if defined(__x86_64__) && (defined(__GNUC__) || defined(__clang__))
 #define RAPIDGLM_PHILOX_AVX2 1
 // Low and high words of the 64-bit products of every 32-bit lane of c with m.
@@ -1100,6 +1130,10 @@ struct ResampleOptions {
     // `screen` makes that rare.
     double prescreen = 0;
     std::uint64_t prescreen_test_id = 0;
+    // The prescreen's stream has its own seed when prescreen_seeded, so that
+    // tests whose own streams have different seeds can share it.
+    bool prescreen_seeded = false;
+    std::uint64_t prescreen_seed = 0;
     // End the screens (the shared prescreen and the empirical screen) as soon as
     // their outcome is certain: once enough draws are at least as extreme as the
     // statistic on each side that the screen's p-value must exceed its threshold
@@ -1312,7 +1346,7 @@ inline void check_budgets(const ResampleOptions &o) {
 // After each budget a skew-normal fit that is accepted (FitCheck) ends the
 // drawing; with an empirical screen the first budget ends with its empirical
 // p-value unless that is at most the screen. With a shared prescreen the first
-// budget is drawn twice, first from the shared stream (test_id() tells which).
+// budget is drawn twice, first from the shared stream (stream() tells which).
 // A sequential stage (sequential_screen, early_stop) can end before its budget:
 // advance() tells when.
 class NullStages {
@@ -1432,8 +1466,10 @@ class NullStages {
         return false;
     }
     // The stream of the draws to write now.
-    std::uint64_t test_id() const {
-        return prescreening_ ? o_.prescreen_test_id : o_.test_id;
+    Stream stream() const {
+        if (prescreening_)
+            return {o_.prescreen_seeded ? o_.prescreen_seed : o_.seed, o_.prescreen_test_id};
+        return {o_.seed, o_.test_id};
     }
     std::size_t begin() const {
         return index_ == 0 ? 0 : o_.budgets[index_ - 1];
@@ -1529,7 +1565,7 @@ inline void staged_null(ResampleResult &out, const ResampleOptions &o, MakeBatch
     NullStages stages(o, out.statistic);
     do {
         const std::size_t begin = stages.begin(), budget = stages.end();
-        const std::uint64_t test = stages.test_id();
+        const Stream stream = stages.stream();
         double *null = stages.null();
         // A stage that may end early is drawn checkpoint by checkpoint, in order.
         const bool sequential = stages.sequential();
@@ -1540,12 +1576,13 @@ inline void staged_null(ResampleResult &out, const ResampleOptions &o, MakeBatch
             std::exception_ptr failure;
             std::mutex failure_mutex;
 #pragma omp taskloop grainsize(1) shared(null, make_batch, failure, failure_mutex)                 \
-    firstprivate(begin, budget, chunk_size, test)
+    firstprivate(begin, budget, chunk_size, stream)
             for (std::size_t chunk = 0; chunk < chunks; ++chunk) {
                 try {
                     auto batch = make_batch();
                     const auto first = begin + chunk * chunk_size;
-                    batch(test, first, std::min(budget, first + chunk_size) - first, null + first);
+                    batch(stream, first, std::min(budget, first + chunk_size) - first,
+                          null + first);
                 } catch (...) {
                     std::lock_guard<std::mutex> lock(failure_mutex);
                     if (!failure)
@@ -1562,7 +1599,7 @@ inline void staged_null(ResampleResult &out, const ResampleOptions &o, MakeBatch
             for (std::size_t first = begin, last; first < budget; first = last) {
                 last = std::min(budget, sequential ? NullStages::next_checkpoint(first)
                                                    : first + chunk_size);
-                serial(test, first, last - first, null + first);
+                serial(stream, first, last - first, null + first);
                 if (stages.advance(last))
                     break;
             }
@@ -1641,16 +1678,15 @@ inline void draw_statistics(const BinaryScoreWorkspace &workspace, const Sampler
 struct BinaryDrawBatch {
     const BinaryScoreWorkspace &workspace;
     const Sampler &sampler;
-    std::uint64_t seed;
     // Stored draws covering a given first draw, if any.
     std::function<const CachedDraws *(std::size_t)> cache;
     DrawScratch scratch;
-    BinaryDrawBatch(const BinaryScoreWorkspace &w, const Sampler &s, std::uint64_t seed_,
+    BinaryDrawBatch(const BinaryScoreWorkspace &w, const Sampler &s,
                     std::function<const CachedDraws *(std::size_t)> cache_ = {})
-        : workspace(w), sampler(s), seed(seed_), cache(std::move(cache_)) {}
-    void operator()(std::uint64_t test, std::size_t first, std::size_t count, double *null) {
-        draw_statistics(workspace, sampler, seed, test, cache ? cache(first) : nullptr, first,
-                        count, null, scratch);
+        : workspace(w), sampler(s), cache(std::move(cache_)) {}
+    void operator()(const Stream &stream, std::size_t first, std::size_t count, double *null) {
+        draw_statistics(workspace, sampler, stream.seed, stream.test,
+                        cache ? cache(first) : nullptr, first, count, null, scratch);
     }
 };
 // The observed statistic of a binary covariate, or NaN when its score is not
@@ -1683,7 +1719,7 @@ inline ResampleResult resample_prepared(const BinaryScoreWorkspace &workspace,
         out.statistic = nan;
         return out;
     }
-    staged_null(out, o, [&] { return BinaryDrawBatch(workspace, sampler, o.seed); }, 256);
+    staged_null(out, o, [&] { return BinaryDrawBatch(workspace, sampler); }, 256);
     return out;
 }
 } // namespace detail
@@ -1721,12 +1757,11 @@ inline ResampleResult resample_permutation(const ScoreWorkspace &score, const Ve
                 const ScoreWorkspace &score;
                 const Vector &observed;
                 const std::vector<std::vector<std::size_t>> &members;
-                std::uint64_t seed;
                 Vector permuted;
-                void operator()(std::uint64_t test, std::size_t first, std::size_t count,
+                void operator()(const Stream &stream, std::size_t first, std::size_t count,
                                 double *null) {
                     for (std::size_t k = 0; k < count; ++k) {
-                        CounterRng rng(seed, test, first + k);
+                        CounterRng rng(stream.seed, stream.test, first + k);
                         permuted = observed;
                         for (const auto &m : members)
                             for (std::size_t r = m.size(); r > 1; --r) {
@@ -1737,7 +1772,7 @@ inline ResampleResult resample_permutation(const ScoreWorkspace &score, const Ve
                     }
                 }
             };
-            return Draws{score, observed, members, o.seed, {}};
+            return Draws{score, observed, members, {}};
         },
         16);
     return out;

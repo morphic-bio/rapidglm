@@ -269,7 +269,41 @@ keys are rejected by other commands.
 - `pairs`: TSV header `response<TAB>target<TAB>kind`, with zero-based response
   index and kind `discovery`, `negative`, or `positive`. Negative-control
   targets must contain explicitly NT guides. Supply individual NT targets
-  or predeclared NT guide groups if testing them against other NT cells.
+  or predeclared NT guide groups if testing them against other NT cells. A pair
+  may be listed once within a kind (`stream_keys` below).
+- `targets` (from 1.3.0), instead of or beside `pairs`: TSV header
+  `target<TAB>kind`, kind `discovery` or `negative`. Every target is then tested
+  against every response, or against the responses of `grid_responses` (a text
+  file with one zero-based response index per line), without a list of the
+  pairs. Only the pairs that pass pair QC get a row in the output table; the
+  others are tallied in `OUTPUT.tally.tsv`, one row per target and kind:
+  `requested`, `passing`, `few_treatment` (too few treated cells with a nonzero
+  count) and `few_control` (enough of those, too few control cells with one).
+  The rows are those of listing the same pairs. `pairs` may then hold further
+  pairs, such as positive controls, but none of the grid's in its kind.
+- `response_ids` (from 1.3.0, optional): a text file with one ID per response
+  (gene or peak names, say), which identifies each response in the stream keys.
+
+**Stream keys** (`stream_keys`, from 1.3.0). With `identity`, the default, a
+pair's draws depend only on `seed`, its response and its target: its row is the
+same wherever it is listed, whatever else is listed, and however the run is
+split into tiles or separate runs. The response is identified by its ID in
+`response_ids`, or by its index when that file is not given; the index
+identifies it only while the matrix keeps its rows. `position` keys the draws by
+the pair's place in the list, as releases before 1.3.0 did, and reproduces
+their tables; a pair's p-value then changes with the order and content of the
+list (METHODS.md, Resampling).
+
+**Adjustment family** (`adjustment_family`, from 1.3.0). Adjusted p-values are computed
+within each kind of pair. With `tested`, the default, the family is the pairs
+that pass pair QC, as in SCEPTRE; a pair that fails pair QC has no adjusted
+p-value. With `listed`, as before 1.3.0, it is every listed pair, the failed
+ones counting with p = 1. `family_size_discovery`, `family_size_negative` and
+`family_size_positive` give a family's size when it is larger than the pairs at
+hand, for a run that lists only some of them. Effect fits of the significant
+pairs follow the family. The run record stores the keys, the family, and the
+pairs listed, passing pair QC and in each family (METHODS.md, Tests and
+effects).
 
 Parameters: `moi` (`low`/`high`), `control_group` (`nt_cells`/`complement`),
 `resampling_mechanism` (`permutations`/`crt`), `integration`

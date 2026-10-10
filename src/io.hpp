@@ -117,6 +117,19 @@ inline Vector read_vector(const std::string &path) {
     require(f.eof(), "invalid vector token");
     return v;
 }
+// The nonempty lines of a text file: one name per line.
+inline std::vector<std::string> read_lines(const std::string &path) {
+    auto f = input(path);
+    std::vector<std::string> lines;
+    std::string line;
+    while (std::getline(f, line)) {
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+        if (!line.empty())
+            lines.push_back(line);
+    }
+    return lines;
+}
 inline Matrix read_matrix(const std::string &path) {
     auto f = input(path);
     std::string line;
@@ -813,5 +826,13 @@ inline void pair_table(std::ostream &out, const std::vector<PairResult> &tests) 
         }
         out << '\n';
     }
+}
+// The pairs of a grid request by target and kind, and by the outcome of pair QC.
+inline void tally_table(std::ostream &out, const std::vector<PairTally> &tally) {
+    out << "target\tkind\trequested\tpassing\tfew_treatment\tfew_control\n";
+    for (const auto &t : tally)
+        out << t.target << '\t' << (t.kind == PairKind::negative_control ? "negative" : "discovery")
+            << '\t' << t.requested << '\t' << t.passing << '\t' << t.few_treatment << '\t'
+            << t.few_control << '\n';
 }
 } // namespace rapidglm::cli

@@ -272,10 +272,33 @@ change. Gaussian coefficients are mean differences. The perturbation workflow
 also reports observed treatment mean / fitted-null treatment mean as
 `sceptre_mean_ratio` (undefined if denominator is zero), and its log2 transform
 separately. Its compatibility with 0.99.0 must be measured; it is not named a
-log fold change. Failed tests remain in the declared family with p=1 for
-adjustment and missing inferential results. BH sorts p and takes reverse
-cumulative minima of m*p_(i)/i; Bonferroni is min(1,m*p).
+log fold change. BH sorts p and takes reverse cumulative minima of m*p_(i)/i;
+Bonferroni is min(1,m*p).
 Source: [Benjamini & Hochberg 1995](https://doi.org/10.1111/j.2517-6161.1995.tb02031.x).
+
+**The adjustment family** of the perturbation workflow (`adjustment_family`;
+`SceptreOptions::family` in C++), within each kind of pair (discovery, negative
+control, positive control):
+- `tested`, the default from 1.3.0: the pairs that pass pair QC. A pair that
+  fails pair QC has no adjusted p-value. A pair that passes and whose test then
+  fails (a null model without a regular fit, say) stays in the family with
+  p = 1.
+- `listed`, the default before 1.3.0: every listed pair, those that fail pair QC
+  counting with p = 1. The adjusted p-values then depend on how many untestable
+  pairs the list happens to hold.
+- `family_size` gives the number of hypotheses of a kind when it is larger than
+  the pairs at hand, for a caller that lists only some of them; the others
+  count with p = 1, exactly as if they were listed.
+
+SCEPTRE's documentation says that pairs below its nonzero-cell thresholds "are
+excluded" and have missing p-values and significance calls, and that the
+resulting p-values "are subjected to a multiplicity adjustment"; it does not
+name the family in so many words. Its outputs do: on the Gasperini benchmark
+panel (10,000 discovery pairs listed, 9,718 passing pairwise QC) SCEPTRE
+0.99.0's 101 calls are BH at 0.1 over the 9,718, not over the 10,000 (97
+calls). `tested` is that family. Sources:
+[pairwise QC](https://timothy-barry.github.io/sceptre-book/run-qc.html),
+[multiple testing](https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html).
 
 By default only pairs rejected at `alpha` in their testing family (after
 guide integration) receive this full effect fit; the others report the
@@ -360,8 +383,8 @@ with AVX2 when available. Draw k of a pair always uses its own key and is
 written to slot k, so none of this changes any result.
 
 Optionally (`reuse_draws`, high MOI only), the CRT draws of a target are shared
-by all its tests: test IDs of the random streams are target indices instead of
-pair indices, and each stage's draws are stored once per target (within
+by all its tests: the random streams are keyed by the target instead of the
+pair, and each stage's draws are stored once per target (within
 `draw_cache_mb`) and scored against every gene. Each test is still a CRT with
 the same law and staging; only the resamples are common to the target's genes,
 so their errors are correlated. It is meant for routine discovery; reported
@@ -369,9 +392,8 @@ statistics use the default's independent draws.
 
 Optionally (`shared_screen`, high MOI only), only the first-stage screen is
 shared. Each test is first screened with its target's first-stage draws, from
-a stream keyed by the target (test IDs from 2^31 up, apart from the pairs'
-own); a test whose empirical p-value there exceeds `shared_screen_p` ends with
-it. Every other test is then staged as in the default from its own stream,
+a stream keyed by the target and apart from the pairs' own; a test whose
+empirical p-value there exceeds `shared_screen_p` ends with it. Every other test is then staged as in the default from its own stream,
 starting again at draw 0, so its result is the default's. The shared screen can
 end a test that the default would have continued; with `shared_screen_p` above
 the default screen this is rare, and a test whose p-value is small passes with
@@ -426,7 +448,37 @@ responses; more often costs time, because each return interrupts every thread.
 Philox4x32-10 is implemented from the published algorithm; seed is the 64-bit
 key, test ID and draw ID partition the 128-bit counter with a per-draw block
 index. Limits are checked. No thread ID contributes to streams. Floating point
-reductions within a test have a fixed order. Sources:
+reductions within a test have a fixed order.
+
+**Stream keys of the perturbation workflow** (`stream_keys`). A stream is a
+64-bit seed and a 32-bit test ID; draw k of a test uses the stream's draw k.
+- `identity`, the default from 1.3.0: a pair's stream depends only on the
+  run's seed, the response and the target. Its record is therefore the same
+  wherever the pair is listed, whatever else is listed, and however the run is
+  divided among threads, tiles, shards or calls.
+  - *Keys.* The response's key is the 64-bit FNV-1a hash of its ID
+    (`response_ids`: one string per response, such as a gene or peak name), or
+    its column index when no IDs are given; the index identifies a response
+    only while the matrix keeps its columns. The target's key is the FNV-1a
+    hash of its name (of the guide's ID for a per-guide test). Names in one run
+    must have distinct keys, which is checked.
+  - *Stream.* Philox keyed by the run's seed turns a domain number into a
+    64-bit key (counter words: the domain, 0, 2^32 - 1, 2^32 - 1); Philox with
+    that key turns the two keys (counter words: the response key, then the
+    target key, low words first) into the stream: its seed is the first two
+    output words and its test ID the third. Domains: 1 a pair, 2 a target whose
+    draws are reused, 3 a target's shared screen; 4 to 6 the same for per-guide
+    tests. Two of N pairs share a stream with probability about N²/2⁹⁷.
+  - *Duplicates.* A pair listed twice within a kind would be one test counted
+    twice, and is an error. A pair listed under two kinds (a positive control
+    that is also a discovery pair) is one test and has one p-value.
+- `position`, the default before 1.3.0: the test ID is the pair's place in the
+  list (the target's order of first appearance for reused draws and the shared
+  screen), under the run's seed. It reproduces earlier releases; a pair's
+  p-value then changes when the list is reordered or other pairs are added or
+  removed. Each p-value is valid under either setting.
+
+Sources:
 [Salmon et al. 2011](https://www.thesalmons.org/john/random123/papers/random123sc11.pdf),
 [Barry et al. 2021](https://doi.org/10.1186/s13059-021-02545-2).
 
@@ -519,8 +571,23 @@ Union pools guides; singleton tests each; Bonferroni tests each then returns
 min(1,k*min(p)), retaining failed guides in k. NT controls exclude treatment
 cells. High MOI requires complement controls. Negative-control targets must be
 explicitly identified, never inferred from no-call or WT labels. BH is applied
-separately to declared discovery, power and calibration families; QQ output
-includes pointwise Beta order-statistic 95% bands (not simultaneous bands).
+separately to the discovery, power and calibration families (Adjustment family
+above); QQ output includes pointwise Beta order-statistic 95% bands (not
+simultaneous bands).
+
+Pair QC is decided first, from the target's treated cells and the response's
+nonzero cells alone. A pair that fails it costs nothing more: no cells are
+gathered, and with complement controls a response's null model is fitted only
+when one of its pairs passes.
+
+A request can name targets and responses instead of listing pairs
+(`sceptre_grid`; `targets` in the CLI): every discovery target and every
+negative-control target against every named response. One pass over each
+response's nonzero cells counts them for all targets, the pairs that pass pair
+QC are tested, and the others are only tallied, by target and kind, as having
+too few treated cells with a nonzero count or too few control cells with one.
+The records are those of listing the same pairs (identity stream keys), and
+the `listed` family counts the untested pairs without holding them.
 Sources: [SCEPTRE QC documentation](https://katsevich-lab.github.io/sceptre/reference/run_qc.html),
 [analysis parameters](https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html).
 

@@ -128,7 +128,8 @@ class CAPI(unittest.TestCase):
                 self.assert_same(table, frame, text=("family", "status"))
                 self.assertEqual((frame["status"] == "ok").sum(), 78)  # gene 3 is all zero
 
-    def test_sceptre_matches_cli(self):
+    def screen(self):
+        """A high-MOI screen and its CLI input files."""
         rng = np.random.default_rng(7)
         cells, genes = 600, 12
         guides = pd.DataFrame({
@@ -156,6 +157,24 @@ class CAPI(unittest.TestCase):
                      responses=write_market(self.root / "responses.mtx", responses),
                      assignments=write_market(self.root / "assignments.mtx", assignments),
                      guides=str(guides_file), pairs=str(pairs_file))
+        return x, responses, assignments, guides, pairs, files
+
+    def cli_kinds(self, table):
+        kinds = {"0": "discovery", "1": "negative", "2": "positive"}
+        table["kind"] = [kinds[k] for k in table["kind"]]
+        return table
+
+    def assert_same_counts(self, record, frame):
+        """The run record's counts by kind equal the frame's run-level values."""
+        for name in ("pairs_listed", "pairs_passing_qc", "family_size"):
+            for kind, count in record[name].items():
+                self.assertEqual(frame.attrs[f"{name}_{kind}"], count, (name, kind))
+        self.assertEqual(frame.attrs["null_fits"], record["null_fits"])
+        for name in ("discovery_rejections", "calibration_rejections", "power_rejections"):
+            self.assertEqual(frame.attrs[name], record[name], name)
+
+    def test_sceptre_matches_cli(self):
+        x, responses, assignments, guides, pairs, files = self.screen()
         cases = [
             dict(moi="high", budgets=[199, 1999], seed=3, threads=4),
             dict(moi="high", integration="singleton", approximation="no_approximation",
@@ -167,11 +186,140 @@ class CAPI(unittest.TestCase):
             with self.subTest(**{k: str(v) for k, v in config.items()}):
                 table, record = self.cli("sceptre", **files, **config)
                 frame = rapidglm.sceptre(x, responses, assignments, guides, pairs, **config)
-                kinds = {"0": "discovery", "1": "negative", "2": "positive"}
-                table["kind"] = [kinds[k] for k in table["kind"]]
-                self.assert_same(table, frame, text=("target", "guide", "kind", "status"))
+                self.assert_same(self.cli_kinds(table), frame, text=("target", "guide", "kind", "status"))
                 self.assertGreaterEqual((frame["status"] == "ok").sum(), 5)
                 self.assertEqual(frame.attrs["discovery_rejections"], record["discovery_rejections"])
+
+    def test_sceptre_stream_keys_and_families_match_cli(self):
+        x, responses, assignments, guides, pairs, files = self.screen()
+        genes = responses.shape[1]
+        # Every target against every gene; with min_nonzero 40 the pairs of C fail pair QC.
+        targets = ["A", "B", "C", "non-targeting"]
+        pairs = pd.DataFrame(
+            [(g, t, "negative" if t == "non-targeting" else "discovery") for g in range(genes) for t in targets]
+            + [(0, "A", "positive")], columns=["response", "target", "kind"])
+        pairs.to_csv(files["pairs"], sep="\t", index=False)
+        ids = [f"gene{j}" for j in range(genes)]
+        ids_file = self.root / "ids.txt"
+        ids_file.write_text("".join(f"{i}\n" for i in ids))
+        common = dict(moi="high", budgets=[199, 999], seed=3, min_nonzero=40, alpha=0.3)
+        default = rapidglm.sceptre(x, responses, assignments, guides, pairs, **common)
+        failed = default["status"] == "failed_pair_qc"
+        self.assertEqual(failed.sum(), 13)
+        self.assertTrue(default["adjusted_p"][failed].isna().all())
+        self.assertTrue(default["adjusted_p"][~failed].notna().all())
+        self.assertEqual((default.attrs["pairs_listed_discovery"], default.attrs["family_size_discovery"]),
+                         (36, 24))
+        cases = [  # CLI configuration, Python arguments
+            (dict(), dict()),
+            (dict(stream_keys="position"), dict(stream_keys="position")),
+            (dict(response_ids=str(ids_file)), dict(response_ids=ids)),
+            (dict(adjustment_family="listed", threads=3), dict(adjustment_family="listed", threads=3)),
+            (dict(family_size_discovery=50, family_size_positive=2),
+             dict(family_size={"discovery": 50, "positive": 2})),
+            (dict(stream_keys="position", adjustment_family="listed", family_size_negative=30,
+                  integration="singleton", adjustment="bonferroni"),
+             dict(stream_keys="position", adjustment_family="listed", family_size=(0, 30, 0),
+                  integration="singleton", adjustment="bonferroni")),
+        ]
+        for config, arguments in cases:
+            with self.subTest(**{k: str(v) for k, v in arguments.items()}):
+                table, record = self.cli("sceptre", **files, **common, **config)
+                frame = rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, **arguments)
+                self.assert_same(self.cli_kinds(table), frame, text=("target", "guide", "kind", "status"))
+                self.assert_same_counts(record, frame)
+                self.assertEqual(record["stream_keys"], arguments.get("stream_keys", "identity"))
+                self.assertEqual(record["adjustment_family"], arguments.get("adjustment_family", "tested"))
+                if "integration" not in arguments:
+                    # The keys change the draws; the family, the adjusted p-values alone.
+                    keys = "stream_keys" in arguments or "response_ids" in arguments
+                    self.assertEqual(frame["p_value"].equals(default["p_value"]), not keys)
+                    self.assertEqual(frame["adjusted_p"].equals(default["adjusted_p"]), not arguments)
+        with self.assertRaisesRegex(ValueError, "stream_keys must be one of identity/position"):
+            rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, stream_keys="name")
+        with self.assertRaisesRegex(ValueError, "adjustment_family must be one of tested/listed"):
+            rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, adjustment_family="all")
+        with self.assertRaisesRegex(ValueError, f"response_ids needs {genes} IDs, got 2"):
+            rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, response_ids=["a", "b"])
+        with self.assertRaisesRegex(ValueError, "response IDs must be distinct"):
+            rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, response_ids=["a"] * genes)
+        with self.assertRaisesRegex(ValueError, "family_size kinds must be"):
+            rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, family_size={"other": 3})
+        with self.assertRaisesRegex(ValueError, "family_size needs three sizes"):
+            rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, family_size=[50])
+        with self.assertRaisesRegex(ValueError, "family_size is smaller"):
+            rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, family_size=[3, 0, 0])
+        with self.assertRaisesRegex(ValueError, "listed twice"):
+            rapidglm.sceptre(x, responses, assignments, guides, pd.concat([pairs, pairs[4:5]]), **common)
+
+    def test_sceptre_grid_matches_cli_and_the_list(self):
+        x, responses, assignments, guides, _, files = self.screen()
+        genes = responses.shape[1]
+        discovery, negative = ["A", "B", "C"], ["non-targeting"]
+        positive = pd.DataFrame({"response": [0], "target": ["A"], "kind": ["positive"]})
+        grid_pairs = pd.DataFrame(
+            [(g, t, "negative" if t in negative else "discovery") for g in range(genes)
+             for t in discovery + negative], columns=["response", "target", "kind"])
+        positive.to_csv(files["pairs"], sep="\t", index=False)
+        targets_file = self.root / "targets.tsv"
+        pd.DataFrame({"target": discovery + negative,
+                      "kind": ["discovery"] * 3 + ["negative"]}).to_csv(targets_file, sep="\t", index=False)
+        some = [7, 0, 5]
+        some_file = self.root / "grid_responses.txt"
+        some_file.write_text("".join(f"{g}\n" for g in some))
+        common = dict(moi="high", budgets=[199, 999], seed=3, min_nonzero=40, alpha=0.3)
+        cases = [  # CLI configuration, Python arguments
+            (dict(), dict()),
+            (dict(adjustment_family="listed", threads=3), dict(adjustment_family="listed", threads=3)),
+            (dict(grid_responses=str(some_file), integration="bonferroni"),
+             dict(grid_responses=some, integration="bonferroni")),
+        ]
+        for config, arguments in cases:
+            with self.subTest(**{k: str(v) for k, v in arguments.items()}):
+                table, record = self.cli("sceptre", **files, targets=str(targets_file), **common, **config)
+                frame, tally = rapidglm.sceptre_grid(x, responses, assignments, guides, discovery, negative,
+                                                     pairs=positive, **common, **arguments)
+                self.assert_same(self.cli_kinds(table), frame, text=("target", "guide", "kind", "status"))
+                self.assert_same_counts(record, frame)
+                self.assertTrue(record["grid"])
+                cli_tally = pd.read_csv(self.root / "result.tally.tsv", sep="\t", dtype=str, keep_default_na=False)
+                self.assert_same(cli_tally, tally, text=("target", "kind"))
+                # The grid's rows are the rows of the listed pairs that pass pair QC.
+                responses_used = arguments.get("grid_responses", range(genes))
+                options = {k: v for k, v in arguments.items() if k != "grid_responses"}
+                listed = pd.concat([grid_pairs[grid_pairs["response"] == g] for g in responses_used] + [positive],
+                                   ignore_index=True)
+                reference = rapidglm.sceptre(x, responses, assignments, guides, listed, **common, **options)
+                passing = reference[reference["status"] != "failed_pair_qc"].reset_index(drop=True)
+                self.assertGreater(len(reference), len(passing))
+                pd.testing.assert_frame_equal(frame, passing, check_exact=True)
+                for name in ("pairs_listed", "pairs_passing_qc", "family_size"):
+                    for kind in ("discovery", "negative", "positive"):
+                        self.assertEqual(frame.attrs[f"{name}_{kind}"], reference.attrs[f"{name}_{kind}"])
+                # Every pair of the grid is in the tally, by target and kind.
+                self.assertEqual(tally["target"].tolist(), discovery + negative)
+                self.assertEqual(tally["kind"].tolist(), ["discovery"] * 3 + ["negative"])
+                self.assertTrue((tally["requested"] == len(responses_used)).all())
+                self.assertTrue(
+                    (tally["requested"] == tally["passing"] + tally["few_treatment"] + tally["few_control"]).all())
+                self.assertEqual(tally["passing"].sum() + 1, len(frame))
+                self.assertEqual(tally["few_treatment"][2], len(responses_used))
+        # No listed pairs, responses by name, and invalid requests.
+        named = pd.DataFrame(responses, columns=[f"gene{j}" for j in range(genes)])
+        frame, tally = rapidglm.sceptre_grid(x, named, assignments, guides, ["A"], grid_responses=["gene5", "gene2"],
+                                             **common)
+        self.assertEqual(frame["response_name"].tolist(), ["gene5", "gene2"])
+        self.assertEqual((len(tally), tally["requested"][0]), (1, 2))
+        with self.assertRaisesRegex(ValueError, "identity stream keys"):
+            rapidglm.sceptre_grid(x, responses, assignments, guides, discovery, negative, **common,
+                                  stream_keys="position")
+        with self.assertRaisesRegex(ValueError, "repeats a pair of the grid"):
+            rapidglm.sceptre_grid(x, responses, assignments, guides, discovery, negative, pairs=grid_pairs[:1],
+                                  **common)
+        with self.assertRaisesRegex(ValueError, "grid targets must be distinct known targets"):
+            rapidglm.sceptre_grid(x, responses, assignments, guides, ["A", "A"], **common)
+        with self.assertRaisesRegex(ValueError, "grid_responses is empty"):
+            rapidglm.sceptre_grid(x, responses, assignments, guides, ["A"], grid_responses=[], **common)
 
     def test_errors_are_python_exceptions(self):
         x, counts = self.bulk_data()

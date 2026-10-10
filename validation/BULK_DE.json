@@ -1,6 +1,6 @@
 {
  "purpose": "Validation of the bulk DE module (rapidglm bulk-de) against DESeq2 1.48.2.",
- "commit": "be60928fc0375f31dbf479184610296144f6a484",
+ "commit": "4446d4249011fa120299376732deec5bb1522409",
  "worktree_dirty": true,
  "command": "python3 scripts/validate_bulk.py --work DIR --output validation/BULK_DE.json",
  "datasets": {
@@ -518,5 +518,7 @@
   2.18505859375,
   2.37646484375,
   2.6201171875
- ]
+ ],
+ "version": "1.2.0",
+ "commit_note": "the source measured is this commit (v1.2.0-dev.1); it was made while the stages ran, and stages that started before it recorded be60928 with the same source uncommitted"
 }

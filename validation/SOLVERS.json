@@ -1,12 +1,12 @@
 {
  "purpose": "RapidGLM's NB solvers against Ceres Solver 2.2 (Levenberg-Marquardt, dogleg, L-BFGS, BFGS) on identical problems; see docs/SOLVERS.md",
  "version": "1.2.0",
- "commit": "be60928fc0375f31dbf479184610296144f6a484",
- "commit_note": "measured with the 1.2.0 changes uncommitted on top of this commit; they are committed with this receipt",
+ "commit": "4446d4249011fa120299376732deec5bb1522409",
+ "commit_note": "the source measured is this commit (v1.2.0-dev.1); it was made while the stages ran, and stages that started before it recorded be60928 with the same source uncommitted",
  "command": "docker run --rm --cpuset-cpus 16 -v DATASET:/data rapidglm-solvers build-solvers/rapidglm_solver_benchmark /data {fixed|joint} 1 0 both",
  "container": "built from the v1.2.0 tree (Dockerfile, then benchmarks/solvers/Dockerfile)",
  "rapidglm_note": "rapidglm_newton shares among the genes the design-only part of a fit (prepare_design: X'X, its rank check and the rows' nonzero entries), computed once and not timed, as fit_batch and bulk_de do; rapidglm_newton_plain calls fit() for each gene on its own. Both give the same estimates.",
- "host": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-06. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired. One thread per solver.",
+ "host": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-06 and 2026-10-07. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired. One thread per solver.",
  "runs": [
   {
    "dataset": "airway",

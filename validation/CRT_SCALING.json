@@ -1,0 +1,224 @@
+{
+ "purpose": "Wall time of the perturbation workflow (conditional randomization test) on panels of the Gasperini screen, with RapidGLM's defaults and with fit_check ks",
+ "version": "1.2.0",
+ "commit": "4446d4249011fa120299376732deec5bb1522409",
+ "commit_note": "the source measured is this commit (v1.2.0-dev.1); it was made while the stages ran, and stages that started before it recorded be60928 with the same source uncommitted",
+ "configuration": "207,324 cells, moi high, complement controls, CRT, budgets 499/4,999/19,999, screen 0.02, cell_qc false, seed 20260930, 16 threads on CPUs 16-31; default: fit_check strict with 199,999 confirmation draws; ks: fit_check ks",
+ "panels": "every pair of T targets and G response genes: the first T of a random order of the benchmark panel's 3,776 discovery targets and the first G of a random order of its 7,418 response genes (numpy default_rng(20261001): one permutation of the sorted target names, then one of the gene indices), so the sets are nested; written by scripts/prepare_crt_panels.py",
+ "commands": [
+  "python3 scripts/prepare_crt_panels.py --output DIR 50x1000 200x1000 100x7418",
+  "rapidglm sceptre config.json under /usr/bin/time -v"
+ ],
+ "host": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-06 and 2026-10-07. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired.",
+ "points": [
+  {
+   "panel": "t50_g1000",
+   "targets": 50,
+   "genes": 1000,
+   "fit_check": "ks",
+   "confirm_draws": 0,
+   "pairs": 50000,
+   "pairs_tested": 48596,
+   "draws": 29352404,
+   "wall_seconds": 133.7,
+   "user_seconds": 1832.67,
+   "max_rss_gb": 2.81754,
+   "waited_for_idle_seconds": 0,
+   "others_cpu": 0.0107,
+   "discoveries": 6,
+   "pairs_past_the_screen": 1024,
+   "confirmation": {
+    "pairs": 0,
+    "fit_confirmed": 0,
+    "fit_rejected_empirical_p": 0
+   },
+   "discovery_pairs": [
+    "response 155 x chr5.4556_top_two",
+    "response 296 x chr15.2327_top_two",
+    "response 669 x chr1.6127_top_two",
+    "response 771 x chr15.2327_top_two",
+    "response 772 x chr15.2327_top_two",
+    "response 971 x chr15.2327_top_two"
+   ]
+  },
+  {
+   "panel": "t50_g1000",
+   "targets": 50,
+   "genes": 1000,
+   "fit_check": "strict",
+   "confirm_draws": 199999,
+   "pairs": 50000,
+   "pairs_tested": 48596,
+   "draws": 31032404,
+   "wall_seconds": 133.49,
+   "user_seconds": 1934.13,
+   "max_rss_gb": 2.67202,
+   "waited_for_idle_seconds": 0,
+   "others_cpu": 0.0065,
+   "discoveries": 6,
+   "pairs_past_the_screen": 1024,
+   "confirmation": {
+    "pairs": 6,
+    "fit_confirmed": 6,
+    "fit_rejected_empirical_p": 0
+   },
+   "discovery_pairs": [
+    "response 155 x chr5.4556_top_two",
+    "response 296 x chr15.2327_top_two",
+    "response 669 x chr1.6127_top_two",
+    "response 771 x chr15.2327_top_two",
+    "response 772 x chr15.2327_top_two",
+    "response 971 x chr15.2327_top_two"
+   ]
+  },
+  {
+   "panel": "t200_g1000",
+   "targets": 200,
+   "genes": 1000,
+   "fit_check": "ks",
+   "confirm_draws": 0,
+   "pairs": 200000,
+   "pairs_tested": 193824,
+   "draws": 116450676,
+   "wall_seconds": 415.96,
+   "user_seconds": 6256.41,
+   "max_rss_gb": 3.58334,
+   "waited_for_idle_seconds": 0,
+   "others_cpu": 0.0058,
+   "discoveries": 5,
+   "pairs_past_the_screen": 3925,
+   "confirmation": {
+    "pairs": 0,
+    "fit_confirmed": 0,
+    "fit_rejected_empirical_p": 0
+   },
+   "discovery_pairs": [
+    "response 296 x chr15.2327_top_two",
+    "response 343 x chr1.11567_top_two",
+    "response 771 x chr15.2327_top_two",
+    "response 772 x chr15.2327_top_two",
+    "response 944 x chr1.11567_top_two"
+   ]
+  },
+  {
+   "panel": "t200_g1000",
+   "targets": 200,
+   "genes": 1000,
+   "fit_check": "strict",
+   "confirm_draws": 199999,
+   "pairs": 200000,
+   "pairs_tested": 193824,
+   "draws": 122330676,
+   "wall_seconds": 440.31,
+   "user_seconds": 6571.65,
+   "max_rss_gb": 3.507904,
+   "waited_for_idle_seconds": 0,
+   "others_cpu": 0.0061,
+   "discoveries": 5,
+   "pairs_past_the_screen": 3925,
+   "confirmation": {
+    "pairs": 20,
+    "fit_confirmed": 19,
+    "fit_rejected_empirical_p": 1
+   },
+   "discovery_pairs": [
+    "response 296 x chr15.2327_top_two",
+    "response 343 x chr1.11567_top_two",
+    "response 771 x chr15.2327_top_two",
+    "response 772 x chr15.2327_top_two",
+    "response 944 x chr1.11567_top_two"
+   ]
+  },
+  {
+   "panel": "t100_g7418",
+   "targets": 100,
+   "genes": 7418,
+   "fit_check": "ks",
+   "confirm_draws": 0,
+   "pairs": 741800,
+   "pairs_tested": 721266,
+   "draws": 436113234,
+   "wall_seconds": 1675.56,
+   "user_seconds": 24876.54,
+   "max_rss_gb": 12.389576,
+   "waited_for_idle_seconds": 0,
+   "others_cpu": 0.008,
+   "discoveries": 22,
+   "pairs_past_the_screen": 15057,
+   "confirmation": {
+    "pairs": 0,
+    "fit_confirmed": 0,
+    "fit_rejected_empirical_p": 0
+   },
+   "discovery_pairs": [
+    "response 515 x chr15.2327_top_two",
+    "response 534 x chr15.2327_top_two",
+    "response 1196 x chr22.1919_top_two",
+    "response 2043 x chr5.980_top_two",
+    "response 2043 x chr12.3309_top_two",
+    "response 2264 x chr15.2327_top_two",
+    "response 2406 x chr15.2327_top_two",
+    "response 2536 x chr6.4971_second_two",
+    "response 2597 x chr1.11567_top_two",
+    "response 2628 x chr11.1726_top_two",
+    "response 2650 x chr1.11567_top_two",
+    "response 4245 x chr1.4670_top_two",
+    "response 4420 x chr1.8792_top_two",
+    "response 4475 x chr1.11567_top_two",
+    "response 4521 x chr3.4961_top_two",
+    "response 4639 x chr20.1393_top_two",
+    "response 5341 x chr1.11567_top_two",
+    "response 5745 x chr15.2327_top_two",
+    "response 5747 x chr15.2327_top_two",
+    "response 5788 x chr1.4670_top_two",
+    "response 6966 x chr1.11567_top_two",
+    "response 7193 x chr15.2327_top_two"
+   ],
+   "discoveries_by_direct_count": {
+    "contradicted": 4,
+    "not contradicted": 18
+   }
+  },
+  {
+   "panel": "t100_g7418",
+   "targets": 100,
+   "genes": 7418,
+   "fit_check": "strict",
+   "confirm_draws": 199999,
+   "pairs": 741800,
+   "pairs_tested": 721266,
+   "draws": 454758234,
+   "wall_seconds": 1741.12,
+   "user_seconds": 25873.93,
+   "max_rss_gb": 12.386444,
+   "waited_for_idle_seconds": 0,
+   "others_cpu": 0.0082,
+   "discoveries": 14,
+   "pairs_past_the_screen": 15057,
+   "confirmation": {
+    "pairs": 52,
+    "fit_confirmed": 49,
+    "fit_rejected_empirical_p": 3
+   },
+   "discovery_pairs": [
+    "response 515 x chr15.2327_top_two",
+    "response 534 x chr15.2327_top_two",
+    "response 2264 x chr15.2327_top_two",
+    "response 2406 x chr15.2327_top_two",
+    "response 2597 x chr1.11567_top_two",
+    "response 2628 x chr11.1726_top_two",
+    "response 2650 x chr1.11567_top_two",
+    "response 4420 x chr1.8792_top_two",
+    "response 4475 x chr1.11567_top_two",
+    "response 4639 x chr20.1393_top_two",
+    "response 5341 x chr1.11567_top_two",
+    "response 5745 x chr15.2327_top_two",
+    "response 5747 x chr15.2327_top_two",
+    "response 6966 x chr1.11567_top_two"
+   ],
+   "discoveries_by_direct_count": {
+    "not contradicted": 14
+   }
+  }
+ ]
+}

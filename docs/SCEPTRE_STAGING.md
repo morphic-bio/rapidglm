@@ -29,7 +29,9 @@ so systematically more discoveries.
 
 (Since 1.0.0 the acceptance of the skew-normal fit is stricter by default than
 the one this page describes; `fit_check=ks` gives the acceptance used here.
-See METHODS.md, Resampling.)
+See METHODS.md, Resampling. With version 1.2.0 the receipt repeats the ten
+seeds of each panel under RapidGLM's defaults as well, `defaults_screen_0.02`:
+on these panels they give the discoveries of `fit_check=ks` in every seed.)
 
 A new resampling option, `screen`, reproduces that staging. The first budget
 always ends with its empirical p-value, which is final unless it is at most the
