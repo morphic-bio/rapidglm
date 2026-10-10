@@ -12,6 +12,7 @@ to the C++ calls (`tests/test_c_api.cpp`).
 | `rapidglm_fit_batch` | `fit_batch` | `fit` |
 | `rapidglm_bulk_de` | `bulk_de` | `bulk-de` |
 | `rapidglm_sceptre` | `sceptre` | `sceptre` |
+| `rapidglm_sceptre_grid` | `sceptre_grid` | `sceptre` with `targets` |
 | `rapidglm_scan` | `score_scan` | `scan` |
 
 ## Building and linking
@@ -77,6 +78,14 @@ several rows (a joint likelihood ratio test), as in
 [HYPOTHESES.md](HYPOTHESES.md). `rapidglm_sceptre_options_init(&o, high_moi)`
 sets the MOI-dependent defaults for the control group and calibration.
 
+From 1.3.0 `rapidglm_sceptre_options` ends with `stream_keys`, `response_ids`,
+`family` and `family_size` ([CLI.md](CLI.md#perturbation-workflow), stream keys
+and adjustment family). A caller built against an earlier header passes a
+shorter struct and gets their defaults: streams keyed by identity and the
+family of the tested pairs. `rapidglm_sceptre_grid` takes target names and
+response columns instead of a list of pairs and returns a second table, the
+tally of the pairs that fail pair QC by target and kind.
+
 ## Language bindings
 
 - **Python** ([bindings/python](../bindings/python)) loads the library with
@@ -98,5 +107,5 @@ sets the MOI-dependent defaults for the control group and calibration.
   error paths.
 - The `c_api_*` Boost cases compare every numeric column with the C++ results
   bit for bit: `fit_batch`; `bulk_de` with shrinkage and a contrast; `score_scan`;
-  and `sceptre`.
+  `sceptre` with each stream key and adjustment family; and `sceptre_grid`.
 - Both run under ctest, with and without the sanitizers.

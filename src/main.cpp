@@ -70,9 +70,10 @@ int main(int argc, char **argv) {
                 new_fingerprints = true;
             }
         };
-        for (const char *key : {"design", "covariates", "offset", "weights", "assignments",
-                                "guides", "pairs", "units", "group", "qc_total", "qc_detected",
-                                "qc_mito", "predictors", "strata", "size_factor_values"})
+        for (const char *key :
+             {"design", "covariates", "offset", "weights", "assignments", "guides", "pairs",
+              "targets", "grid_responses", "response_ids", "units", "group", "qc_total",
+              "qc_detected", "qc_mito", "predictors", "strata", "size_factor_values"})
             if (auto path = config.get_optional<std::string>(key))
                 if (!path->empty()) {
                     const auto stamp = recorded(*path);
@@ -134,7 +135,9 @@ int main(int argc, char **argv) {
         require(static_cast<bool>(out), "cannot create result table");
         std::size_t failures = 0, retained = responses.rows, calibration = 0, power = 0,
                     discoveries = 0, samplers_cached = 0, samplers_rebuilt = 0,
-                    sampler_cache_mb = 0;
+                    sampler_cache_mb = 0, null_fits = 0;
+        // By kind (discovery, negative control, positive control).
+        std::array<std::size_t, 3> pairs_listed{}, pairs_passing_qc{}, family_sizes{};
         std::uint64_t seed = config.get<std::uint64_t>("seed", 1);
         QuasiLikelihoodResult quasi;
         BulkResult bulk;
@@ -156,10 +159,32 @@ int main(int argc, char **argv) {
         const bool shared_screen = config.get<bool>("shared_screen", false);
         const bool sequential_screen = config.get<bool>("sequential_screen", false);
         const double early_stop_p = config.get<double>("early_stop_p", 0.0);
-        for (const char *key :
-             {"reuse_draws", "shared_screen", "shared_screen_p", "sequential_screen",
-              "early_stop_p", "draw_cache_mb", "sampler_cache_mb", "checkpoint_dir", "phase",
-              "tile", "tile_targets", "tile_responses"})
+        const auto stream_keys = config.get<std::string>("stream_keys", "identity");
+        const auto adjustment_family = config.get<std::string>("adjustment_family", "tested");
+        // A grid request: targets against responses, without a list of the pairs.
+        const auto targets_path = config.get<std::string>("targets", "");
+        const bool grid_request = !targets_path.empty();
+        const auto response_ids_path = config.get<std::string>("response_ids", "");
+        for (const char *key : {"reuse_draws",
+                                "shared_screen",
+                                "shared_screen_p",
+                                "sequential_screen",
+                                "early_stop_p",
+                                "draw_cache_mb",
+                                "sampler_cache_mb",
+                                "checkpoint_dir",
+                                "phase",
+                                "tile",
+                                "tile_targets",
+                                "tile_responses",
+                                "stream_keys",
+                                "response_ids",
+                                "adjustment_family",
+                                "family_size_discovery",
+                                "family_size_negative",
+                                "family_size_positive",
+                                "targets",
+                                "grid_responses"})
             io::require(command == "sceptre" || !config.count(key),
                         std::string(key) + " is a sceptre setting");
         for (const char *key : {"effect_fits", "crt_draw", "fit_check", "confirm_draws"})
@@ -312,7 +337,11 @@ int main(int argc, char **argv) {
                     "ridge=0; set null_model=direct for other response models");
             auto assignments = io::read_market(config.get<std::string>("assignments"));
             auto guide_table = io::read_table(config.get<std::string>("guides"));
-            auto pair_table = io::read_table(config.get<std::string>("pairs"));
+            // With a grid request the listed pairs are optional (positive controls, say).
+            const auto pair_table =
+                grid_request && config.get<std::string>("pairs", "").empty()
+                    ? std::vector<std::vector<std::string>>({{"response", "target", "kind"}})
+                    : io::read_table(config.get<std::string>("pairs"));
             require(guide_table[0] == std::vector<std::string>({"id", "target", "non_targeting"}),
                     "guides header must be id,target,non_targeting (tab separated)");
             require(pair_table[0] == std::vector<std::string>({"response", "target", "kind"}),
@@ -429,10 +458,67 @@ int main(int argc, char **argv) {
             auto adjustment = config.get<std::string>("adjustment", "BH");
             require(adjustment == "BH" || adjustment == "bonferroni", "invalid adjustment");
             o.bonferroni_adjustment = adjustment == "bonferroni";
+            require(stream_keys == "identity" || stream_keys == "position",
+                    "stream_keys must be identity/position");
+            o.stream_keys = stream_keys == "position" ? StreamKeys::position : StreamKeys::identity;
+            if (!response_ids_path.empty())
+                o.response_ids = io::read_lines(response_ids_path);
+            require(adjustment_family == "tested" || adjustment_family == "listed",
+                    "adjustment_family must be tested/listed");
+            o.family =
+                adjustment_family == "listed" ? AdjustmentFamily::listed : AdjustmentFamily::tested;
+            o.family_size = {config.get<std::size_t>("family_size_discovery", 0),
+                             config.get<std::size_t>("family_size_negative", 0),
+                             config.get<std::size_t>("family_size_positive", 0)};
             CellQC qc;
             qc.total_counts = io::read_vector(config.get<std::string>("qc_total", ""));
             qc.detected_features = io::read_vector(config.get<std::string>("qc_detected", ""));
             qc.mitochondrial_fraction = io::read_vector(config.get<std::string>("qc_mito", ""));
+            // A grid request is run as sceptre_grid() runs it: pair QC of the whole
+            // grid first, then the pairs that pass it and the listed pairs as a
+            // list, with the families of listing every pair of the grid.
+            io::require(grid_request || !config.count("grid_responses"),
+                        "grid_responses needs targets");
+            std::vector<PairTally> tally;
+            std::array<std::size_t, 3> grid_pairs{};
+            if (grid_request) {
+                require(o.stream_keys == StreamKeys::identity,
+                        "a grid request needs identity stream keys (a list has the positions)");
+                const auto target_table = io::read_table(targets_path);
+                require(target_table[0] == std::vector<std::string>({"target", "kind"}),
+                        "targets header must be target,kind (tab separated)");
+                SceptreGrid grid;
+                for (std::size_t i = 1; i < target_table.size(); ++i) {
+                    const auto &r = target_table[i];
+                    require(r[1] == "discovery" || r[1] == "negative",
+                            "target kind must be discovery/negative");
+                    (r[1] == "negative" ? grid.negative_targets : grid.discovery_targets)
+                        .push_back(r[0]);
+                }
+                if (config.count("grid_responses")) {
+                    for (double v : io::read_vector(config.get<std::string>("grid_responses"))) {
+                        require(v >= 0 && std::floor(v) == v && v < responses.cols,
+                                "invalid response index");
+                        grid.responses.push_back(static_cast<std::size_t>(v));
+                    }
+                    require(!grid.responses.empty(), "grid_responses file has no rows");
+                }
+                auto checked =
+                    count_matrix
+                        ? sceptre_pair_qc(design, counts, assignments, guides, grid, qc, o)
+                        : sceptre_pair_qc(design, responses, assignments, guides, grid, qc, o);
+                // The rows of listing every pair of the grid and the listed pairs
+                // (a listed pair may not repeat a pair of the grid in its kind).
+                grid.pairs = pairs;
+                grid_pairs = rapidglm::detail::grid_rows(guides, grid, checked.tally, o);
+                if (o.family == AdjustmentFamily::listed)
+                    for (std::size_t k = 0; k < 3; ++k)
+                        if (!o.family_size[k])
+                            o.family_size[k] = grid_pairs[k];
+                checked.passing.insert(checked.passing.end(), pairs.begin(), pairs.end());
+                pairs = std::move(checked.passing);
+                tally = std::move(checked.tally);
+            }
             SceptreResult result;
             const auto checkpoint = config.get<std::string>("checkpoint_dir", "");
             if (checkpoint.empty()) {
@@ -443,6 +529,7 @@ int main(int argc, char **argv) {
                              : sceptre(design, responses, assignments, guides, pairs, qc, o);
                 samplers_cached = result.samplers_cached;
                 samplers_rebuilt = result.samplers_rebuilt;
+                null_fits = result.null_fits;
             } else {
                 tiled.emplace();
                 tiled->directory = checkpoint;
@@ -478,6 +565,10 @@ int main(int argc, char **argv) {
                     parts.push_back("default:fit_check=strict");
                 if (!config.count("confirm_draws"))
                     parts.push_back("default:confirm_draws=" + std::to_string(confirm));
+                if (!config.count("stream_keys"))
+                    parts.push_back("default:stream_keys=identity");
+                if (!config.count("adjustment_family"))
+                    parts.push_back("default:adjustment_family=tested");
                 finish_hashes();
                 for (const auto &entry : hashes)
                     if (entry.first != argv[2])
@@ -492,6 +583,7 @@ int main(int argc, char **argv) {
                                            : io::sceptre_tiled(*tiled, design, responses,
                                                                assignments, guides, pairs, qc, o);
                 samplers_rebuilt = tiled->samplers_rebuilt;
+                null_fits = tiled->null_fits;
                 if (!merged) {
                     warn_samplers(samplers_rebuilt);
                     out.close();
@@ -511,6 +603,15 @@ int main(int argc, char **argv) {
             discoveries = result.discovery_rejections;
             for (const auto &r : result.tests)
                 failures += !std::isfinite(r.p_value);
+            // A grid request lists every pair of the grid, tested or not.
+            pairs_listed = grid_request ? grid_pairs : result.pairs_listed;
+            pairs_passing_qc = result.pairs_passing_qc;
+            family_sizes = result.family_size;
+            if (grid_request) {
+                std::ofstream tally_file(prefix + ".tally.tsv");
+                io::tally_table(tally_file, tally);
+                require(static_cast<bool>(tally_file), "failed writing tally output");
+            }
             std::ofstream qq(prefix + ".qq.tsv");
             qq << "expected\tobserved\tlower_95\tupper_95\n";
             for (const auto &q : result.calibration_qq)
@@ -669,6 +770,22 @@ int main(int argc, char **argv) {
                 record << ",\n  \"samplers\": {\"cache_mb\": " << sampler_cache_mb
                        << ", \"cached_targets\": " << samplers_cached
                        << ", \"targets_rebuilt_per_pair\": " << samplers_rebuilt << "}";
+                record << ",\n  \"stream_keys\": ";
+                io::quoted(record, stream_keys);
+                record << ",\n  \"response_ids\": "
+                       << (response_ids_path.empty() ? "false" : "true");
+                record << ",\n  \"adjustment_family\": ";
+                io::quoted(record, adjustment_family);
+                const auto by_kind = [&](const char *name, const std::array<std::size_t, 3> &n) {
+                    record << ",\n  \"" << name << "\": {\"discovery\": " << n[0]
+                           << ", \"negative\": " << n[1] << ", \"positive\": " << n[2] << "}";
+                };
+                by_kind("pairs_listed", pairs_listed);
+                by_kind("pairs_passing_qc", pairs_passing_qc);
+                by_kind("family_size", family_sizes);
+                record << ",\n  \"null_fits\": " << null_fits;
+                if (grid_request)
+                    record << ",\n  \"grid\": true";
             }
             if (tiled)
                 record << ",\n  \"tiles\": {\"count\": " << tiled->tiles

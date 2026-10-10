@@ -182,6 +182,17 @@ enum { RAPIDGLM_CRT_THINNED = 0, RAPIDGLM_CRT_DIRECT = 1, RAPIDGLM_CRT_HAZARD = 
  * statistic's side; ks is the check of releases before 1.0.0. */
 enum { RAPIDGLM_FIT_CHECK_STRICT = 0, RAPIDGLM_FIT_CHECK_KS = 1 };
 #define RAPIDGLM_CONFIRM_AUTO ((size_t)-1)
+/* What a pair's random stream is keyed by. identity: the seed, the response
+ * (its ID, or else its column) and the target (the guide for a per-guide
+ * test), so a pair's record is the same wherever it is listed and with
+ * whatever other pairs; a pair may then be listed once within a kind.
+ * position: the pair's place in the list (releases before 1.3.0). */
+enum { RAPIDGLM_STREAMS_IDENTITY = 0, RAPIDGLM_STREAMS_POSITION = 1 };
+/* The family within which p-values of a kind are adjusted. tested: the pairs
+ * that pass pair QC; the other pairs get no adjusted p-value (NaN). listed:
+ * every listed pair, those that fail pair QC counting with p = 1 (releases
+ * before 1.3.0). */
+enum { RAPIDGLM_FAMILY_TESTED = 0, RAPIDGLM_FAMILY_LISTED = 1 };
 
 typedef struct {
     size_t struct_size;
@@ -208,6 +219,17 @@ typedef struct {
      * times the last budget (199999 for the default budgets). Off when 0 or not
      * above the last budget. */
     size_t confirm_draws;
+    int stream_keys; /* default RAPIDGLM_STREAMS_IDENTITY */
+    /* With identity keys: NULL (a response is identified by its column) or one
+     * ID per response column, distinct strings that stay with the response
+     * (gene names, say) when the matrix changes its columns. */
+    const char *const *response_ids;
+    int family; /* default RAPIDGLM_FAMILY_TESTED */
+    /* Hypotheses in the discovery, negative-control and positive-control
+     * families when a family is larger than its pairs at hand (a caller that
+     * lists only some of them; those not listed count with p = 1). Default 0:
+     * the pairs at hand. */
+    size_t family_size[3];
 } rapidglm_sceptre_options;
 /* high_moi selects the MOI-dependent defaults (control group, mechanism). */
 void rapidglm_sceptre_options_init(rapidglm_sceptre_options *options, int high_moi);
@@ -216,15 +238,49 @@ void rapidglm_sceptre_options_init(rapidglm_sceptre_options *options, int high_m
  * guides (binary calls). Guides: id, target and non-targeting flag per column of
  * `assignments`. Pairs: response column, target name and kind. Columns:
  * response, target, guide, kind, status, cells, nonzero_treatment,
- * nonzero_control, draws, approximation, statistic, p_value, adjusted_p, log2fc,
- * log2fc_se, sceptre_mean_ratio, mean_ratio_log2. Scalars: retained_cells,
- * calibration_rejections, power_rejections, discovery_rejections. */
+ * nonzero_control, draws, approximation, statistic, p_value, adjusted_p (NaN
+ * for a pair outside its adjustment family), log2fc, log2fc_se,
+ * sceptre_mean_ratio, mean_ratio_log2. Scalars: retained_cells,
+ * calibration_rejections, power_rejections, discovery_rejections, null_fits
+ * (null models fitted) and, for <kind> in discovery, negative and positive,
+ * pairs_listed_<kind>, pairs_passing_qc_<kind> and family_size_<kind> (the
+ * size of the adjustment family). */
 int rapidglm_sceptre(const rapidglm_dense *design, const rapidglm_sparse *responses,
                      const rapidglm_sparse *assignments, size_t n_guides,
                      const char *const *guide_ids, const char *const *guide_targets,
                      const int *guide_non_targeting, size_t n_pairs, const size_t *pair_responses,
                      const char *const *pair_targets, const int *pair_kinds,
                      const rapidglm_sceptre_options *options, rapidglm_table **result);
+
+/* rapidglm_sceptre for a grid request: every pair of some targets and some
+ * responses, without a list of the pairs. Discovery targets are tested against
+ * each grid response as discovery pairs, negative targets (of non-targeting
+ * guides) as negative controls; grid_responses holds n_grid_responses distinct
+ * response columns (0, NULL: every response). Pair QC is decided for the whole
+ * grid first, and only the pairs that pass it get a record: `result` has those
+ * rows (by response in the order requested, then discovery and negative
+ * targets in the order given), then the rows of the n_pairs further pairs
+ * (may be 0), which are listed as for rapidglm_sceptre (positive controls,
+ * say) and may not repeat a pair of the grid in its kind. The records are
+ * those rapidglm_sceptre gives for a list of the same pairs, and the
+ * adjustment families those of listing every pair of the grid: with
+ * RAPIDGLM_FAMILY_LISTED the pairs that fail pair QC are counted without being
+ * listed, and pairs_listed_<kind> counts every pair of the grid. Needs
+ * identity stream keys. `result`: columns and scalars as for rapidglm_sceptre.
+ * `tally` (may be NULL): one row per grid target and kind, discovery targets
+ * first, with the columns target, kind, requested, passing, few_treatment (too
+ * few treated cells with a nonzero count) and few_control (enough of those, too
+ * few such control cells); requested = passing + few_treatment + few_control. */
+int rapidglm_sceptre_grid(const rapidglm_dense *design, const rapidglm_sparse *responses,
+                          const rapidglm_sparse *assignments, size_t n_guides,
+                          const char *const *guide_ids, const char *const *guide_targets,
+                          const int *guide_non_targeting, size_t n_discovery,
+                          const char *const *discovery_targets, size_t n_negative,
+                          const char *const *negative_targets, size_t n_grid_responses,
+                          const size_t *grid_responses, size_t n_pairs,
+                          const size_t *pair_responses, const char *const *pair_targets,
+                          const int *pair_kinds, const rapidglm_sceptre_options *options,
+                          rapidglm_table **result, rapidglm_table **tally);
 
 /* Score scan: each response's null model fitted once, many predictors tested. */
 enum {

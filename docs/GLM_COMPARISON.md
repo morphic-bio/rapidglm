@@ -7,7 +7,7 @@ Measurements, commands and per-problem results are in
 [GLM_COMPARISON.json](../validation/GLM_COMPARISON.json). Comparators ran as
 black boxes; their documentation, not their source, describes them below.
 The accuracy, single-thread speed and many-response tables are from version
-1.2.0 (2026-10-06); the page was first written on 2026-09-29.
+1.3.0 (2026-10-09); the page was first written on 2026-09-29.
 
 ## What the standard fitters are built on
 
@@ -93,44 +93,44 @@ ratios relative to the RapidGLM engine:
 
 | Comparator | Poisson | Binomial | Gaussian |
 |---|---:|---:|---:|
-| R `glm.fit` | 5.5× slower | 4.9× slower | 5.6× slower |
-| R `glm()` | 6.5× slower | 5.8× slower | 7.1× slower |
-| statsmodels GLM | 6.4× slower | 6.5× slower | 12.1× slower |
-| fastglm | 3.4× slower | 3.3× slower | 3.7× slower |
-| speedglm | 3.3× slower | 2.9× slower | 2.3× slower |
-| glum, defaults | 1.6× slower | 1.4× slower | 2.3× slower |
-| glum, tight | 4.6× slower | 1.7× slower | 2.3× slower |
-| scikit-learn, defaults (tol 1e-4) | 1.1× slower | 1.4× faster | 1.7× slower |
+| R `glm.fit` | 5.7× slower | 5.0× slower | 5.7× slower |
+| R `glm()` | 6.7× slower | 6.0× slower | 7.4× slower |
+| statsmodels GLM | 6.5× slower | 6.9× slower | 12.2× slower |
+| fastglm | 3.6× slower | 3.5× slower | 3.4× slower |
+| speedglm | 3.4× slower | 3.0× slower | 2.3× slower |
+| glum, defaults | 1.6× slower | 1.4× slower | 2.2× slower |
+| glum, tight | 4.7× slower | 1.7× slower | 2.2× slower |
+| scikit-learn, defaults (tol 1e-4) | 1.1× slower | 1.3× faster | 1.6× slower |
 | scikit-learn, tol 1e-10 | 1.3× slower | 1.1× slower | 1.7× slower |
 
 Absolute times in seconds at n = 1,000,000:
 
 | Problem | RapidGLM | R glm.fit | R glm | R glm + rapidglm | fastglm | speedglm | statsmodels | rapidglm.statsmodels | glum (tight) | sklearn (tight) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Poisson, p = 5 | 0.29 | 1.25 | 1.75 | 1.25 | 0.73 | 0.84 | 1.39 | 0.51 | 37.56 | 0.42 |
-| Poisson, p = 20 | 0.79 | 4.51 | 5.17 | 3.12 | 3.56 | 2.81 | 6.15 | 1.62 | 6.55 | 1.00 |
-| Poisson, p = 50 | 2.23 | 16.62 | 17.80 | 9.37 | 15.79 | 10.17 | 28.74 | 5.67 | 16.03 | 2.97 |
-| Binomial, p = 5 | 0.31 | 0.85 | 1.21 | 1.26 | 0.54 | 0.55 | 1.24 | 0.57 | 0.50 | 0.35 |
-| Binomial, p = 20 | 0.68 | 3.51 | 4.10 | 2.87 | 2.94 | 2.17 | 6.21 | 1.55 | 1.75 | 0.92 |
-| Binomial, p = 50 | 1.74 | 13.17 | 14.42 | 8.55 | 12.76 | 8.31 | 25.52 | 5.19 | 3.22 | 1.91 |
-| Gaussian, p = 5 | 0.09 | 0.41 | 0.48 | 0.48 | 0.24 | 0.21 | 0.90 | 0.31 | 0.20 | 0.10 |
-| Gaussian, p = 20 | 0.29 | 1.71 | 2.03 | 2.02 | 1.42 | 0.67 | 4.41 | 1.11 | 0.66 | 0.67 |
-| Gaussian, p = 50 | 0.87 | 6.83 | 7.47 | 7.32 | 6.59 | 2.27 | 20.68 | 4.34 | 2.05 | 3.29 |
+| Poisson, p = 5 | 0.29 | 1.31 | 1.82 | 1.29 | 0.79 | 0.87 | 1.45 | 0.52 | 39.20 | 0.44 |
+| Poisson, p = 20 | 0.78 | 4.62 | 5.37 | 3.08 | 3.70 | 2.85 | 6.38 | 1.66 | 6.68 | 1.03 |
+| Poisson, p = 50 | 2.24 | 17.30 | 18.52 | 9.64 | 16.66 | 10.47 | 28.18 | 5.80 | 16.46 | 3.02 |
+| Binomial, p = 5 | 0.32 | 0.87 | 1.25 | 1.26 | 0.56 | 0.54 | 1.28 | 0.58 | 0.51 | 0.36 |
+| Binomial, p = 20 | 0.69 | 3.78 | 4.24 | 2.94 | 3.09 | 2.25 | 6.44 | 1.58 | 1.79 | 0.93 |
+| Binomial, p = 50 | 1.76 | 13.81 | 15.08 | 8.74 | 13.38 | 8.50 | 24.61 | 5.38 | 3.31 | 1.93 |
+| Gaussian, p = 5 | 0.09 | 0.42 | 0.50 | 0.50 | 0.25 | 0.23 | 0.93 | 0.33 | 0.20 | 0.11 |
+| Gaussian, p = 20 | 0.29 | 1.72 | 2.09 | 2.08 | 1.49 | 0.69 | 4.59 | 1.14 | 0.67 | 0.69 |
+| Gaussian, p = 50 | 0.88 | 6.74 | 7.66 | 7.68 | 6.80 | 2.32 | 21.00 | 4.45 | 2.10 | 3.45 |
 
 R here links the reference BLAS, which slows R's QR steps; an optimized BLAS
 would narrow the R ratios. glum with tight tolerances needs many more
-iterations on the Poisson problems (37.6 s at p = 5).
+iterations on the Poisson problems (39.2 s at p = 5).
 
 Negative binomial with estimated θ:
 
 | Problem | RapidGLM | rapidglm::glm_nb | MASS::glm.nb | statsmodels NB |
 |---|---:|---:|---:|---:|
-| n = 10,000, p = 5 | 0.006 | 0.020 | 0.122 | 0.025 |
-| n = 10,000, p = 20 | 0.011 | 0.039 | 0.221 | 0.053 |
-| n = 10,000, p = 50 | 0.037 | 0.127 | 0.308 | 0.135 |
-| n = 100,000, p = 5 | 0.058 | 0.237 | 1.221 | 0.262 |
-| n = 100,000, p = 20 | 0.118 | 0.433 | 1.574 | 0.531 |
-| n = 100,000, p = 50 | 0.404 | 1.434 | 3.778 | 1.803 |
+| n = 10,000, p = 5 | 0.006 | 0.019 | 0.122 | 0.025 |
+| n = 10,000, p = 20 | 0.011 | 0.039 | 0.222 | 0.054 |
+| n = 10,000, p = 50 | 0.037 | 0.127 | 0.311 | 0.135 |
+| n = 100,000, p = 5 | 0.058 | 0.234 | 1.235 | 0.261 |
+| n = 100,000, p = 20 | 0.130 | 0.422 | 1.598 | 0.557 |
+| n = 100,000, p = 50 | 0.407 | 1.412 | 3.882 | 1.920 |
 
 statsmodels' NB model is fast at its defaults but failed 8 of the 13 accuracy
 problems.
@@ -145,14 +145,14 @@ loop over single fits in one thread. statsmodels' NB time is extrapolated from
 
 | Tool | Poisson | NB (θ estimated) |
 |---|---:|---:|
-| RapidGLM `fit_batch`, 1 thread | 1.07 | 3.02 |
+| RapidGLM `fit_batch`, 1 thread | 1.06 | 3.01 |
 | RapidGLM `fit_batch`, 4 threads | 0.29 | 0.79 |
 | RapidGLM `fit_batch`, 16 threads | 0.08 | 0.21 |
-| Python `rapidglm.fit` loop | 1.15 | 3.15 |
-| R `rapidglm::glm_fit` / `glm_nb` loop | 3.09 | 10.51 |
-| R `glm.fit` / `MASS::glm.nb` loop | 5.61 | 143.37 |
-| glmGamPoi `glm_gp`, whole batch | – | 5.86 |
-| Python statsmodels GLM / NegativeBinomial loop | 5.00 | 23.16 |
+| Python `rapidglm.fit` loop | 1.14 | 3.12 |
+| R `rapidglm::glm_fit` / `glm_nb` loop | 2.94 | 10.28 |
+| R `glm.fit` / `MASS::glm.nb` loop | 5.68 | 143.82 |
+| glmGamPoi `glm_gp`, whole batch | – | 5.96 |
+| Python statsmodels GLM / NegativeBinomial loop | 4.96 | 23.41 |
 
 The 1,000 fitted coefficient sets agree with R's to 1.8e-6 relative for Poisson
 (R's tolerance) and 9.2e-4 for NB, where `glm.nb` stops earlier; statsmodels' NB
@@ -214,7 +214,7 @@ stay with `glm.fit`, whose single QR is also the `qr` component `glm()`
 stores. End to end, `glm()` with the RapidGLM method is 1.2–1.9× faster for
 Poisson and binomial at n ≥ 1e5 (most at p = 50; equal for binomial at p = 5
 with n = 1e6): model-frame construction and the QR stored in the result are
-R-side costs a drop-in must still pay. `glm_nb` is 2.4–6.1× faster than
+R-side costs a drop-in must still pay. `glm_nb` is 2.5–6.4× faster than
 `MASS::glm.nb`, and 14× in the many-response loop. Results are ordinary
 `glm` objects, and `summary`, `anova`, `predict(se.fit = TRUE)`, `vcov`,
 profile `confint`, `drop1`, all residual types, `hatvalues`, `cooks.distance`,
@@ -231,7 +231,7 @@ covariances agree with statsmodels to rounding
 families, rank-deficient designs and non-IRLS options fall back to
 statsmodels. `rapidglm.fit()` exposes the engine directly, including NB with
 estimated θ. End to end, including statsmodels' model setup, the drop-in is
-3.4× (Poisson), 3.1× (binomial) and 3.8× (Gaussian) faster than
+3.5× (Poisson), 3.3× (binomial) and 3.9× (Gaussian) faster than
 `statsmodels.api.GLM` at n ≥ 1e5.
 
 ## Limitations

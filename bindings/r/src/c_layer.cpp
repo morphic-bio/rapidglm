@@ -1,4 +1,4 @@
-// R entry points for bulk_de and sceptre through the RapidGLM C interface
+// R entry points for bulk_de, sceptre and sceptre_grid through the RapidGLM C interface
 // (rapidglm_c.h; src/c_api.cpp is compiled into the package by configure).
 // The R layer (R/applications.R) orients inputs and names options; this file
 // fills the C option structs and converts result tables to R lists.
@@ -95,6 +95,119 @@ void check(int status) {
     if (status != RAPIDGLM_OK)
         cpp11::stop("%s", rapidglm_last_error());
 }
+// R strings as the C interface takes them; the pointers refer to `values`.
+struct Texts {
+    std::vector<std::string> values;
+    std::vector<const char *> pointers;
+    explicit Texts(const cpp11::strings &s) : values(s.begin(), s.end()) {
+        for (const auto &v : values)
+            pointers.push_back(v.c_str());
+    }
+    Texts(const Texts &) = delete;
+    Texts &operator=(const Texts &) = delete;
+};
+// The targets and responses of a grid request (sceptre_grid).
+struct Grid {
+    cpp11::strings discovery_targets, negative_targets;
+    cpp11::integers responses; // empty: every response
+};
+// sceptre and sceptre_grid: with a grid the result is list(result, tally).
+cpp11::writable::list
+run_sceptre(const cpp11::doubles_matrix<> &design, const cpp11::integers &yp,
+            const cpp11::integers &yi, const cpp11::doubles &yx, int genes,
+            const cpp11::integers &gp, const cpp11::integers &gi, const cpp11::doubles &gx,
+            int n_guides, const cpp11::strings &guide_ids, const cpp11::strings &guide_targets,
+            const cpp11::integers &guide_non_targeting, const cpp11::integers &pair_responses,
+            const cpp11::strings &pair_targets, const cpp11::integers &pair_kinds,
+            const cpp11::list &o, const Grid *grid) {
+    using namespace cpp11::literals;
+    const auto d = dense(design);
+    const int cells = static_cast<int>(d.view.rows);
+    const auto y = sparse(yp, yi, yx, cells, genes);
+    const auto g = sparse(gp, gi, gx, cells, n_guides);
+    rapidglm_sceptre_options s;
+    rapidglm_sceptre_options_init(&s, has(o, "high_moi") && number(o, "high_moi") != 0);
+    const auto integer = [&](const char *name, int &field) {
+        if (has(o, name))
+            field = static_cast<int>(number(o, name));
+    };
+    const auto real = [&](const char *name, double &field) {
+        if (has(o, name))
+            field = number(o, name);
+    };
+    integer("family", s.model.family);
+    integer("null_model", s.null_model);
+    integer("nt_controls", s.nt_controls);
+    integer("crt", s.crt);
+    integer("integration", s.integration);
+    integer("side", s.side);
+    integer("approximate", s.approximate);
+    integer("effect_fits", s.effect_fits);
+    integer("cell_qc", s.cell_qc);
+    integer("assignment_qc", s.assignment_qc);
+    integer("bonferroni", s.bonferroni);
+    integer("crt_draw", s.crt_draw);
+    integer("fit_check", s.fit_check);
+    integer("threads", s.threads);
+    integer("stream_keys", s.stream_keys);
+    integer("adjustment_family", s.family);
+    real("screen", s.screen);
+    real("alpha", s.alpha);
+    real("lower_quantile", s.lower_quantile);
+    real("upper_quantile", s.upper_quantile);
+    real("max_mito", s.max_mito);
+    if (has(o, "min_nonzero"))
+        s.min_nonzero = static_cast<size_t>(number(o, "min_nonzero"));
+    if (has(o, "confirm_draws"))
+        s.confirm_draws = static_cast<size_t>(number(o, "confirm_draws"));
+    if (has(o, "seed"))
+        s.seed = static_cast<uint64_t>(number(o, "seed"));
+    std::vector<size_t> budgets;
+    if (has(o, "budgets")) {
+        cpp11::doubles v(o["budgets"]);
+        for (double b : v)
+            budgets.push_back(static_cast<size_t>(b));
+        s.budgets = budgets.data();
+        s.n_budgets = budgets.size();
+    }
+    if (has(o, "family_size")) {
+        cpp11::doubles v(o["family_size"]); // discovery, negative, positive
+        if (v.size() != 3)
+            cpp11::stop("family_size needs three sizes");
+        for (int k = 0; k < 3; ++k)
+            s.family_size[k] = static_cast<size_t>(v[k]);
+    }
+    const Texts response_ids(has(o, "response_ids") ? cpp11::strings(o["response_ids"])
+                                                    : cpp11::strings());
+    if (has(o, "response_ids")) {
+        // The C interface reads one ID per response column.
+        if (response_ids.values.size() != static_cast<size_t>(genes))
+            cpp11::stop("response_ids needs one ID per response");
+        s.response_ids = response_ids.pointers.data();
+    }
+    const Texts ids(guide_ids), targets(guide_targets), pair_target(pair_targets);
+    std::vector<int> nt(guide_non_targeting.begin(), guide_non_targeting.end()),
+        kinds(pair_kinds.begin(), pair_kinds.end());
+    std::vector<size_t> responses(pair_responses.begin(), pair_responses.end());
+    rapidglm_table *t = nullptr;
+    if (!grid) {
+        check(rapidglm_sceptre(&d.view, &y.view, &g.view, static_cast<size_t>(n_guides),
+                               ids.pointers.data(), targets.pointers.data(), nt.data(),
+                               responses.size(), responses.data(), pair_target.pointers.data(),
+                               kinds.data(), &s, &t));
+        return table(t);
+    }
+    const Texts discovery(grid->discovery_targets), negative(grid->negative_targets);
+    std::vector<size_t> grid_responses(grid->responses.begin(), grid->responses.end());
+    rapidglm_table *tally = nullptr;
+    check(rapidglm_sceptre_grid(
+        &d.view, &y.view, &g.view, static_cast<size_t>(n_guides), ids.pointers.data(),
+        targets.pointers.data(), nt.data(), discovery.values.size(), discovery.pointers.data(),
+        negative.values.size(), negative.pointers.data(), grid_responses.size(),
+        grid_responses.data(), responses.size(), responses.data(), pair_target.pointers.data(),
+        kinds.data(), &s, &t, &tally));
+    return cpp11::writable::list({"result"_nm = table(t), "tally"_nm = table(tally)});
+}
 } // namespace
 
 [[cpp11::register]] cpp11::writable::list rapidglm_bulk_de_(cpp11::doubles_matrix<> design,
@@ -160,69 +273,21 @@ rapidglm_sceptre_(cpp11::doubles_matrix<> design, cpp11::integers yp, cpp11::int
                   cpp11::strings guide_targets, cpp11::integers guide_non_targeting,
                   cpp11::integers pair_responses, cpp11::strings pair_targets,
                   cpp11::integers pair_kinds, cpp11::list o) {
-    const auto d = dense(design);
-    const int cells = static_cast<int>(d.view.rows);
-    const auto y = sparse(yp, yi, yx, cells, genes);
-    const auto g = sparse(gp, gi, gx, cells, n_guides);
-    rapidglm_sceptre_options s;
-    rapidglm_sceptre_options_init(&s, has(o, "high_moi") && number(o, "high_moi") != 0);
-    const auto integer = [&](const char *name, int &field) {
-        if (has(o, name))
-            field = static_cast<int>(number(o, name));
-    };
-    const auto real = [&](const char *name, double &field) {
-        if (has(o, name))
-            field = number(o, name);
-    };
-    integer("family", s.model.family);
-    integer("null_model", s.null_model);
-    integer("nt_controls", s.nt_controls);
-    integer("crt", s.crt);
-    integer("integration", s.integration);
-    integer("side", s.side);
-    integer("approximate", s.approximate);
-    integer("effect_fits", s.effect_fits);
-    integer("cell_qc", s.cell_qc);
-    integer("assignment_qc", s.assignment_qc);
-    integer("bonferroni", s.bonferroni);
-    integer("crt_draw", s.crt_draw);
-    integer("fit_check", s.fit_check);
-    integer("threads", s.threads);
-    real("screen", s.screen);
-    real("alpha", s.alpha);
-    real("lower_quantile", s.lower_quantile);
-    real("upper_quantile", s.upper_quantile);
-    real("max_mito", s.max_mito);
-    if (has(o, "min_nonzero"))
-        s.min_nonzero = static_cast<size_t>(number(o, "min_nonzero"));
-    if (has(o, "confirm_draws"))
-        s.confirm_draws = static_cast<size_t>(number(o, "confirm_draws"));
-    if (has(o, "seed"))
-        s.seed = static_cast<uint64_t>(number(o, "seed"));
-    std::vector<size_t> budgets;
-    if (has(o, "budgets")) {
-        cpp11::doubles v(o["budgets"]);
-        for (double b : v)
-            budgets.push_back(static_cast<size_t>(b));
-        s.budgets = budgets.data();
-        s.n_budgets = budgets.size();
-    }
-    std::vector<std::string> ids(guide_ids.begin(), guide_ids.end()),
-        targets(guide_targets.begin(), guide_targets.end()),
-        pair_target(pair_targets.begin(), pair_targets.end());
-    std::vector<const char *> id_p, target_p, pair_target_p;
-    for (auto &v : ids)
-        id_p.push_back(v.c_str());
-    for (auto &v : targets)
-        target_p.push_back(v.c_str());
-    for (auto &v : pair_target)
-        pair_target_p.push_back(v.c_str());
-    std::vector<int> nt(guide_non_targeting.begin(), guide_non_targeting.end()),
-        kinds(pair_kinds.begin(), pair_kinds.end());
-    std::vector<size_t> responses(pair_responses.begin(), pair_responses.end());
-    rapidglm_table *t = nullptr;
-    check(rapidglm_sceptre(&d.view, &y.view, &g.view, static_cast<size_t>(n_guides), id_p.data(),
-                           target_p.data(), nt.data(), responses.size(), responses.data(),
-                           pair_target_p.data(), kinds.data(), &s, &t));
-    return table(t);
+    return run_sceptre(design, yp, yi, yx, genes, gp, gi, gx, n_guides, guide_ids, guide_targets,
+                       guide_non_targeting, pair_responses, pair_targets, pair_kinds, o, nullptr);
+}
+
+// grid_responses: 0-based response columns (empty: every response). Returns
+// list(result, tally), each as rapidglm_sceptre_ returns its table.
+[[cpp11::register]] cpp11::writable::list
+rapidglm_sceptre_grid_(cpp11::doubles_matrix<> design, cpp11::integers yp, cpp11::integers yi,
+                       cpp11::doubles yx, int genes, cpp11::integers gp, cpp11::integers gi,
+                       cpp11::doubles gx, int n_guides, cpp11::strings guide_ids,
+                       cpp11::strings guide_targets, cpp11::integers guide_non_targeting,
+                       cpp11::strings discovery_targets, cpp11::strings negative_targets,
+                       cpp11::integers grid_responses, cpp11::integers pair_responses,
+                       cpp11::strings pair_targets, cpp11::integers pair_kinds, cpp11::list o) {
+    const Grid grid{discovery_targets, negative_targets, grid_responses};
+    return run_sceptre(design, yp, yi, yx, genes, gp, gi, gx, n_guides, guide_ids, guide_targets,
+                       guide_non_targeting, pair_responses, pair_targets, pair_kinds, o, &grid);
 }

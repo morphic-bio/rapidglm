@@ -46,20 +46,26 @@ and the run record stores it. Scans keep 0 by default. A scan configured like
 RapidGLM's draws differ from SCEPTRE's, so borderline pairs can go either way.
 SCEPTRE's results do not change with R's seed, so its own Monte Carlo spread
 cannot be measured by reseeding it. The floor is therefore the agreement between
-RapidGLM runs with different seeds. Over seeds 1–10 (BH 0.1 over the pairs
-matched with SCEPTRE):
+RapidGLM runs with different seeds. Over seeds 1–10 with version 1.3.0 (BH 0.1
+over the pairs matched with SCEPTRE):
 
 | Panel (SCEPTRE discoveries) | Screen | RapidGLM discoveries | Jaccard with SCEPTRE, mean (min) | Jaccard between seeds, mean (min) | Stage agreement |
 |---|---|---|---|---|---|
-| public S1, low MOI (32) | 0.02 | 29–32 | 0.963 (0.906) | 0.949 (0.906) | 0.97 |
-| | 0 | 30–33 | 0.975 (0.938) | 0.958 (0.906) | 0.55 |
-| public S2, high MOI (11) | 0.02 | 10–14 | 0.880 (0.786) | 0.845 (0.714) | 0.96 |
-| | 0 | 10–16 | 0.759 (0.688) | 0.828 (0.625) | 0.83 |
+| public S1, low MOI (32) | 0.02 | 30–32 | 0.963 (0.909) | 0.948 (0.879) | 0.97 |
+| | 0 | 31–32 | 0.975 (0.969) | 0.972 (0.938) | 0.55 |
+| public S2, high MOI (11) | 0.02 | 11–16 | 0.834 (0.688) | 0.811 (0.647) | 0.95 |
+| | 0 | 13–18 | 0.702 (0.611) | 0.895 (0.722) | 0.83 |
 
 With the screen, agreement with SCEPTRE equals or exceeds the agreement between
-two RapidGLM seeds on every panel, and discovery counts centre on SCEPTRE's.
-Without it, S2 falls below that floor and averages 14.4 discoveries against
-SCEPTRE's 11. Stage agreement is the fraction of pairs that both tools
+two RapidGLM seeds on every panel. Without it, S2 falls well below that floor
+and averages 15.8 discoveries against SCEPTRE's 11.
+
+Ten seeds are few for S2. From 1.3.0 a pair's draws are keyed by the pair
+itself, so the same ten seeds give other draws than before: with the screen
+they average 13.2 discoveries on S2, where the draws of 1.2.0 gave 12.4. Over
+200 seeds the two sets of draws agree: 12.3 discoveries (standard error 0.11;
+9 to 17 in single runs) and a mean Jaccard index with SCEPTRE of 0.883 with
+either. On S1, 200 seeds average 31.1 discoveries (29 to 34) and 0.963. Stage agreement is the fraction of pairs that both tools
 take to a second stage, or both do not. The S2 value that prompted this, 0.846
 at seed 20260926 without the screen, is one draw from such a distribution. With
 the screen, that seed gives 0.769.
@@ -68,6 +74,11 @@ Gates, set after exploring S1 and S2; all pass:
 - **G1 floor:** with the screen, the mean Jaccard with SCEPTRE is at least the
   mean between-seed Jaccard minus 0.02.
 - **G2 counts:** the mean discovery count is within max(1, 15%) of SCEPTRE's.
+  From 1.3.0 the mean is taken over 200 seeds. Over ten seeds its standard
+  error on S2, about 0.5, is a third of the margin there (1.65), so the outcome
+  turns on the seeds: the ten above average 13.2, outside the margin (the
+  receipt records this as `G2_counts_ten_seeds`), and the same seeds with the
+  draws of 1.2.0 averaged 12.4, inside it. Over 200 seeds the mean is 12.3.
 - **G3 null calibration:** screened resampling meets the scan's null bounds on
   six configurations (Poisson and NB responses; binary and continuous
   predictors; permutation and CRT). Rejections at 0.05 run from 98 to 130 of

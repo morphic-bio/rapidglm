@@ -1,8 +1,8 @@
 """RapidGLM: fast, numerically stable GLM fitting.
 
-``bulk_de``, ``sceptre``, ``scan`` and ``fit_batch`` run the applications and
-the batch engine through the C interface (``rapidglm.capi``, needs
-librapidglm_c); ``rapidglm.deseq`` wraps bulk_de in PyDESeq2's workflow
+``bulk_de``, ``sceptre``, ``sceptre_grid``, ``scan`` and ``fit_batch`` run the
+applications and the batch engine through the C interface (``rapidglm.capi``,
+needs librapidglm_c); ``rapidglm.deseq`` wraps bulk_de in PyDESeq2's workflow
 (DeseqDataSet, DeseqStats). ``rapidglm.fit`` fits one model through the compiled
 extension; ``rapidglm.statsmodels.GLM`` is a drop-in replacement for
 ``statsmodels.api.GLM`` that returns statsmodels results objects.
@@ -10,10 +10,10 @@ extension; ``rapidglm.statsmodels.GLM`` is a drop-in replacement for
 
 import numpy as np
 
-from .capi import bulk_de, fit_batch, library_version, scan, sceptre
+from .capi import bulk_de, fit_batch, library_version, scan, sceptre, sceptre_grid
 
-__all__ = ["bulk_de", "sceptre", "scan", "fit_batch", "fit", "library_version"]
-__version__ = "1.2.0"
+__all__ = ["bulk_de", "sceptre", "sceptre_grid", "scan", "fit_batch", "fit", "library_version"]
+__version__ = "1.3.0"
 
 
 def fit(

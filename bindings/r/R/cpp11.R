@@ -8,6 +8,10 @@ rapidglm_sceptre_ <- function(design, yp, yi, yx, genes, gp, gi, gx, n_guides, g
   .Call(`_rapidglm_rapidglm_sceptre_`, design, yp, yi, yx, genes, gp, gi, gx, n_guides, guide_ids, guide_targets, guide_non_targeting, pair_responses, pair_targets, pair_kinds, o)
 }
 
+rapidglm_sceptre_grid_ <- function(design, yp, yi, yx, genes, gp, gi, gx, n_guides, guide_ids, guide_targets, guide_non_targeting, discovery_targets, negative_targets, grid_responses, pair_responses, pair_targets, pair_kinds, o) {
+  .Call(`_rapidglm_rapidglm_sceptre_grid_`, design, yp, yi, yx, genes, gp, gi, gx, n_guides, guide_ids, guide_targets, guide_non_targeting, discovery_targets, negative_targets, grid_responses, pair_responses, pair_targets, pair_kinds, o)
+}
+
 rapidglm_fit_ <- function(x, y, weights, offset, start, family, theta, estimate_theta, tolerance, max_iterations, singular_ok, alias_tolerance) {
   .Call(`_rapidglm_rapidglm_fit_`, x, y, weights, offset, start, family, theta, estimate_theta, tolerance, max_iterations, singular_ok, alias_tolerance)
 }

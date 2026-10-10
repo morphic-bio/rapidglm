@@ -449,7 +449,8 @@ BOOST_AUTO_TEST_CASE(pair_pipeline_results_do_not_depend_on_schedule) {
                             (std::isnan(a.statistic) && std::isnan(b.statistic))));
                 BOOST_TEST(
                     (a.p_value == b.p_value || (std::isnan(a.p_value) && std::isnan(b.p_value))));
-                BOOST_TEST(a.adjusted_p == b.adjusted_p);
+                BOOST_TEST((a.adjusted_p == b.adjusted_p ||
+                            (std::isnan(a.adjusted_p) && std::isnan(b.adjusted_p))));
                 BOOST_TEST(
                     (a.log2fc == b.log2fc || (std::isnan(a.log2fc) && std::isnan(b.log2fc))));
             }
@@ -1245,4 +1246,502 @@ BOOST_AUTO_TEST_CASE(sampler_cache_is_counted_and_does_not_change_results) {
             BOOST_TEST(same_record(none.tests[k], all.tests[k]));
         }
     }
+}
+
+// ---- 1.3.0: streams keyed by identity, adjustment families, pair QC before
+// any other work, and requests for targets x responses without a list.
+namespace {
+using PairKey = std::tuple<std::size_t, std::string, std::string, int>;
+PairKey key_of(const PairResult &r) {
+    return {r.response, r.target, r.guide, static_cast<int>(r.kind)};
+}
+std::map<PairKey, PairResult> by_pair(const SceptreResult &result) {
+    std::map<PairKey, PairResult> out;
+    for (const auto &r : result.tests)
+        BOOST_REQUIRE(out.emplace(key_of(r), r).second);
+    return out;
+}
+// The same test: everything but the adjusted p-value, which belongs to the family.
+bool same_test(PairResult a, const PairResult &b) {
+    a.adjusted_p = b.adjusted_p;
+    return same_record(a, b);
+}
+// default, reuse_draws, shared_screen, sequential screen with early stop,
+// one test per guide, per-guide tests combined by Bonferroni.
+SceptreOptions screen_options(int mode, bool high_moi) {
+    SceptreOptions o;
+    o.high_moi = high_moi;
+    o.nt_controls = !high_moi;
+    o.crt = high_moi;
+    o.cell_qc = false;
+    o.min_nonzero = 3;
+    o.alpha = 0.5;
+    o.resampling.budgets = {99, 999};
+    o.resampling.screen = 0.2;
+    o.reuse_draws = mode == 1;
+    o.shared_screen = mode == 2;
+    o.shared_screen_p = 0.4;
+    o.resampling.sequential_screen = mode == 3;
+    o.resampling.early_stop = mode == 3 ? 0.1 : 0;
+    o.integration = mode == 4   ? Integration::singleton
+                    : mode == 5 ? Integration::bonferroni
+                                : Integration::union_guides;
+    o.effect_fits = EffectFits::none;
+    o.threads = 4;
+    return o;
+}
+SparseCSC select_columns(const SparseCSC &m, const std::vector<std::size_t> &order) {
+    SparseCSC out{m.rows, order.size(), {0}, {}, {}};
+    for (auto j : order) {
+        for (auto k = m.column_ptr[j]; k < m.column_ptr[j + 1]; ++k) {
+            out.row_index.push_back(m.row_index[k]);
+            out.values.push_back(m.values[k]);
+        }
+        out.column_ptr.push_back(out.values.size());
+    }
+    return out;
+}
+} // namespace
+
+BOOST_AUTO_TEST_CASE(name_keys_and_keyed_streams_are_the_documented_functions) {
+    // FNV-1a, 64 bits (published test vectors).
+    BOOST_TEST(name_key("") == 0xcbf29ce484222325ULL);
+    BOOST_TEST(name_key("a") == 0xaf63dc4c8601ec8cULL);
+    BOOST_TEST(name_key("foobar") == 0x85944171f73967e8ULL);
+    // keyed_stream: Philox keyed by the seed makes the domain's key; Philox with
+    // that key makes the stream from the two keys.
+    const std::uint64_t seed = 0x0123456789abcdefULL, a = 0xfedcba9876543210ULL,
+                        b = 0x0f1e2d3c4b5a6978ULL;
+    const auto lo = [](std::uint64_t v) { return static_cast<std::uint32_t>(v); };
+    const auto hi = [](std::uint64_t v) { return static_cast<std::uint32_t>(v >> 32); };
+    for (std::uint32_t domain : {1u, 2u, 3u, 6u}) {
+        const auto k =
+            CounterRng::philox({domain, 0, UINT32_MAX, UINT32_MAX}, {lo(seed), hi(seed)});
+        const auto w = CounterRng::philox({lo(a), hi(a), lo(b), hi(b)}, {k[0], k[1]});
+        const auto stream = keyed_stream(seed, domain, a, b);
+        BOOST_TEST(stream.seed == (w[0] | (static_cast<std::uint64_t>(w[1]) << 32)));
+        BOOST_TEST(stream.test == w[2]);
+    }
+    // Every argument matters.
+    const auto base = keyed_stream(seed, 1, a, b);
+    for (const auto &other : {keyed_stream(seed + 1, 1, a, b), keyed_stream(seed, 2, a, b),
+                              keyed_stream(seed, 1, a + 1, b), keyed_stream(seed, 1, a, b + 1),
+                              keyed_stream(seed, 1, b, a)})
+        BOOST_TEST((other.seed != base.seed && other.test != base.test));
+    // Frozen values: a change here changes every p-value drawn with identity keys.
+    BOOST_TEST(keyed_stream(1, 1, 0, name_key("T0")).seed == 1904839154607047874ULL);
+    BOOST_TEST(keyed_stream(1, 1, 0, name_key("T0")).test == 1199715793u);
+}
+
+BOOST_AUTO_TEST_CASE(a_pairs_record_does_not_depend_on_the_list) {
+    const auto d = screen_data();
+    for (int mode : {0, 1, 2, 3, 4, 5})
+        for (bool high_moi : {true, false}) {
+            if ((mode == 1 || mode == 2) && !high_moi)
+                continue;
+            BOOST_TEST_CONTEXT("mode " << mode << " high MOI " << high_moi) {
+                auto o = screen_options(mode, high_moi);
+                const auto full =
+                    sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+                const auto reference = by_pair(full);
+                std::size_t tested = 0, resampled = 0;
+                for (const auto &r : full.tests) {
+                    tested += r.status == "ok";
+                    resampled += r.draws > 99;
+                }
+                BOOST_TEST(tested > 20u);
+                BOOST_TEST(resampled > 0u);
+                BOOST_TEST(tested < full.tests.size()); // some pairs fail pair QC
+                // The list in another order: the same records, adjusted p-values included.
+                auto permuted = d.pairs;
+                std::reverse(permuted.begin(), permuted.end());
+                std::rotate(permuted.begin(), permuted.begin() + 5, permuted.end());
+                const auto other =
+                    sceptre(d.x, d.responses, d.assignments, d.guides, permuted, {}, o);
+                BOOST_REQUIRE(other.tests.size() == full.tests.size());
+                for (const auto &r : other.tests)
+                    BOOST_TEST(same_record(r, reference.at(key_of(r))));
+                // Some of the pairs, and one thread: the same tests.
+                std::vector<Pair> some;
+                for (std::size_t k = 0; k < d.pairs.size(); k += 3)
+                    some.push_back(d.pairs[k]);
+                o.threads = 1;
+                const auto part = sceptre(d.x, d.responses, d.assignments, d.guides, some, {}, o);
+                BOOST_REQUIRE(!part.tests.empty());
+                for (const auto &r : part.tests)
+                    BOOST_TEST(same_test(r, reference.at(key_of(r))));
+                // With the keys of releases before 1.3.0 the order matters.
+                o.stream_keys = StreamKeys::position;
+                const auto position =
+                    sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+                const auto position_permuted =
+                    sceptre(d.x, d.responses, d.assignments, d.guides, permuted, {}, o);
+                const auto by_position = by_pair(position);
+                std::size_t moved = 0;
+                for (const auto &r : position_permuted.tests)
+                    moved += !same_test(r, by_position.at(key_of(r)));
+                BOOST_TEST(moved > 0u);
+            }
+        }
+}
+
+BOOST_AUTO_TEST_CASE(response_ids_identify_responses_whatever_their_columns) {
+    const auto d = screen_data();
+    for (bool high_moi : {true, false}) {
+        auto o = screen_options(0, high_moi);
+        for (std::size_t j = 0; j < d.responses.cols; ++j)
+            o.response_ids.push_back("gene" + std::to_string(j));
+        const auto reference =
+            by_pair(sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o));
+        // The same responses in other columns (and three of them left out).
+        const std::vector<std::size_t> order{6, 1, 4, 3, 0};
+        std::vector<std::size_t> column_of(d.responses.cols, d.responses.cols);
+        auto moved = o;
+        moved.response_ids.clear();
+        for (std::size_t k = 0; k < order.size(); ++k) {
+            column_of[order[k]] = k;
+            moved.response_ids.push_back(o.response_ids[order[k]]);
+        }
+        std::vector<Pair> pairs;
+        for (const auto &pair : d.pairs)
+            if (column_of[pair.response] < d.responses.cols)
+                pairs.push_back({column_of[pair.response], pair.target, pair.kind});
+        const auto other = sceptre(d.x, select_columns(d.responses, order), d.assignments, d.guides,
+                                   pairs, {}, moved);
+        BOOST_REQUIRE(other.tests.size() == pairs.size());
+        std::size_t resampled = 0;
+        for (auto r : other.tests) {
+            r.response = order[r.response];
+            BOOST_TEST(same_test(r, reference.at(key_of(r))));
+            resampled += r.draws > 99;
+        }
+        BOOST_TEST(resampled > 0u);
+        // IDs must be one per column and distinct.
+        moved.response_ids.pop_back();
+        BOOST_CHECK_THROW(sceptre(d.x, select_columns(d.responses, order), d.assignments, d.guides,
+                                  pairs, {}, moved),
+                          std::invalid_argument);
+        moved.response_ids.push_back(moved.response_ids.front());
+        BOOST_CHECK_THROW(sceptre(d.x, select_columns(d.responses, order), d.assignments, d.guides,
+                                  pairs, {}, moved),
+                          std::invalid_argument);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(a_pair_is_listed_once_within_a_kind) {
+    const auto d = screen_data();
+    auto o = screen_options(0, true);
+    // (1, T0) is listed as a discovery pair and as a positive control: one test.
+    const auto full = sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+    const PairResult *discovery = nullptr, *positive = nullptr;
+    for (const auto &r : full.tests)
+        if (r.response == 1 && r.target == "T0")
+            (r.kind == PairKind::positive_control ? positive : discovery) = &r;
+    BOOST_REQUIRE(discovery && positive && discovery->status == "ok");
+    BOOST_TEST(discovery->p_value == positive->p_value);
+    BOOST_TEST(discovery->draws == positive->draws);
+    auto twice = d.pairs;
+    twice.push_back(d.pairs[9]);
+    BOOST_CHECK_EXCEPTION(sceptre(d.x, d.responses, d.assignments, d.guides, twice, {}, o),
+                          std::invalid_argument, [](const std::invalid_argument &e) {
+                              return std::string(e.what()).find("listed twice") !=
+                                     std::string::npos;
+                          });
+    // By position the two rows are two tests with their own draws.
+    o.stream_keys = StreamKeys::position;
+    BOOST_CHECK_NO_THROW(sceptre(d.x, d.responses, d.assignments, d.guides, twice, {}, o));
+}
+
+BOOST_AUTO_TEST_CASE(adjustment_families_are_the_tested_or_the_listed_pairs) {
+    const auto d = screen_data();
+    for (bool bonferroni : {false, true}) {
+        auto o = screen_options(0, true);
+        o.effect_fits = EffectFits::significant;
+        o.bonferroni_adjustment = bonferroni;
+        const auto tested = sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+        o.family = AdjustmentFamily::listed;
+        const auto listed = sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+        BOOST_REQUIRE(tested.tests.size() == listed.tests.size());
+        for (std::size_t kind = 0; kind < 3; ++kind) {
+            Vector p_tested, p_listed;
+            std::vector<std::size_t> rows_tested, rows_listed;
+            for (std::size_t i = 0; i < tested.tests.size(); ++i) {
+                const auto &r = tested.tests[i];
+                if (static_cast<std::size_t>(r.kind) != kind)
+                    continue;
+                BOOST_TEST(same_test(r, listed.tests[i]) ==
+                           (std::isnan(r.log2fc) == std::isnan(listed.tests[i].log2fc)));
+                rows_listed.push_back(i);
+                p_listed.push_back(r.p_value);
+                if (r.status == "failed_pair_qc") {
+                    BOOST_TEST(std::isnan(r.adjusted_p));
+                    BOOST_TEST(listed.tests[i].adjusted_p == 1);
+                } else {
+                    rows_tested.push_back(i);
+                    p_tested.push_back(r.p_value);
+                }
+            }
+            BOOST_TEST(tested.pairs_listed[kind] == rows_listed.size());
+            BOOST_TEST(tested.pairs_passing_qc[kind] == rows_tested.size());
+            BOOST_TEST(tested.family_size[kind] == rows_tested.size());
+            BOOST_TEST(listed.family_size[kind] == rows_listed.size());
+            const auto q_tested = adjust_pvalues(p_tested, bonferroni),
+                       q_listed = adjust_pvalues(p_listed, bonferroni);
+            for (std::size_t k = 0; k < rows_tested.size(); ++k)
+                BOOST_TEST(tested.tests[rows_tested[k]].adjusted_p == q_tested[k]);
+            for (std::size_t k = 0; k < rows_listed.size(); ++k)
+                BOOST_TEST(listed.tests[rows_listed[k]].adjusted_p == q_listed[k]);
+        }
+        BOOST_TEST(tested.pairs_listed[0] > tested.pairs_passing_qc[0]);
+        // Effect fits of the significant pairs follow the family.
+        std::size_t fits_tested = 0, fits_listed = 0, called_tested = 0, called_listed = 0;
+        for (std::size_t i = 0; i < tested.tests.size(); ++i) {
+            fits_tested += std::isfinite(tested.tests[i].log2fc);
+            fits_listed += std::isfinite(listed.tests[i].log2fc);
+            called_tested += tested.tests[i].adjusted_p <= o.alpha;
+            called_listed += listed.tests[i].adjusted_p <= o.alpha;
+        }
+        BOOST_TEST(fits_tested == called_tested);
+        BOOST_TEST(fits_listed == called_listed);
+        BOOST_TEST(called_tested >= called_listed);
+        BOOST_TEST(called_tested > 0u);
+        // A caller that lists only the pairs that pass pair QC, and gives the
+        // sizes of the listed families, gets the adjusted p-values of the full list.
+        std::vector<Pair> passing;
+        for (const auto &r : tested.tests)
+            if (r.status != "failed_pair_qc")
+                passing.push_back({r.response, r.target, r.kind});
+        o.family_size = listed.family_size;
+        for (auto family : {AdjustmentFamily::listed, AdjustmentFamily::tested}) {
+            o.family = family;
+            const auto supplied =
+                sceptre(d.x, d.responses, d.assignments, d.guides, passing, {}, o);
+            const auto reference = by_pair(listed);
+            for (const auto &r : supplied.tests)
+                BOOST_TEST(same_record(r, reference.at(key_of(r))));
+            BOOST_TEST((supplied.family_size == listed.family_size));
+        }
+        o.family_size = {1, 0, 0}; // smaller than the family at hand
+        BOOST_CHECK_THROW(sceptre(d.x, d.responses, d.assignments, d.guides, passing, {}, o),
+                          std::invalid_argument);
+    }
+    // A family larger than its p-values counts the others with p = 1.
+    const Vector p{0.01, 0.2, 0.04}, with_ones{0.01, 0.2, 0.04, 1, 1, 1, 1};
+    for (bool bonferroni : {false, true}) {
+        const auto q = adjust_pvalues(p, bonferroni, 7),
+                   all = adjust_pvalues(with_ones, bonferroni);
+        for (std::size_t k = 0; k < p.size(); ++k)
+            BOOST_TEST(q[k] == all[k]);
+    }
+    BOOST_CHECK_THROW(adjust_pvalues(p, false, 2), std::invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE(pair_qc_comes_before_any_other_work_for_a_pair) {
+    auto d = screen_data();
+    const auto n = d.x.rows;
+    // A second non-targeting guide in cells that other guides also treat.
+    d.assignments.cols += 1;
+    for (std::size_t i = 0; i < n; i += 5) {
+        d.assignments.row_index.push_back(i);
+        d.assignments.values.push_back(1);
+    }
+    d.assignments.column_ptr.push_back(d.assignments.values.size());
+    d.guides.push_back({"nt2", "NT", true});
+    // A response with too few nonzero cells for any pair.
+    const auto sparse = d.responses.cols++;
+    for (std::size_t i = 0; i < 5; ++i) {
+        d.responses.row_index.push_back(i);
+        d.responses.values.push_back(2);
+    }
+    d.responses.column_ptr.push_back(d.responses.values.size());
+    for (std::size_t t = 0; t + 2 < d.guides.size(); ++t)
+        d.pairs.push_back({sparse, "T" + std::to_string(t)});
+    d.pairs.push_back({sparse, "NT", PairKind::negative_control});
+    for (bool high_moi : {true, false}) {
+        auto o = screen_options(0, high_moi);
+        o.assignment_qc = false; // keep cells with two guides
+        o.min_nonzero = 60;      // so that pairs fail
+        const auto result = sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+        // The counts of every pair, by their definition.
+        std::set<std::size_t> testable_responses;
+        std::size_t tested = 0, failed = 0;
+        for (const auto &r : result.tests) {
+            const auto y = d.responses.column(r.response);
+            std::vector<unsigned char> treated(n), control(n);
+            for (std::size_t j = 0; j < d.guides.size(); ++j)
+                for (auto k = d.assignments.column_ptr[j]; k < d.assignments.column_ptr[j + 1];
+                     ++k) {
+                    if (d.guides[j].target == r.target)
+                        treated[d.assignments.row_index[k]] = 1;
+                    if (d.guides[j].non_targeting)
+                        control[d.assignments.row_index[k]] = 1;
+                }
+            std::size_t cells = 0, nonzero_treatment = 0, nonzero_control = 0;
+            for (std::size_t i = 0; i < n; ++i) {
+                const bool in_control = high_moi ? !treated[i] : (control[i] && !treated[i]);
+                cells += treated[i] || in_control;
+                nonzero_treatment += treated[i] && y[i] != 0;
+                nonzero_control += in_control && y[i] != 0;
+            }
+            BOOST_TEST(r.cells == cells);
+            BOOST_TEST(r.nonzero_treatment == nonzero_treatment);
+            BOOST_TEST(r.nonzero_control == nonzero_control);
+            const bool passes = nonzero_treatment >= 60 && nonzero_control >= 60;
+            BOOST_TEST((r.status == "failed_pair_qc") == !passes);
+            if (passes) {
+                ++tested;
+                testable_responses.insert(r.response);
+            } else
+                ++failed;
+        }
+        BOOST_TEST(tested > 0u);
+        BOOST_TEST(failed > 8u);
+        // A null model is fitted for a response with a pair to test (complement
+        // controls), or for each such pair (non-targeting controls), and for
+        // nothing else.
+        BOOST_TEST(result.null_fits == (high_moi ? testable_responses.size() : tested));
+        if (high_moi) {
+            BOOST_TEST(testable_responses.size() < d.responses.cols);
+            // The nulls prepared for shards: likewise.
+            std::vector<std::size_t> which(d.responses.cols);
+            std::iota(which.begin(), which.end(), 0);
+            const auto nulls =
+                sceptre_nulls(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o, which);
+            for (std::size_t j = 0; j < nulls.size(); ++j)
+                BOOST_TEST((nulls[j].parameters != 0) == (testable_responses.count(j) != 0));
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(a_grid_request_gives_the_records_of_the_listed_pairs) {
+    const auto d = screen_data();
+    SceptreGrid grid;
+    for (std::size_t t = 0; t + 1 < d.guides.size(); ++t)
+        grid.discovery_targets.push_back("T" + std::to_string(t));
+    grid.negative_targets = {"NT"};
+    grid.pairs = {{1, "T0", PairKind::positive_control}};
+    for (int mode : {0, 1, 2, 4, 5})
+        for (bool high_moi : {true, false}) {
+            if ((mode == 1 || mode == 2) && !high_moi)
+                continue;
+            BOOST_TEST_CONTEXT("mode " << mode << " high MOI " << high_moi) {
+                auto o = screen_options(mode, high_moi);
+                o.min_nonzero = 40; // pairs fail on either arm
+                o.effect_fits = EffectFits::significant;
+                for (auto family : {AdjustmentFamily::tested, AdjustmentFamily::listed}) {
+                    o.family = family;
+                    // screen_data() lists exactly the grid's pairs and the positive control.
+                    const auto listed =
+                        sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+                    const auto reference = by_pair(listed);
+                    const auto request =
+                        sceptre_grid(d.x, d.responses, d.assignments, d.guides, grid, {}, o);
+                    // Every listed pair that passes pair QC has its record, and no other
+                    // grid pair has one.
+                    std::size_t passing = 0;
+                    for (const auto &r : listed.tests)
+                        passing +=
+                            r.status != "failed_pair_qc" || r.kind == PairKind::positive_control;
+                    BOOST_TEST(request.result.tests.size() == passing);
+                    for (const auto &r : request.result.tests)
+                        BOOST_TEST(same_record(r, reference.at(key_of(r))));
+                    BOOST_TEST((request.result.pairs_listed == listed.pairs_listed));
+                    BOOST_TEST((request.result.family_size == listed.family_size));
+                    BOOST_TEST(request.result.discovery_rejections == listed.discovery_rejections);
+                    // The tallies: every pair of the grid, by target and kind.
+                    BOOST_REQUIRE(request.tally.size() == d.guides.size());
+                    std::size_t few_treatment = 0, few_control = 0;
+                    for (const auto &entry : request.tally) {
+                        std::size_t ok = 0, failed = 0;
+                        for (const auto &r : listed.tests)
+                            if (r.target == entry.target && r.kind == entry.kind) {
+                                ok += r.status != "failed_pair_qc";
+                                failed += r.status == "failed_pair_qc";
+                            }
+                        BOOST_TEST(entry.requested == d.responses.cols);
+                        BOOST_TEST(entry.passing == ok);
+                        BOOST_TEST(entry.few_treatment + entry.few_control == failed);
+                        few_treatment += entry.few_treatment;
+                        few_control += entry.few_control;
+                    }
+                    BOOST_TEST(few_treatment > 0u);
+                    if (!high_moi)
+                        BOOST_TEST(few_control > 0u);
+                }
+            }
+        }
+    // Targets with two guides: per-guide tests give a row for each guide
+    // (singleton) or for each pair (Bonferroni), and so do the families.
+    auto two = screen_data();
+    two.assignments.cols += 2;
+    for (std::size_t g = 0; g < 2; ++g) {
+        for (std::size_t i = 7 + g; i < two.x.rows; i += 9) {
+            two.assignments.row_index.push_back(i);
+            two.assignments.values.push_back(1);
+        }
+        two.assignments.column_ptr.push_back(two.assignments.values.size());
+        two.guides.push_back({"second" + std::to_string(g), g == 0 ? "T1" : "NT", g == 1});
+    }
+    for (int mode : {4, 5})
+        for (bool high_moi : {true, false})
+            for (auto family : {AdjustmentFamily::tested, AdjustmentFamily::listed}) {
+                BOOST_TEST_CONTEXT("two guides, mode " << mode << " high MOI " << high_moi) {
+                    auto o = screen_options(mode, high_moi);
+                    o.min_nonzero = 40;
+                    o.family = family;
+                    const auto listed = sceptre(two.x, two.responses, two.assignments, two.guides,
+                                                two.pairs, {}, o);
+                    const auto reference = by_pair(listed);
+                    const auto request = sceptre_grid(two.x, two.responses, two.assignments,
+                                                      two.guides, grid, {}, o);
+                    // The rows of every pair one of whose guides passes pair QC.
+                    std::set<std::tuple<std::size_t, std::string, int>> passing;
+                    for (const auto &r : listed.tests)
+                        if (r.status != "failed_pair_qc" || r.kind == PairKind::positive_control)
+                            passing.insert({r.response, r.target, static_cast<int>(r.kind)});
+                    std::size_t rows = 0;
+                    for (const auto &r : listed.tests)
+                        rows += passing.count({r.response, r.target, static_cast<int>(r.kind)});
+                    BOOST_TEST(request.result.tests.size() == rows);
+                    for (const auto &r : request.result.tests)
+                        BOOST_TEST(same_record(r, reference.at(key_of(r))));
+                    BOOST_TEST((request.result.pairs_listed == listed.pairs_listed));
+                    BOOST_TEST((request.result.family_size == listed.family_size));
+                    if (mode == 4)
+                        BOOST_TEST(listed.pairs_listed[0] > two.responses.cols * 6);
+                }
+            }
+    // Some of the responses; sceptre_pair_qc alone lists the pairs that pass.
+    auto o = screen_options(0, true);
+    o.min_nonzero = 40;
+    grid.responses = {5, 2, 3};
+    grid.pairs.clear();
+    const auto checked = sceptre_pair_qc(d.x, d.responses, d.assignments, d.guides, grid, {}, o);
+    const auto all = sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+    std::vector<PairKey> expected, found;
+    for (auto column : grid.responses)
+        for (const auto &r : all.tests)
+            if (r.response == column && r.status != "failed_pair_qc" &&
+                r.kind != PairKind::positive_control)
+                expected.push_back(key_of(r));
+    for (const auto &pair : checked.passing)
+        found.push_back({pair.response, pair.target, "union", static_cast<int>(pair.kind)});
+    BOOST_TEST((found == expected)); // by response as requested, then targets as given
+    BOOST_TEST(checked.retained_cells == all.retained_cells);
+    // Invalid requests.
+    grid.pairs = {{2, "T1", PairKind::discovery}}; // a pair of the grid, listed again
+    BOOST_CHECK_THROW(sceptre_grid(d.x, d.responses, d.assignments, d.guides, grid, {}, o),
+                      std::invalid_argument);
+    grid.pairs.clear();
+    grid.responses = {2, 2};
+    BOOST_CHECK_THROW(sceptre_grid(d.x, d.responses, d.assignments, d.guides, grid, {}, o),
+                      std::invalid_argument);
+    grid.responses.clear();
+    grid.negative_targets = {"T0"}; // not a non-targeting target
+    BOOST_CHECK_THROW(sceptre_grid(d.x, d.responses, d.assignments, d.guides, grid, {}, o),
+                      std::invalid_argument);
+    grid.negative_targets = {"NT"};
+    o.stream_keys = StreamKeys::position;
+    BOOST_CHECK_THROW(sceptre_grid(d.x, d.responses, d.assignments, d.guides, grid, {}, o),
+                      std::invalid_argument);
 }

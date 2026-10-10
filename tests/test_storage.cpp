@@ -123,46 +123,58 @@ BOOST_AUTO_TEST_CASE(cached_target_and_response_contexts_match_independent_pair_
         options.model.weights[i] = i % 29 == 0 ? 0 : 0.5 + i % 3;
     }
     for (bool nt_controls : {false, true})
-        for (auto mode : {FitMethod::direct, FitMethod::sceptre_null}) {
-            options.nt_controls = nt_controls;
-            options.null_model = mode;
-            std::vector<ResampleResult> expected;
-            for (std::size_t j = 0; j < pairs.size(); ++j) {
-                std::vector<std::size_t> cells;
-                Vector g;
-                for (std::size_t i = 0; i < n; ++i) {
-                    const bool treated = j % 2 == 0 ? calls[0][i] || calls[1][i] : calls[2][i];
-                    if (qc.keep[i] && (!nt_controls || treated || calls[3][i])) {
-                        cells.push_back(i);
-                        g.push_back(treated);
+        for (auto mode : {FitMethod::direct, FitMethod::sceptre_null})
+            for (auto keys : {StreamKeys::identity, StreamKeys::position}) {
+                options.nt_controls = nt_controls;
+                options.null_model = mode;
+                options.stream_keys = keys;
+                std::vector<ResampleResult> expected;
+                for (std::size_t j = 0; j < pairs.size(); ++j) {
+                    std::vector<std::size_t> cells;
+                    Vector g;
+                    for (std::size_t i = 0; i < n; ++i) {
+                        const bool treated = j % 2 == 0 ? calls[0][i] || calls[1][i] : calls[2][i];
+                        if (qc.keep[i] && (!nt_controls || treated || calls[3][i])) {
+                            cells.push_back(i);
+                            g.push_back(treated);
+                        }
+                    }
+                    auto x = subset_rows(design, cells);
+                    auto y = subset(responses.column(pairs[j].response), cells);
+                    auto model = options.model;
+                    model.offset = subset(model.offset, cells);
+                    model.weights = subset(model.weights, cells);
+                    auto null = mode == FitMethod::direct ? fit(x, y, model)
+                                                          : fit_sceptre_null(x, y, model);
+                    auto po = model;
+                    po.family = Family::binomial;
+                    po.offset.clear();
+                    po.weights.clear();
+                    auto propensity = fit(x, g, po);
+                    BOOST_REQUIRE(null.ok() && propensity.ok());
+                    // The pair's stream: keyed by the seed, the response's column
+                    // and the target's name, or (releases before 1.3.0) by the
+                    // pair's place in the list.
+                    auto ro = options.resampling;
+                    ro.test_id = j;
+                    if (keys == StreamKeys::identity) {
+                        const auto stream =
+                            keyed_stream(ro.seed, 1, pairs[j].response, name_key(pairs[j].target));
+                        ro.seed = stream.seed;
+                        ro.test_id = stream.test;
+                    }
+                    expected.push_back(
+                        resample(ScoreWorkspace(x, null), g, crt_sampler(propensity.fitted), ro));
+                }
+                for (int threads : {1, 16}) {
+                    options.threads = threads;
+                    auto actual =
+                        sceptre(design, responses, assignments, guides, pairs, qc, options);
+                    for (std::size_t j = 0; j < pairs.size(); ++j) {
+                        BOOST_REQUIRE(actual.tests[j].status == "ok");
+                        BOOST_TEST(actual.tests[j].statistic == expected[j].statistic);
+                        BOOST_TEST(actual.tests[j].p_value == expected[j].p_value);
                     }
                 }
-                auto x = subset_rows(design, cells);
-                auto y = subset(responses.column(pairs[j].response), cells);
-                auto model = options.model;
-                model.offset = subset(model.offset, cells);
-                model.weights = subset(model.weights, cells);
-                auto null =
-                    mode == FitMethod::direct ? fit(x, y, model) : fit_sceptre_null(x, y, model);
-                auto po = model;
-                po.family = Family::binomial;
-                po.offset.clear();
-                po.weights.clear();
-                auto propensity = fit(x, g, po);
-                BOOST_REQUIRE(null.ok() && propensity.ok());
-                auto ro = options.resampling;
-                ro.test_id = j;
-                expected.push_back(
-                    resample(ScoreWorkspace(x, null), g, crt_sampler(propensity.fitted), ro));
             }
-            for (int threads : {1, 16}) {
-                options.threads = threads;
-                auto actual = sceptre(design, responses, assignments, guides, pairs, qc, options);
-                for (std::size_t j = 0; j < pairs.size(); ++j) {
-                    BOOST_REQUIRE(actual.tests[j].status == "ok");
-                    BOOST_TEST(actual.tests[j].statistic == expected[j].statistic);
-                    BOOST_TEST(actual.tests[j].p_value == expected[j].p_value);
-                }
-            }
-        }
 }

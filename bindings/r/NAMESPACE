@@ -1,4 +1,4 @@
 useDynLib(rapidglm, .registration = TRUE)
-export(glm_fit, glm, glm_nb, bulk_de, sceptre)
+export(glm_fit, glm, glm_nb, bulk_de, sceptre, sceptre_grid)
 importFrom(stats, gaussian, glm.control, model.frame, model.response, model.weights,
            model.offset, model.matrix, terms, delete.response, na.omit)

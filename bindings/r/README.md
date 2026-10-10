@@ -12,10 +12,18 @@ res <- rapidglm::bulk_de(counts, ~ cell + dex, col_data, contrast = c("dex", "tr
 attr(res, "run")$size_factors
 pairs_res <- rapidglm::sceptre(responses, grna_calls, ~ log_umi + batch, guides, pairs,
                                cell_data = covariates, moi = "high", threads = 8)
+# every target against every response, without a list of pairs
+grid_res <- rapidglm::sceptre_grid(responses, grna_calls, ~ log_umi + batch, guides,
+                                   discovery_targets, negative_targets,
+                                   cell_data = covariates, moi = "high", threads = 8)
+attr(grid_res, "tally")   # the pairs that failed pair QC, by target and kind
 ```
 
 - `bulk_de()` runs the DESeq2 procedure (written from its paper and
-  documentation). `sceptre()` runs the perturbation workflow.
+  documentation). `sceptre()` runs the perturbation workflow on a list of
+  pairs, and `sceptre_grid()` on targets and responses without a list. A pair's
+  draws depend only on the seed, its response and its target (`response_ids`
+  names the responses), so its row does not depend on what else is tested.
 - Both call the RapidGLM C interface, which the package compiles in, so they
   run the same code as the CLI and the Python package.
 - Inputs follow R conventions:

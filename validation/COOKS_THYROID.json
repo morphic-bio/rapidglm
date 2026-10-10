@@ -4,8 +4,8 @@
     "rapidglm": "rapidglm bulk-de with cooks_filter=false, coefficient sex[T.female] (scripts/validate_cooks.py)",
     "deseq2": "DESeq(full = design, betaPrior = FALSE) then results(name = 'sex.T.female.', cooksCutoff = FALSE) (scripts/reference_bulk_nocooks.R)"
   },
-  "version": "1.2.0",
-  "commit": "4446d4249011fa120299376732deec5bb1522409",
+  "version": "1.3.0",
+  "commit": "303cae173dc64d6ec55dcdd0ffb7fbc61969973d",
   "datasets": {
     "thyroid128": {
       "discoveries": [

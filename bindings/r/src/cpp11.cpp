@@ -19,6 +19,13 @@ extern "C" SEXP _rapidglm_rapidglm_sceptre_(SEXP design, SEXP yp, SEXP yi, SEXP 
     return cpp11::as_sexp(rapidglm_sceptre_(cpp11::as_cpp<cpp11::decay_t<cpp11::doubles_matrix<>>>(design), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(yp), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(yi), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(yx), cpp11::as_cpp<cpp11::decay_t<int>>(genes), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(gp), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(gi), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(gx), cpp11::as_cpp<cpp11::decay_t<int>>(n_guides), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(guide_ids), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(guide_targets), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(guide_non_targeting), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(pair_responses), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(pair_targets), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(pair_kinds), cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(o)));
   END_CPP11
 }
+// c_layer.cpp
+cpp11::writable::list rapidglm_sceptre_grid_(cpp11::doubles_matrix<> design, cpp11::integers yp, cpp11::integers yi, cpp11::doubles yx, int genes, cpp11::integers gp, cpp11::integers gi, cpp11::doubles gx, int n_guides, cpp11::strings guide_ids, cpp11::strings guide_targets, cpp11::integers guide_non_targeting, cpp11::strings discovery_targets, cpp11::strings negative_targets, cpp11::integers grid_responses, cpp11::integers pair_responses, cpp11::strings pair_targets, cpp11::integers pair_kinds, cpp11::list o);
+extern "C" SEXP _rapidglm_rapidglm_sceptre_grid_(SEXP design, SEXP yp, SEXP yi, SEXP yx, SEXP genes, SEXP gp, SEXP gi, SEXP gx, SEXP n_guides, SEXP guide_ids, SEXP guide_targets, SEXP guide_non_targeting, SEXP discovery_targets, SEXP negative_targets, SEXP grid_responses, SEXP pair_responses, SEXP pair_targets, SEXP pair_kinds, SEXP o) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(rapidglm_sceptre_grid_(cpp11::as_cpp<cpp11::decay_t<cpp11::doubles_matrix<>>>(design), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(yp), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(yi), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(yx), cpp11::as_cpp<cpp11::decay_t<int>>(genes), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(gp), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(gi), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(gx), cpp11::as_cpp<cpp11::decay_t<int>>(n_guides), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(guide_ids), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(guide_targets), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(guide_non_targeting), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(discovery_targets), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(negative_targets), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(grid_responses), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(pair_responses), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(pair_targets), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(pair_kinds), cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(o)));
+  END_CPP11
+}
 // fit.cpp
 cpp11::writable::list rapidglm_fit_(cpp11::doubles_matrix<> x, cpp11::doubles y, cpp11::doubles weights, cpp11::doubles offset, cpp11::doubles start, std::string family, double theta, bool estimate_theta, double tolerance, int max_iterations, bool singular_ok, double alias_tolerance);
 extern "C" SEXP _rapidglm_rapidglm_fit_(SEXP x, SEXP y, SEXP weights, SEXP offset, SEXP start, SEXP family, SEXP theta, SEXP estimate_theta, SEXP tolerance, SEXP max_iterations, SEXP singular_ok, SEXP alias_tolerance) {
@@ -29,9 +36,10 @@ extern "C" SEXP _rapidglm_rapidglm_fit_(SEXP x, SEXP y, SEXP weights, SEXP offse
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
-    {"_rapidglm_rapidglm_bulk_de_", (DL_FUNC) &_rapidglm_rapidglm_bulk_de_,  7},
-    {"_rapidglm_rapidglm_fit_",     (DL_FUNC) &_rapidglm_rapidglm_fit_,     12},
-    {"_rapidglm_rapidglm_sceptre_", (DL_FUNC) &_rapidglm_rapidglm_sceptre_, 16},
+    {"_rapidglm_rapidglm_bulk_de_",      (DL_FUNC) &_rapidglm_rapidglm_bulk_de_,       7},
+    {"_rapidglm_rapidglm_fit_",          (DL_FUNC) &_rapidglm_rapidglm_fit_,          12},
+    {"_rapidglm_rapidglm_sceptre_",      (DL_FUNC) &_rapidglm_rapidglm_sceptre_,      16},
+    {"_rapidglm_rapidglm_sceptre_grid_", (DL_FUNC) &_rapidglm_rapidglm_sceptre_grid_, 19},
     {NULL, NULL, 0}
 };
 }

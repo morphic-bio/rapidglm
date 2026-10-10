@@ -1,10 +1,10 @@
 {
  "purpose": "Bulk DE against DESeq2 1.48.2 and PyDESeq2 0.5.2 (docs/BENCHMARK.md)",
- "version": "1.2.0",
- "commit": "4446d4249011fa120299376732deec5bb1522409",
- "commit_note": "the source measured is this commit (v1.2.0-dev.1); it was made while the stages ran, and stages that started before it recorded be60928 with the same source uncommitted",
- "started": "2026-10-07T00:32:54",
- "finished": "2026-10-07T02:08:55",
+ "version": "1.3.0",
+ "commit": "303cae173dc64d6ec55dcdd0ffb7fbc61969973d",
+ "commit_note": "the source measured is this commit (v1.3.0-dev.1); it was made while the stages ran, and stages that started before it recorded 5a38191 with the same source uncommitted",
+ "started": "2026-10-10T00:01:12",
+ "finished": "2026-10-10T01:37:58",
  "host": {
   "cores": 28,
   "cpus_allowed": [
@@ -42,7 +42,7 @@
   },
   "uname": "Linux pikachu 6.8.0-124-generic #124~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue May 26 21:05:19 UTC  x86_64"
  },
- "host_note": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-06 and 2026-10-07. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired.",
+ "host_note": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-09 and 2026-10-10. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired.",
  "commands": [
   "python3 scripts/benchmark_applications.py --datasets airway thyroid32 thyroid128 --sceptre-datasets --repeats 3 --cpus 1:16 8:16-23 --output OUT",
   "python3 scripts/benchmark_applications.py --datasets thyroid --sceptre-datasets --repeats 2 --cpus 1:16 8:16-23 --output OUT"
@@ -58,34 +58,34 @@
    "dataset": "airway",
    "tool": "rapidglm-cli",
    "threads": 1,
-   "seconds": 1.0987871875986457,
+   "seconds": 1.0910776602104306,
    "all_seconds": [
-    1.0987871875986457,
-    1.141105242073536,
-    1.1077795531600714
+    1.0910776602104306,
+    1.0947879124432802,
+    1.1063644420355558
    ],
-   "load": 2.25048828125,
+   "load": 5.650390625,
    "contended": false,
    "runs": [
     {
-     "seconds": 1.0987871875986457,
-     "load": 2.25048828125,
+     "seconds": 1.0910776602104306,
+     "load": 5.650390625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0089,
+     "others_cpu": 0.009,
      "contended": false
     },
     {
-     "seconds": 1.141105242073536,
-     "load": 2.76513671875,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0,
-     "contended": false
-    },
-    {
-     "seconds": 1.1077795531600714,
-     "load": 2.26220703125,
+     "seconds": 1.0947879124432802,
+     "load": 6.33837890625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0088,
+     "contended": false
+    },
+    {
+     "seconds": 1.1063644420355558,
+     "load": 5.6640625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0,
      "contended": false
     }
    ],
@@ -99,34 +99,34 @@
    "dataset": "airway",
    "tool": "rapidglm-cli",
    "threads": 8,
-   "seconds": 0.3340903799980879,
+   "seconds": 0.32941540889441967,
    "all_seconds": [
-    0.3340903799980879,
-    0.35435062926262617,
-    0.37190506886690855
+    0.32941540889441967,
+    0.34617290180176497,
+    0.33283043932169676
    ],
-   "load": 2.25048828125,
+   "load": 5.35791015625,
    "contended": false,
    "runs": [
     {
-     "seconds": 0.3340903799980879,
-     "load": 2.25048828125,
+     "seconds": 0.32941540889441967,
+     "load": 5.35791015625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0,
+     "others_cpu": 0.0036,
      "contended": false
     },
     {
-     "seconds": 0.35435062926262617,
-     "load": 2.76513671875,
+     "seconds": 0.34617290180176497,
+     "load": 6.33837890625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0032,
+     "others_cpu": 0.027,
      "contended": false
     },
     {
-     "seconds": 0.37190506886690855,
-     "load": 2.24072265625,
+     "seconds": 0.33283043932169676,
+     "load": 6.01171875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0094,
+     "others_cpu": 0.0243,
      "contended": false
     }
    ],
@@ -140,34 +140,34 @@
    "dataset": "airway",
    "tool": "rapidglm-python",
    "threads": 1,
-   "seconds": 1.0532751837745309,
+   "seconds": 1.0603951876983047,
    "all_seconds": [
-    1.0587154850363731,
-    1.0532751837745309,
-    1.0578148448839784
+    1.0756435561925173,
+    1.0773244565352798,
+    1.0603951876983047
    ],
-   "load": 2.62353515625,
+   "load": 6.01171875,
    "contended": false,
    "runs": [
     {
-     "seconds": 1.0587154850363731,
-     "load": 2.310546875,
+     "seconds": 1.0756435561925173,
+     "load": 5.35791015625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 1.0532751837745309,
-     "load": 2.62353515625,
+     "seconds": 1.0773244565352798,
+     "load": 6.07080078125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 1.0578148448839784,
-     "load": 2.24072265625,
+     "seconds": 1.0603951876983047,
+     "load": 6.01171875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0068,
+     "others_cpu": 0.0,
      "contended": false
     }
    ],
@@ -181,34 +181,34 @@
    "dataset": "airway",
    "tool": "rapidglm-python",
    "threads": 8,
-   "seconds": 0.30354354437440634,
+   "seconds": 0.3054221123456955,
    "all_seconds": [
-    0.30551167391240597,
-    0.30354354437440634,
-    0.30680208280682564
+    0.3054221123456955,
+    0.31527229864150286,
+    0.3146067978814244
    ],
-   "load": 2.73388671875,
+   "load": 5.0888671875,
    "contended": false,
    "runs": [
     {
-     "seconds": 0.30551167391240597,
-     "load": 2.28564453125,
+     "seconds": 0.3054221123456955,
+     "load": 5.0888671875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.1059,
+     "others_cpu": 0.0317,
      "contended": false
     },
     {
-     "seconds": 0.30354354437440634,
-     "load": 2.73388671875,
+     "seconds": 0.31527229864150286,
+     "load": 6.3857421875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0326,
+     "others_cpu": 0.0805,
      "contended": false
     },
     {
-     "seconds": 0.30680208280682564,
-     "load": 2.06103515625,
+     "seconds": 0.3146067978814244,
+     "load": 5.6904296875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0143,
+     "others_cpu": 0.0925,
      "contended": false
     }
    ],
@@ -222,32 +222,32 @@
    "dataset": "airway",
    "tool": "rapidglm-deseq",
    "threads": 1,
-   "seconds": 1.1724178278818727,
+   "seconds": 1.1959149381145835,
    "all_seconds": [
-    1.1931557273492217,
-    1.1724178278818727,
-    1.1761986427009106
+    1.1966755017638206,
+    1.1978543354198337,
+    1.1959149381145835
    ],
-   "load": 2.6748046875,
+   "load": 5.39453125,
    "contended": false,
    "runs": [
     {
-     "seconds": 1.1931557273492217,
-     "load": 2.34326171875,
+     "seconds": 1.1966755017638206,
+     "load": 5.40234375,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 1.1724178278818727,
-     "load": 2.6748046875,
+     "seconds": 1.1978543354198337,
+     "load": 6.1142578125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0062,
      "contended": false
     },
     {
-     "seconds": 1.1761986427009106,
-     "load": 1.9755859375,
+     "seconds": 1.1959149381145835,
+     "load": 5.39453125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
@@ -263,34 +263,34 @@
    "dataset": "airway",
    "tool": "rapidglm-deseq",
    "threads": 8,
-   "seconds": 0.4281492726877332,
+   "seconds": 0.423528965562582,
    "all_seconds": [
-    0.4363733772188425,
-    0.44792469684034586,
-    0.4281492726877332
+    0.4280029982328415,
+    0.4279435910284519,
+    0.423528965562582
    ],
-   "load": 1.8974609375,
+   "load": 5.12255859375,
    "contended": false,
    "runs": [
     {
-     "seconds": 0.4363733772188425,
-     "load": 2.39599609375,
+     "seconds": 0.4280029982328415,
+     "load": 5.69091796875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.1074,
+     "others_cpu": 0.0397,
      "contended": false
     },
     {
-     "seconds": 0.44792469684034586,
-     "load": 2.701171875,
+     "seconds": 0.4279435910284519,
+     "load": 6.505859375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0349,
+     "others_cpu": 0.0574,
      "contended": false
     },
     {
-     "seconds": 0.4281492726877332,
-     "load": 1.8974609375,
+     "seconds": 0.423528965562582,
+     "load": 5.12255859375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0181,
+     "others_cpu": 0.0355,
      "contended": false
     }
    ],
@@ -304,32 +304,32 @@
    "dataset": "airway",
    "tool": "rapidglm-r",
    "threads": 1,
-   "seconds": 0.99,
+   "seconds": 1.016,
    "all_seconds": [
-    1.008,
-    0.99,
-    0.995
+    1.021,
+    1.017,
+    1.016
    ],
-   "load": 2.701171875,
+   "load": 5.75341796875,
    "contended": false,
    "runs": [
     {
-     "seconds": 1.008,
-     "load": 2.39599609375,
+     "seconds": 1.021,
+     "load": 5.47509765625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0056,
+     "contended": false
+    },
+    {
+     "seconds": 1.017,
+     "load": 6.505859375,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 0.99,
-     "load": 2.701171875,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0058,
-     "contended": false
-    },
-    {
-     "seconds": 0.995,
-     "load": 2.06591796875,
+     "seconds": 1.016,
+     "load": 5.75341796875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
@@ -345,34 +345,34 @@
    "dataset": "airway",
    "tool": "rapidglm-r",
    "threads": 8,
-   "seconds": 0.287,
+   "seconds": 0.283,
    "all_seconds": [
-    0.287,
-    0.288,
-    0.29
+    0.285,
+    0.284,
+    0.283
    ],
-   "load": 2.2041015625,
+   "load": 5.61279296875,
    "contended": false,
    "runs": [
     {
-     "seconds": 0.287,
-     "load": 2.2041015625,
+     "seconds": 0.285,
+     "load": 6.158203125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0512,
+     "others_cpu": 0.0488,
      "contended": false
     },
     {
-     "seconds": 0.288,
-     "load": 2.8857421875,
+     "seconds": 0.284,
+     "load": 6.30517578125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0143,
+     "others_cpu": 0.0729,
      "contended": false
     },
     {
-     "seconds": 0.29,
-     "load": 2.06591796875,
+     "seconds": 0.283,
+     "load": 5.61279296875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0271,
+     "others_cpu": 0.0769,
      "contended": false
     }
    ],
@@ -386,32 +386,32 @@
    "dataset": "airway",
    "tool": "pydeseq2",
    "threads": 1,
-   "seconds": 53.23322622664273,
+   "seconds": 53.46859144978225,
    "all_seconds": [
-    53.28863163292408,
-    53.23322622664273,
-    53.66410519182682
+    53.46859144978225,
+    53.608223653398454,
+    54.033479428850114
    ],
-   "load": 2.814453125,
+   "load": 6.158203125,
    "contended": false,
    "runs": [
     {
-     "seconds": 53.28863163292408,
-     "load": 2.02734375,
+     "seconds": 53.46859144978225,
+     "load": 6.158203125,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0046,
+     "contended": false
+    },
+    {
+     "seconds": 53.608223653398454,
+     "load": 6.1201171875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0002,
      "contended": false
     },
     {
-     "seconds": 53.23322622664273,
-     "load": 2.814453125,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0004,
-     "contended": false
-    },
-    {
-     "seconds": 53.66410519182682,
-     "load": 1.98046875,
+     "seconds": 54.033479428850114,
+     "load": 5.61279296875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
@@ -427,34 +427,34 @@
    "dataset": "airway",
    "tool": "pydeseq2",
    "threads": 8,
-   "seconds": 12.2227355344221,
+   "seconds": 12.503397580236197,
    "all_seconds": [
-    12.397306927479804,
-    12.2227355344221,
-    12.250336147844791
+    12.522527524270117,
+    12.521619953215122,
+    12.503397580236197
    ],
-   "load": 2.74365234375,
+   "load": 6.67236328125,
    "contended": false,
    "runs": [
     {
-     "seconds": 12.397306927479804,
-     "load": 2.1357421875,
+     "seconds": 12.522527524270117,
+     "load": 7.05517578125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0195,
+     "others_cpu": 0.0174,
      "contended": false
     },
     {
-     "seconds": 12.2227355344221,
-     "load": 2.74365234375,
+     "seconds": 12.521619953215122,
+     "load": 5.42578125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0085,
+     "others_cpu": 0.0184,
      "contended": false
     },
     {
-     "seconds": 12.250336147844791,
-     "load": 2.11572265625,
+     "seconds": 12.503397580236197,
+     "load": 6.67236328125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0105,
+     "others_cpu": 0.018,
      "contended": false
     }
    ],
@@ -468,34 +468,34 @@
    "dataset": "airway",
    "tool": "pydeseq2-rapidglm",
    "threads": 1,
-   "seconds": 3.203427023254335,
+   "seconds": 3.212315060198307,
    "all_seconds": [
-    3.2477642288431525,
-    3.228909036144614,
-    3.203427023254335
+    3.212315060198307,
+    3.224848186597228,
+    3.2670857766643167
    ],
-   "load": 2.25,
+   "load": 7.25341796875,
    "contended": false,
    "runs": [
     {
-     "seconds": 3.2477642288431525,
-     "load": 3.31787109375,
+     "seconds": 3.212315060198307,
+     "load": 7.25341796875,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0046,
+     "contended": false
+    },
+    {
+     "seconds": 3.224848186597228,
+     "load": 6.58740234375,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0,
+     "contended": false
+    },
+    {
+     "seconds": 3.2670857766643167,
+     "load": 6.779296875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0023,
-     "contended": false
-    },
-    {
-     "seconds": 3.228909036144614,
-     "load": 3.802734375,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0,
-     "contended": false
-    },
-    {
-     "seconds": 3.203427023254335,
-     "load": 2.25,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0,
      "contended": false
     }
    ],
@@ -509,34 +509,34 @@
    "dataset": "airway",
    "tool": "pydeseq2-rapidglm",
    "threads": 8,
-   "seconds": 3.317226075567305,
+   "seconds": 3.362278931774199,
    "all_seconds": [
-    3.3277483666315675,
-    3.317226075567305,
-    3.336868171580136
+    3.3644993361085653,
+    3.362278931774199,
+    3.387580539099872
    ],
-   "load": 3.498046875,
+   "load": 6.04833984375,
    "contended": false,
    "runs": [
     {
-     "seconds": 3.3277483666315675,
-     "load": 3.2119140625,
+     "seconds": 3.3644993361085653,
+     "load": 7.15283203125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0271,
+     "others_cpu": 0.0656,
      "contended": false
     },
     {
-     "seconds": 3.317226075567305,
-     "load": 3.498046875,
+     "seconds": 3.362278931774199,
+     "load": 6.04833984375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0305,
+     "others_cpu": 0.0551,
      "contended": false
     },
     {
-     "seconds": 3.336868171580136,
-     "load": 2.57958984375,
+     "seconds": 3.387580539099872,
+     "load": 7.03759765625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0244,
+     "others_cpu": 0.06,
      "contended": false
     }
    ],
@@ -550,34 +550,34 @@
    "dataset": "airway",
    "tool": "deseq2",
    "threads": 1,
-   "seconds": 6.037,
+   "seconds": 6.093,
    "all_seconds": [
-    6.06,
-    6.061,
-    6.037
+    6.116,
+    6.093,
+    6.145
    ],
-   "load": 2.53271484375,
+   "load": 6.28515625,
    "contended": false,
    "runs": [
     {
-     "seconds": 6.06,
-     "load": 3.1728515625,
+     "seconds": 6.116,
+     "load": 6.99462890625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0028,
+     "contended": false
+    },
+    {
+     "seconds": 6.093,
+     "load": 6.28515625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0009,
      "contended": false
     },
     {
-     "seconds": 6.061,
-     "load": 3.1875,
+     "seconds": 6.145,
+     "load": 6.416015625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0,
-     "contended": false
-    },
-    {
-     "seconds": 6.037,
-     "load": 2.53271484375,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0,
+     "others_cpu": 0.0009,
      "contended": false
     }
    ],
@@ -591,34 +591,34 @@
    "dataset": "airway",
    "tool": "deseq2",
    "threads": 8,
-   "seconds": 2.682,
+   "seconds": 2.754,
    "all_seconds": [
-    2.682,
-    2.733,
-    2.736
+    2.756,
+    2.759,
+    2.754
    ],
-   "load": 2.99951171875,
+   "load": 7.04736328125,
    "contended": false,
    "runs": [
     {
-     "seconds": 2.682,
-     "load": 2.99951171875,
+     "seconds": 2.756,
+     "load": 6.45361328125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0437,
+     "others_cpu": 0.0457,
      "contended": false
     },
     {
-     "seconds": 2.733,
-     "load": 2.78857421875,
+     "seconds": 2.759,
+     "load": 5.6982421875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0274,
+     "others_cpu": 0.0556,
      "contended": false
     },
     {
-     "seconds": 2.736,
-     "load": 2.5498046875,
+     "seconds": 2.754,
+     "load": 7.04736328125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0318,
+     "others_cpu": 0.0535,
      "contended": false
     }
    ],
@@ -632,34 +632,34 @@
    "dataset": "airway",
    "tool": "deseq2-glmgampoi",
    "threads": 1,
-   "seconds": 15.243,
+   "seconds": 15.421,
    "all_seconds": [
-    15.296,
-    15.243,
-    15.243
+    15.436,
+    15.421,
+    15.498
    ],
-   "load": 2.814453125,
+   "load": 6.20654296875,
    "contended": false,
    "runs": [
     {
-     "seconds": 15.296,
-     "load": 2.77197265625,
+     "seconds": 15.436,
+     "load": 6.70361328125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0005,
      "contended": false
     },
     {
-     "seconds": 15.243,
-     "load": 2.814453125,
+     "seconds": 15.421,
+     "load": 6.20654296875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 15.243,
-     "load": 2.384765625,
+     "seconds": 15.498,
+     "load": 7.17236328125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0005,
+     "others_cpu": 0.0,
      "contended": false
     }
    ],
@@ -673,34 +673,34 @@
    "dataset": "thyroid32",
    "tool": "rapidglm-cli",
    "threads": 1,
-   "seconds": 4.479814289137721,
+   "seconds": 4.58213059976697,
    "all_seconds": [
-    4.479814289137721,
-    4.514566539786756,
-    4.489159508608282
+    4.598235079087317,
+    4.58213059976697,
+    4.589791051112115
    ],
-   "load": 2.3671875,
+   "load": 7.4541015625,
    "contended": false,
    "runs": [
     {
-     "seconds": 4.479814289137721,
-     "load": 2.3671875,
+     "seconds": 4.598235079087317,
+     "load": 7.10791015625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 4.514566539786756,
-     "load": 2.3486328125,
+     "seconds": 4.58213059976697,
+     "load": 7.4541015625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 4.489159508608282,
-     "load": 2.953125,
+     "seconds": 4.589791051112115,
+     "load": 7.0439453125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0022,
+     "others_cpu": 0.0,
      "contended": false
     }
    ],
@@ -714,34 +714,34 @@
    "dataset": "thyroid32",
    "tool": "rapidglm-cli",
    "threads": 8,
-   "seconds": 0.9257202157750726,
+   "seconds": 0.9264679793268442,
    "all_seconds": [
-    0.9257202157750726,
-    0.9595945682376623,
-    0.9426636192947626
+    0.9264679793268442,
+    0.9558934643864632,
+    0.9706440716981888
    ],
-   "load": 2.33740234375,
+   "load": 6.642578125,
    "contended": false,
    "runs": [
     {
-     "seconds": 0.9257202157750726,
-     "load": 2.33740234375,
+     "seconds": 0.9264679793268442,
+     "load": 6.642578125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0132,
+     "others_cpu": 0.0326,
      "contended": false
     },
     {
-     "seconds": 0.9595945682376623,
-     "load": 2.220703125,
+     "seconds": 0.9558934643864632,
+     "load": 6.76904296875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0163,
+     "others_cpu": 0.0354,
      "contended": false
     },
     {
-     "seconds": 0.9426636192947626,
-     "load": 2.95703125,
+     "seconds": 0.9706440716981888,
+     "load": 6.66162109375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0126,
+     "others_cpu": 0.0359,
      "contended": false
     }
    ],
@@ -755,34 +755,34 @@
    "dataset": "thyroid32",
    "tool": "rapidglm-python",
    "threads": 1,
-   "seconds": 4.33742592856288,
+   "seconds": 4.333344395272434,
    "all_seconds": [
-    4.33742592856288,
-    4.347580780275166,
-    4.339770467951894
+    4.361586298793554,
+    4.333344395272434,
+    4.335241192020476
    ],
-   "load": 2.7109375,
+   "load": 7.02783203125,
    "contended": false,
    "runs": [
     {
-     "seconds": 4.33742592856288,
-     "load": 2.7109375,
+     "seconds": 4.361586298793554,
+     "load": 6.83154296875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0021,
+     "others_cpu": 0.0041,
      "contended": false
     },
     {
-     "seconds": 4.347580780275166,
-     "load": 2.36328125,
+     "seconds": 4.333344395272434,
+     "load": 7.02783203125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 4.339770467951894,
-     "load": 2.88037109375,
+     "seconds": 4.335241192020476,
+     "load": 6.3681640625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0021,
+     "others_cpu": 0.0,
      "contended": false
     }
    ],
@@ -796,34 +796,34 @@
    "dataset": "thyroid32",
    "tool": "rapidglm-python",
    "threads": 8,
-   "seconds": 0.7693894235417247,
+   "seconds": 0.773409572429955,
    "all_seconds": [
-    0.7693894235417247,
-    0.7751265820115805,
-    0.7709213513880968
+    0.7772789495065808,
+    0.773409572429955,
+    0.7738211788237095
    ],
-   "load": 2.7490234375,
+   "load": 7.18603515625,
    "contended": false,
    "runs": [
     {
-     "seconds": 0.7693894235417247,
-     "load": 2.7490234375,
+     "seconds": 0.7772789495065808,
+     "load": 6.5244140625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0357,
+     "others_cpu": 0.0271,
      "contended": false
     },
     {
-     "seconds": 0.7751265820115805,
-     "load": 2.333984375,
+     "seconds": 0.773409572429955,
+     "load": 7.18603515625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0382,
+     "others_cpu": 0.0236,
      "contended": false
     },
     {
-     "seconds": 0.7709213513880968,
-     "load": 2.5908203125,
+     "seconds": 0.7738211788237095,
+     "load": 6.7392578125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0156,
+     "others_cpu": 0.0362,
      "contended": false
     }
    ],
@@ -837,32 +837,32 @@
    "dataset": "thyroid32",
    "tool": "rapidglm-deseq",
    "threads": 1,
-   "seconds": 4.505337408743799,
+   "seconds": 4.515202580951154,
    "all_seconds": [
-    4.5259515987709165,
-    4.505337408743799,
-    4.537714128382504
+    4.515202580951154,
+    4.539704932831228,
+    4.538600447587669
    ],
-   "load": 2.30712890625,
+   "load": 6.24169921875,
    "contended": false,
    "runs": [
     {
-     "seconds": 4.5259515987709165,
-     "load": 3.25,
+     "seconds": 4.515202580951154,
+     "load": 6.24169921875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 4.505337408743799,
-     "load": 2.30712890625,
+     "seconds": 4.539704932831228,
+     "load": 7.25146484375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0,
+     "others_cpu": 0.002,
      "contended": false
     },
     {
-     "seconds": 4.537714128382504,
-     "load": 3.1845703125,
+     "seconds": 4.538600447587669,
+     "load": 6.359375,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
@@ -878,34 +878,34 @@
    "dataset": "thyroid32",
    "tool": "rapidglm-deseq",
    "threads": 8,
-   "seconds": 0.9484375221654773,
+   "seconds": 0.9592527132481337,
    "all_seconds": [
-    0.9487724527716637,
-    0.9484375221654773,
-    0.95081483758986
+    0.9601146737113595,
+    0.9592527132481337,
+    0.960483611561358
    ],
-   "load": 2.5,
+   "load": 6.95947265625,
    "contended": false,
    "runs": [
     {
-     "seconds": 0.9487724527716637,
-     "load": 3.14990234375,
+     "seconds": 0.9601146737113595,
+     "load": 5.74267578125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0091,
+     "others_cpu": 0.0155,
      "contended": false
     },
     {
-     "seconds": 0.9484375221654773,
-     "load": 2.5,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0117,
-     "contended": false
-    },
-    {
-     "seconds": 0.95081483758986,
-     "load": 3.16943359375,
+     "seconds": 0.9592527132481337,
+     "load": 6.95947265625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.025,
+     "contended": false
+    },
+    {
+     "seconds": 0.960483611561358,
+     "load": 6.28515625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0243,
      "contended": false
     }
    ],
@@ -919,32 +919,32 @@
    "dataset": "thyroid32",
    "tool": "rapidglm-r",
    "threads": 1,
-   "seconds": 4.344,
+   "seconds": 4.353,
    "all_seconds": [
-    4.344,
-    4.346,
-    4.344
+    4.374,
+    4.353,
+    4.385
    ],
-   "load": 2.9775390625,
+   "load": 6.95947265625,
    "contended": false,
    "runs": [
     {
-     "seconds": 4.344,
-     "load": 2.9775390625,
+     "seconds": 4.374,
+     "load": 6.8046875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 4.346,
-     "load": 2.9404296875,
+     "seconds": 4.353,
+     "load": 6.95947265625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0019,
      "contended": false
     },
     {
-     "seconds": 4.344,
-     "load": 3.4765625,
+     "seconds": 4.385,
+     "load": 7.0634765625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
@@ -960,34 +960,34 @@
    "dataset": "thyroid32",
    "tool": "rapidglm-r",
    "threads": 8,
-   "seconds": 0.771,
+   "seconds": 0.776,
    "all_seconds": [
     0.776,
-    0.771,
-    0.772
+    0.782,
+    0.779
    ],
-   "load": 3.025390625,
+   "load": 6.90087890625,
    "contended": false,
    "runs": [
     {
      "seconds": 0.776,
-     "load": 2.82080078125,
+     "load": 6.90087890625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0126,
+     "others_cpu": 0.0414,
      "contended": false
     },
     {
-     "seconds": 0.771,
-     "load": 3.025390625,
+     "seconds": 0.782,
+     "load": 6.20263671875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0123,
+     "others_cpu": 0.0607,
      "contended": false
     },
     {
-     "seconds": 0.772,
-     "load": 3.32275390625,
+     "seconds": 0.779,
+     "load": 7.298828125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0287,
+     "others_cpu": 0.0224,
      "contended": false
     }
    ],
@@ -1001,34 +1001,34 @@
    "dataset": "thyroid32",
    "tool": "pydeseq2",
    "threads": 1,
-   "seconds": 104.50961305666715,
+   "seconds": 104.57654787506908,
    "all_seconds": [
-    104.98915328085423,
-    105.04954867158085,
-    104.50961305666715
+    104.57654787506908,
+    105.38284828234464,
+    105.75833033025265
    ],
-   "load": 3.216796875,
+   "load": 6.58837890625,
    "contended": false,
    "runs": [
     {
-     "seconds": 104.98915328085423,
-     "load": 3.31591796875,
+     "seconds": 104.57654787506908,
+     "load": 6.58837890625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0001,
+     "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 105.04954867158085,
-     "load": 2.86279296875,
+     "seconds": 105.38284828234464,
+     "load": 5.94580078125,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0002,
+     "contended": false
+    },
+    {
+     "seconds": 105.75833033025265,
+     "load": 6.8740234375,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0003,
-     "contended": false
-    },
-    {
-     "seconds": 104.50961305666715,
-     "load": 3.216796875,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0001,
      "contended": false
     }
    ],
@@ -1042,34 +1042,34 @@
    "dataset": "thyroid32",
    "tool": "pydeseq2",
    "threads": 8,
-   "seconds": 20.380332181230187,
+   "seconds": 20.696771463379264,
    "all_seconds": [
-    20.38336978200823,
-    20.380332181230187,
-    20.382003062404692
+    20.696771463379264,
+    20.710192596539855,
+    20.836830670945346
    ],
-   "load": 2.25146484375,
+   "load": 5.7998046875,
    "contended": false,
    "runs": [
     {
-     "seconds": 20.38336978200823,
-     "load": 2.66552734375,
+     "seconds": 20.696771463379264,
+     "load": 5.7998046875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0051,
+     "others_cpu": 0.0138,
      "contended": false
     },
     {
-     "seconds": 20.380332181230187,
-     "load": 2.25146484375,
+     "seconds": 20.710192596539855,
+     "load": 6.6513671875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0083,
+     "others_cpu": 0.0111,
      "contended": false
     },
     {
-     "seconds": 20.382003062404692,
-     "load": 2.0009765625,
+     "seconds": 20.836830670945346,
+     "load": 5.9619140625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0063,
+     "others_cpu": 0.0162,
      "contended": false
     }
    ],
@@ -1083,32 +1083,32 @@
    "dataset": "thyroid32",
    "tool": "pydeseq2-rapidglm",
    "threads": 1,
-   "seconds": 7.800896259024739,
+   "seconds": 7.904879529029131,
    "all_seconds": [
-    7.862886440940201,
-    7.800896259024739,
-    7.841538233682513
+    7.9176969192922115,
+    7.904879529029131,
+    7.922394002787769
    ],
-   "load": 4.3203125,
+   "load": 7.43115234375,
    "contended": false,
    "runs": [
     {
-     "seconds": 7.862886440940201,
-     "load": 3.33251953125,
+     "seconds": 7.9176969192922115,
+     "load": 7.88330078125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0011,
      "contended": false
     },
     {
-     "seconds": 7.800896259024739,
-     "load": 4.3203125,
+     "seconds": 7.904879529029131,
+     "load": 7.43115234375,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 7.841538233682513,
-     "load": 3.46875,
+     "seconds": 7.922394002787769,
+     "load": 6.67138671875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0011,
      "contended": false
@@ -1124,34 +1124,34 @@
    "dataset": "thyroid32",
    "tool": "pydeseq2-rapidglm",
    "threads": 8,
-   "seconds": 5.468580502085388,
+   "seconds": 5.544679801911116,
    "all_seconds": [
-    5.4944145968183875,
-    5.468580502085388,
-    5.4983060117810965
+    5.62513579800725,
+    5.561683356761932,
+    5.544679801911116
    ],
-   "load": 4.03662109375,
+   "load": 6.89306640625,
    "contended": false,
    "runs": [
     {
-     "seconds": 5.4944145968183875,
-     "load": 3.25244140625,
+     "seconds": 5.62513579800725,
+     "load": 7.6611328125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0262,
+     "others_cpu": 0.0517,
      "contended": false
     },
     {
-     "seconds": 5.468580502085388,
-     "load": 4.03662109375,
+     "seconds": 5.561683356761932,
+     "load": 7.15673828125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0394,
+     "others_cpu": 0.0491,
      "contended": false
     },
     {
-     "seconds": 5.4983060117810965,
-     "load": 3.12548828125,
+     "seconds": 5.544679801911116,
+     "load": 6.89306640625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0348,
+     "others_cpu": 0.0444,
      "contended": false
     }
    ],
@@ -1165,32 +1165,32 @@
    "dataset": "thyroid32",
    "tool": "deseq2",
    "threads": 1,
-   "seconds": 31.34,
+   "seconds": 31.65,
    "all_seconds": [
-    31.343,
-    31.402,
-    31.34
+    31.65,
+    31.781,
+    31.813
    ],
-   "load": 2.79833984375,
+   "load": 6.7900390625,
    "contended": false,
    "runs": [
     {
-     "seconds": 31.343,
-     "load": 2.98583984375,
+     "seconds": 31.65,
+     "load": 6.7900390625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0003,
+     "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 31.402,
-     "load": 4.0302734375,
+     "seconds": 31.781,
+     "load": 7.158203125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0005,
+     "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 31.34,
-     "load": 2.79833984375,
+     "seconds": 31.813,
+     "load": 6.78125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0003,
      "contended": false
@@ -1206,34 +1206,34 @@
    "dataset": "thyroid32",
    "tool": "deseq2",
    "threads": 8,
-   "seconds": 7.454,
+   "seconds": 7.562,
    "all_seconds": [
-    7.801,
-    7.461,
-    7.454
+    7.569,
+    7.943,
+    7.562
    ],
-   "load": 2.2236328125,
+   "load": 5.71826171875,
    "contended": false,
    "runs": [
     {
-     "seconds": 7.801,
-     "load": 2.515625,
+     "seconds": 7.569,
+     "load": 6.33154296875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0214,
+     "others_cpu": 0.0376,
      "contended": false
     },
     {
-     "seconds": 7.461,
-     "load": 3.279296875,
+     "seconds": 7.943,
+     "load": 7.384765625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0191,
+     "others_cpu": 0.0936,
      "contended": false
     },
     {
-     "seconds": 7.454,
-     "load": 2.2236328125,
+     "seconds": 7.562,
+     "load": 5.71826171875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0236,
+     "others_cpu": 0.0362,
      "contended": false
     }
    ],
@@ -1247,32 +1247,32 @@
    "dataset": "thyroid32",
    "tool": "deseq2-glmgampoi",
    "threads": 1,
-   "seconds": 37.851,
+   "seconds": 38.223,
    "all_seconds": [
-    37.869,
-    37.851,
-    37.878
+    38.223,
+    38.444,
+    38.273
    ],
-   "load": 3.59228515625,
+   "load": 8.2470703125,
    "contended": false,
    "runs": [
     {
-     "seconds": 37.869,
-     "load": 2.9619140625,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0,
-     "contended": false
-    },
-    {
-     "seconds": 37.851,
-     "load": 3.59228515625,
+     "seconds": 38.223,
+     "load": 8.2470703125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0005,
      "contended": false
     },
     {
-     "seconds": 37.878,
-     "load": 3.1044921875,
+     "seconds": 38.444,
+     "load": 7.82080078125,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0002,
+     "contended": false
+    },
+    {
+     "seconds": 38.273,
+     "load": 6.5263671875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0002,
      "contended": false
@@ -1288,32 +1288,32 @@
    "dataset": "thyroid128",
    "tool": "rapidglm-cli",
    "threads": 1,
-   "seconds": 10.165601800195873,
+   "seconds": 10.416769434697926,
    "all_seconds": [
-    10.18061746750027,
-    10.165601800195873,
-    10.210692847147584
+    10.455809310078621,
+    10.432089482434094,
+    10.416769434697926
    ],
-   "load": 2.638671875,
+   "load": 2.84716796875,
    "contended": false,
    "runs": [
     {
-     "seconds": 10.18061746750027,
-     "load": 2.88037109375,
+     "seconds": 10.455809310078621,
+     "load": 6.1015625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.001,
      "contended": false
     },
     {
-     "seconds": 10.165601800195873,
-     "load": 2.638671875,
+     "seconds": 10.432089482434094,
+     "load": 5.8408203125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0,
+     "others_cpu": 0.0019,
      "contended": false
     },
     {
-     "seconds": 10.210692847147584,
-     "load": 2.474609375,
+     "seconds": 10.416769434697926,
+     "load": 2.84716796875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
@@ -1329,34 +1329,34 @@
    "dataset": "thyroid128",
    "tool": "rapidglm-cli",
    "threads": 8,
-   "seconds": 2.2014047680422664,
+   "seconds": 2.242726412601769,
    "all_seconds": [
-    2.2046301178634167,
-    2.221099104732275,
-    2.2014047680422664
+    2.242726412601769,
+    2.3302830141037703,
+    2.266750960610807
    ],
-   "load": 2.36279296875,
+   "load": 6.3388671875,
    "contended": false,
    "runs": [
     {
-     "seconds": 2.2046301178634167,
-     "load": 2.6845703125,
+     "seconds": 2.242726412601769,
+     "load": 6.3388671875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0174,
+     "others_cpu": 0.049,
      "contended": false
     },
     {
-     "seconds": 2.221099104732275,
-     "load": 2.681640625,
+     "seconds": 2.3302830141037703,
+     "load": 6.48095703125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0149,
+     "others_cpu": 0.0522,
      "contended": false
     },
     {
-     "seconds": 2.2014047680422664,
-     "load": 2.36279296875,
+     "seconds": 2.266750960610807,
+     "load": 2.72705078125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0095,
+     "others_cpu": 0.0207,
      "contended": false
     }
    ],
@@ -1370,32 +1370,32 @@
    "dataset": "thyroid128",
    "tool": "rapidglm-python",
    "threads": 1,
-   "seconds": 9.483756249770522,
+   "seconds": 9.414768859744072,
    "all_seconds": [
-    9.490857460536063,
-    9.507466594688594,
-    9.483756249770522
+    9.454317383468151,
+    9.436289486475289,
+    9.414768859744072
    ],
-   "load": 2.814453125,
+   "load": 2.9091796875,
    "contended": false,
    "runs": [
     {
-     "seconds": 9.490857460536063,
-     "load": 2.62939453125,
+     "seconds": 9.454317383468151,
+     "load": 6.0712890625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 9.507466594688594,
-     "load": 2.87841796875,
+     "seconds": 9.436289486475289,
+     "load": 6.1220703125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.001,
+     "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 9.483756249770522,
-     "load": 2.814453125,
+     "seconds": 9.414768859744072,
+     "load": 2.9091796875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
@@ -1411,34 +1411,34 @@
    "dataset": "thyroid128",
    "tool": "rapidglm-python",
    "threads": 8,
-   "seconds": 1.5787291219457984,
+   "seconds": 1.5779430232942104,
    "all_seconds": [
-    1.5808573178946972,
-    1.5787291219457984,
-    1.5876401038840413
+    1.5850179307162762,
+    1.6454535331577063,
+    1.5779430232942104
    ],
-   "load": 2.66259765625,
+   "load": 2.77490234375,
    "contended": false,
    "runs": [
     {
-     "seconds": 1.5808573178946972,
-     "load": 2.55712890625,
+     "seconds": 1.5850179307162762,
+     "load": 6.3271484375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0096,
+     "others_cpu": 0.0202,
      "contended": false
     },
     {
-     "seconds": 1.5787291219457984,
-     "load": 2.66259765625,
+     "seconds": 1.6454535331577063,
+     "load": 6.03759765625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0047,
+     "others_cpu": 0.0353,
      "contended": false
     },
     {
-     "seconds": 1.5876401038840413,
-     "load": 2.69580078125,
+     "seconds": 1.5779430232942104,
+     "load": 2.77490234375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0201,
+     "others_cpu": 0.0136,
      "contended": false
     }
    ],
@@ -1452,32 +1452,32 @@
    "dataset": "thyroid128",
    "tool": "rapidglm-deseq",
    "threads": 1,
-   "seconds": 9.794703879393637,
+   "seconds": 9.717483414337039,
    "all_seconds": [
-    9.794703879393637,
-    9.794786361046135,
-    9.808105353266
+    9.821862660348415,
+    9.809430368244648,
+    9.717483414337039
    ],
-   "load": 2.9931640625,
+   "load": 3.2734375,
    "contended": false,
    "runs": [
     {
-     "seconds": 9.794703879393637,
-     "load": 2.9931640625,
+     "seconds": 9.821862660348415,
+     "load": 6.140625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0019,
+     "others_cpu": 0.0009,
      "contended": false
     },
     {
-     "seconds": 9.794786361046135,
-     "load": 2.609375,
+     "seconds": 9.809430368244648,
+     "load": 5.7138671875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.001,
+     "others_cpu": 0.0009,
      "contended": false
     },
     {
-     "seconds": 9.808105353266,
-     "load": 2.4794921875,
+     "seconds": 9.717483414337039,
+     "load": 3.2734375,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
@@ -1493,34 +1493,34 @@
    "dataset": "thyroid128",
    "tool": "rapidglm-deseq",
    "threads": 8,
-   "seconds": 1.8912569349631667,
+   "seconds": 1.8808916984125972,
    "all_seconds": [
-    1.8913190867751837,
-    1.90161925368011,
-    1.8912569349631667
+    1.9086459381505847,
+    1.9794755997136235,
+    1.8808916984125972
    ],
-   "load": 2.36083984375,
+   "load": 3.0771484375,
    "contended": false,
    "runs": [
     {
-     "seconds": 1.8913190867751837,
-     "load": 2.9140625,
+     "seconds": 1.9086459381505847,
+     "load": 6.0791015625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0115,
+     "others_cpu": 0.0155,
      "contended": false
     },
     {
-     "seconds": 1.90161925368011,
-     "load": 2.5419921875,
+     "seconds": 1.9794755997136235,
+     "load": 6.44140625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0201,
+     "others_cpu": 0.0475,
      "contended": false
     },
     {
-     "seconds": 1.8912569349631667,
-     "load": 2.36083984375,
+     "seconds": 1.8808916984125972,
+     "load": 3.0771484375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0102,
+     "others_cpu": 0.0161,
      "contended": false
     }
    ],
@@ -1534,32 +1534,32 @@
    "dataset": "thyroid128",
    "tool": "rapidglm-r",
    "threads": 1,
-   "seconds": 9.487,
+   "seconds": 9.563,
    "all_seconds": [
-    9.487,
-    9.496,
-    9.488
+    9.623,
+    9.639,
+    9.563
    ],
-   "load": 2.7607421875,
+   "load": 2.91064453125,
    "contended": false,
    "runs": [
     {
-     "seconds": 9.487,
-     "load": 2.7607421875,
+     "seconds": 9.623,
+     "load": 7.0341796875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 9.496,
-     "load": 2.5791015625,
+     "seconds": 9.639,
+     "load": 6.32568359375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0018,
+     "others_cpu": 0.0009,
      "contended": false
     },
     {
-     "seconds": 9.488,
-     "load": 2.25146484375,
+     "seconds": 9.563,
+     "load": 2.91064453125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0009,
      "contended": false
@@ -1575,34 +1575,34 @@
    "dataset": "thyroid128",
    "tool": "rapidglm-r",
    "threads": 8,
-   "seconds": 1.716,
+   "seconds": 1.735,
    "all_seconds": [
-    1.732,
-    1.716,
-    1.719
+    1.738,
+    1.745,
+    1.735
    ],
-   "load": 2.5244140625,
+   "load": 2.55419921875,
    "contended": false,
    "runs": [
     {
-     "seconds": 1.732,
-     "load": 2.90673828125,
+     "seconds": 1.738,
+     "load": 6.14013671875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0244,
+     "others_cpu": 0.0444,
      "contended": false
     },
     {
-     "seconds": 1.716,
-     "load": 2.5244140625,
+     "seconds": 1.745,
+     "load": 7.64501953125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.028,
+     "others_cpu": 0.037,
      "contended": false
     },
     {
-     "seconds": 1.719,
-     "load": 2.3623046875,
+     "seconds": 1.735,
+     "load": 2.55419921875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.019,
+     "others_cpu": 0.0399,
      "contended": false
     }
    ],
@@ -1616,34 +1616,34 @@
    "dataset": "thyroid128",
    "tool": "pydeseq2",
    "threads": 1,
-   "seconds": 114.92500470113009,
+   "seconds": 116.0446932548657,
    "all_seconds": [
-    114.92500470113009,
-    117.41269646864384,
-    115.41357191000134
+    116.28852715343237,
+    116.34203093778342,
+    116.0446932548657
    ],
-   "load": 3.40234375,
+   "load": 2.88232421875,
    "contended": false,
    "runs": [
     {
-     "seconds": 114.92500470113009,
-     "load": 3.40234375,
+     "seconds": 116.28852715343237,
+     "load": 5.888671875,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0,
+     "contended": false
+    },
+    {
+     "seconds": 116.34203093778342,
+     "load": 7.19287109375,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0002,
      "contended": false
     },
     {
-     "seconds": 117.41269646864384,
-     "load": 2.5625,
+     "seconds": 116.0446932548657,
+     "load": 2.88232421875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0001,
-     "contended": false
-    },
-    {
-     "seconds": 115.41357191000134,
-     "load": 2.3330078125,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0001,
+     "others_cpu": 0.0003,
      "contended": false
     }
    ],
@@ -1657,34 +1657,34 @@
    "dataset": "thyroid128",
    "tool": "pydeseq2",
    "threads": 8,
-   "seconds": 22.88968473765999,
+   "seconds": 22.971943436190486,
    "all_seconds": [
-    22.88968473765999,
-    23.03451265860349,
-    22.999177620746195
+    23.212690018117428,
+    24.79920489806682,
+    22.971943436190486
    ],
-   "load": 2.5673828125,
+   "load": 2.5556640625,
    "contended": false,
    "runs": [
     {
-     "seconds": 22.88968473765999,
-     "load": 2.5673828125,
+     "seconds": 23.212690018117428,
+     "load": 6.53662109375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.006,
+     "others_cpu": 0.0128,
      "contended": false
     },
     {
-     "seconds": 23.03451265860349,
-     "load": 2.36669921875,
+     "seconds": 24.79920489806682,
+     "load": 6.228515625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0064,
+     "others_cpu": 0.0302,
      "contended": false
     },
     {
-     "seconds": 22.999177620746195,
-     "load": 2.7353515625,
+     "seconds": 22.971943436190486,
+     "load": 2.5556640625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0061,
+     "others_cpu": 0.0062,
      "contended": false
     }
    ],
@@ -1698,34 +1698,34 @@
    "dataset": "thyroid128",
    "tool": "pydeseq2-rapidglm",
    "threads": 1,
-   "seconds": 13.806244653649628,
+   "seconds": 13.739404496736825,
    "all_seconds": [
-    13.828719889745116,
-    13.83704730309546,
-    13.806244653649628
+    13.80351356510073,
+    13.987434856593609,
+    13.739404496736825
    ],
-   "load": 4.56982421875,
+   "load": 4.1376953125,
    "contended": false,
    "runs": [
     {
-     "seconds": 13.828719889745116,
-     "load": 4.57568359375,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0007,
-     "contended": false
-    },
-    {
-     "seconds": 13.83704730309546,
-     "load": 3.423828125,
+     "seconds": 13.80351356510073,
+     "load": 8.7138671875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 13.806244653649628,
-     "load": 4.56982421875,
+     "seconds": 13.987434856593609,
+     "load": 8.576171875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0007,
+     "others_cpu": 0.0006,
+     "contended": false
+    },
+    {
+     "seconds": 13.739404496736825,
+     "load": 4.1376953125,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0,
      "contended": false
     }
    ],
@@ -1739,34 +1739,34 @@
    "dataset": "thyroid128",
    "tool": "pydeseq2-rapidglm",
    "threads": 8,
-   "seconds": 5.5204620053991675,
+   "seconds": 5.539531481452286,
    "all_seconds": [
-    5.5300486870110035,
-    5.57058856356889,
-    5.5204620053991675
+    5.586871243081987,
+    5.6225672252476215,
+    5.539531481452286
    ],
-   "load": 4.14794921875,
+   "load": 3.939453125,
    "contended": false,
    "runs": [
     {
-     "seconds": 5.5300486870110035,
-     "load": 3.7646484375,
+     "seconds": 5.586871243081987,
+     "load": 9.18359375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0198,
+     "others_cpu": 0.0362,
      "contended": false
     },
     {
-     "seconds": 5.57058856356889,
-     "load": 3.01904296875,
+     "seconds": 5.6225672252476215,
+     "load": 8.86328125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.022,
+     "others_cpu": 0.0523,
      "contended": false
     },
     {
-     "seconds": 5.5204620053991675,
-     "load": 4.14794921875,
+     "seconds": 5.539531481452286,
+     "load": 3.939453125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0246,
+     "others_cpu": 0.0216,
      "contended": false
     }
    ],
@@ -1780,34 +1780,34 @@
    "dataset": "thyroid128",
    "tool": "deseq2",
    "threads": 1,
-   "seconds": 118.893,
+   "seconds": 119.004,
    "all_seconds": [
-    118.893,
-    118.967,
-    119.126
+    119.917,
+    119.037,
+    119.004
    ],
-   "load": 3.3388671875,
+   "load": 3.96142578125,
    "contended": false,
    "runs": [
     {
-     "seconds": 118.893,
-     "load": 3.3388671875,
+     "seconds": 119.917,
+     "load": 8.3125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0001,
      "contended": false
     },
     {
-     "seconds": 118.967,
-     "load": 2.935546875,
+     "seconds": 119.037,
+     "load": 8.04150390625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0002,
      "contended": false
     },
     {
-     "seconds": 119.126,
-     "load": 3.74365234375,
+     "seconds": 119.004,
+     "load": 3.96142578125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0003,
+     "others_cpu": 0.0001,
      "contended": false
     }
    ],
@@ -1821,34 +1821,34 @@
    "dataset": "thyroid128",
    "tool": "deseq2",
    "threads": 8,
-   "seconds": 31.261,
+   "seconds": 31.285,
    "all_seconds": [
-    31.261,
-    31.306,
-    31.433
+    38.489,
+    31.348,
+    31.285
    ],
-   "load": 2.529296875,
+   "load": 2.41552734375,
    "contended": false,
    "runs": [
     {
-     "seconds": 31.261,
-     "load": 2.529296875,
+     "seconds": 38.489,
+     "load": 7.05712890625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.017,
+     "others_cpu": 0.0651,
      "contended": false
     },
     {
-     "seconds": 31.306,
-     "load": 2.8388671875,
+     "seconds": 31.348,
+     "load": 3.1220703125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0192,
+     "others_cpu": 0.0251,
      "contended": false
     },
     {
-     "seconds": 31.433,
-     "load": 2.75537109375,
+     "seconds": 31.285,
+     "load": 2.41552734375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0302,
+     "others_cpu": 0.023,
      "contended": false
     }
    ],
@@ -1862,32 +1862,32 @@
    "dataset": "thyroid128",
    "tool": "deseq2-glmgampoi",
    "threads": 1,
-   "seconds": 86.101,
+   "seconds": 86.29,
    "all_seconds": [
-    86.192,
-    86.101,
-    86.494
+    87.127,
+    86.29,
+    86.376
    ],
-   "load": 3.96875,
+   "load": 4.12841796875,
    "contended": false,
    "runs": [
     {
-     "seconds": 86.192,
-     "load": 4.07666015625,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0003,
-     "contended": false
-    },
-    {
-     "seconds": 86.101,
-     "load": 3.96875,
+     "seconds": 87.127,
+     "load": 7.3837890625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0002,
      "contended": false
     },
     {
-     "seconds": 86.494,
-     "load": 3.55712890625,
+     "seconds": 86.29,
+     "load": 4.12841796875,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0002,
+     "contended": false
+    },
+    {
+     "seconds": 86.376,
+     "load": 3.40283203125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0001,
      "contended": false
@@ -1903,26 +1903,26 @@
    "dataset": "thyroid",
    "tool": "rapidglm-cli",
    "threads": 1,
-   "seconds": 37.93489548936486,
+   "seconds": 38.62481840420514,
    "all_seconds": [
-    37.93594059534371,
-    37.93489548936486
+    38.71318606287241,
+    38.62481840420514
    ],
-   "load": 2.56201171875,
+   "load": 2.50146484375,
    "contended": false,
    "runs": [
     {
-     "seconds": 37.93594059534371,
-     "load": 3.2578125,
+     "seconds": 38.71318606287241,
+     "load": 2.88818359375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0011,
+     "others_cpu": 0.001,
      "contended": false
     },
     {
-     "seconds": 37.93489548936486,
-     "load": 2.56201171875,
+     "seconds": 38.62481840420514,
+     "load": 2.50146484375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0,
+     "others_cpu": 0.0003,
      "contended": false
     }
    ],
@@ -1936,26 +1936,26 @@
    "dataset": "thyroid",
    "tool": "rapidglm-cli",
    "threads": 8,
-   "seconds": 7.952761460095644,
+   "seconds": 8.091522239148617,
    "all_seconds": [
-    7.96094830147922,
-    7.952761460095644
+    8.091522239148617,
+    8.132184497080743
    ],
-   "load": 2.77099609375,
+   "load": 2.3212890625,
    "contended": false,
    "runs": [
     {
-     "seconds": 7.96094830147922,
-     "load": 3.48583984375,
+     "seconds": 8.091522239148617,
+     "load": 2.3212890625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0432,
+     "others_cpu": 0.0109,
      "contended": false
     },
     {
-     "seconds": 7.952761460095644,
-     "load": 2.77099609375,
+     "seconds": 8.132184497080743,
+     "load": 2.18017578125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.015,
+     "others_cpu": 0.0141,
      "contended": false
     }
    ],
@@ -1969,24 +1969,90 @@
    "dataset": "thyroid",
    "tool": "rapidglm-python",
    "threads": 1,
-   "seconds": 35.09474010579288,
+   "seconds": 34.670467293821275,
    "all_seconds": [
-    35.29713618941605,
-    35.09474010579288
+    34.87087678723037,
+    34.670467293821275
    ],
-   "load": 3.1328125,
+   "load": 2.55908203125,
    "contended": false,
    "runs": [
     {
-     "seconds": 35.29713618941605,
-     "load": 3.5908203125,
+     "seconds": 34.87087678723037,
+     "load": 2.75244140625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0,
+     "contended": false
+    },
+    {
+     "seconds": 34.670467293821275,
+     "load": 2.55908203125,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0003,
+     "contended": false
+    }
+   ],
+   "agreement_with_deseq2": {
+    "discoveries": 7177,
+    "jaccard": 1.0,
+    "spearman": 0.999996435742762
+   }
+  },
+  {
+   "dataset": "thyroid",
+   "tool": "rapidglm-python",
+   "threads": 8,
+   "seconds": 5.800848324783146,
+   "all_seconds": [
+    5.807983606122434,
+    5.800848324783146
+   ],
+   "load": 3.66015625,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 5.807983606122434,
+     "load": 2.6279296875,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0173,
+     "contended": false
+    },
+    {
+     "seconds": 5.800848324783146,
+     "load": 3.66015625,
+     "waited_for_idle_seconds": 0.0,
+     "others_cpu": 0.0122,
+     "contended": false
+    }
+   ],
+   "agreement_with_deseq2": {
+    "discoveries": 7177,
+    "jaccard": 1.0,
+    "spearman": 0.999996435742762
+   }
+  },
+  {
+   "dataset": "thyroid",
+   "tool": "rapidglm-deseq",
+   "threads": 1,
+   "seconds": 35.71029917988926,
+   "all_seconds": [
+    36.360378159210086,
+    35.71029917988926
+   ],
+   "load": 3.55810546875,
+   "contended": false,
+   "runs": [
+    {
+     "seconds": 36.360378159210086,
+     "load": 2.53125,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0005,
      "contended": false
     },
     {
-     "seconds": 35.09474010579288,
-     "load": 3.1328125,
+     "seconds": 35.71029917988926,
+     "load": 3.55810546875,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
@@ -2000,94 +2066,28 @@
   },
   {
    "dataset": "thyroid",
-   "tool": "rapidglm-python",
-   "threads": 8,
-   "seconds": 5.856691550463438,
-   "all_seconds": [
-    5.856691550463438,
-    5.8613632675260305
-   ],
-   "load": 3.49072265625,
-   "contended": false,
-   "runs": [
-    {
-     "seconds": 5.856691550463438,
-     "load": 3.49072265625,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0266,
-     "contended": false
-    },
-    {
-     "seconds": 5.8613632675260305,
-     "load": 3.2109375,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0079,
-     "contended": false
-    }
-   ],
-   "agreement_with_deseq2": {
-    "discoveries": 7177,
-    "jaccard": 1.0,
-    "spearman": 0.999996435742762
-   }
-  },
-  {
-   "dataset": "thyroid",
-   "tool": "rapidglm-deseq",
-   "threads": 1,
-   "seconds": 36.123106892220676,
-   "all_seconds": [
-    36.27713827416301,
-    36.123106892220676
-   ],
-   "load": 3.2587890625,
-   "contended": false,
-   "runs": [
-    {
-     "seconds": 36.27713827416301,
-     "load": 3.81591796875,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0003,
-     "contended": false
-    },
-    {
-     "seconds": 36.123106892220676,
-     "load": 3.2587890625,
-     "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0003,
-     "contended": false
-    }
-   ],
-   "agreement_with_deseq2": {
-    "discoveries": 7177,
-    "jaccard": 1.0,
-    "spearman": 0.999996435742762
-   }
-  },
-  {
-   "dataset": "thyroid",
    "tool": "rapidglm-deseq",
    "threads": 8,
-   "seconds": 6.845998994074762,
+   "seconds": 6.793366636149585,
    "all_seconds": [
-    6.845998994074762,
-    6.8872646894305944
+    7.329363610595465,
+    6.793366636149585
    ],
-   "load": 3.48388671875,
+   "load": 3.095703125,
    "contended": false,
    "runs": [
     {
-     "seconds": 6.845998994074762,
-     "load": 3.48388671875,
+     "seconds": 7.329363610595465,
+     "load": 3.919921875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0137,
+     "others_cpu": 0.0113,
      "contended": false
     },
     {
-     "seconds": 6.8872646894305944,
-     "load": 2.37841796875,
+     "seconds": 6.793366636149585,
+     "load": 3.095703125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0285,
+     "others_cpu": 0.0187,
      "contended": false
     }
    ],
@@ -2101,24 +2101,24 @@
    "dataset": "thyroid",
    "tool": "rapidglm-r",
    "threads": 1,
-   "seconds": 34.727,
+   "seconds": 35.098,
    "all_seconds": [
-    34.739,
-    34.727
+    35.098,
+    35.115
    ],
-   "load": 2.80029296875,
+   "load": 4.25927734375,
    "contended": false,
    "runs": [
     {
-     "seconds": 34.739,
-     "load": 3.97021484375,
+     "seconds": 35.098,
+     "load": 4.25927734375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0007,
+     "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 34.727,
-     "load": 2.80029296875,
+     "seconds": 35.115,
+     "load": 3.4140625,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0002,
      "contended": false
@@ -2134,26 +2134,26 @@
    "dataset": "thyroid",
    "tool": "rapidglm-r",
    "threads": 8,
-   "seconds": 6.476,
+   "seconds": 6.553,
    "all_seconds": [
-    6.538,
-    6.476
+    6.553,
+    6.567
    ],
-   "load": 2.72314453125,
+   "load": 3.53662109375,
    "contended": false,
    "runs": [
     {
-     "seconds": 6.538,
-     "load": 2.5048828125,
+     "seconds": 6.553,
+     "load": 3.53662109375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.026,
+     "others_cpu": 0.0292,
      "contended": false
     },
     {
-     "seconds": 6.476,
-     "load": 2.72314453125,
+     "seconds": 6.567,
+     "load": 2.89794921875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0158,
+     "others_cpu": 0.0252,
      "contended": false
     }
    ],
@@ -2167,26 +2167,26 @@
    "dataset": "thyroid",
    "tool": "pydeseq2",
    "threads": 1,
-   "seconds": 173.3418087363243,
+   "seconds": 173.06347186211497,
    "all_seconds": [
-    173.3418087363243,
-    174.40383154712617
+    179.81968927104026,
+    173.06347186211497
    ],
-   "load": 3.11376953125,
+   "load": 3.36279296875,
    "contended": false,
    "runs": [
     {
-     "seconds": 173.3418087363243,
-     "load": 3.11376953125,
+     "seconds": 179.81968927104026,
+     "load": 3.6025390625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0001,
+     "others_cpu": 0.0002,
      "contended": false
     },
     {
-     "seconds": 174.40383154712617,
-     "load": 2.56201171875,
+     "seconds": 173.06347186211497,
+     "load": 3.36279296875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0001,
+     "others_cpu": 0.0003,
      "contended": false
     }
    ],
@@ -2200,26 +2200,26 @@
    "dataset": "thyroid",
    "tool": "pydeseq2",
    "threads": 8,
-   "seconds": 35.61699105333537,
+   "seconds": 37.39248688146472,
    "all_seconds": [
-    35.61699105333537,
-    35.90030147507787
+    39.59708308707923,
+    37.39248688146472
    ],
-   "load": 2.263671875,
+   "load": 2.4111328125,
    "contended": false,
    "runs": [
     {
-     "seconds": 35.61699105333537,
-     "load": 2.263671875,
+     "seconds": 39.59708308707923,
+     "load": 2.123046875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0115,
+     "others_cpu": 0.0123,
      "contended": false
     },
     {
-     "seconds": 35.90030147507787,
-     "load": 3.31396484375,
+     "seconds": 37.39248688146472,
+     "load": 2.4111328125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0135,
+     "others_cpu": 0.0102,
      "contended": false
     }
    ],
@@ -2233,26 +2233,26 @@
    "dataset": "thyroid",
    "tool": "pydeseq2-rapidglm",
    "threads": 1,
-   "seconds": 43.478808615356684,
+   "seconds": 43.33214070275426,
    "all_seconds": [
-    43.478808615356684,
-    43.545025968924165
+    43.70268545486033,
+    43.33214070275426
    ],
-   "load": 4.771484375,
+   "load": 4.21533203125,
    "contended": false,
    "runs": [
     {
-     "seconds": 43.478808615356684,
-     "load": 4.771484375,
+     "seconds": 43.70268545486033,
+     "load": 4.4052734375,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0,
      "contended": false
     },
     {
-     "seconds": 43.545025968924165,
-     "load": 5.650390625,
+     "seconds": 43.33214070275426,
+     "load": 4.21533203125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0002,
+     "others_cpu": 0.0007,
      "contended": false
     }
    ],
@@ -2266,26 +2266,26 @@
    "dataset": "thyroid",
    "tool": "pydeseq2-rapidglm",
    "threads": 8,
-   "seconds": 13.281032087281346,
+   "seconds": 13.340890946798027,
    "all_seconds": [
-    13.281032087281346,
-    13.331062243320048
+    14.369344194419682,
+    13.340890946798027
    ],
-   "load": 3.13232421875,
+   "load": 3.86279296875,
    "contended": false,
    "runs": [
     {
-     "seconds": 13.281032087281346,
-     "load": 3.13232421875,
+     "seconds": 14.369344194419682,
+     "load": 3.47802734375,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0286,
+     "others_cpu": 0.0333,
      "contended": false
     },
     {
-     "seconds": 13.331062243320048,
-     "load": 5.00390625,
+     "seconds": 13.340890946798027,
+     "load": 3.86279296875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0495,
+     "others_cpu": 0.0245,
      "contended": false
     }
    ],
@@ -2299,24 +2299,24 @@
    "dataset": "thyroid",
    "tool": "deseq2",
    "threads": 1,
-   "seconds": 482.282,
+   "seconds": 481.039,
    "all_seconds": [
-    482.282,
-    482.929
+    481.295,
+    481.039
    ],
-   "load": 4.888671875,
+   "load": 4.29833984375,
    "contended": false,
    "runs": [
     {
-     "seconds": 482.282,
-     "load": 4.888671875,
+     "seconds": 481.295,
+     "load": 4.27685546875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0002,
+     "others_cpu": 0.0001,
      "contended": false
     },
     {
-     "seconds": 482.929,
-     "load": 4.5029296875,
+     "seconds": 481.039,
+     "load": 4.29833984375,
      "waited_for_idle_seconds": 0.0,
      "others_cpu": 0.0001,
      "contended": false
@@ -2332,26 +2332,26 @@
    "dataset": "thyroid",
    "tool": "deseq2",
    "threads": 8,
-   "seconds": 83.912,
+   "seconds": 83.787,
    "all_seconds": [
-    83.944,
-    83.912
+    83.898,
+    83.787
    ],
-   "load": 3.236328125,
+   "load": 2.6875,
    "contended": false,
    "runs": [
     {
-     "seconds": 83.944,
-     "load": 3.07666015625,
+     "seconds": 83.898,
+     "load": 2.8642578125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0189,
+     "others_cpu": 0.0143,
      "contended": false
     },
     {
-     "seconds": 83.912,
-     "load": 3.236328125,
+     "seconds": 83.787,
+     "load": 2.6875,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0139,
+     "others_cpu": 0.0167,
      "contended": false
     }
    ],
@@ -2365,26 +2365,26 @@
    "dataset": "thyroid",
    "tool": "deseq2-glmgampoi",
    "threads": 1,
-   "seconds": 271.861,
+   "seconds": 272.065,
    "all_seconds": [
-    271.861,
-    272.752
+    272.065,
+    272.171
    ],
-   "load": 8.705078125,
+   "load": 5.76806640625,
    "contended": false,
    "runs": [
     {
-     "seconds": 271.861,
-     "load": 8.705078125,
+     "seconds": 272.065,
+     "load": 5.76806640625,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0002,
+     "others_cpu": 0.0001,
      "contended": false
     },
     {
-     "seconds": 272.752,
-     "load": 5.39599609375,
+     "seconds": 272.171,
+     "load": 5.42626953125,
      "waited_for_idle_seconds": 0.0,
-     "others_cpu": 0.0002,
+     "others_cpu": 0.0001,
      "contended": false
     }
    ],

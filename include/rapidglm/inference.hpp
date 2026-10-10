@@ -115,22 +115,29 @@ struct ScoreWorkspace {
         return result;
     }
 };
-inline Vector adjust_pvalues(const Vector &p, bool bonferroni = false) {
-    const auto m = p.size();
-    Vector adjusted(m, 1);
-    std::vector<std::size_t> order(m);
+// BH (or Bonferroni) adjustment within a family of `family_size` hypotheses, of
+// which p holds the p-values at hand (0: the family is p itself). The others
+// count as p = 1, as a missing p-value does, so the result is that of listing
+// them.
+inline Vector adjust_pvalues(const Vector &p, bool bonferroni = false,
+                             std::size_t family_size = 0) {
+    const auto n = p.size();
+    require(family_size == 0 || family_size >= n, "the family is smaller than its p-values");
+    const double m = static_cast<double>(family_size ? family_size : n);
+    Vector adjusted(n, 1);
+    std::vector<std::size_t> order(n);
     std::iota(order.begin(), order.end(), 0);
     for (double v : p)
         require(std::isnan(v) || (v >= 0 && v <= 1), "invalid p-value");
     auto safe = [&](std::size_t i) { return std::isnan(p[i]) ? 1.0 : p[i]; };
     if (bonferroni) {
-        for (std::size_t i = 0; i < m; ++i)
+        for (std::size_t i = 0; i < n; ++i)
             adjusted[i] = std::min(1.0, m * safe(i));
         return adjusted;
     }
     std::stable_sort(order.begin(), order.end(), [&](auto a, auto b) { return safe(a) < safe(b); });
     double previous = 1;
-    for (std::size_t k = m; k > 0; --k) {
+    for (std::size_t k = n; k > 0; --k) {
         previous = std::min(previous, safe(order[k - 1]) * m / k);
         adjusted[order[k - 1]] = previous;
     }

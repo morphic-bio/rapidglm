@@ -10,7 +10,10 @@ any thread count.
 Two widely used methods are built on it, written from their publications and
 documentation (the reference implementations were run only as black boxes):
 - **bulk differential expression** following the DESeq2 procedure (`bulk_de`);
-- **perturbation-screen analysis** following the SCEPTRE method (`sceptre`).
+- **perturbation-screen analysis** following the SCEPTRE method (`sceptre`), for
+  a list of pairs or for every pair of named targets and responses
+  (`sceptre_grid`). A pair's result depends only on the seed, its response and
+  its target, not on what else is tested or in what order.
 
 One library serves several interfaces:
 - a C++ header library and a CLI;
@@ -20,24 +23,28 @@ One library serves several interfaces:
 
 ## Benchmarks
 
-Measured on 2026-10-07 with version 1.2.0 on one workstation (wall-clock
+Measured on 2026-10-10 with version 1.3.0 on one workstation (wall-clock
 seconds; one / eight threads, each thread on its own efficiency core of an
 Intel Core i9-13900KF; [docs/BENCHMARK.md](docs/BENCHMARK.md#host)). Jaccard is
 the overlap of discoveries with the reference tool at a false-discovery rate of
 0.1. RapidGLM times are for its R package; the CLI and Python package take
 similar times. The SCEPTRE rows accept the skew-normal fit as SCEPTRE does
 (`fit_check: "ks"`); RapidGLM's default is a stricter check with confirmation
-draws, which takes 25–45% longer on these panels
+draws, which takes 27–40% longer on these panels
 ([docs/CLI.md](docs/CLI.md#perturbation-workflow)).
 
 | Analysis | Reference (1 / 8) | RapidGLM (1 / 8) | Speed-up (1 thread) | Jaccard |
 |---|---|---|---:|---:|
-| DESeq2 1.48.2, airway (8 samples) | 6.04 / 2.68 | 0.99 / 0.29 | 6.1× | 0.932 |
-| DESeq2, GTEx thyroid (128 samples) | 119 / 31.3 | 9.49 / 1.72 | 12.5× | 0.997 |
-| DESeq2, GTEx thyroid (647 samples) | 482 / 83.9 | 34.7 / 6.48 | 13.9× | 1.000 |
-| SCEPTRE 0.99.0, Gasperini screen (50,000 cells) | 1,522 / 251 | 371 / 63.8 | 4.1× | 0.83 |
-| SCEPTRE, Gasperini screen (207,324 cells) | – / 1,507 | – / 336 | 4.5× (8 threads) | 0.92 |
+| DESeq2 1.48.2, airway (8 samples) | 6.09 / 2.75 | 1.02 / 0.28 | 6.0× | 0.932 |
+| DESeq2, GTEx thyroid (128 samples) | 119 / 31.3 | 9.56 / 1.74 | 12.4× | 0.997 |
+| DESeq2, GTEx thyroid (647 samples) | 481 / 83.8 | 35.1 / 6.55 | 13.7× | 1.000 |
+| SCEPTRE 0.99.0, Gasperini screen (50,000 cells) | 1,517 / 251 | 336 / 59.4 | 4.5× | 0.79 |
+| SCEPTRE, Gasperini screen (207,324 cells) | – / 1,473 | – / 335 | 4.4× (8 threads) | 0.89 |
 
+Both perturbation tools are Monte Carlo tests, so their overlap turns on the
+draws: over six seeds the Jaccard index on the full screen is 0.89 to
+0.96, and 0.90 to 0.96 between two RapidGLM seeds
+([validation/PERTURBATION_SEEDS.json](validation/PERTURBATION_SEEDS.json)).
 Bulk DE computes Cook's distances with DESeq2's robust dispersion as
 implemented in PyDESeq2 (MIT; Muzellec et al. 2023), the default from 1.2.0.
 RapidGLM's own estimator (`legacy_cooks: false`) flags more genes in designs
@@ -49,8 +56,8 @@ available, and the runs will be repeated when it is repaired.
 **Engine:**
 - *Accuracy.* All 39 identifiable problems from a binary128-referenced suite
   are fitted, with coefficient errors of at most 6.6e-7 standard errors.
-- *Single fits.* Median speed-up over R `glm.fit` 5.5×, statsmodels 8.5× and
-  fastglm 3.6× (one thread, n ≥ 1e5;
+- *Single fits.* Median speed-up over R `glm.fit` 5.6×, statsmodels 8.9× and
+  fastglm 3.5× (one thread, n ≥ 1e5;
   [docs/GLM_COMPARISON.md](docs/GLM_COMPARISON.md)).
 - *Solvers.* Against Ceres Solver on identical problems, the safeguarded Newton
   solvers are 2.1–2.7× faster than Levenberg–Marquardt (fixed dispersion) and

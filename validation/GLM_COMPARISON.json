@@ -1,7 +1,7 @@
 {
  "purpose": "Accuracy, stability and single-thread speed of RapidGLM against the standard R and Python GLM fitters, and its drop-in interfaces.",
- "commit": "4446d4249011fa120299376732deec5bb1522409",
- "version": "1.2.0",
+ "commit": "303cae173dc64d6ec55dcdd0ffb7fbc61969973d",
+ "version": "1.3.0",
  "commands": [
   "python3 benchmarks/glm/problems.py validation/work/glm-compare/problems",
   "python3 benchmarks/glm/run_comparison.py validation/work/glm-compare/problems --reference --accuracy",
@@ -1477,7 +1477,7 @@
    "n": 10000,
    "p": 20,
    "tool": "fastglm",
-   "seconds": 0.011,
+   "seconds": 0.0109999999999999,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.0762930872751708e-14
@@ -1488,7 +1488,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glm.fit",
-   "seconds": 0.022,
+   "seconds": 0.023,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -1510,7 +1510,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glum-tight",
-   "seconds": 0.009107250720262527,
+   "seconds": 0.008936322294175625,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.7951886047618786e-10
@@ -1521,7 +1521,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glum",
-   "seconds": 0.007576193660497665,
+   "seconds": 0.0075647952035069466,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.195408192567414e-05
@@ -1532,7 +1532,7 @@
    "n": 10000,
    "p": 20,
    "tool": "py-rapidglm",
-   "seconds": 0.009147943928837776,
+   "seconds": 0.009384334087371826,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.557748356073456e-14
@@ -1543,7 +1543,7 @@
    "n": 10000,
    "p": 20,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.014,
+   "seconds": 0.013,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.536932819159323e-14
@@ -1565,7 +1565,7 @@
    "n": 10000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.005051996,
+   "seconds": 0.005084575,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.557748356073456e-14
@@ -1576,7 +1576,7 @@
    "n": 10000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.005047945,
+   "seconds": 0.005088894,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.557748356073456e-14
@@ -1587,7 +1587,7 @@
    "n": 10000,
    "p": 20,
    "tool": "sklearn-tight",
-   "seconds": 0.004854865372180939,
+   "seconds": 0.004820291884243488,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.795178196993422e-10
@@ -1598,7 +1598,7 @@
    "n": 10000,
    "p": 20,
    "tool": "sklearn",
-   "seconds": 0.0037651564925909042,
+   "seconds": 0.0035348739475011826,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.195408192588229e-05
@@ -1620,7 +1620,7 @@
    "n": 10000,
    "p": 20,
    "tool": "statsmodels",
-   "seconds": 0.02397673949599266,
+   "seconds": 0.02480250783264637,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.9566604699284826e-14
@@ -1664,7 +1664,7 @@
    "n": 10000,
    "p": 5,
    "tool": "glum-tight",
-   "seconds": 0.0050262827426195145,
+   "seconds": 0.005148879252374172,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.6152663223796294e-12
@@ -1675,7 +1675,7 @@
    "n": 10000,
    "p": 5,
    "tool": "glum",
-   "seconds": 0.004242619499564171,
+   "seconds": 0.004272611811757088,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.1412703577797823e-05
@@ -1686,7 +1686,7 @@
    "n": 10000,
    "p": 5,
    "tool": "py-rapidglm",
-   "seconds": 0.004185322672128677,
+   "seconds": 0.00414288230240345,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.710342938688484e-14
@@ -1697,7 +1697,7 @@
    "n": 10000,
    "p": 5,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.00699999999999998,
+   "seconds": 0.00700000000000001,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.6802449007415924e-14
@@ -1708,7 +1708,7 @@
    "n": 10000,
    "p": 5,
    "tool": "r-rapidglm",
-   "seconds": 0.01,
+   "seconds": 0.00900000000000001,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.6802449007415924e-14
@@ -1719,7 +1719,7 @@
    "n": 10000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.002603738,
+   "seconds": 0.002585625,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.710342938688484e-14
@@ -1730,7 +1730,7 @@
    "n": 10000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.002576078,
+   "seconds": 0.002568408,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.710342938688484e-14
@@ -1741,7 +1741,7 @@
    "n": 10000,
    "p": 5,
    "tool": "sklearn-tight",
-   "seconds": 0.0031183231621980667,
+   "seconds": 0.0031032199040055275,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.614515750526908e-12
@@ -1752,7 +1752,7 @@
    "n": 10000,
    "p": 5,
    "tool": "sklearn",
-   "seconds": 0.0023467224091291428,
+   "seconds": 0.0023668762296438217,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.1412703578173109e-05
@@ -1774,7 +1774,7 @@
    "n": 10000,
    "p": 5,
    "tool": "statsmodels",
-   "seconds": 0.008491474203765392,
+   "seconds": 0.008478838950395584,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.8758821473963854e-14
@@ -1785,7 +1785,7 @@
    "n": 10000,
    "p": 50,
    "tool": "fastglm",
-   "seconds": 0.036,
+   "seconds": 0.0369999999999999,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.3886156931671204e-13
@@ -1807,7 +1807,7 @@
    "n": 10000,
    "p": 50,
    "tool": "glm",
-   "seconds": 0.09,
+   "seconds": 0.091,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -1818,7 +1818,7 @@
    "n": 10000,
    "p": 50,
    "tool": "glum-tight",
-   "seconds": 0.02283022366464138,
+   "seconds": 0.02250772248953581,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.881947111524038e-10
@@ -1829,7 +1829,7 @@
    "n": 10000,
    "p": 50,
    "tool": "glum",
-   "seconds": 0.019036955200135708,
+   "seconds": 0.019651086069643497,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0002972031895032438
@@ -1840,7 +1840,7 @@
    "n": 10000,
    "p": 50,
    "tool": "py-rapidglm",
-   "seconds": 0.026020891033113003,
+   "seconds": 0.02580560091882944,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.9085903065796176e-13
@@ -1851,7 +1851,7 @@
    "n": 10000,
    "p": 50,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.048,
+   "seconds": 0.047,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.9134160722094016e-13
@@ -1862,7 +1862,7 @@
    "n": 10000,
    "p": 50,
    "tool": "r-rapidglm",
-   "seconds": 0.057,
+   "seconds": 0.056,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.9134160722094016e-13
@@ -1873,7 +1873,7 @@
    "n": 10000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 0.014310392,
+   "seconds": 0.014369044,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.9085903065796176e-13
@@ -1884,7 +1884,7 @@
    "n": 10000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 0.014273529,
+   "seconds": 0.014339739,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.9085903065796176e-13
@@ -1895,7 +1895,7 @@
    "n": 10000,
    "p": 50,
    "tool": "sklearn-tight",
-   "seconds": 0.01231203693896532,
+   "seconds": 0.012464136816561222,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.882199257778195e-10
@@ -1906,7 +1906,7 @@
    "n": 10000,
    "p": 50,
    "tool": "sklearn",
-   "seconds": 0.008508613333106041,
+   "seconds": 0.008752585388720036,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0002972031894788736
@@ -1917,7 +1917,7 @@
    "n": 10000,
    "p": 50,
    "tool": "speedglm",
-   "seconds": 0.0489999999999999,
+   "seconds": 0.0499999999999999,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.4215658960558317e-13
@@ -1928,7 +1928,7 @@
    "n": 10000,
    "p": 50,
    "tool": "statsmodels",
-   "seconds": 0.08135887328535318,
+   "seconds": 0.08250496722757816,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.311221374051038e-13
@@ -1939,7 +1939,7 @@
    "n": 100000,
    "p": 20,
    "tool": "fastglm",
-   "seconds": 0.137,
+   "seconds": 0.143,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.397461304113503e-14
@@ -1950,7 +1950,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glm.fit",
-   "seconds": 0.247,
+   "seconds": 0.239,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -1961,7 +1961,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glm",
-   "seconds": 0.307,
+   "seconds": 0.315,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -1972,7 +1972,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glum-tight",
-   "seconds": 0.07876855786889791,
+   "seconds": 0.08156238216906786,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.369853795637045e-11
@@ -1983,7 +1983,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glum",
-   "seconds": 0.06858418509364128,
+   "seconds": 0.0674306508153677,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.844355481897069e-05
@@ -1994,7 +1994,7 @@
    "n": 100000,
    "p": 20,
    "tool": "py-rapidglm",
-   "seconds": 0.10517120268195868,
+   "seconds": 0.10495485085994005,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.480545217153938e-14
@@ -2005,7 +2005,7 @@
    "n": 100000,
    "p": 20,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.163,
+   "seconds": 0.159,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.397461304113503e-14
@@ -2016,7 +2016,7 @@
    "n": 100000,
    "p": 20,
    "tool": "r-rapidglm",
-   "seconds": 0.226,
+   "seconds": 0.228,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.397461304113503e-14
@@ -2027,7 +2027,7 @@
    "n": 100000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.054171754,
+   "seconds": 0.053986299,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.480545217153938e-14
@@ -2038,7 +2038,7 @@
    "n": 100000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.053977641,
+   "seconds": 0.054064936,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.480545217153938e-14
@@ -2049,7 +2049,7 @@
    "n": 100000,
    "p": 20,
    "tool": "sklearn-tight",
-   "seconds": 0.052353537641465664,
+   "seconds": 0.05916342232376337,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.369618391216764e-11
@@ -2060,7 +2060,7 @@
    "n": 100000,
    "p": 20,
    "tool": "sklearn",
-   "seconds": 0.03706730715930462,
+   "seconds": 0.04375849384814501,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.844355481855527e-05
@@ -2071,7 +2071,7 @@
    "n": 100000,
    "p": 20,
    "tool": "speedglm",
-   "seconds": 0.141,
+   "seconds": 0.144,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.034437970756839e-14
@@ -2082,7 +2082,7 @@
    "n": 100000,
    "p": 20,
    "tool": "statsmodels",
-   "seconds": 0.28487455379217863,
+   "seconds": 0.2939670495688915,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.777324999825019e-14
@@ -2093,7 +2093,7 @@
    "n": 100000,
    "p": 5,
    "tool": "fastglm",
-   "seconds": 0.0429999999999999,
+   "seconds": 0.0470000000000002,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5877825086439367e-14
@@ -2104,7 +2104,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glm.fit",
-   "seconds": 0.109,
+   "seconds": 0.105,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -2115,7 +2115,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glm",
-   "seconds": 0.151,
+   "seconds": 0.152,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -2126,7 +2126,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glum-tight",
-   "seconds": 0.03318390157073736,
+   "seconds": 0.033896601758897305,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.245485376526897e-11
@@ -2137,7 +2137,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glum",
-   "seconds": 0.026472607627511024,
+   "seconds": 0.02629293128848076,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5069164423049483e-05
@@ -2148,7 +2148,7 @@
    "n": 100000,
    "p": 5,
    "tool": "py-rapidglm",
-   "seconds": 0.04385219421237707,
+   "seconds": 0.04570448212325573,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.728701358124547e-14
@@ -2159,7 +2159,7 @@
    "n": 100000,
    "p": 5,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.0619999999999999,
+   "seconds": 0.0609999999999999,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5877825086439367e-14
@@ -2170,7 +2170,7 @@
    "n": 100000,
    "p": 5,
    "tool": "r-rapidglm",
-   "seconds": 0.128,
+   "seconds": 0.126,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5877825086439367e-14
@@ -2181,7 +2181,7 @@
    "n": 100000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.026420266,
+   "seconds": 0.026414786,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.728701358124547e-14
@@ -2192,7 +2192,7 @@
    "n": 100000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.026581263,
+   "seconds": 0.026215924,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.728701358124547e-14
@@ -2203,7 +2203,7 @@
    "n": 100000,
    "p": 5,
    "tool": "sklearn-tight",
-   "seconds": 0.02469895500689745,
+   "seconds": 0.024951986968517303,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.2454635544702384e-11
@@ -2214,7 +2214,7 @@
    "n": 100000,
    "p": 5,
    "tool": "sklearn",
-   "seconds": 0.018270986154675484,
+   "seconds": 0.01909638661891222,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5069164423049483e-05
@@ -2225,7 +2225,7 @@
    "n": 100000,
    "p": 5,
    "tool": "speedglm",
-   "seconds": 0.0449999999999999,
+   "seconds": 0.046,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.6895116954923454e-14
@@ -2236,7 +2236,7 @@
    "n": 100000,
    "p": 5,
    "tool": "statsmodels",
-   "seconds": 0.08204718679189682,
+   "seconds": 0.08788914140313864,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.934431479233834e-14
@@ -2247,7 +2247,7 @@
    "n": 100000,
    "p": 50,
    "tool": "fastglm",
-   "seconds": 0.679,
+   "seconds": 0.745,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.771581560489277e-14
@@ -2258,7 +2258,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glm.fit",
-   "seconds": 1.004,
+   "seconds": 1.036,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -2269,7 +2269,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glm",
-   "seconds": 1.095,
+   "seconds": 1.132,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -2280,7 +2280,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glum-tight",
-   "seconds": 0.29643856547772884,
+   "seconds": 0.3059049816802144,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.7642885622295507e-10
@@ -2291,7 +2291,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glum",
-   "seconds": 0.2573383403941989,
+   "seconds": 0.2597683323547244,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.975470790592533e-05
@@ -2302,7 +2302,7 @@
    "n": 100000,
    "p": 50,
    "tool": "py-rapidglm",
-   "seconds": 0.36472638696432114,
+   "seconds": 0.38257790450006723,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.441632929693318e-14
@@ -2313,7 +2313,7 @@
    "n": 100000,
    "p": 50,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.618,
+   "seconds": 0.62,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.482242103584472e-14
@@ -2324,7 +2324,7 @@
    "n": 100000,
    "p": 50,
    "tool": "r-rapidglm",
-   "seconds": 0.719,
+   "seconds": 0.731,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.482242103584472e-14
@@ -2335,7 +2335,7 @@
    "n": 100000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 0.167518476,
+   "seconds": 0.171023304,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.441632929693318e-14
@@ -2346,7 +2346,7 @@
    "n": 100000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 0.168794228,
+   "seconds": 0.169697756,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.441632929693318e-14
@@ -2357,7 +2357,7 @@
    "n": 100000,
    "p": 50,
    "tool": "sklearn-tight",
-   "seconds": 0.1834177551791072,
+   "seconds": 0.18590515106916428,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.7643110131238627e-10
@@ -2368,7 +2368,7 @@
    "n": 100000,
    "p": 50,
    "tool": "sklearn",
-   "seconds": 0.12476339843124151,
+   "seconds": 0.1263022180646658,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.9754707907796236e-05
@@ -2379,7 +2379,7 @@
    "n": 100000,
    "p": 50,
    "tool": "speedglm",
-   "seconds": 0.717,
+   "seconds": 0.735,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.624370583924837e-14
@@ -2390,7 +2390,7 @@
    "n": 100000,
    "p": 50,
    "tool": "statsmodels",
-   "seconds": 1.2888026423752308,
+   "seconds": 1.4232915323227644,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.634524691536963e-14
@@ -2401,7 +2401,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "fastglm",
-   "seconds": 2.936,
+   "seconds": 3.093,
    "repeats": 5,
    "error": null,
    "max_rel_diff_vs_R": 6.133284604705089e-14
@@ -2412,8 +2412,8 @@
    "n": 1000000,
    "p": 20,
    "tool": "glm.fit",
-   "seconds": 3.514,
-   "repeats": 5,
+   "seconds": 3.778,
+   "repeats": 4,
    "error": null,
    "max_rel_diff_vs_R": 0.0
   },
@@ -2423,7 +2423,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glm",
-   "seconds": 4.099,
+   "seconds": 4.24,
    "repeats": 4,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -2434,7 +2434,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glum-tight",
-   "seconds": 1.747048326767981,
+   "seconds": 1.7852966440841556,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.89843995019247e-10
@@ -2445,7 +2445,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glum",
-   "seconds": 0.9972410164773464,
+   "seconds": 1.0009645139798522,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.00010790449873206924
@@ -2456,7 +2456,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "py-rapidglm",
-   "seconds": 1.5498345596715808,
+   "seconds": 1.5761003028601408,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.1999432798213244e-13
@@ -2467,7 +2467,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "r-rapidglm.fit",
-   "seconds": 2.137,
+   "seconds": 2.177,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.1999432798213244e-13
@@ -2478,7 +2478,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "r-rapidglm",
-   "seconds": 2.868,
+   "seconds": 2.937,
    "repeats": 5,
    "error": null,
    "max_rel_diff_vs_R": 1.1999432798213244e-13
@@ -2489,7 +2489,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.68287828,
+   "seconds": 0.690237616,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.1999432798213244e-13
@@ -2500,7 +2500,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.684057281,
+   "seconds": 0.687434698,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.1999432798213244e-13
@@ -2511,7 +2511,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "sklearn-tight",
-   "seconds": 0.9163179760798812,
+   "seconds": 0.9260151591151953,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.197382034827042e-13
@@ -2522,7 +2522,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "sklearn",
-   "seconds": 0.48888423293828964,
+   "seconds": 0.49785239808261395,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.00010790449873262595
@@ -2533,7 +2533,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "speedglm",
-   "seconds": 2.167,
+   "seconds": 2.249,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.817658476016459e-14
@@ -2544,7 +2544,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "statsmodels",
-   "seconds": 6.213977303355932,
+   "seconds": 6.443697747774422,
    "repeats": 3,
    "error": null,
    "max_rel_diff_vs_R": 1.1871370548499122e-13
@@ -2555,7 +2555,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "fastglm",
-   "seconds": 0.537,
+   "seconds": 0.565,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.854809536901407e-14
@@ -2566,7 +2566,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glm.fit",
-   "seconds": 0.854,
+   "seconds": 0.871,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -2577,7 +2577,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glm",
-   "seconds": 1.21,
+   "seconds": 1.253,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -2588,7 +2588,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glum-tight",
-   "seconds": 0.5011909995228052,
+   "seconds": 0.5086579881608486,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.234992886547168e-08
@@ -2599,7 +2599,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glum",
-   "seconds": 0.4308485956862569,
+   "seconds": 0.441548477858305,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.5454956301096902e-06
@@ -2610,7 +2610,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "py-rapidglm",
-   "seconds": 0.5719407135620713,
+   "seconds": 0.5780215645208955,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.234992014961066e-08
@@ -2621,7 +2621,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.724,
+   "seconds": 0.723,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.2349919139076046e-08
@@ -2632,7 +2632,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "r-rapidglm",
-   "seconds": 1.257,
+   "seconds": 1.264,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.2349919139076046e-08
@@ -2643,7 +2643,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.313144033,
+   "seconds": 0.315238553,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.234992014961066e-08
@@ -2654,7 +2654,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.312442918,
+   "seconds": 0.315149618,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.234992014961066e-08
@@ -2665,7 +2665,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "sklearn-tight",
-   "seconds": 0.3505836268886924,
+   "seconds": 0.35929189156740904,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.23499346760457e-08
@@ -2676,7 +2676,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "sklearn",
-   "seconds": 0.2509899418801069,
+   "seconds": 0.25205937400460243,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.5454956016884043e-06
@@ -2687,7 +2687,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "speedglm",
-   "seconds": 0.547,
+   "seconds": 0.544,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.444583226304294e-14
@@ -2698,7 +2698,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "statsmodels",
-   "seconds": 1.2389276269823313,
+   "seconds": 1.2840315168723464,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.234992937073899e-08
@@ -2709,7 +2709,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "fastglm",
-   "seconds": 12.756,
+   "seconds": 13.376,
    "repeats": 2,
    "error": null,
    "max_rel_diff_vs_R": 8.516787555058143e-14
@@ -2720,7 +2720,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glm.fit",
-   "seconds": 13.173,
+   "seconds": 13.814,
    "repeats": 2,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -2731,8 +2731,8 @@
    "n": 1000000,
    "p": 50,
    "tool": "glm",
-   "seconds": 14.418,
-   "repeats": 2,
+   "seconds": 15.084,
+   "repeats": 1,
    "error": null,
    "max_rel_diff_vs_R": 0.0
   },
@@ -2742,7 +2742,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glum-tight",
-   "seconds": 3.2230347599834204,
+   "seconds": 3.3117262311279774,
    "repeats": 5,
    "error": null,
    "max_rel_diff_vs_R": 1.5161124790841392e-10
@@ -2753,7 +2753,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glum",
-   "seconds": 2.7657510824501514,
+   "seconds": 2.8284054724499583,
    "repeats": 6,
    "error": null,
    "max_rel_diff_vs_R": 5.485927865361162e-05
@@ -2764,7 +2764,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "py-rapidglm",
-   "seconds": 5.186163883656263,
+   "seconds": 5.375629128888249,
    "repeats": 3,
    "error": null,
    "max_rel_diff_vs_R": 1.039019260101002e-13
@@ -2775,7 +2775,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "r-rapidglm.fit",
-   "seconds": 7.089,
+   "seconds": 7.166,
    "repeats": 3,
    "error": null,
    "max_rel_diff_vs_R": 1.039019260101002e-13
@@ -2786,7 +2786,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "r-rapidglm",
-   "seconds": 8.551,
+   "seconds": 8.745,
    "repeats": 2,
    "error": null,
    "max_rel_diff_vs_R": 1.039019260101002e-13
@@ -2797,7 +2797,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 1.747729885,
+   "seconds": 1.766155576,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.039019260101002e-13
@@ -2808,7 +2808,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 1.74415768,
+   "seconds": 1.755983668,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.039019260101002e-13
@@ -2819,7 +2819,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "sklearn-tight",
-   "seconds": 1.9091655518859625,
+   "seconds": 1.9331222819164395,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.5161153617560772e-10
@@ -2830,7 +2830,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "sklearn",
-   "seconds": 1.3041621167212725,
+   "seconds": 1.3326299833133817,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.4859278634730114e-05
@@ -2841,7 +2841,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "speedglm",
-   "seconds": 8.313,
+   "seconds": 8.504,
    "repeats": 2,
    "error": null,
    "max_rel_diff_vs_R": 1.1186308186245541e-13
@@ -2852,7 +2852,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "statsmodels",
-   "seconds": 25.523825800977647,
+   "seconds": 24.61267296783626,
    "repeats": 1,
    "error": null,
    "max_rel_diff_vs_R": 1.8751780956843606e-13
@@ -2874,7 +2874,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glm.fit",
-   "seconds": 0.01,
+   "seconds": 0.011,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -2896,7 +2896,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glum-tight",
-   "seconds": 0.0053762588649988174,
+   "seconds": 0.005379917100071907,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.7145030569393934e-14
@@ -2907,7 +2907,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glum",
-   "seconds": 0.005893470719456673,
+   "seconds": 0.00546587910503149,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.7145030569393934e-14
@@ -2918,7 +2918,7 @@
    "n": 10000,
    "p": 20,
    "tool": "py-rapidglm",
-   "seconds": 0.005333582870662212,
+   "seconds": 0.0053029777482151985,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.8752364113156196e-14
@@ -2951,7 +2951,7 @@
    "n": 10000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.002044423,
+   "seconds": 0.002045947,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.8752364113156196e-14
@@ -2962,7 +2962,7 @@
    "n": 10000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.002284296,
+   "seconds": 0.002040698,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.8752364113156196e-14
@@ -2973,7 +2973,7 @@
    "n": 10000,
    "p": 20,
    "tool": "sklearn-tight",
-   "seconds": 0.0025235991925001144,
+   "seconds": 0.0025440678000450134,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.234377965037051e-14
@@ -2984,7 +2984,7 @@
    "n": 10000,
    "p": 20,
    "tool": "sklearn",
-   "seconds": 0.002499038353562355,
+   "seconds": 0.002441742457449436,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.234377965037051e-14
@@ -3006,7 +3006,7 @@
    "n": 10000,
    "p": 20,
    "tool": "statsmodels",
-   "seconds": 0.020251563750207424,
+   "seconds": 0.019380622543394566,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.768669873892177e-14
@@ -3050,7 +3050,7 @@
    "n": 10000,
    "p": 5,
    "tool": "glum-tight",
-   "seconds": 0.002015647478401661,
+   "seconds": 0.002028924413025379,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.935768404278097e-15
@@ -3061,7 +3061,7 @@
    "n": 10000,
    "p": 5,
    "tool": "glum",
-   "seconds": 0.0020081577822566032,
+   "seconds": 0.0020575420930981636,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.935768404278097e-15
@@ -3072,7 +3072,7 @@
    "n": 10000,
    "p": 5,
    "tool": "py-rapidglm",
-   "seconds": 0.0018469179049134254,
+   "seconds": 0.0018731551244854927,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.989348740902661e-15
@@ -3083,7 +3083,7 @@
    "n": 10000,
    "p": 5,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.005,
+   "seconds": 0.00499999999999998,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3105,7 +3105,7 @@
    "n": 10000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.000593703,
+   "seconds": 0.000593809,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.989348740902661e-15
@@ -3116,7 +3116,7 @@
    "n": 10000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.000590807,
+   "seconds": 0.000598669,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.989348740902661e-15
@@ -3127,7 +3127,7 @@
    "n": 10000,
    "p": 5,
    "tool": "sklearn-tight",
-   "seconds": 0.0008345376700162888,
+   "seconds": 0.000849810428917408,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.145757854775802e-15
@@ -3138,7 +3138,7 @@
    "n": 10000,
    "p": 5,
    "tool": "sklearn",
-   "seconds": 0.0008348114788532257,
+   "seconds": 0.0008271597325801849,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.145757854775802e-15
@@ -3160,7 +3160,7 @@
    "n": 10000,
    "p": 5,
    "tool": "statsmodels",
-   "seconds": 0.0058555807918310165,
+   "seconds": 0.005772778764367104,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.2189346715501038e-15
@@ -3171,7 +3171,7 @@
    "n": 10000,
    "p": 50,
    "tool": "fastglm",
-   "seconds": 0.0169999999999999,
+   "seconds": 0.017,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.2452609718062515e-14
@@ -3182,7 +3182,7 @@
    "n": 10000,
    "p": 50,
    "tool": "glm.fit",
-   "seconds": 0.039,
+   "seconds": 0.038,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3193,7 +3193,7 @@
    "n": 10000,
    "p": 50,
    "tool": "glm",
-   "seconds": 0.045,
+   "seconds": 0.046,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3204,7 +3204,7 @@
    "n": 10000,
    "p": 50,
    "tool": "glum-tight",
-   "seconds": 0.015475645661354065,
+   "seconds": 0.015323172323405743,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.791933208419948e-14
@@ -3215,7 +3215,7 @@
    "n": 10000,
    "p": 50,
    "tool": "glum",
-   "seconds": 0.01533432211726904,
+   "seconds": 0.015610716305673122,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.791933208419948e-14
@@ -3226,7 +3226,7 @@
    "n": 10000,
    "p": 50,
    "tool": "py-rapidglm",
-   "seconds": 0.018204654566943645,
+   "seconds": 0.02032498363405466,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5185970901130997e-14
@@ -3248,7 +3248,7 @@
    "n": 10000,
    "p": 50,
    "tool": "r-rapidglm",
-   "seconds": 0.047,
+   "seconds": 0.046,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3259,7 +3259,7 @@
    "n": 10000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 0.007615159,
+   "seconds": 0.007371112,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5185970901130997e-14
@@ -3270,7 +3270,7 @@
    "n": 10000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 0.007382614,
+   "seconds": 0.007373906,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5185970901130997e-14
@@ -3281,7 +3281,7 @@
    "n": 10000,
    "p": 50,
    "tool": "sklearn-tight",
-   "seconds": 0.009120133705437183,
+   "seconds": 0.009664354845881462,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5842965099004523e-14
@@ -3292,7 +3292,7 @@
    "n": 10000,
    "p": 50,
    "tool": "sklearn",
-   "seconds": 0.00909161102026701,
+   "seconds": 0.009479332715272903,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5842965099004523e-14
@@ -3303,7 +3303,7 @@
    "n": 10000,
    "p": 50,
    "tool": "speedglm",
-   "seconds": 0.013,
+   "seconds": 0.0139999999999999,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.4600250647616322e-14
@@ -3314,7 +3314,7 @@
    "n": 10000,
    "p": 50,
    "tool": "statsmodels",
-   "seconds": 0.06761005334556103,
+   "seconds": 0.06896448042243719,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.868506657898944e-14
@@ -3325,7 +3325,7 @@
    "n": 100000,
    "p": 20,
    "tool": "fastglm",
-   "seconds": 0.0700000000000001,
+   "seconds": 0.0600000000000001,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.2340702048490684e-14
@@ -3336,7 +3336,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glm.fit",
-   "seconds": 0.121,
+   "seconds": 0.129,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3347,7 +3347,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glm",
-   "seconds": 0.152,
+   "seconds": 0.16,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3358,7 +3358,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glum-tight",
-   "seconds": 0.04799976758658886,
+   "seconds": 0.04711827635765076,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.964564354444979e-14
@@ -3369,7 +3369,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glum",
-   "seconds": 0.04699090588837862,
+   "seconds": 0.046139865182340145,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.964564354444979e-14
@@ -3380,7 +3380,7 @@
    "n": 100000,
    "p": 20,
    "tool": "py-rapidglm",
-   "seconds": 0.0626370208337903,
+   "seconds": 0.062297651544213295,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.380052540484617e-14
@@ -3402,7 +3402,7 @@
    "n": 100000,
    "p": 20,
    "tool": "r-rapidglm",
-   "seconds": 0.156,
+   "seconds": 0.161,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3413,7 +3413,7 @@
    "n": 100000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.02127404,
+   "seconds": 0.022361589,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.380052540484617e-14
@@ -3424,7 +3424,7 @@
    "n": 100000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.021513284,
+   "seconds": 0.021146307,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.380052540484617e-14
@@ -3435,7 +3435,7 @@
    "n": 100000,
    "p": 20,
    "tool": "sklearn-tight",
-   "seconds": 0.02991300728172064,
+   "seconds": 0.03177871648222208,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.591210436016127e-14
@@ -3446,7 +3446,7 @@
    "n": 100000,
    "p": 20,
    "tool": "sklearn",
-   "seconds": 0.030036753974854946,
+   "seconds": 0.03023585584014654,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.591210436016127e-14
@@ -3457,7 +3457,7 @@
    "n": 100000,
    "p": 20,
    "tool": "speedglm",
-   "seconds": 0.04,
+   "seconds": 0.0469999999999999,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.17675820984521e-14
@@ -3468,7 +3468,7 @@
    "n": 100000,
    "p": 20,
    "tool": "statsmodels",
-   "seconds": 0.23166894353926182,
+   "seconds": 0.23918058909475803,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.166693742248046e-14
@@ -3479,7 +3479,7 @@
    "n": 100000,
    "p": 5,
    "tool": "fastglm",
-   "seconds": 0.013,
+   "seconds": 0.0139999999999999,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.4616608299123465e-14
@@ -3490,7 +3490,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glm.fit",
-   "seconds": 0.032,
+   "seconds": 0.034,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3501,7 +3501,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glm",
-   "seconds": 0.053,
+   "seconds": 0.0559999999999999,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3512,7 +3512,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glum-tight",
-   "seconds": 0.011593427509069443,
+   "seconds": 0.011855707503855228,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.3516918149622101e-14
@@ -3523,7 +3523,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glum",
-   "seconds": 0.011237499304115772,
+   "seconds": 0.012407873757183552,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.3516918149622101e-14
@@ -3534,7 +3534,7 @@
    "n": 100000,
    "p": 5,
    "tool": "py-rapidglm",
-   "seconds": 0.02102292701601982,
+   "seconds": 0.024118834175169468,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.3301954247076124e-14
@@ -3545,7 +3545,7 @@
    "n": 100000,
    "p": 5,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.032,
+   "seconds": 0.035,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3556,7 +3556,7 @@
    "n": 100000,
    "p": 5,
    "tool": "r-rapidglm",
-   "seconds": 0.0529999999999999,
+   "seconds": 0.0559999999999999,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3567,7 +3567,7 @@
    "n": 100000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.006205424,
+   "seconds": 0.006223057,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.3301954247076124e-14
@@ -3578,7 +3578,7 @@
    "n": 100000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.006257432,
+   "seconds": 0.006213353,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.3301954247076124e-14
@@ -3589,7 +3589,7 @@
    "n": 100000,
    "p": 5,
    "tool": "sklearn-tight",
-   "seconds": 0.005413682200014591,
+   "seconds": 0.006739473901689053,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.441045043433247e-14
@@ -3600,7 +3600,7 @@
    "n": 100000,
    "p": 5,
    "tool": "sklearn",
-   "seconds": 0.005831277929246426,
+   "seconds": 0.006128910928964615,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.441045043433247e-14
@@ -3622,7 +3622,7 @@
    "n": 100000,
    "p": 5,
    "tool": "statsmodels",
-   "seconds": 0.05804211087524891,
+   "seconds": 0.06013461295515299,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.3080255009624857e-14
@@ -3633,7 +3633,7 @@
    "n": 100000,
    "p": 50,
    "tool": "fastglm",
-   "seconds": 0.337,
+   "seconds": 0.351,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.7971794470778066e-14
@@ -3644,7 +3644,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glm.fit",
-   "seconds": 0.466,
+   "seconds": 0.484,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3655,7 +3655,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glm",
-   "seconds": 0.539,
+   "seconds": 0.571,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3666,7 +3666,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glum-tight",
-   "seconds": 0.1897093914449215,
+   "seconds": 0.19700862281024456,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.959879348926856e-14
@@ -3677,7 +3677,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glum",
-   "seconds": 0.19019120186567307,
+   "seconds": 0.18860303331166506,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.959879348926856e-14
@@ -3688,7 +3688,7 @@
    "n": 100000,
    "p": 50,
    "tool": "py-rapidglm",
-   "seconds": 0.27973497565835714,
+   "seconds": 0.29414686281234026,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.8218538870598002e-14
@@ -3699,7 +3699,7 @@
    "n": 100000,
    "p": 50,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.465,
+   "seconds": 0.482,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3721,7 +3721,7 @@
    "n": 100000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 0.085740559,
+   "seconds": 0.083634909,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.8218538870598002e-14
@@ -3732,7 +3732,7 @@
    "n": 100000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 0.082439718,
+   "seconds": 0.086858748,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.8218538870598002e-14
@@ -3743,7 +3743,7 @@
    "n": 100000,
    "p": 50,
    "tool": "sklearn-tight",
-   "seconds": 0.16968685202300549,
+   "seconds": 0.1701130634173751,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.775447297952223e-14
@@ -3754,7 +3754,7 @@
    "n": 100000,
    "p": 50,
    "tool": "sklearn",
-   "seconds": 0.17302389163523912,
+   "seconds": 0.16097485460340977,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.775447297952223e-14
@@ -3765,7 +3765,7 @@
    "n": 100000,
    "p": 50,
    "tool": "speedglm",
-   "seconds": 0.186,
+   "seconds": 0.194,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.113250477242685e-14
@@ -3776,7 +3776,7 @@
    "n": 100000,
    "p": 50,
    "tool": "statsmodels",
-   "seconds": 1.0999710699543357,
+   "seconds": 1.1330896150320768,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.313989961163026e-14
@@ -3787,7 +3787,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "fastglm",
-   "seconds": 1.416,
+   "seconds": 1.488,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.298434133879957e-14
@@ -3798,7 +3798,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glm.fit",
-   "seconds": 1.711,
+   "seconds": 1.722,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3809,7 +3809,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glm",
-   "seconds": 2.034,
+   "seconds": 2.091,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3820,7 +3820,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glum-tight",
-   "seconds": 0.6577979233115911,
+   "seconds": 0.6725772432982922,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.088909708983882e-14
@@ -3831,7 +3831,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glum",
-   "seconds": 0.654979282990098,
+   "seconds": 0.6660409346222878,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.088909708983882e-14
@@ -3842,7 +3842,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "py-rapidglm",
-   "seconds": 1.106643758714199,
+   "seconds": 1.1364661511033773,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.752403721154788e-14
@@ -3853,7 +3853,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "r-rapidglm.fit",
-   "seconds": 1.674,
+   "seconds": 1.715,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3864,7 +3864,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "r-rapidglm",
-   "seconds": 2.019,
+   "seconds": 2.077,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3875,7 +3875,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.288047879,
+   "seconds": 0.291846899,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.752403721154788e-14
@@ -3886,7 +3886,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.286720999,
+   "seconds": 0.2906098,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.752403721154788e-14
@@ -3897,7 +3897,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "sklearn-tight",
-   "seconds": 0.6659733112901449,
+   "seconds": 0.6858736583963037,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.961928146050863e-14
@@ -3908,7 +3908,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "sklearn",
-   "seconds": 0.6706678699702024,
+   "seconds": 0.684443736448884,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.961928146050863e-14
@@ -3919,7 +3919,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "speedglm",
-   "seconds": 0.674,
+   "seconds": 0.695,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.0206198001949152e-13
@@ -3930,7 +3930,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "statsmodels",
-   "seconds": 4.414216062985361,
+   "seconds": 4.586462112143636,
    "repeats": 4,
    "error": null,
    "max_rel_diff_vs_R": 7.839705564861485e-14
@@ -3941,7 +3941,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "fastglm",
-   "seconds": 0.241,
+   "seconds": 0.249,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.666929632325017e-13
@@ -3952,7 +3952,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glm.fit",
-   "seconds": 0.412,
+   "seconds": 0.425,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3963,7 +3963,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glm",
-   "seconds": 0.479,
+   "seconds": 0.499,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -3974,7 +3974,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glum-tight",
-   "seconds": 0.2002879325300455,
+   "seconds": 0.202305824495852,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5670264595357474e-13
@@ -3985,7 +3985,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glum",
-   "seconds": 0.1995011791586876,
+   "seconds": 0.206367002800107,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.5670264595357474e-13
@@ -3996,7 +3996,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "py-rapidglm",
-   "seconds": 0.3096785917878151,
+   "seconds": 0.3276865482330322,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.859278922897966e-14
@@ -4007,7 +4007,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.409,
+   "seconds": 0.424,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4018,7 +4018,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "r-rapidglm",
-   "seconds": 0.484,
+   "seconds": 0.504,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4029,7 +4029,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.087101426,
+   "seconds": 0.089550956,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.859278922897966e-14
@@ -4040,7 +4040,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.089239212,
+   "seconds": 0.093140305,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.859278922897966e-14
@@ -4051,7 +4051,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "sklearn-tight",
-   "seconds": 0.10010011587291956,
+   "seconds": 0.10692507401108742,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.227879164552919e-14
@@ -4062,7 +4062,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "sklearn",
-   "seconds": 0.10740216635167599,
+   "seconds": 0.1044414909556508,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.227879164552919e-14
@@ -4073,7 +4073,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "speedglm",
-   "seconds": 0.213,
+   "seconds": 0.226,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.2919834006638343e-13
@@ -4084,7 +4084,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "statsmodels",
-   "seconds": 0.8952735671773553,
+   "seconds": 0.926683128811419,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.759716209253107e-13
@@ -4095,7 +4095,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "fastglm",
-   "seconds": 6.587,
+   "seconds": 6.798,
    "repeats": 3,
    "error": null,
    "max_rel_diff_vs_R": 1.286625886291007e-13
@@ -4106,7 +4106,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glm.fit",
-   "seconds": 6.832,
+   "seconds": 6.74,
    "repeats": 3,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4117,7 +4117,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glm",
-   "seconds": 7.47,
+   "seconds": 7.658,
    "repeats": 2,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4128,7 +4128,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glum-tight",
-   "seconds": 2.0456117391586304,
+   "seconds": 2.0991005301475525,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.298984570493539e-14
@@ -4139,7 +4139,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glum",
-   "seconds": 2.0518567245453596,
+   "seconds": 2.0775797506794333,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.298984570493539e-14
@@ -4150,7 +4150,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "py-rapidglm",
-   "seconds": 4.3376223389059305,
+   "seconds": 4.446927927434444,
    "repeats": 4,
    "error": null,
    "max_rel_diff_vs_R": 7.819493758543796e-14
@@ -4161,7 +4161,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "r-rapidglm.fit",
-   "seconds": 6.471,
+   "seconds": 6.735,
    "repeats": 3,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4172,8 +4172,8 @@
    "n": 1000000,
    "p": 50,
    "tool": "r-rapidglm",
-   "seconds": 7.321,
-   "repeats": 3,
+   "seconds": 7.679,
+   "repeats": 2,
    "error": null,
    "max_rel_diff_vs_R": 0.0
   },
@@ -4183,7 +4183,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 0.876936556,
+   "seconds": 0.887020621,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.819493758543796e-14
@@ -4194,7 +4194,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 0.874810926,
+   "seconds": 0.883872893,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.819493758543796e-14
@@ -4205,7 +4205,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "sklearn-tight",
-   "seconds": 3.2871930049732327,
+   "seconds": 3.446049690246582,
    "repeats": 5,
    "error": null,
    "max_rel_diff_vs_R": 1.8643910052682908e-13
@@ -4216,7 +4216,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "sklearn",
-   "seconds": 3.308576979674399,
+   "seconds": 3.4223019359633327,
    "repeats": 5,
    "error": null,
    "max_rel_diff_vs_R": 1.8643910052682908e-13
@@ -4227,7 +4227,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "speedglm",
-   "seconds": 2.274,
+   "seconds": 2.319,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.4712126173548956e-13
@@ -4238,7 +4238,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "statsmodels",
-   "seconds": 20.68437312077731,
+   "seconds": 21.001726338639855,
    "repeats": 1,
    "error": null,
    "max_rel_diff_vs_R": 3.727227055569719e-13
@@ -4249,7 +4249,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glm.nb",
-   "seconds": 0.221,
+   "seconds": 0.222,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4271,7 +4271,7 @@
    "n": 10000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.011449904,
+   "seconds": 0.011161677,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.618701916719393e-11
@@ -4282,7 +4282,7 @@
    "n": 10000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.011250827,
+   "seconds": 0.011242204,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.618701916719393e-11
@@ -4293,7 +4293,7 @@
    "n": 10000,
    "p": 20,
    "tool": "statsmodels-nb",
-   "seconds": 0.05336214601993561,
+   "seconds": 0.05395694077014923,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.606062209648227e-05
@@ -4315,7 +4315,7 @@
    "n": 10000,
    "p": 5,
    "tool": "r-rapidglm.nb",
-   "seconds": 0.02,
+   "seconds": 0.019,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.2026460409100214e-08
@@ -4326,7 +4326,7 @@
    "n": 10000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.005672331,
+   "seconds": 0.005730651,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.202646055784051e-08
@@ -4337,7 +4337,7 @@
    "n": 10000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.005644595,
+   "seconds": 0.005713578,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.202646055784051e-08
@@ -4348,7 +4348,7 @@
    "n": 10000,
    "p": 5,
    "tool": "statsmodels-nb",
-   "seconds": 0.024835015647113323,
+   "seconds": 0.025058072991669178,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 9.382146902576332e-06
@@ -4359,7 +4359,7 @@
    "n": 10000,
    "p": 50,
    "tool": "glm.nb",
-   "seconds": 0.308,
+   "seconds": 0.311,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4381,7 +4381,7 @@
    "n": 10000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 0.036948622,
+   "seconds": 0.037082183,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.703247211956781e-06
@@ -4392,7 +4392,7 @@
    "n": 10000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 0.036987188,
+   "seconds": 0.037004326,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.703247211956781e-06
@@ -4403,7 +4403,7 @@
    "n": 10000,
    "p": 50,
    "tool": "statsmodels-nb",
-   "seconds": 0.13535841181874275,
+   "seconds": 0.13461966533213854,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.010268697692629133
@@ -4414,7 +4414,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glm.nb",
-   "seconds": 1.574,
+   "seconds": 1.598,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4425,7 +4425,7 @@
    "n": 100000,
    "p": 20,
    "tool": "r-rapidglm.nb",
-   "seconds": 0.433,
+   "seconds": 0.422,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.4640646533570344e-09
@@ -4436,7 +4436,7 @@
    "n": 100000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.118562339,
+   "seconds": 0.122808886,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.4640637052561506e-09
@@ -4447,7 +4447,7 @@
    "n": 100000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.117500976,
+   "seconds": 0.129551853,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.4640637052561506e-09
@@ -4458,7 +4458,7 @@
    "n": 100000,
    "p": 20,
    "tool": "statsmodels-nb",
-   "seconds": 0.5312826186418533,
+   "seconds": 0.5569370742887259,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.00048189749940631715
@@ -4469,7 +4469,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glm.nb",
-   "seconds": 1.221,
+   "seconds": 1.235,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4480,7 +4480,7 @@
    "n": 100000,
    "p": 5,
    "tool": "r-rapidglm.nb",
-   "seconds": 0.237,
+   "seconds": 0.234,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.0325923281418186e-10
@@ -4491,7 +4491,7 @@
    "n": 100000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.057549493,
+   "seconds": 0.057170788,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.032620826973669e-10
@@ -4502,7 +4502,7 @@
    "n": 100000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.057676643,
+   "seconds": 0.058116886,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.032620826973669e-10
@@ -4513,7 +4513,7 @@
    "n": 100000,
    "p": 5,
    "tool": "statsmodels-nb",
-   "seconds": 0.2616512468084693,
+   "seconds": 0.2606386439874768,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.149422556186572e-05
@@ -4524,7 +4524,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glm.nb",
-   "seconds": 3.778,
+   "seconds": 3.882,
    "repeats": 4,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4535,7 +4535,7 @@
    "n": 100000,
    "p": 50,
    "tool": "r-rapidglm.nb",
-   "seconds": 1.434,
+   "seconds": 1.412,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.2195032826452604e-09
@@ -4546,7 +4546,7 @@
    "n": 100000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 0.396287418,
+   "seconds": 0.415098849,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.2194518645069932e-09
@@ -4557,7 +4557,7 @@
    "n": 100000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 0.404444255,
+   "seconds": 0.407265749,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.2194518645069932e-09
@@ -4568,7 +4568,7 @@
    "n": 100000,
    "p": 50,
    "tool": "statsmodels-nb",
-   "seconds": 1.8026797827333212,
+   "seconds": 1.9199742898344994,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.004477605653637924
@@ -4579,7 +4579,7 @@
    "n": 10000,
    "p": 20,
    "tool": "fastglm",
-   "seconds": 0.013,
+   "seconds": 0.0129999999999999,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.01014302075723e-14
@@ -4590,7 +4590,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glm.fit",
-   "seconds": 0.029,
+   "seconds": 0.028,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4601,7 +4601,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glm",
-   "seconds": 0.033,
+   "seconds": 0.034,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4612,7 +4612,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glum-tight",
-   "seconds": 0.011634227819740772,
+   "seconds": 0.011641931720077991,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.985173043757869e-12
@@ -4623,7 +4623,7 @@
    "n": 10000,
    "p": 20,
    "tool": "glum",
-   "seconds": 0.010424485430121422,
+   "seconds": 0.01071506179869175,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.1804562858259204e-09
@@ -4634,7 +4634,7 @@
    "n": 10000,
    "p": 20,
    "tool": "py-rapidglm",
-   "seconds": 0.00898391380906105,
+   "seconds": 0.009412519633769989,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.9863331852810497e-12
@@ -4667,7 +4667,7 @@
    "n": 10000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.005551712,
+   "seconds": 0.005554956,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.9863331852810497e-12
@@ -4678,7 +4678,7 @@
    "n": 10000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.005579796,
+   "seconds": 0.005558906,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.9863331852810497e-12
@@ -4689,7 +4689,7 @@
    "n": 10000,
    "p": 20,
    "tool": "sklearn-tight",
-   "seconds": 0.007138664834201336,
+   "seconds": 0.007275242358446121,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.9853019483715557e-12
@@ -4700,7 +4700,7 @@
    "n": 10000,
    "p": 20,
    "tool": "sklearn",
-   "seconds": 0.004814856685698032,
+   "seconds": 0.004902585409581661,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.720190041278465e-05
@@ -4722,7 +4722,7 @@
    "n": 10000,
    "p": 20,
    "tool": "statsmodels",
-   "seconds": 0.027208339422941208,
+   "seconds": 0.028916141018271446,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.977309862322977e-12
@@ -4733,7 +4733,7 @@
    "n": 10000,
    "p": 5,
    "tool": "fastglm",
-   "seconds": 0.00499999999999989,
+   "seconds": 0.005,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.13371651355388e-15
@@ -4744,7 +4744,7 @@
    "n": 10000,
    "p": 5,
    "tool": "glm.fit",
-   "seconds": 0.00899999999999998,
+   "seconds": 0.00900000000000001,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -4766,7 +4766,7 @@
    "n": 10000,
    "p": 5,
    "tool": "glum-tight",
-   "seconds": 0.005316987633705139,
+   "seconds": 0.005322611890733242,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.988425817199624e-13
@@ -4777,7 +4777,7 @@
    "n": 10000,
    "p": 5,
    "tool": "glum",
-   "seconds": 0.00477822870016098,
+   "seconds": 0.004717986099421978,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.864785608046227e-07
@@ -4788,7 +4788,7 @@
    "n": 10000,
    "p": 5,
    "tool": "py-rapidglm",
-   "seconds": 0.0035289330407977104,
+   "seconds": 0.0035192500799894333,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.872714916211859e-13
@@ -4799,7 +4799,7 @@
    "n": 10000,
    "p": 5,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.00699999999999998,
+   "seconds": 0.00600000000000001,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.875546106702575e-13
@@ -4810,7 +4810,7 @@
    "n": 10000,
    "p": 5,
    "tool": "r-rapidglm",
-   "seconds": 0.01,
+   "seconds": 0.00900000000000001,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.875546106702575e-13
@@ -4821,7 +4821,7 @@
    "n": 10000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.002162965,
+   "seconds": 0.002158315,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.872714916211859e-13
@@ -4832,7 +4832,7 @@
    "n": 10000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.002161811,
+   "seconds": 0.002188854,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.872714916211859e-13
@@ -4843,7 +4843,7 @@
    "n": 10000,
    "p": 5,
    "tool": "sklearn-tight",
-   "seconds": 0.003131038509309292,
+   "seconds": 0.0031034043058753014,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 7.986190041712023e-13
@@ -4854,7 +4854,7 @@
    "n": 10000,
    "p": 5,
    "tool": "sklearn",
-   "seconds": 0.002581225708127022,
+   "seconds": 0.002588273026049137,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 8.864785606928339e-07
@@ -4876,7 +4876,7 @@
    "n": 10000,
    "p": 5,
    "tool": "statsmodels",
-   "seconds": 0.009400230832397938,
+   "seconds": 0.009436028078198433,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.895364440137583e-13
@@ -4887,7 +4887,7 @@
    "n": 10000,
    "p": 50,
    "tool": "fastglm",
-   "seconds": 0.046,
+   "seconds": 0.044,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.053776937906513e-13
@@ -4920,7 +4920,7 @@
    "n": 10000,
    "p": 50,
    "tool": "glum-tight",
-   "seconds": 0.028268213383853436,
+   "seconds": 0.030422675423324108,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.0528235645166546e-10
@@ -4931,7 +4931,7 @@
    "n": 10000,
    "p": 50,
    "tool": "glum",
-   "seconds": 0.02509499154984951,
+   "seconds": 0.025190305896103382,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0004454953266651917
@@ -4942,7 +4942,7 @@
    "n": 10000,
    "p": 50,
    "tool": "py-rapidglm",
-   "seconds": 0.027742107398808002,
+   "seconds": 0.027657169848680496,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.048725786172404e-10
@@ -4964,7 +4964,7 @@
    "n": 10000,
    "p": 50,
    "tool": "r-rapidglm",
-   "seconds": 0.067,
+   "seconds": 0.065,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.0487202854628117e-10
@@ -4975,7 +4975,7 @@
    "n": 10000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 0.018414729,
+   "seconds": 0.018009196,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.048725786172404e-10
@@ -4986,7 +4986,7 @@
    "n": 10000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 0.017921521,
+   "seconds": 0.017948372,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.048725786172404e-10
@@ -4997,7 +4997,7 @@
    "n": 10000,
    "p": 50,
    "tool": "sklearn-tight",
-   "seconds": 0.01836167462170124,
+   "seconds": 0.018515570089221,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.0523931339910587e-10
@@ -5008,7 +5008,7 @@
    "n": 10000,
    "p": 50,
    "tool": "sklearn",
-   "seconds": 0.014776174910366535,
+   "seconds": 0.014796748757362366,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.00044549532669104506
@@ -5019,7 +5019,7 @@
    "n": 10000,
    "p": 50,
    "tool": "speedglm",
-   "seconds": 0.0629999999999999,
+   "seconds": 0.0600000000000001,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.0482290119173866e-14
@@ -5030,7 +5030,7 @@
    "n": 10000,
    "p": 50,
    "tool": "statsmodels",
-   "seconds": 0.09190365858376026,
+   "seconds": 0.09380040131509304,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.040575109734044e-10
@@ -5041,7 +5041,7 @@
    "n": 100000,
    "p": 20,
    "tool": "fastglm",
-   "seconds": 0.166,
+   "seconds": 0.174,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.982651305343141e-14
@@ -5052,7 +5052,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glm.fit",
-   "seconds": 0.292,
+   "seconds": 0.291,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5063,7 +5063,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glm",
-   "seconds": 0.375,
+   "seconds": 0.382,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5074,7 +5074,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glum-tight",
-   "seconds": 0.08877155650407076,
+   "seconds": 0.10311267338693142,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.5067464371392814e-11
@@ -5085,7 +5085,7 @@
    "n": 100000,
    "p": 20,
    "tool": "glum",
-   "seconds": 0.08000735007226467,
+   "seconds": 0.0893314154818654,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.4234276992100751e-05
@@ -5096,7 +5096,7 @@
    "n": 100000,
    "p": 20,
    "tool": "py-rapidglm",
-   "seconds": 0.10385358147323132,
+   "seconds": 0.10518471244722605,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.172604408273942e-12
@@ -5107,7 +5107,7 @@
    "n": 100000,
    "p": 20,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.181,
+   "seconds": 0.183,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.172604408273942e-12
@@ -5129,7 +5129,7 @@
    "n": 100000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.058167632,
+   "seconds": 0.059464373,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.172604408273942e-12
@@ -5140,7 +5140,7 @@
    "n": 100000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.059121906,
+   "seconds": 0.058449675,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.172604408273942e-12
@@ -5151,7 +5151,7 @@
    "n": 100000,
    "p": 20,
    "tool": "sklearn-tight",
-   "seconds": 0.06943320669233799,
+   "seconds": 0.06723202019929886,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.5067464371392814e-11
@@ -5162,7 +5162,7 @@
    "n": 100000,
    "p": 20,
    "tool": "sklearn",
-   "seconds": 0.05406901240348816,
+   "seconds": 0.052266160026192665,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.4234276992293856e-05
@@ -5173,7 +5173,7 @@
    "n": 100000,
    "p": 20,
    "tool": "speedglm",
-   "seconds": 0.175,
+   "seconds": 0.176,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.788695288575465e-14
@@ -5184,7 +5184,7 @@
    "n": 100000,
    "p": 20,
    "tool": "statsmodels",
-   "seconds": 0.3270680606365204,
+   "seconds": 0.32613497879356146,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.1730811413305651e-12
@@ -5206,7 +5206,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glm.fit",
-   "seconds": 0.121,
+   "seconds": 0.127,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5217,7 +5217,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glm",
-   "seconds": 0.17,
+   "seconds": 0.182,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5228,7 +5228,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glum-tight",
-   "seconds": 0.0347154950723052,
+   "seconds": 0.03576878737658262,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.587781279402763e-12
@@ -5239,7 +5239,7 @@
    "n": 100000,
    "p": 5,
    "tool": "glum",
-   "seconds": 0.031007389537990093,
+   "seconds": 0.035573916509747505,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.315683026021392e-09
@@ -5250,7 +5250,7 @@
    "n": 100000,
    "p": 5,
    "tool": "py-rapidglm",
-   "seconds": 0.03522084001451731,
+   "seconds": 0.03532753046602011,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.5803971308341119e-12
@@ -5261,7 +5261,7 @@
    "n": 100000,
    "p": 5,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.06,
+   "seconds": 0.058,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.5803971308341119e-12
@@ -5272,7 +5272,7 @@
    "n": 100000,
    "p": 5,
    "tool": "r-rapidglm",
-   "seconds": 0.111,
+   "seconds": 0.108,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.5803971308341119e-12
@@ -5283,7 +5283,7 @@
    "n": 100000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.022421618,
+   "seconds": 0.023052827,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.5803971308341119e-12
@@ -5294,7 +5294,7 @@
    "n": 100000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.022706911,
+   "seconds": 0.022432458,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.5803971308341119e-12
@@ -5305,7 +5305,7 @@
    "n": 100000,
    "p": 5,
    "tool": "sklearn-tight",
-   "seconds": 0.027009007520973682,
+   "seconds": 0.02699076011776924,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.5887279651166926e-12
@@ -5316,7 +5316,7 @@
    "n": 100000,
    "p": 5,
    "tool": "sklearn",
-   "seconds": 0.01856851950287819,
+   "seconds": 0.018168577924370766,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.00014434936006691042
@@ -5327,7 +5327,7 @@
    "n": 100000,
    "p": 5,
    "tool": "speedglm",
-   "seconds": 0.0629999999999999,
+   "seconds": 0.0700000000000001,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 5.2257051408915167e-14
@@ -5338,7 +5338,7 @@
    "n": 100000,
    "p": 5,
    "tool": "statsmodels",
-   "seconds": 0.09570594783872366,
+   "seconds": 0.09672651533037424,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.5934613936863408e-12
@@ -5349,7 +5349,7 @@
    "n": 100000,
    "p": 50,
    "tool": "fastglm",
-   "seconds": 0.845,
+   "seconds": 0.901,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.297897404701255e-14
@@ -5360,7 +5360,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glm.fit",
-   "seconds": 1.228,
+   "seconds": 1.26,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5371,7 +5371,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glm",
-   "seconds": 1.305,
+   "seconds": 1.356,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5382,7 +5382,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glum-tight",
-   "seconds": 0.42009226232767105,
+   "seconds": 0.4413416599854827,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.794998167639435e-12
@@ -5393,7 +5393,7 @@
    "n": 100000,
    "p": 50,
    "tool": "glum",
-   "seconds": 0.37728717364370823,
+   "seconds": 0.3889428023248911,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.733910088587755e-10
@@ -5404,7 +5404,7 @@
    "n": 100000,
    "p": 50,
    "tool": "py-rapidglm",
-   "seconds": 0.4050790695473552,
+   "seconds": 0.41870763525366783,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.7935251131349917e-12
@@ -5415,7 +5415,7 @@
    "n": 100000,
    "p": 50,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.68,
+   "seconds": 0.708,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.7937706222190657e-12
@@ -5426,7 +5426,7 @@
    "n": 100000,
    "p": 50,
    "tool": "r-rapidglm",
-   "seconds": 0.805,
+   "seconds": 0.823,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.7937706222190657e-12
@@ -5437,7 +5437,7 @@
    "n": 100000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 0.211111685,
+   "seconds": 0.21343997,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.7935251131349917e-12
@@ -5448,7 +5448,7 @@
    "n": 100000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 0.206859676,
+   "seconds": 0.216022965,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.7935251131349917e-12
@@ -5459,7 +5459,7 @@
    "n": 100000,
    "p": 50,
    "tool": "sklearn-tight",
-   "seconds": 0.3378256456926465,
+   "seconds": 0.3436740767210722,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.795120922181472e-12
@@ -5470,7 +5470,7 @@
    "n": 100000,
    "p": 50,
    "tool": "sklearn",
-   "seconds": 0.2270282292738557,
+   "seconds": 0.23257068451493979,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.282140727066236e-05
@@ -5481,7 +5481,7 @@
    "n": 100000,
    "p": 50,
    "tool": "speedglm",
-   "seconds": 0.871,
+   "seconds": 0.896,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.3932279506670146e-14
@@ -5492,7 +5492,7 @@
    "n": 100000,
    "p": 50,
    "tool": "statsmodels",
-   "seconds": 1.4873706363141537,
+   "seconds": 1.6156542962417006,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.79438439492925e-12
@@ -5503,8 +5503,8 @@
    "n": 1000000,
    "p": 20,
    "tool": "fastglm",
-   "seconds": 3.561,
-   "repeats": 5,
+   "seconds": 3.704,
+   "repeats": 4,
    "error": null,
    "max_rel_diff_vs_R": 9.775105707041215e-14
   },
@@ -5514,7 +5514,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glm.fit",
-   "seconds": 4.511,
+   "seconds": 4.619,
    "repeats": 4,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5525,7 +5525,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glm",
-   "seconds": 5.165,
+   "seconds": 5.368,
    "repeats": 3,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5536,7 +5536,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glum-tight",
-   "seconds": 6.545303015038371,
+   "seconds": 6.6768856113776565,
    "repeats": 3,
    "error": null,
    "max_rel_diff_vs_R": 1.30915835306769e-10
@@ -5547,7 +5547,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "glum",
-   "seconds": 1.193827936425805,
+   "seconds": 1.2232109289616346,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.6009472246349286e-05
@@ -5558,7 +5558,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "py-rapidglm",
-   "seconds": 1.6150856968015432,
+   "seconds": 1.656867885030806,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.079443173578162e-12
@@ -5569,7 +5569,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "r-rapidglm.fit",
-   "seconds": 2.271,
+   "seconds": 2.285,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.080372392952835e-12
@@ -5580,7 +5580,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "r-rapidglm",
-   "seconds": 3.12,
+   "seconds": 3.078,
    "repeats": 5,
    "error": null,
    "max_rel_diff_vs_R": 1.080372392952835e-12
@@ -5591,7 +5591,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "rapidglm-singular",
-   "seconds": 0.781569304,
+   "seconds": 0.799975628,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.079443173578162e-12
@@ -5602,7 +5602,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "rapidglm",
-   "seconds": 0.787233757,
+   "seconds": 0.779162598,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.079443173578162e-12
@@ -5613,7 +5613,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "sklearn-tight",
-   "seconds": 1.0021667871624231,
+   "seconds": 1.029864938929677,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.7956619609641403e-10
@@ -5624,7 +5624,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "sklearn",
-   "seconds": 0.8110216939821839,
+   "seconds": 0.823603255674243,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.6009472245487518e-05
@@ -5635,7 +5635,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "speedglm",
-   "seconds": 2.812,
+   "seconds": 2.845,
    "repeats": 6,
    "error": null,
    "max_rel_diff_vs_R": 1.7355117363256263e-13
@@ -5646,7 +5646,7 @@
    "n": 1000000,
    "p": 20,
    "tool": "statsmodels",
-   "seconds": 6.146548829041421,
+   "seconds": 6.382500139996409,
    "repeats": 3,
    "error": null,
    "max_rel_diff_vs_R": 1.0799077832654984e-12
@@ -5657,7 +5657,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "fastglm",
-   "seconds": 0.732,
+   "seconds": 0.788,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.213950698468195e-14
@@ -5668,7 +5668,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glm.fit",
-   "seconds": 1.245,
+   "seconds": 1.313,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5679,7 +5679,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glm",
-   "seconds": 1.754,
+   "seconds": 1.821,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5690,7 +5690,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glum-tight",
-   "seconds": 37.56272551510483,
+   "seconds": 39.20307082589716,
    "repeats": 1,
    "error": null,
    "max_rel_diff_vs_R": 1.298412351017488e-10
@@ -5701,7 +5701,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "glum",
-   "seconds": 0.4583793068304658,
+   "seconds": 0.47189597971737385,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.4732878578924885e-07
@@ -5712,7 +5712,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "py-rapidglm",
-   "seconds": 0.5109082330018282,
+   "seconds": 0.5229032933712006,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.107583260545584e-13
@@ -5723,7 +5723,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "r-rapidglm.fit",
-   "seconds": 0.644,
+   "seconds": 0.66,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.107583260545584e-13
@@ -5734,7 +5734,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "r-rapidglm",
-   "seconds": 1.25,
+   "seconds": 1.29,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.107583260545584e-13
@@ -5745,7 +5745,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "rapidglm-singular",
-   "seconds": 0.287498989,
+   "seconds": 0.294155505,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.107583260545584e-13
@@ -5756,7 +5756,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "rapidglm",
-   "seconds": 0.287120463,
+   "seconds": 0.289576192,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.107583260545584e-13
@@ -5767,7 +5767,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "sklearn-tight",
-   "seconds": 0.42367212660610676,
+   "seconds": 0.43554134480655193,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.344928398114457e-13
@@ -5778,7 +5778,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "sklearn",
-   "seconds": 0.3438223162665963,
+   "seconds": 0.3514740578830242,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 4.4732878563450095e-07
@@ -5789,7 +5789,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "speedglm",
-   "seconds": 0.84,
+   "seconds": 0.869,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 3.287451284339043e-14
@@ -5800,7 +5800,7 @@
    "n": 1000000,
    "p": 5,
    "tool": "statsmodels",
-   "seconds": 1.3935256144031882,
+   "seconds": 1.448882502503693,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 6.138541321967611e-13
@@ -5811,7 +5811,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "fastglm",
-   "seconds": 15.792,
+   "seconds": 16.655,
    "repeats": 1,
    "error": null,
    "max_rel_diff_vs_R": 8.907548318377874e-14
@@ -5822,7 +5822,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glm.fit",
-   "seconds": 16.619,
+   "seconds": 17.296,
    "repeats": 1,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5833,7 +5833,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glm",
-   "seconds": 17.798,
+   "seconds": 18.516,
    "repeats": 1,
    "error": null,
    "max_rel_diff_vs_R": 0.0
@@ -5844,7 +5844,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glum-tight",
-   "seconds": 16.032794624567032,
+   "seconds": 16.458542848937213,
    "repeats": 1,
    "error": null,
    "max_rel_diff_vs_R": 2.6624172327017828e-11
@@ -5855,7 +5855,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "glum",
-   "seconds": 3.5893845595419407,
+   "seconds": 3.6827827906236053,
    "repeats": 5,
    "error": null,
    "max_rel_diff_vs_R": 2.0705934060851474e-05
@@ -5866,7 +5866,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "py-rapidglm",
-   "seconds": 5.665418433956802,
+   "seconds": 5.800813051871955,
    "repeats": 3,
    "error": null,
    "max_rel_diff_vs_R": 1.037677091504417e-12
@@ -5877,7 +5877,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "r-rapidglm.fit",
-   "seconds": 7.992,
+   "seconds": 8.164,
    "repeats": 2,
    "error": null,
    "max_rel_diff_vs_R": 1.0370786618092009e-12
@@ -5888,7 +5888,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "r-rapidglm",
-   "seconds": 9.369,
+   "seconds": 9.643,
    "repeats": 2,
    "error": null,
    "max_rel_diff_vs_R": 1.0370786618092009e-12
@@ -5899,7 +5899,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "rapidglm-singular",
-   "seconds": 2.215676838,
+   "seconds": 2.235797668,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.037677091504417e-12
@@ -5910,7 +5910,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "rapidglm",
-   "seconds": 2.225552787,
+   "seconds": 2.238085364,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 1.037677091504417e-12
@@ -5921,8 +5921,8 @@
    "n": 1000000,
    "p": 50,
    "tool": "sklearn-tight",
-   "seconds": 2.968373200856149,
-   "repeats": 6,
+   "seconds": 3.021591958589852,
+   "repeats": 5,
    "error": null,
    "max_rel_diff_vs_R": 8.471123642857382e-11
   },
@@ -5932,7 +5932,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "sklearn",
-   "seconds": 2.3928610095754266,
+   "seconds": 2.4473089585080743,
    "repeats": 7,
    "error": null,
    "max_rel_diff_vs_R": 2.07059340611674e-05
@@ -5943,7 +5943,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "speedglm",
-   "seconds": 10.171,
+   "seconds": 10.469,
    "repeats": 2,
    "error": null,
    "max_rel_diff_vs_R": 1.618489663166435e-13
@@ -5954,7 +5954,7 @@
    "n": 1000000,
    "p": 50,
    "tool": "statsmodels",
-   "seconds": 28.736286737956107,
+   "seconds": 28.175757973454893,
    "repeats": 1,
    "error": null,
    "max_rel_diff_vs_R": 1.0386744743297767e-12
@@ -6015,8 +6015,8 @@
    {
     "tool": "rapidglm fit_batch",
     "family": "poisson",
-    "load": 7.61328125,
-    "seconds": 1.07414,
+    "load": 10.96923828125,
+    "seconds": 1.06323,
     "threads": 1,
     "failed": 0,
     "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
@@ -6024,8 +6024,8 @@
    {
     "tool": "rapidglm fit_batch",
     "family": "poisson",
-    "load": 7.24365234375,
-    "seconds": 0.291624,
+    "load": 10.1708984375,
+    "seconds": 0.293926,
     "threads": 4,
     "failed": 0,
     "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
@@ -6033,8 +6033,8 @@
    {
     "tool": "rapidglm fit_batch",
     "family": "poisson",
-    "load": 7.24365234375,
-    "seconds": 0.0779502,
+    "load": 10.1708984375,
+    "seconds": 0.077493,
     "threads": 16,
     "failed": 0,
     "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
@@ -6043,24 +6043,24 @@
     "tool": "R glm.fit",
     "family": "poisson",
     "threads": 1,
-    "load": 6.43701171875,
-    "seconds": 5.614,
+    "load": 9.58349609375,
+    "seconds": 5.678,
     "max_rel_coef_diff_vs_R": 0.0
    },
    {
     "tool": "R rapidglm::glm_fit",
     "family": "poisson",
     "threads": 1,
-    "load": 6.482421875,
-    "seconds": 3.091,
+    "load": 9.13623046875,
+    "seconds": 2.935,
     "max_rel_coef_diff_vs_R": 1.8416019677704892e-06
    },
    {
     "tool": "Python statsmodels",
     "family": "poisson",
     "threads": 1,
-    "load": 6.283203125,
-    "seconds": 5.003965080715716,
+    "load": 8.564453125,
+    "seconds": 4.960306087508798,
     "responses_timed": 1000,
     "max_rel_coef_diff_vs_R": 1.841601901742036e-06
    },
@@ -6068,16 +6068,16 @@
     "tool": "Python rapidglm.fit",
     "family": "poisson",
     "threads": 1,
-    "load": 6.283203125,
-    "seconds": 1.1460622185841203,
+    "load": 8.564453125,
+    "seconds": 1.1395347015932202,
     "responses_timed": 1000,
     "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
    },
    {
     "tool": "rapidglm fit_batch",
     "family": "nb",
-    "load": 6.02001953125,
-    "seconds": 3.02176,
+    "load": 8.03857421875,
+    "seconds": 3.00623,
     "threads": 1,
     "failed": 0,
     "max_rel_coef_diff_vs_R": 0.0009165957712542424
@@ -6085,8 +6085,8 @@
    {
     "tool": "rapidglm fit_batch",
     "family": "nb",
-    "load": 5.85791015625,
-    "seconds": 0.789532,
+    "load": 7.5546875,
+    "seconds": 0.789038,
     "threads": 4,
     "failed": 0,
     "max_rel_coef_diff_vs_R": 0.0009165957712542424
@@ -6094,8 +6094,8 @@
    {
     "tool": "rapidglm fit_batch",
     "family": "nb",
-    "load": 7.07080078125,
-    "seconds": 0.210259,
+    "load": 7.27001953125,
+    "seconds": 0.206365,
     "threads": 16,
     "failed": 0,
     "max_rel_coef_diff_vs_R": 0.0009165957712542424
@@ -6104,24 +6104,24 @@
     "tool": "R glm.nb",
     "family": "nb",
     "threads": 1,
-    "load": 3.5224609375,
-    "seconds": 143.372,
+    "load": 7.087890625,
+    "seconds": 143.824,
     "max_rel_coef_diff_vs_R": 0.0
    },
    {
     "tool": "R rapidglm::glm_nb",
     "family": "nb",
     "threads": 1,
-    "load": 3.3681640625,
-    "seconds": 10.51,
+    "load": 7.46240234375,
+    "seconds": 10.284,
     "max_rel_coef_diff_vs_R": 0.0009165957712558615
    },
    {
     "tool": "R glmGamPoi::glm_gp",
     "family": "nb",
     "threads": 1,
-    "load": 2.701171875,
-    "seconds": 5.858,
+    "load": 7.24169921875,
+    "seconds": 5.958,
     "glmgampoi_version": "1.25.1",
     "max_rel_coef_diff_vs_R": 0.029732091914182555
    },
@@ -6129,8 +6129,8 @@
     "tool": "Python statsmodels",
     "family": "nb",
     "threads": 1,
-    "load": 2.7255859375,
-    "seconds": 23.16005623433739,
+    "load": 6.90185546875,
+    "seconds": 23.41189293190837,
     "responses_timed": 200,
     "max_rel_coef_diff_vs_R": 0.009014687429888963
    },
@@ -6138,8 +6138,8 @@
     "tool": "Python rapidglm.fit",
     "family": "nb",
     "threads": 1,
-    "load": 2.908203125,
-    "seconds": 3.154544479213655,
+    "load": 7.23046875,
+    "seconds": 3.122889194637537,
     "responses_timed": 1000,
     "max_rel_coef_diff_vs_R": 0.0009165957712542424
    }
@@ -6147,11 +6147,11 @@
  },
  "environment": {
   "load_average": [
-   6.076171875,
-   8.19775390625,
-   13.34814453125
+   8.740234375,
+   12.11083984375,
+   17.28515625
   ],
   "host_threads": 28,
-  "note": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-06 and 2026-10-07. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired. The load average before each timing is in the speed log."
+  "note": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-09 and 2026-10-10. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired. The load average before each timing is in the speed log."
  }
 }

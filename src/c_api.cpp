@@ -2,6 +2,7 @@
 #include <rapidglm/rapidglm.hpp>
 #include <rapidglm/rapidglm_c.h>
 
+#include <array>
 #include <cstring>
 #include <deque>
 #include <memory>
@@ -145,6 +146,146 @@ void budgets(ResampleOptions &r, const std::size_t *values, std::size_t n) {
 std::string text_or_empty(const char *const *values, std::size_t i) {
     require(values != nullptr && values[i] != nullptr, "missing text value");
     return values[i];
+}
+StreamKeys stream_keys(int k) {
+    require(k == RAPIDGLM_STREAMS_IDENTITY || k == RAPIDGLM_STREAMS_POSITION,
+            "unknown stream_keys");
+    return k == RAPIDGLM_STREAMS_POSITION ? StreamKeys::position : StreamKeys::identity;
+}
+AdjustmentFamily adjustment_family(int f) {
+    require(f == RAPIDGLM_FAMILY_TESTED || f == RAPIDGLM_FAMILY_LISTED,
+            "unknown adjustment family");
+    return f == RAPIDGLM_FAMILY_LISTED ? AdjustmentFamily::listed : AdjustmentFamily::tested;
+}
+// The inputs of the perturbation workflow shared by rapidglm_sceptre and
+// rapidglm_sceptre_grid.
+std::vector<Guide> sceptre_guides(std::size_t n, const char *const *ids, const char *const *targets,
+                                  const int *non_targeting) {
+    std::vector<Guide> guides(n);
+    for (std::size_t j = 0; j < n; ++j)
+        guides[j] = {text_or_empty(ids, j), text_or_empty(targets, j),
+                     non_targeting && non_targeting[j] != 0};
+    return guides;
+}
+std::vector<Pair> sceptre_pairs(std::size_t n, const std::size_t *responses,
+                                const char *const *targets, const int *kinds) {
+    require(n == 0 || (responses && kinds), "pair arrays required");
+    std::vector<Pair> pairs(n);
+    for (std::size_t k = 0; k < n; ++k) {
+        require(kinds[k] >= RAPIDGLM_PAIR_DISCOVERY && kinds[k] <= RAPIDGLM_PAIR_POSITIVE,
+                "unknown pair kind");
+        pairs[k] = {responses[k], text_or_empty(targets, k),
+                    kinds[k] == RAPIDGLM_PAIR_NEGATIVE   ? PairKind::negative_control
+                    : kinds[k] == RAPIDGLM_PAIR_POSITIVE ? PairKind::positive_control
+                                                         : PairKind::discovery};
+    }
+    return pairs;
+}
+SceptreOptions sceptre_options(const rapidglm_sceptre_options &c, std::size_t cells,
+                               std::size_t responses) {
+    SceptreOptions o;
+    o.model = fit_options(c.model, cells);
+    require(c.null_model == RAPIDGLM_NULL_SCEPTRE || c.null_model == RAPIDGLM_NULL_DIRECT,
+            "unknown null model");
+    o.null_model =
+        c.null_model == RAPIDGLM_NULL_SCEPTRE ? FitMethod::sceptre_null : FitMethod::direct;
+    o.high_moi = c.high_moi != 0;
+    o.nt_controls = c.nt_controls != 0;
+    o.crt = c.crt != 0;
+    require(c.integration >= RAPIDGLM_INTEGRATION_UNION &&
+                c.integration <= RAPIDGLM_INTEGRATION_BONFERRONI,
+            "unknown integration");
+    o.integration = c.integration == RAPIDGLM_INTEGRATION_SINGLETON    ? Integration::singleton
+                    : c.integration == RAPIDGLM_INTEGRATION_BONFERRONI ? Integration::bonferroni
+                                                                       : Integration::union_guides;
+    o.resampling.side = side(c.side);
+    o.resampling.approximate = c.approximate != 0;
+    o.resampling.fit_check = fit_check(c.fit_check);
+    o.resampling.confirm = c.confirm_draws;
+    budgets(o.resampling, c.budgets, c.n_budgets);
+    o.resampling.screen = c.screen;
+    o.resampling.seed = c.seed;
+    o.effect_fits = effect_fits(c.effect_fits);
+    o.cell_qc = c.cell_qc != 0;
+    o.assignment_qc = c.assignment_qc != 0;
+    o.min_nonzero = c.min_nonzero;
+    o.alpha = c.alpha;
+    o.lower_quantile = c.lower_quantile;
+    o.upper_quantile = c.upper_quantile;
+    o.max_mito = c.max_mito;
+    o.threads = c.threads;
+    o.bonferroni_adjustment = c.bonferroni != 0;
+    o.crt_draw = crt_draw(c.crt_draw);
+    o.stream_keys = stream_keys(c.stream_keys);
+    if (c.response_ids)
+        for (std::size_t j = 0; j < responses; ++j)
+            o.response_ids.push_back(text_or_empty(c.response_ids, j));
+    o.family = adjustment_family(c.family);
+    std::copy(c.family_size, c.family_size + 3, o.family_size.begin());
+    return o;
+}
+CellQC sceptre_qc(const rapidglm_sceptre_options &c, std::size_t cells) {
+    CellQC qc;
+    qc.total_counts = optional_vector(c.qc_total, cells);
+    qc.detected_features = optional_vector(c.qc_detected, cells);
+    qc.mitochondrial_fraction = optional_vector(c.qc_mito, cells);
+    return qc;
+}
+std::unique_ptr<rapidglm_table> sceptre_table(const SceptreResult &r) {
+    auto t = std::make_unique<rapidglm_table>();
+    t->rows = r.tests.size();
+    auto &response = t->numeric("response");
+    auto &target = t->text("target");
+    auto &guide = t->text("guide");
+    auto &kind = t->numeric("kind");
+    auto &status = t->text("status");
+    auto &cells = t->numeric("cells");
+    auto &nt = t->numeric("nonzero_treatment");
+    auto &nc = t->numeric("nonzero_control");
+    auto &draws = t->numeric("draws");
+    auto &approximation = t->numeric("approximation");
+    auto &statistic = t->numeric("statistic");
+    auto &p = t->numeric("p_value");
+    auto &q = t->numeric("adjusted_p");
+    auto &lfc = t->numeric("log2fc");
+    auto &lfc_se = t->numeric("log2fc_se");
+    auto &ratio = t->numeric("sceptre_mean_ratio");
+    auto &ratio_log2 = t->numeric("mean_ratio_log2");
+    for (std::size_t i = 0; i < r.tests.size(); ++i) {
+        const auto &e = r.tests[i];
+        response[i] = static_cast<double>(e.response);
+        target[i] = e.target;
+        guide[i] = e.guide;
+        kind[i] = static_cast<int>(e.kind);
+        status[i] = e.status;
+        cells[i] = static_cast<double>(e.cells);
+        nt[i] = static_cast<double>(e.nonzero_treatment);
+        nc[i] = static_cast<double>(e.nonzero_control);
+        draws[i] = static_cast<double>(e.draws);
+        approximation[i] = e.approximation;
+        statistic[i] = e.statistic;
+        p[i] = e.p_value;
+        q[i] = e.adjusted_p;
+        lfc[i] = e.log2fc;
+        lfc_se[i] = e.log2fc_se;
+        ratio[i] = e.sceptre_mean_ratio;
+        ratio_log2[i] = e.mean_ratio_log2;
+    }
+    t->scalars = {{"retained_cells", static_cast<double>(r.retained_cells)},
+                  {"calibration_rejections", static_cast<double>(r.calibration_rejections)},
+                  {"power_rejections", static_cast<double>(r.power_rejections)},
+                  {"discovery_rejections", static_cast<double>(r.discovery_rejections)},
+                  {"null_fits", static_cast<double>(r.null_fits)}};
+    // By kind, in the order of RAPIDGLM_PAIR_*.
+    const auto by_kind = [&](const char *name, const std::array<std::size_t, 3> &counts) {
+        const char *const kinds[] = {"discovery", "negative", "positive"};
+        for (std::size_t k = 0; k < 3; ++k)
+            t->scalars.emplace_back(std::string(name) + kinds[k], static_cast<double>(counts[k]));
+    };
+    by_kind("pairs_listed_", r.pairs_listed);
+    by_kind("pairs_passing_qc_", r.pairs_passing_qc);
+    by_kind("family_size_", r.family_size);
+    return t;
 }
 } // namespace
 
@@ -468,6 +609,8 @@ void rapidglm_sceptre_options_init(rapidglm_sceptre_options *o, int high_moi) {
     o->max_mito = d.max_mito;
     o->seed = 1;
     o->threads = 1;
+    o->stream_keys = RAPIDGLM_STREAMS_IDENTITY;
+    o->family = RAPIDGLM_FAMILY_TESTED;
 }
 
 int rapidglm_sceptre(const rapidglm_dense *design, const rapidglm_sparse *responses,
@@ -483,103 +626,64 @@ int rapidglm_sceptre(const rapidglm_dense *design, const rapidglm_sparse *respon
         const auto x = dense(design);
         const auto y = sparse(responses);
         const auto a = sparse(assignments);
-        std::vector<Guide> guides(n_guides);
-        for (std::size_t j = 0; j < n_guides; ++j)
-            guides[j] = {text_or_empty(guide_ids, j), text_or_empty(guide_targets, j),
-                         guide_non_targeting && guide_non_targeting[j] != 0};
-        require(n_pairs == 0 || (pair_responses && pair_kinds), "pair arrays required");
-        std::vector<Pair> pairs(n_pairs);
-        for (std::size_t k = 0; k < n_pairs; ++k) {
-            require(pair_kinds[k] >= RAPIDGLM_PAIR_DISCOVERY &&
-                        pair_kinds[k] <= RAPIDGLM_PAIR_POSITIVE,
-                    "unknown pair kind");
-            pairs[k] = {pair_responses[k], text_or_empty(pair_targets, k),
-                        pair_kinds[k] == RAPIDGLM_PAIR_NEGATIVE   ? PairKind::negative_control
-                        : pair_kinds[k] == RAPIDGLM_PAIR_POSITIVE ? PairKind::positive_control
-                                                                  : PairKind::discovery};
+        const auto guides = sceptre_guides(n_guides, guide_ids, guide_targets, guide_non_targeting);
+        const auto pairs = sceptre_pairs(n_pairs, pair_responses, pair_targets, pair_kinds);
+        const auto o = sceptre_options(c, x.rows, y.cols);
+        const auto r = sceptre(x, y, a, guides, pairs, sceptre_qc(c, x.rows), o);
+        *result = sceptre_table(r).release();
+    });
+}
+
+int rapidglm_sceptre_grid(const rapidglm_dense *design, const rapidglm_sparse *responses,
+                          const rapidglm_sparse *assignments, size_t n_guides,
+                          const char *const *guide_ids, const char *const *guide_targets,
+                          const int *guide_non_targeting, size_t n_discovery,
+                          const char *const *discovery_targets, size_t n_negative,
+                          const char *const *negative_targets, size_t n_grid_responses,
+                          const size_t *grid_responses, size_t n_pairs,
+                          const size_t *pair_responses, const char *const *pair_targets,
+                          const int *pair_kinds, const rapidglm_sceptre_options *options,
+                          rapidglm_table **result, rapidglm_table **tally) {
+    return guarded([&] {
+        require(result != nullptr, "result pointer required");
+        require(options != nullptr, "options required");
+        const auto c = effective(options, rapidglm_sceptre_options_init, options->high_moi);
+        const auto x = dense(design);
+        const auto y = sparse(responses);
+        const auto a = sparse(assignments);
+        const auto guides = sceptre_guides(n_guides, guide_ids, guide_targets, guide_non_targeting);
+        SceptreGrid grid;
+        for (std::size_t k = 0; k < n_discovery; ++k)
+            grid.discovery_targets.push_back(text_or_empty(discovery_targets, k));
+        for (std::size_t k = 0; k < n_negative; ++k)
+            grid.negative_targets.push_back(text_or_empty(negative_targets, k));
+        require(n_grid_responses == 0 || grid_responses, "grid responses required");
+        if (n_grid_responses)
+            grid.responses.assign(grid_responses, grid_responses + n_grid_responses);
+        grid.pairs = sceptre_pairs(n_pairs, pair_responses, pair_targets, pair_kinds);
+        const auto o = sceptre_options(c, x.rows, y.cols);
+        const auto r = sceptre_grid(x, y, a, guides, grid, sceptre_qc(c, x.rows), o);
+        auto t = sceptre_table(r.result);
+        if (tally) {
+            auto counts = std::make_unique<rapidglm_table>();
+            counts->rows = r.tally.size();
+            auto &target = counts->text("target");
+            auto &kind = counts->numeric("kind");
+            auto &requested = counts->numeric("requested");
+            auto &passing = counts->numeric("passing");
+            auto &few_treatment = counts->numeric("few_treatment");
+            auto &few_control = counts->numeric("few_control");
+            for (std::size_t i = 0; i < r.tally.size(); ++i) {
+                const auto &e = r.tally[i];
+                target[i] = e.target;
+                kind[i] = static_cast<int>(e.kind);
+                requested[i] = static_cast<double>(e.requested);
+                passing[i] = static_cast<double>(e.passing);
+                few_treatment[i] = static_cast<double>(e.few_treatment);
+                few_control[i] = static_cast<double>(e.few_control);
+            }
+            *tally = counts.release();
         }
-        SceptreOptions o;
-        o.model = fit_options(c.model, x.rows);
-        require(c.null_model == RAPIDGLM_NULL_SCEPTRE || c.null_model == RAPIDGLM_NULL_DIRECT,
-                "unknown null model");
-        o.null_model =
-            c.null_model == RAPIDGLM_NULL_SCEPTRE ? FitMethod::sceptre_null : FitMethod::direct;
-        o.high_moi = c.high_moi != 0;
-        o.nt_controls = c.nt_controls != 0;
-        o.crt = c.crt != 0;
-        require(c.integration >= RAPIDGLM_INTEGRATION_UNION &&
-                    c.integration <= RAPIDGLM_INTEGRATION_BONFERRONI,
-                "unknown integration");
-        o.integration = c.integration == RAPIDGLM_INTEGRATION_SINGLETON ? Integration::singleton
-                        : c.integration == RAPIDGLM_INTEGRATION_BONFERRONI
-                            ? Integration::bonferroni
-                            : Integration::union_guides;
-        o.resampling.side = side(c.side);
-        o.resampling.approximate = c.approximate != 0;
-        o.resampling.fit_check = fit_check(c.fit_check);
-        o.resampling.confirm = c.confirm_draws;
-        budgets(o.resampling, c.budgets, c.n_budgets);
-        o.resampling.screen = c.screen;
-        o.resampling.seed = c.seed;
-        o.effect_fits = effect_fits(c.effect_fits);
-        o.cell_qc = c.cell_qc != 0;
-        o.assignment_qc = c.assignment_qc != 0;
-        o.min_nonzero = c.min_nonzero;
-        o.alpha = c.alpha;
-        o.lower_quantile = c.lower_quantile;
-        o.upper_quantile = c.upper_quantile;
-        o.max_mito = c.max_mito;
-        o.threads = c.threads;
-        o.bonferroni_adjustment = c.bonferroni != 0;
-        o.crt_draw = crt_draw(c.crt_draw);
-        CellQC qc;
-        qc.total_counts = optional_vector(c.qc_total, x.rows);
-        qc.detected_features = optional_vector(c.qc_detected, x.rows);
-        qc.mitochondrial_fraction = optional_vector(c.qc_mito, x.rows);
-        const auto r = sceptre(x, y, a, guides, pairs, qc, o);
-        auto t = std::make_unique<rapidglm_table>();
-        t->rows = r.tests.size();
-        auto &response = t->numeric("response");
-        auto &target = t->text("target");
-        auto &guide = t->text("guide");
-        auto &kind = t->numeric("kind");
-        auto &status = t->text("status");
-        auto &cells = t->numeric("cells");
-        auto &nt = t->numeric("nonzero_treatment");
-        auto &nc = t->numeric("nonzero_control");
-        auto &draws = t->numeric("draws");
-        auto &approximation = t->numeric("approximation");
-        auto &statistic = t->numeric("statistic");
-        auto &p = t->numeric("p_value");
-        auto &q = t->numeric("adjusted_p");
-        auto &lfc = t->numeric("log2fc");
-        auto &lfc_se = t->numeric("log2fc_se");
-        auto &ratio = t->numeric("sceptre_mean_ratio");
-        auto &ratio_log2 = t->numeric("mean_ratio_log2");
-        for (std::size_t i = 0; i < r.tests.size(); ++i) {
-            const auto &e = r.tests[i];
-            response[i] = static_cast<double>(e.response);
-            target[i] = e.target;
-            guide[i] = e.guide;
-            kind[i] = static_cast<int>(e.kind);
-            status[i] = e.status;
-            cells[i] = static_cast<double>(e.cells);
-            nt[i] = static_cast<double>(e.nonzero_treatment);
-            nc[i] = static_cast<double>(e.nonzero_control);
-            draws[i] = static_cast<double>(e.draws);
-            approximation[i] = e.approximation;
-            statistic[i] = e.statistic;
-            p[i] = e.p_value;
-            q[i] = e.adjusted_p;
-            lfc[i] = e.log2fc;
-            lfc_se[i] = e.log2fc_se;
-            ratio[i] = e.sceptre_mean_ratio;
-            ratio_log2[i] = e.mean_ratio_log2;
-        }
-        t->scalars = {{"retained_cells", static_cast<double>(r.retained_cells)},
-                      {"calibration_rejections", static_cast<double>(r.calibration_rejections)},
-                      {"power_rejections", static_cast<double>(r.power_rejections)},
-                      {"discovery_rejections", static_cast<double>(r.discovery_rejections)}};
         *result = t.release();
     });
 }
