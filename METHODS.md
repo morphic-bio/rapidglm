@@ -814,17 +814,21 @@ the specification the implementation follows (`validation/work/edger/EDGER_QL_SP
 8. **Fold changes.** From fits at φ/a of the counts plus 0.125 × library /
    mean library with offsets log(library + 0.25 × library / mean library).
 
-Fits at a fixed dispersion are by Fisher scoring, warm-started across passes:
-whole steps while the Newton decrement (about twice the deviance still to gain)
-shrinks, then steps halved until the deviance does not increase, until the
-decrement is below 1e-12; a fit that does not converge in 60 steps is refitted
-by `fit`. Leverages come from the Cholesky factor of X'WX, or from a
-Householder QR of W^(1/2)X when fitted means near zero make that factor
-ill-conditioned.
+Fits at a fixed dispersion are by Newton's method (observed information),
+warm-started across passes: whole steps while the Newton decrement (about twice
+the deviance still to gain) shrinks, then steps halved until the deviance does
+not increase, until the decrement is below 1e-14 × (100 + the gene's total
+count). After a whole step, convergence is confirmed without a new
+factorization when the decrement computed with the previous information, times
+exp of the largest change in a linear predictor (which bounds the change of
+every weight), is below that threshold; otherwise the next step computes the
+decrement. A fit that does not converge in 60 steps is refitted by `fit`.
+Leverages come from the Cholesky factor of X'WX, or from a Householder QR of
+W^(1/2)X when fitted means near zero make that factor ill-conditioned.
 
 **Agreement with edgeR 4.6.2** (`scripts/validate_edger.py`; eight datasets).
 The kept genes, TMM factors (to 5e-15), average log CPM (to 1e-11) and φ (to
-1e-8) agree. On airway, kang and three simulated sets the discoveries at FDR
+4e-5 relative, within the tolerance of the search) agree. On airway, kang and three simulated sets the discoveries at FDR
 0.1 are identical and p-values agree to within 0.007 in log10. On the GTEx
 thyroid sets, for 22, 7 and 9 genes edgeR's `glmFit` reports a deviance that is
 not the deviance of its own fitted values, or flags the fit as failed, for the

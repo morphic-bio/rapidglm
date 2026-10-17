@@ -104,13 +104,15 @@ inline double mad(const Vector &v) {
         d[i] = std::abs(v[i] - m);
     return 1.4826 * median(d);
 }
-// R's default (type 7) quantile.
+// R's default (type 7) quantile, from the two order statistics it needs (by
+// selection, not a sort).
 inline double quantile7(Vector v, double p) {
-    std::sort(v.begin(), v.end());
     const double h = p * (v.size() - 1);
     const auto lo = static_cast<std::size_t>(std::floor(h));
-    const auto hi = std::min(lo + 1, v.size() - 1);
-    return v[lo] + (h - lo) * (v[hi] - v[lo]);
+    const auto at = v.begin() + static_cast<std::ptrdiff_t>(lo);
+    std::nth_element(v.begin(), at, v.end());
+    const double low = *at, high = lo + 1 < v.size() ? *std::min_element(at + 1, v.end()) : low;
+    return low + (h - lo) * (high - low);
 }
 // Cleveland's (1979) LOWESS: local linear fits with tricube weights over the
 // nearest ceil(f n) points, then `iterations` robustness passes with bisquare

@@ -1,13 +1,14 @@
 # Changelog
 
-## 1.4.0 (development release 1.4.0-dev.1, 2026-10-17)
+## 1.4.0 (development releases 1.4.0-dev.1 and 1.4.0-dev.2, 2026-10-17)
 
 Bulk DE (`bulk-de`) now fits low counts as DESeq2 does, and two workflows are
 new: quasi-likelihood DE following edgeR 4 (`edger-ql`) and cis-QTL mapping
 (`qtl`, provisional). The perturbation workflow, single fits, batch fits and
-score scans are unchanged. The code of 1.4.0 is tagged `v1.4.0-dev.1` for
-testing; the benchmark receipts and README tables are those of 1.3.0 and follow
-in the release.
+score scans are unchanged. The code of 1.4.0 is tagged `v1.4.0-dev.2` for
+testing (`v1.4.0-dev.1` before the single-thread work on `edger-ql` and the
+MatrixMarket reader); the benchmark receipts and README tables are those of
+1.3.0 and follow in the release.
 
 **For a user of 1.3.0 who changes no option:** `bulk-de` results change for
 genes with a fitted count below 0.5 (low counts, groups of zeros, samples with
@@ -51,6 +52,23 @@ Agreement with DESeq2 improves: airway Jaccard 0.932 to 0.986, kang 0.973 to
   The cross products of the scores run in register tiles (with AVX2 fused
   multiply-adds where available), and Gaussian permutations are scored in
   batches against a basis computed once per gene.
+- **Faster `edger-ql` on one thread** (1.4.0-dev.2). The Newton fits form X'WX
+  as one weighted cross product of the design (its lower triangle, in register
+  tiles), compute linear predictors and their exponentials four at a time (an
+  AVX2 exponential within one unit in the last place of the C library's), and
+  after a whole step confirm convergence from the score and a bound from the
+  previous information, which saves a factorization per fit without changing the
+  fit. Leverages come from one triangular kernel, TMM selects its order
+  statistics instead of sorting, and the deviance-moment table is built once per
+  run. GTEx thyroid (647 samples, 28,764 genes), whole command on one efficiency
+  core: 52.4 s to 12.7 s (128 samples: 13.1 s to 3.3 s). Results agree with
+  1.4.0-dev.1 to rounding; the discoveries are the same on all eight validation
+  datasets.
+- **Faster MatrixMarket input for the CLI** (1.4.0-dev.2). A file in (feature,
+  observation) order is read straight into the matrix, other orders are grouped
+  by feature in linear time instead of sorted, and the SHA-1 input fingerprint
+  uses the SHA extensions where the processor has them. The thyroid counts (241
+  MB): 3.2 s to 0.7 s.
 
 ## 1.3.0 (2026-10-10)
 

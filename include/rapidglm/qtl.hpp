@@ -1,4 +1,5 @@
 #pragma once
+#include "kernels.hpp"
 #include "workflows.hpp"
 #include <boost/math/distributions/beta.hpp>
 #include <boost/math/distributions/chi_squared.hpp>
@@ -68,150 +69,6 @@ struct CisQtlResult {
     std::vector<CisQtlPair> nominal;
 };
 namespace detail {
-// c = A'G (p x m, row k at c + k m), u = G'r and v[q] = sum_i w_i G(i, q)^2 for A
-// (n x p) and G (n x m), both row-major. Each sum runs over the samples in
-// order from zero; tiles of four rows of c by eight variants are held in
-// registers through all samples, and the variants of a tile are adjacent in G.
-inline void qtl_cross_generic(const double *a, const double *w, const double *r, const double *g,
-                              std::size_t n, std::size_t p, std::size_t m, double *c, double *u,
-                              double *v) {
-    std::size_t q0 = 0;
-    for (; q0 + 8 <= m; q0 += 8) {
-        std::size_t k0 = 0;
-        for (; k0 + 4 <= p; k0 += 4) {
-            double acc[4][8] = {};
-            for (std::size_t i = 0; i < n; ++i) {
-                const double *gi = g + i * m + q0, *ai = a + i * p + k0;
-                for (int kk = 0; kk < 4; ++kk)
-                    for (int qq = 0; qq < 8; ++qq)
-                        acc[kk][qq] += ai[kk] * gi[qq];
-            }
-            for (int kk = 0; kk < 4; ++kk)
-                for (int qq = 0; qq < 8; ++qq)
-                    c[(k0 + kk) * m + q0 + qq] = acc[kk][qq];
-        }
-        for (; k0 < p; ++k0) {
-            double acc[8] = {};
-            for (std::size_t i = 0; i < n; ++i)
-                for (int qq = 0; qq < 8; ++qq)
-                    acc[qq] += a[i * p + k0] * g[i * m + q0 + qq];
-            for (int qq = 0; qq < 8; ++qq)
-                c[k0 * m + q0 + qq] = acc[qq];
-        }
-        double su[8] = {}, sv[8] = {};
-        for (std::size_t i = 0; i < n; ++i) {
-            const double *gi = g + i * m + q0;
-            for (int qq = 0; qq < 8; ++qq) {
-                su[qq] += r[i] * gi[qq];
-                sv[qq] += w[i] * gi[qq] * gi[qq];
-            }
-        }
-        for (int qq = 0; qq < 8; ++qq) {
-            u[q0 + qq] = su[qq];
-            v[q0 + qq] = sv[qq];
-        }
-    }
-    for (; q0 < m; ++q0) {
-        for (std::size_t k = 0; k < p; ++k) {
-            double sum = 0;
-            for (std::size_t i = 0; i < n; ++i)
-                sum += a[i * p + k] * g[i * m + q0];
-            c[k * m + q0] = sum;
-        }
-        double su = 0, sv = 0;
-        for (std::size_t i = 0; i < n; ++i) {
-            su += r[i] * g[i * m + q0];
-            sv += w[i] * g[i * m + q0] * g[i * m + q0];
-        }
-        u[q0] = su;
-        v[q0] = sv;
-    }
-}
-#ifdef RAPIDGLM_PHILOX_AVX2
-// The same with AVX2 fused multiply-adds (each term rounded once with its sum),
-// for whole tiles; the rest as in qtl_cross_generic.
-__attribute__((target("avx2,fma"))) inline void
-qtl_cross_avx2(const double *a, const double *w, const double *r, const double *g, std::size_t n,
-               std::size_t p, std::size_t m, double *c, double *u, double *v) {
-    const std::size_t tiled = m / 8 * 8;
-    for (std::size_t q0 = 0; q0 < tiled; q0 += 8) {
-        std::size_t k0 = 0;
-        for (; k0 + 4 <= p; k0 += 4) {
-            __m256d acc[4][2];
-            for (auto &row : acc)
-                row[0] = row[1] = _mm256_setzero_pd();
-            for (std::size_t i = 0; i < n; ++i) {
-                const double *gi = g + i * m + q0, *ai = a + i * p + k0;
-                const __m256d g0 = _mm256_loadu_pd(gi), g1 = _mm256_loadu_pd(gi + 4);
-                for (int kk = 0; kk < 4; ++kk) {
-                    const __m256d b = _mm256_broadcast_sd(ai + kk);
-                    acc[kk][0] = _mm256_fmadd_pd(b, g0, acc[kk][0]);
-                    acc[kk][1] = _mm256_fmadd_pd(b, g1, acc[kk][1]);
-                }
-            }
-            for (int kk = 0; kk < 4; ++kk) {
-                _mm256_storeu_pd(c + (k0 + kk) * m + q0, acc[kk][0]);
-                _mm256_storeu_pd(c + (k0 + kk) * m + q0 + 4, acc[kk][1]);
-            }
-        }
-        for (; k0 < p; ++k0) {
-            __m256d s0 = _mm256_setzero_pd(), s1 = _mm256_setzero_pd();
-            for (std::size_t i = 0; i < n; ++i) {
-                const double *gi = g + i * m + q0;
-                const __m256d b = _mm256_broadcast_sd(a + i * p + k0);
-                s0 = _mm256_fmadd_pd(b, _mm256_loadu_pd(gi), s0);
-                s1 = _mm256_fmadd_pd(b, _mm256_loadu_pd(gi + 4), s1);
-            }
-            _mm256_storeu_pd(c + k0 * m + q0, s0);
-            _mm256_storeu_pd(c + k0 * m + q0 + 4, s1);
-        }
-        __m256d u0 = _mm256_setzero_pd(), u1 = _mm256_setzero_pd(), v0 = _mm256_setzero_pd(),
-                v1 = _mm256_setzero_pd();
-        for (std::size_t i = 0; i < n; ++i) {
-            const double *gi = g + i * m + q0;
-            const __m256d g0 = _mm256_loadu_pd(gi), g1 = _mm256_loadu_pd(gi + 4);
-            const __m256d ri = _mm256_broadcast_sd(r + i), wi = _mm256_broadcast_sd(w + i);
-            u0 = _mm256_fmadd_pd(ri, g0, u0);
-            u1 = _mm256_fmadd_pd(ri, g1, u1);
-            v0 = _mm256_fmadd_pd(_mm256_mul_pd(wi, g0), g0, v0);
-            v1 = _mm256_fmadd_pd(_mm256_mul_pd(wi, g1), g1, v1);
-        }
-        _mm256_storeu_pd(u + q0, u0);
-        _mm256_storeu_pd(u + q0 + 4, u1);
-        _mm256_storeu_pd(v + q0, v0);
-        _mm256_storeu_pd(v + q0 + 4, v1);
-    }
-    if (tiled < m) {
-        // The last variants: their columns of G as a block of their own.
-        const std::size_t rest = m - tiled;
-        std::vector<double> block(n * rest), cr(p * rest), ur(rest), vr(rest);
-        for (std::size_t i = 0; i < n; ++i)
-            for (std::size_t q = 0; q < rest; ++q)
-                block[i * rest + q] = g[i * m + tiled + q];
-        qtl_cross_generic(a, w, r, block.data(), n, p, rest, cr.data(), ur.data(), vr.data());
-        for (std::size_t k = 0; k < p; ++k)
-            for (std::size_t q = 0; q < rest; ++q)
-                c[k * m + tiled + q] = cr[k * rest + q];
-        for (std::size_t q = 0; q < rest; ++q) {
-            u[tiled + q] = ur[q];
-            v[tiled + q] = vr[q];
-        }
-    }
-}
-inline bool fma_available() {
-    static const bool available = __builtin_cpu_supports("avx2") && __builtin_cpu_supports("fma");
-    return available;
-}
-#endif
-inline void qtl_cross(const double *a, const double *w, const double *r, const double *g,
-                      std::size_t n, std::size_t p, std::size_t m, double *c, double *u,
-                      double *v) {
-#ifdef RAPIDGLM_PHILOX_AVX2
-    if (fma_available())
-        return qtl_cross_avx2(a, w, r, g, n, p, m, c, u, v);
-#endif
-    qtl_cross_generic(a, w, r, g, n, p, m, c, u, v);
-}
 // What a gene's scores take from the null's working weights alone: the factor
 // of X'WX, s = L^-1 D^-1 X'WG (p x m, row k at s + k m) and the information
 // v - |s|^2 of each variant. With weights that do not change between fits (a
@@ -235,7 +92,7 @@ inline void qtl_residual_scores(const double *g, const double *r, std::size_t n,
 // With W the working weights, r the score residuals and L L' = X'WX:
 // u = g'r - (L^-1 X'Wg)'(L^-1 X'r), I = g'Wg - |L^-1 X'Wg|^2 and
 // z = u / sqrt(I scale): the per-variant arithmetic of ScoreWorkspace, with the
-// sums over samples taken for all variants at once (qtl_cross). `g` holds the
+// sums over samples taken for all variants at once (cross_products). `g` holds the
 // variants sample by sample (g[i m + q]). z (and, if asked, estimates and SEs)
 // for every variant; `basis` (may be null) holds the weight-only part: computed
 // when not ready, reused when it is.
@@ -255,14 +112,15 @@ inline void qtl_scores(const Matrix &x, const FitResult &null, const std::vector
         require(b.factor->ok, "singular null information");
         const auto &ch = *b.factor;
         const auto &l = ch.l;
-        // c = X'WG, u = G'r and v = G'WG (diagonal) by detail::qtl_cross.
+        // c = X'WG, u = G'r and v = G'WG (diagonal) by detail::cross_products.
         std::vector<double> v(m), a(n * p);
         b.s.assign(p * m, 0.0);
         auto &c = b.s;
         for (std::size_t i = 0; i < n; ++i)
             for (std::size_t k = 0; k < p; ++k)
                 a[i * p + k] = w[i] * x(i, k);
-        qtl_cross(a.data(), w.data(), r.data(), g.data(), n, p, m, c.data(), u.data(), v.data());
+        cross_products(a.data(), w.data(), r.data(), g.data(), n, p, m, c.data(), u.data(),
+                       v.data());
         // Forward substitution L s = D^-1 c, all variants at once (rows of c by covariate).
         for (std::size_t k = 0; k < p; ++k) {
             double *ck = &c[k * m];
@@ -578,7 +436,7 @@ inline CisQtlResult cis_qtl(const Matrix &design, const Responses &responses,
             // A Gaussian null refitted to a permuted response is its least-squares
             // residual, r = y - X b with X'X b = X'y, and scale |r|^2 / (n - p); the
             // permutations are scored in batches, G'R for a batch of residuals at
-            // once (detail::qtl_cross), with the basis of the observed fit.
+            // once (detail::cross_products), with the basis of the observed fit.
             const auto &factor = *basis.factor;
             const std::size_t p = design.cols, batch = 64, df = n - p;
             std::vector<double> residuals(n * batch), cross(batch * m), ignored_u(m), ignored_v(m),
@@ -611,8 +469,8 @@ inline CisQtlResult cis_qtl(const Matrix &design, const Responses &responses,
                         t[j * p + k] = value / factor.l(k, k);
                     }
                 }
-                detail::qtl_cross(residuals.data(), ones.data(), zero.data(), g.data(), n, count, m,
-                                  cross.data(), ignored_u.data(), ignored_v.data());
+                detail::cross_products(residuals.data(), ones.data(), zero.data(), g.data(), n,
+                                       count, m, cross.data(), ignored_u.data(), ignored_v.data());
                 for (std::size_t j = 0; j < count; ++j) {
                     double maximum = 0;
                     for (std::size_t q = 0; q < m; ++q) {

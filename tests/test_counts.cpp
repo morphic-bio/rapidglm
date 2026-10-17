@@ -3,6 +3,7 @@
 #include "../src/io.hpp"
 #include <boost/test/unit_test.hpp>
 #include <cstdio>
+#include <map>
 #include <rapidglm/rapidglm.hpp>
 
 using namespace rapidglm;
@@ -126,6 +127,77 @@ BOOST_AUTO_TEST_CASE(count_loader_equals_the_csc_reader) {
     const TemporaryFile marks(market(entries, features, cells, "pattern"));
     BOOST_TEST(same(io::read_market_counts(marks.path, 4),
                     CountMatrix::from(io::read_market(marks.path))));
+}
+
+BOOST_AUTO_TEST_CASE(market_reader_is_independent_of_entry_order) {
+    // The CSC matrix built directly: entries summed per (feature, cell), zeros dropped.
+    const std::size_t features = 40, cells = 300;
+    auto entries = table(features, cells);
+    for (std::size_t k = 0; k < 300; ++k) // repeated entries, to be summed
+        entries.push_back({entries[k * 13][0], entries[k * 13][1], k % 2 ? entries[k * 13][2] : 3});
+    std::map<std::pair<std::uint64_t, std::uint64_t>, double> sums;
+    for (const auto &e : entries)
+        sums[{e[0] - 1, e[1] - 1}] += static_cast<double>(e[2]);
+    SparseCSC expected{cells, features, {0}, {}, {}};
+    for (std::size_t f = 0; f < features; ++f) {
+        for (const auto &[key, value] : sums)
+            if (key.first == f && value != 0) {
+                expected.row_index.push_back(key.second);
+                expected.values.push_back(value);
+            }
+        expected.column_ptr.push_back(expected.values.size());
+    }
+    const auto check = [&](std::vector<std::array<std::uint64_t, 3>> order) {
+        const TemporaryFile file(market(order, features, cells));
+        const auto m = io::read_market(file.path);
+        BOOST_TEST(m.rows == cells);
+        BOOST_TEST(m.cols == features);
+        BOOST_TEST(m.column_ptr == expected.column_ptr);
+        BOOST_TEST(m.row_index == expected.row_index);
+        BOOST_TEST(m.values == expected.values);
+    };
+    // In feature order (read straight into the matrix), in cell order and shuffled.
+    auto by_feature = entries;
+    std::stable_sort(by_feature.begin(), by_feature.end(), [](const auto &a, const auto &b) {
+        return std::tie(a[0], a[1]) < std::tie(b[0], b[1]);
+    });
+    check(by_feature);
+    auto by_cell = entries;
+    std::stable_sort(by_cell.begin(), by_cell.end(), [](const auto &a, const auto &b) {
+        return std::tie(a[1], a[0]) < std::tie(b[1], b[0]);
+    });
+    check(by_cell);
+    auto shuffled = entries;
+    for (std::size_t k = 0; k < shuffled.size(); ++k)
+        std::swap(shuffled[k], shuffled[(k * 7919 + 13) % shuffled.size()]);
+    check(shuffled);
+    // A feature-ordered file that falls out of order only at its last entry.
+    auto late = by_feature;
+    const auto middle = late.begin() + static_cast<std::ptrdiff_t>(late.size() / 2);
+    std::rotate(middle, middle + 1, late.end());
+    check(late);
+}
+
+BOOST_AUTO_TEST_CASE(sha1_matches_published_digests) {
+    // FIPS 180-2 examples, whole and in uneven pieces (both compression paths
+    // where the processor has the SHA extensions: blocks straight from the input
+    // and through the buffer).
+    const auto digest = [](const std::string &text, std::size_t piece) {
+        io::Sha1 hash;
+        for (std::size_t at = 0; at < text.size(); at += piece)
+            hash.update(text.data() + at, std::min(piece, text.size() - at));
+        return hash.hex();
+    };
+    const std::string million(1000000, 'a');
+    for (std::size_t piece : {1u, 7u, 64u, 100u, 65536u, 1000000u}) {
+        BOOST_TEST(digest("abc", piece) == "a9993e364706816aba3e25717850c26c9cd0d89d");
+        BOOST_TEST(digest("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", piece) ==
+                   "84983e441c3bd26ebaae4aa1f95129e5e54670f1");
+        BOOST_TEST(digest(million, piece) == "34aa973cd4c4daa4f61eeb2bdbad27316534016f");
+    }
+    BOOST_TEST(digest("", 1) == "da39a3ee5e6b4b0d3255bfef95601890afd80709");
+    const TemporaryFile file(million);
+    BOOST_TEST(io::file_sha1(file.path) == "34aa973cd4c4daa4f61eeb2bdbad27316534016f");
 }
 
 BOOST_AUTO_TEST_CASE(count_loader_rejects_what_is_not_a_count_table) {

@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <cctype>
@@ -10,6 +11,8 @@
 #include <fstream>
 #include <iomanip>
 #include <iterator>
+#include <numeric>
+#include <optional>
 #include <rapidglm/rapidglm.hpp>
 #include <sstream>
 #include <sys/mman.h>
@@ -18,6 +21,11 @@
 #include <unistd.h>
 #ifdef __GLIBC__
 #include <malloc.h>
+#endif
+#if defined(__x86_64__) && (defined(__GNUC__) || defined(__clang__))
+#include <cpuid.h>
+#include <immintrin.h>
+#define RAPIDGLM_SHA_NI 1
 #endif
 namespace rapidglm::cli {
 using Tree = boost::property_tree::ptree;
@@ -37,31 +45,31 @@ class Sha1 {
     static std::uint32_t rotate(std::uint32_t x, unsigned n) {
         return (x << n) | (x >> (32 - n));
     }
-    void compress() {
+    void compress(const unsigned char *block) {
         std::uint32_t w[80];
         for (unsigned t = 0; t < 16; ++t)
-            w[t] = std::uint32_t(block_[4 * t]) << 24 | std::uint32_t(block_[4 * t + 1]) << 16 |
-                   std::uint32_t(block_[4 * t + 2]) << 8 | std::uint32_t(block_[4 * t + 3]);
+            w[t] = std::uint32_t(block[4 * t]) << 24 | std::uint32_t(block[4 * t + 1]) << 16 |
+                   std::uint32_t(block[4 * t + 2]) << 8 | std::uint32_t(block[4 * t + 3]);
         for (unsigned t = 16; t < 80; ++t)
             w[t] = rotate(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
         std::uint32_t a = h_[0], b = h_[1], c = h_[2], d = h_[3], e = h_[4];
-        for (unsigned t = 0; t < 80; ++t) {
-            std::uint32_t f, k;
-            if (t < 20)
-                f = (b & c) | (~b & d), k = 0x5A827999U;
-            else if (t < 40)
-                f = b ^ c ^ d, k = 0x6ED9EBA1U;
-            else if (t < 60)
-                f = (b & c) | (b & d) | (c & d), k = 0x8F1BBCDCU;
-            else
-                f = b ^ c ^ d, k = 0xCA62C1D6U;
-            std::uint32_t next = rotate(a, 5) + f + e + k + w[t];
+        // The four stages as separate loops, so each round is free of branches.
+        const auto round = [&](std::uint32_t f, std::uint32_t k, std::uint32_t word) {
+            const std::uint32_t next = rotate(a, 5) + f + e + k + word;
             e = d;
             d = c;
             c = rotate(b, 30);
             b = a;
             a = next;
-        }
+        };
+        for (unsigned t = 0; t < 20; ++t)
+            round(d ^ (b & (c ^ d)), 0x5A827999U, w[t]);
+        for (unsigned t = 20; t < 40; ++t)
+            round(b ^ c ^ d, 0x6ED9EBA1U, w[t]);
+        for (unsigned t = 40; t < 60; ++t)
+            round((b & c) | (d & (b | c)), 0x8F1BBCDCU, w[t]);
+        for (unsigned t = 60; t < 80; ++t)
+            round(b ^ c ^ d, 0xCA62C1D6U, w[t]);
         h_[0] += a;
         h_[1] += b;
         h_[2] += c;
@@ -69,16 +77,99 @@ class Sha1 {
         h_[4] += e;
     }
 
+#ifdef RAPIDGLM_SHA_NI
+    static bool sha_ni_available() {
+        static const bool available = [] {
+            unsigned a = 0, b = 0, c = 0, d = 0;
+            return __get_cpuid_count(7, 0, &a, &b, &c, &d) && (b >> 29 & 1U) &&
+                   __builtin_cpu_supports("ssse3") && __builtin_cpu_supports("sse4.1");
+        }();
+        return available;
+    }
+    // The same compression with the SHA extensions, for `blocks` consecutive blocks.
+    // Each group of four rounds takes the next four schedule words, which the
+    // message instructions build from the four groups before it.
+    __attribute__((target("sha,ssse3,sse4.1"))) void compress_sha_ni(const unsigned char *data,
+                                                                     std::size_t blocks) {
+        const __m128i reverse = _mm_set_epi64x(0x0001020304050607LL, 0x08090a0b0c0d0e0fLL);
+        __m128i abcd =
+            _mm_shuffle_epi32(_mm_loadu_si128(reinterpret_cast<const __m128i *>(h_)), 0x1B);
+        __m128i e0 = _mm_set_epi32(static_cast<int>(h_[4]), 0, 0, 0), e1;
+        for (; blocks; --blocks, data += 64) {
+            const __m128i abcd_start = abcd, e_start = e0;
+            __m128i msg[4];
+            for (int k = 0; k < 4; ++k)
+                msg[k] = _mm_shuffle_epi8(
+                    _mm_loadu_si128(reinterpret_cast<const __m128i *>(data + 16 * k)), reverse);
+            e0 = _mm_add_epi32(e0, msg[0]);
+            e1 = abcd;
+            abcd = _mm_sha1rnds4_epu32(abcd, e0, 0);
+#define RAPIDGLM_SHA1_GROUP(g, stage)                                                              \
+    {                                                                                              \
+        __m128i &e = (g) % 2 ? e1 : e0, &saved = (g) % 2 ? e0 : e1;                                \
+        e = _mm_sha1nexte_epu32(e, msg[(g) % 4]);                                                  \
+        saved = abcd;                                                                              \
+        if ((g) >= 3 && (g) <= 18)                                                                 \
+            msg[((g) + 1) % 4] = _mm_sha1msg2_epu32(msg[((g) + 1) % 4], msg[(g) % 4]);             \
+        abcd = _mm_sha1rnds4_epu32(abcd, e, stage);                                                \
+        if ((g) <= 16)                                                                             \
+            msg[((g) + 3) % 4] = _mm_sha1msg1_epu32(msg[((g) + 3) % 4], msg[(g) % 4]);             \
+        if ((g) >= 2 && (g) <= 17)                                                                 \
+            msg[((g) + 2) % 4] = _mm_xor_si128(msg[((g) + 2) % 4], msg[(g) % 4]);                  \
+    }
+            RAPIDGLM_SHA1_GROUP(1, 0)
+            RAPIDGLM_SHA1_GROUP(2, 0)
+            RAPIDGLM_SHA1_GROUP(3, 0)
+            RAPIDGLM_SHA1_GROUP(4, 0)
+            RAPIDGLM_SHA1_GROUP(5, 1)
+            RAPIDGLM_SHA1_GROUP(6, 1)
+            RAPIDGLM_SHA1_GROUP(7, 1)
+            RAPIDGLM_SHA1_GROUP(8, 1)
+            RAPIDGLM_SHA1_GROUP(9, 1)
+            RAPIDGLM_SHA1_GROUP(10, 2)
+            RAPIDGLM_SHA1_GROUP(11, 2)
+            RAPIDGLM_SHA1_GROUP(12, 2)
+            RAPIDGLM_SHA1_GROUP(13, 2)
+            RAPIDGLM_SHA1_GROUP(14, 2)
+            RAPIDGLM_SHA1_GROUP(15, 3)
+            RAPIDGLM_SHA1_GROUP(16, 3)
+            RAPIDGLM_SHA1_GROUP(17, 3)
+            RAPIDGLM_SHA1_GROUP(18, 3)
+            RAPIDGLM_SHA1_GROUP(19, 3)
+#undef RAPIDGLM_SHA1_GROUP
+            e0 = _mm_sha1nexte_epu32(e0, e_start);
+            abcd = _mm_add_epi32(abcd, abcd_start);
+        }
+        _mm_storeu_si128(reinterpret_cast<__m128i *>(h_), _mm_shuffle_epi32(abcd, 0x1B));
+        h_[4] = static_cast<std::uint32_t>(_mm_extract_epi32(e0, 3));
+    }
+#endif
+    void compress_blocks(const unsigned char *data, std::size_t blocks) {
+#ifdef RAPIDGLM_SHA_NI
+        if (sha_ni_available())
+            return compress_sha_ni(data, blocks);
+#endif
+        for (; blocks; --blocks, data += 64)
+            compress(data);
+    }
+
   public:
     void update(const char *data, std::size_t size) {
-        for (std::size_t i = 0; i < size; ++i) {
-            block_[used_++] = static_cast<unsigned char>(data[i]);
-            if (used_ == 64) {
-                compress();
-                used_ = 0;
-            }
-        }
+        const auto *bytes = reinterpret_cast<const unsigned char *>(data);
         bytes_ += size;
+        if (used_) {
+            const std::size_t take = std::min(size, 64 - used_);
+            std::memcpy(block_ + used_, bytes, take);
+            used_ += take, bytes += take, size -= take;
+            if (used_ < 64)
+                return;
+            compress_blocks(block_, 1);
+            used_ = 0;
+        }
+        compress_blocks(bytes, size / 64);
+        bytes += size / 64 * 64, size %= 64;
+        std::memcpy(block_, bytes, size);
+        used_ = size;
     }
     std::string hex() {
         const std::uint64_t bits = bytes_ * 8;
@@ -152,81 +243,6 @@ inline Matrix read_matrix(const std::string &path) {
     x.validate();
     return x;
 }
-inline SparseCSC read_market(const std::string &path) {
-    auto f = input(path);
-    std::string line;
-    std::getline(f, line);
-    std::istringstream header(line);
-    std::string banner, object, storage, type, symmetry;
-    header >> banner >> object >> storage >> type >> symmetry;
-    require(banner == "%%MatrixMarket" && object == "matrix" && storage == "coordinate" &&
-                (type == "real" || type == "integer" || type == "pattern") && symmetry == "general",
-            "expected general real/integer coordinate MatrixMarket");
-    do {
-        require(static_cast<bool>(std::getline(f, line)), "missing MatrixMarket dimensions");
-    } while (line.empty() || line[0] == '%');
-    std::size_t features, cells, nnz;
-    std::istringstream dimensions(line);
-    require(static_cast<bool>(dimensions >> features >> cells >> nnz) && features > 0 && cells > 0,
-            "invalid MatrixMarket dimensions");
-    std::vector<std::tuple<std::size_t, std::size_t, double>> entries;
-    entries.reserve(nnz);
-    // The entries are parsed from memory with std::from_chars, which rounds values
-    // exactly as the stream does and is much faster on large matrices.
-    const std::string body{std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>()};
-    const char *cursor = body.data(), *const end = cursor + body.size();
-    const auto skip = [&] {
-        while (cursor < end && std::isspace(static_cast<unsigned char>(*cursor)))
-            ++cursor;
-    };
-    const auto parse = [&](auto &value) {
-        skip();
-        if (cursor < end && *cursor == '+')
-            ++cursor;
-        const auto result = std::from_chars(cursor, end, value);
-        if (result.ec != std::errc() ||
-            (result.ptr < end && !std::isspace(static_cast<unsigned char>(*result.ptr))))
-            return false;
-        cursor = result.ptr;
-        return true;
-    };
-    for (std::size_t i = 0; i < nnz; ++i) {
-        std::size_t feature, cell;
-        double v = 1;
-        require(parse(feature) && parse(cell), "truncated MatrixMarket");
-        if (type != "pattern")
-            require(parse(v), "truncated MatrixMarket value");
-        require(feature > 0 && feature <= features && cell > 0 && cell <= cells && std::isfinite(v),
-                "invalid MatrixMarket entry");
-        entries.emplace_back(feature - 1, cell - 1, v);
-    }
-    skip();
-    require(cursor == end, "extra MatrixMarket entries");
-    if (!std::is_sorted(entries.begin(), entries.end()))
-        std::sort(entries.begin(), entries.end());
-    SparseCSC out;
-    out.rows = cells;
-    out.cols = features;
-    out.column_ptr = {0};
-    std::size_t k = 0;
-    for (std::size_t j = 0; j < features; ++j) {
-        while (k < entries.size() && std::get<0>(entries[k]) == j) {
-            auto row = std::get<1>(entries[k]);
-            double v = 0;
-            do {
-                v += std::get<2>(entries[k++]);
-            } while (k < entries.size() && std::get<0>(entries[k]) == j &&
-                     std::get<1>(entries[k]) == row);
-            if (v != 0) {
-                out.row_index.push_back(row);
-                out.values.push_back(v);
-            }
-        }
-        out.column_ptr.push_back(out.values.size());
-    }
-    out.validate();
-    return out;
-}
 // A file mapped read-only, so that its text is parsed in place.
 class MappedFile {
     const char *data_ = nullptr;
@@ -266,6 +282,178 @@ class MappedFile {
         return data_ + size_;
     }
 };
+inline SparseCSC read_market(const std::string &path) {
+    // The text is mapped when the path is a regular file, else read into memory.
+    std::optional<MappedFile> mapping;
+    std::string copy;
+    try {
+        mapping.emplace(path);
+    } catch (const std::runtime_error &) {
+        auto f = input(path);
+        copy.assign(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>());
+    }
+    const char *cursor = mapping ? mapping->begin() : copy.data(), *const end =
+                                                                       mapping ? mapping->end()
+                                                                               : copy.data() +
+                                                                                     copy.size();
+    const auto line = [&] {
+        const char *stop = static_cast<const char *>(
+            std::memchr(cursor, '\n', static_cast<std::size_t>(end - cursor)));
+        std::string text(cursor, stop ? stop : end);
+        cursor = stop ? stop + 1 : end;
+        return text;
+    };
+    require(cursor < end, "empty MatrixMarket file");
+    std::istringstream header(line());
+    std::string banner, object, storage, type, symmetry;
+    header >> banner >> object >> storage >> type >> symmetry;
+    require(banner == "%%MatrixMarket" && object == "matrix" && storage == "coordinate" &&
+                (type == "real" || type == "integer" || type == "pattern") && symmetry == "general",
+            "expected general real/integer coordinate MatrixMarket");
+    std::string dimension_line;
+    do {
+        require(cursor < end, "missing MatrixMarket dimensions");
+        dimension_line = line();
+    } while (dimension_line.empty() || dimension_line[0] == '%');
+    std::size_t features, cells, nnz;
+    std::istringstream dimensions(dimension_line);
+    require(static_cast<bool>(dimensions >> features >> cells >> nnz) && features > 0 && cells > 0,
+            "invalid MatrixMarket dimensions");
+    // The entries are parsed in place with std::from_chars, which rounds values
+    // exactly as the stream does and is much faster on large matrices.
+    const auto space = [](char c) {
+        return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\v' || c == '\f';
+    };
+    const auto skip = [&] {
+        while (cursor < end && space(*cursor))
+            ++cursor;
+    };
+    const auto parse = [&](auto &value) {
+        skip();
+        if (cursor < end && *cursor == '+')
+            ++cursor;
+        const auto result = std::from_chars(cursor, end, value);
+        if (result.ec != std::errc() || (result.ptr < end && !space(*result.ptr)))
+            return false;
+        cursor = result.ptr;
+        return true;
+    };
+    // A value written as an integer (counts, as most are) is read as one, which
+    // gives the same double; anything else as a double.
+    const auto parse_value = [&](double &value) {
+        skip();
+        const char *start = cursor;
+        if (cursor < end && *cursor == '+')
+            ++cursor;
+        std::int64_t whole;
+        const auto result = std::from_chars(cursor, end, whole);
+        if (result.ec == std::errc() && std::abs(whole) < (std::int64_t(1) << 53) &&
+            (result.ptr == end || space(*result.ptr))) {
+            value = static_cast<double>(whole);
+            cursor = result.ptr;
+            return true;
+        }
+        cursor = start;
+        return parse(value);
+    };
+    const bool pattern = type == "pattern";
+    const auto next_entry = [&](std::size_t &feature, std::size_t &cell, double &v) {
+        v = 1;
+        require(parse(feature) && parse(cell), "truncated MatrixMarket");
+        if (!pattern)
+            require(parse_value(v), "truncated MatrixMarket value");
+        require(feature > 0 && feature <= features && cell > 0 && cell <= cells && std::isfinite(v),
+                "invalid MatrixMarket entry");
+        --feature, --cell;
+    };
+    // The matrix holds the entries in (feature, cell) order: by feature, cells
+    // ascending; repeated entries are summed in file order and zeros dropped.
+    // A file already in that order goes straight into it.
+    SparseCSC out;
+    out.rows = cells;
+    out.cols = features;
+    out.column_ptr.assign(features + 1, 0);
+    out.row_index.reserve(nnz);
+    out.values.reserve(nnz);
+    const char *const first_entry = cursor;
+    const auto drop_zero = [&](std::size_t feature) {
+        if (!out.values.empty() && out.values.back() == 0) {
+            out.values.pop_back();
+            out.row_index.pop_back();
+            --out.column_ptr[feature + 1];
+        }
+    };
+    bool ordered = true;
+    std::size_t last_feature = 0, last_cell = 0;
+    for (std::size_t i = 0; i < nnz && ordered; ++i) {
+        std::size_t feature, cell;
+        double v;
+        next_entry(feature, cell, v);
+        if (i > 0 && feature == last_feature && cell == last_cell) {
+            out.values.back() += v;
+            continue;
+        }
+        if (i > 0 && (feature < last_feature || (feature == last_feature && cell < last_cell))) {
+            ordered = false;
+            break;
+        }
+        if (i > 0)
+            drop_zero(last_feature);
+        out.row_index.push_back(cell);
+        out.values.push_back(v);
+        ++out.column_ptr[feature + 1];
+        last_feature = feature, last_cell = cell;
+    }
+    if (ordered) {
+        if (nnz)
+            drop_zero(last_feature);
+    } else {
+        // Otherwise the entries are read again, grouped by feature in file
+        // order, and each feature's cells sorted where they are not ascending.
+        cursor = first_entry;
+        std::vector<std::size_t> feature_of(nnz), cell_of(nnz);
+        Vector value_of(nnz);
+        for (std::size_t i = 0; i < nnz; ++i)
+            next_entry(feature_of[i], cell_of[i], value_of[i]);
+        std::vector<std::size_t> start(features + 1, 0);
+        for (auto feature : feature_of)
+            ++start[feature + 1];
+        std::partial_sum(start.begin(), start.end(), start.begin());
+        std::vector<std::pair<std::size_t, double>> grouped(nnz);
+        {
+            auto next = start;
+            for (std::size_t i = 0; i < nnz; ++i)
+                grouped[next[feature_of[i]]++] = {cell_of[i], value_of[i]};
+        }
+        feature_of = {}, cell_of = {}, value_of = {};
+        out.row_index.clear();
+        out.values.clear();
+        std::fill(out.column_ptr.begin(), out.column_ptr.end(), 0);
+        for (std::size_t j = 0; j < features; ++j) {
+            const auto first = grouped.begin() + static_cast<std::ptrdiff_t>(start[j]),
+                       last = grouped.begin() + static_cast<std::ptrdiff_t>(start[j + 1]);
+            const auto by_cell = [](const auto &a, const auto &b) { return a.first < b.first; };
+            if (!std::is_sorted(first, last, by_cell))
+                std::stable_sort(first, last, by_cell);
+            for (auto k = first; k != last;) {
+                double v = 0;
+                const auto row = k->first;
+                for (; k != last && k->first == row; ++k)
+                    v += k->second;
+                if (v != 0) {
+                    out.row_index.push_back(row);
+                    out.values.push_back(v);
+                    ++out.column_ptr[j + 1];
+                }
+            }
+        }
+    }
+    skip();
+    require(cursor == end, "extra MatrixMarket entries");
+    std::partial_sum(out.column_ptr.begin(), out.column_ptr.end(), out.column_ptr.begin());
+    out.validate();
+    return out;
+}
 // Thrown by read_market_counts for a well-formed file that is not a table of
 // counts, one entry per line; read_market reads such a file.
 struct NotCountTable : std::invalid_argument {

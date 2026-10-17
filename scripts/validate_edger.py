@@ -100,7 +100,7 @@ def compare(name, out):
         "s2_prior_max_rel": rel(both.s2_prior.to_numpy(), both.s2_prior_edger.to_numpy()),
         "log10_p_max_abs": float(np.nanmax(np.abs(lp - le))),
         "log10_p_median_abs": float(np.nanmedian(np.abs(lp - le))),
-        "logfc_max_abs": float(np.nanmax(np.abs(both.logFC - both.logFC_edger))),
+        "logfc_max_abs": float(np.nanmax(np.abs(same.logFC - same.logFC_edger))),
         "discoveries": len(hits_ours), "discoveries_edger": len(hits_edger),
         "discoveries_shared": len(hits_ours & hits_edger),
         # BH within the genes whose edgeR fits are consistent, for both tools.

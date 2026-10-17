@@ -222,8 +222,8 @@ BOOST_AUTO_TEST_CASE(qtl_kernels_and_reused_bases_agree) {
         for (auto &v : g)
             v = std::floor(std::abs(normal(rng)) * 1.5);
         std::vector<double> c(p * m), u(m), v(m);
-        detail::qtl_cross(a.data(), w.data(), r.data(), g.data(), n, p, m, c.data(), u.data(),
-                          v.data());
+        detail::cross_products(a.data(), w.data(), r.data(), g.data(), n, p, m, c.data(), u.data(),
+                               v.data());
         for (std::size_t q = 0; q < m; ++q) {
             double su = 0, sv = 0;
             for (std::size_t i = 0; i < n; ++i) {

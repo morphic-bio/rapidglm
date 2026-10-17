@@ -133,7 +133,11 @@ BOOST_AUTO_TEST_CASE(leverages_and_fixed_dispersion_fits) {
     Vector w(n);
     for (std::size_t i = 0; i < n; ++i)
         w[i] = fast.mu[i] / (1 + 0.1 * fast.mu[i]);
-    const auto a = detail::fit_leverage(x, w), b = detail::weighted_leverage(x, w);
+    Vector xt(3 * n);
+    for (std::size_t i = 0; i < n; ++i)
+        for (std::size_t j = 0; j < 3; ++j)
+            xt[j * n + i] = x(i, j);
+    const auto a = detail::fit_leverage(x, xt, w), b = detail::weighted_leverage(x, w);
     double total = 0;
     for (std::size_t i = 0; i < n; ++i) {
         BOOST_TEST(a[i] == b[i], boost::test_tools::tolerance(1e-10));
@@ -154,7 +158,11 @@ BOOST_AUTO_TEST_CASE(leverages_and_fixed_dispersion_fits) {
     Vector gw(8);
     for (std::size_t i = 0; i < 8; ++i)
         gw[i] = boundary.mu[i] / (1 + 0.05 * boundary.mu[i]);
-    const auto h = detail::fit_leverage(g, gw);
+    Vector gt(16);
+    for (std::size_t i = 0; i < 8; ++i)
+        for (std::size_t j = 0; j < 2; ++j)
+            gt[j * 8 + i] = g(i, j);
+    const auto h = detail::fit_leverage(g, gt, gw);
     double rest = 0;
     for (std::size_t i = 0; i < 8; ++i)
         rest += h[i];
@@ -224,4 +232,125 @@ BOOST_AUTO_TEST_CASE(edger_ql_finds_changed_genes_and_is_reproducible) {
         if (r.genes[g].kept)
             BOOST_TEST(contrast.genes[g].p_value == r.genes[g].p_value,
                        boost::test_tools::tolerance(1e-9));
+}
+
+BOOST_AUTO_TEST_CASE(rank_windows_equal_average_rank_trims) {
+    std::mt19937_64 rng(5);
+    std::uniform_int_distribution<int> draw(0, 30);
+    for (int trial = 0; trial < 50; ++trial) {
+        Vector v(97);
+        for (auto &e : v)
+            e = draw(rng) / 4.0; // many ties
+        const double n = static_cast<double>(v.size()), lo = std::floor(n * 0.3) + 1,
+                     hi = n + 1 - lo;
+        const auto ranks = detail::average_ranks(v);
+        const auto keep = detail::rank_window(v, lo, hi);
+        for (std::size_t i = 0; i < v.size(); ++i)
+            BOOST_TEST(static_cast<bool>(keep[i]) == (ranks[i] >= lo && ranks[i] <= hi));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(kernels_agree_with_direct_sums) {
+    std::mt19937_64 rng(19);
+    std::normal_distribution<double> normal;
+    std::uniform_real_distribution<double> uniform(0.1, 2);
+    for (std::size_t n : {1u, 5u, 8u, 37u})
+        for (std::size_t p : {1u, 3u, 4u, 5u, 8u, 9u, 12u, 13u, 17u}) {
+            Vector a(n * p), w(n), r(n), x(p), b(p * p, 0.0), xt(p * n);
+            for (auto &v : a)
+                v = normal(rng);
+            for (std::size_t i = 0; i < n; ++i) {
+                w[i] = uniform(rng);
+                r[i] = normal(rng);
+                for (std::size_t k = 0; k < p; ++k)
+                    xt[k * n + i] = a[i * p + k];
+            }
+            for (auto &v : x)
+                v = normal(rng);
+            for (std::size_t j = 0; j < p; ++j)
+                for (std::size_t k = 0; k <= j; ++k)
+                    b[j * p + k] = normal(rng);
+            const auto near = [](double value, double exact) {
+                return std::abs(value - exact) <= 1e-12 * (1 + std::abs(exact));
+            };
+            // A'WA, A'r, Ax and the squared norms of B x_i, both forms.
+            for (bool portable : {false, true}) {
+                Vector c(p * p), u(p, -1), v(n), t(p), h(n);
+                if (portable) {
+                    detail::weighted_gram_generic(a.data(), w.data(), r.data(), n, p, c.data(),
+                                                  u.data());
+                    detail::matrix_vector_generic(a.data(), x.data(), n, p, v.data());
+                    detail::transposed_product_generic(a.data(), r.data(), n, p, t.data());
+                    detail::triangular_norms_generic(b.data(), xt.data(), n, p, h.data());
+                } else {
+                    detail::weighted_gram(a.data(), w.data(), r.data(), n, p, c.data(), u.data());
+                    detail::matrix_vector(a.data(), x.data(), n, p, v.data());
+                    detail::transposed_product(a.data(), r.data(), n, p, t.data());
+                    detail::triangular_norms(b.data(), xt.data(), n, p, h.data());
+                }
+                for (std::size_t k = 0; k < p; ++k) {
+                    double score = 0;
+                    for (std::size_t i = 0; i < n; ++i)
+                        score += a[i * p + k] * r[i];
+                    BOOST_TEST(near(u[k], score));
+                    BOOST_TEST(near(t[k], score));
+                    for (std::size_t q = 0; q < p; ++q) {
+                        double sum = 0;
+                        for (std::size_t i = 0; i < n; ++i)
+                            sum += a[i * p + k] * w[i] * a[i * p + q];
+                        BOOST_TEST(near(c[k * p + q], sum));
+                        BOOST_TEST(c[k * p + q] == c[q * p + k]);
+                    }
+                }
+                for (std::size_t i = 0; i < n; ++i) {
+                    double dot = 0, norm = 0;
+                    for (std::size_t k = 0; k < p; ++k)
+                        dot += a[i * p + k] * x[k];
+                    for (std::size_t j = 0; j < p; ++j) {
+                        double z = 0;
+                        for (std::size_t k = 0; k <= j; ++k)
+                            z += b[j * p + k] * a[i * p + k];
+                        norm += z * z;
+                    }
+                    BOOST_TEST(near(v[i], dot));
+                    BOOST_TEST(near(h[i], norm));
+                }
+                // Without r, u is not written.
+                Vector untouched(p, -1);
+                detail::weighted_gram(a.data(), w.data(), nullptr, n, p, c.data(),
+                                      untouched.data());
+                BOOST_TEST(untouched == Vector(p, -1));
+            }
+        }
+    // The vector exponential: within two units in the last place of std::exp.
+    std::uniform_real_distribution<double> wide(-700, 700);
+    Vector e(1003), value(e.size());
+    for (std::size_t i = 0; i < e.size(); ++i)
+        e[i] = i % 3 ? wide(rng) : 5 * normal(rng);
+    e[0] = -700, e[1] = 700, e[2] = 0, e[3] = std::nan("");
+    detail::exp_array(e.data(), value.data(), e.size());
+    BOOST_TEST(std::isnan(value[3]));
+    for (std::size_t i = 0; i < e.size(); ++i)
+        if (i != 3)
+            BOOST_TEST(std::abs(value[i] - std::exp(e[i])) <= 4.5e-16 * std::exp(e[i]));
+    // The Newton steps' factor solves as Cholesky does and rejects a singular matrix.
+    Matrix m(6, 6);
+    Matrix z(9, 6);
+    for (auto &v : z.values)
+        v = normal(rng);
+    m = detail::crossprod(z, Vector(9, 1));
+    detail::SmallCholesky small(6);
+    BOOST_REQUIRE(small.factor(m, 1e-14));
+    const detail::Cholesky full(m, 1e-14, false);
+    Vector rhs(6), solution(6);
+    for (auto &v : rhs)
+        v = normal(rng);
+    small.solve(rhs.data(), solution.data());
+    const auto expected = full.solve(rhs);
+    for (std::size_t j = 0; j < 6; ++j)
+        BOOST_TEST(solution[j] == expected[j], boost::test_tools::tolerance(1e-10));
+    for (std::size_t j = 0; j < 6; ++j)
+        m(j, 5) = m(5, j) = m(j, 4);
+    m(5, 5) = m(4, 4);
+    BOOST_TEST(!small.factor(m, 1e-14));
 }
