@@ -11,6 +11,7 @@ to the C++ calls (`tests/test_c_api.cpp`).
 |---|---|---|
 | `rapidglm_fit_batch` | `fit_batch` | `fit` |
 | `rapidglm_bulk_de` | `bulk_de` | `bulk-de` |
+| `rapidglm_edger_ql` | `edger_ql` | `edger-ql` |
 | `rapidglm_sceptre` | `sceptre` | `sceptre` |
 | `rapidglm_sceptre_grid` | `sceptre_grid` | `sceptre` with `targets` |
 | `rapidglm_scan` | `score_scan` | `scan` |

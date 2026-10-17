@@ -4,6 +4,10 @@ rapidglm_bulk_de_ <- function(design, p, i, x, samples, genes, o) {
   .Call(`_rapidglm_rapidglm_bulk_de_`, design, p, i, x, samples, genes, o)
 }
 
+rapidglm_edger_ql_ <- function(design, p, i, x, samples, genes, o) {
+  .Call(`_rapidglm_rapidglm_edger_ql_`, design, p, i, x, samples, genes, o)
+}
+
 rapidglm_sceptre_ <- function(design, yp, yi, yx, genes, gp, gi, gx, n_guides, guide_ids, guide_targets, guide_non_targeting, pair_responses, pair_targets, pair_kinds, o) {
   .Call(`_rapidglm_rapidglm_sceptre_`, design, yp, yi, yx, genes, gp, gi, gx, n_guides, guide_ids, guide_targets, guide_non_targeting, pair_responses, pair_targets, pair_kinds, o)
 }

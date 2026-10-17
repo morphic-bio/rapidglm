@@ -7,6 +7,7 @@
 #include <boost/math/distributions/gamma.hpp>
 #include <boost/math/distributions/normal.hpp>
 #include <boost/math/special_functions/trigamma.hpp>
+#include <optional>
 
 // Bulk RNA-seq differential expression following the procedure published for
 // DESeq2 (Love, Huber and Anders 2014, Genome Biology 15:550) and its
@@ -396,6 +397,111 @@ inline MapFit nb_map_fit(const Matrix &x, const Vector &y, const Vector &offset,
     r.beta = std::move(beta);
     return r;
 }
+// NB GLM fit at a fixed dispersion with fitted counts floored at min_mu inside
+// the iterations, as DESeq2 fits (its documented minmu, 0.5), following
+// PyDESeq2's irls_solver (MIT; Muzellec et al. 2023): iteratively reweighted least
+// squares on mu_f = max(s exp(X b), min_mu) with a ridge of 1e-6, from `start`
+// (or the least-squares fit of log(y / s + 0.1)), until the deviance
+// -2 log L(mu_f) changes by at most 1e-8 of itself plus 0.1. Coefficients are
+// kept within [-30, 30] (PyDESeq2 then switches to a bounded optimizer; here the
+// iterations continue on the bounded coefficients). Where no fitted count falls
+// below min_mu this is the maximum likelihood fit (tolerance, coefficient bounds
+// and the iteration limit as PyDESeq2's defaults). Returns the unfloored means
+// s exp(X b), as DESeq2 does, the floored ones, and the leverages from the
+// floored weights.
+struct FlooredFit {
+    Vector beta, mu, floored, hat;
+    double deviance = nan;
+    bool converged = false;
+};
+inline FlooredFit floored_nb_fit(const Matrix &x, const Vector &y, const Vector &offset,
+                                 double dispersion, double min_mu, Vector start = {},
+                                 std::size_t max_iterations = 250, double tolerance = 1e-8,
+                                 double min_beta = -30, double max_beta = 30) {
+    const std::size_t n = x.rows, p = x.cols;
+    constexpr double ridge = 1e-6;
+    FlooredFit f;
+    if (start.size() != p ||
+        !std::all_of(start.begin(), start.end(), [](double b) { return std::isfinite(b); })) {
+        const Cholesky ls(crossprod(x, Vector(n, 1)), 1e-12, false);
+        if (!ls.ok)
+            return f;
+        Vector z(n);
+        for (std::size_t i = 0; i < n; ++i)
+            z[i] = std::log(y[i] / std::exp(offset[i]) + 0.1);
+        start = ls.solve(xtv(x, z));
+    }
+    for (auto &b : start)
+        b = std::clamp(b, min_beta, max_beta);
+    f.beta = std::move(start);
+    const double k = 1 / dispersion;
+    const auto floored_means = [&](const Vector &beta, Vector &mu) {
+        mu = matvec(x, beta);
+        for (std::size_t i = 0; i < n; ++i)
+            mu[i] = std::max(std::exp(mu[i] + offset[i]), min_mu);
+    };
+    // -2 times the NB log likelihood without its count-only terms.
+    const auto deviance = [&](const Vector &mu) {
+        double total = 0;
+        for (std::size_t i = 0; i < n; ++i)
+            total += (y[i] + k) * std::log1p(mu[i] / k) - y[i] * std::log(mu[i]);
+        return 2 * total;
+    };
+    Vector mu, w(n), wz(n);
+    floored_means(f.beta, mu);
+    double dev = 1000;
+    for (std::size_t it = 0; it < max_iterations; ++it) {
+        for (std::size_t i = 0; i < n; ++i) {
+            w[i] = mu[i] / (1 + mu[i] / k);
+            wz[i] = w[i] * (std::log(mu[i]) - offset[i] + (y[i] - mu[i]) / mu[i]);
+        }
+        auto a = crossprod(x, w);
+        for (std::size_t j = 0; j < p; ++j)
+            a(j, j) += ridge;
+        const Cholesky ch(a, 1e-14, false);
+        if (!ch.ok)
+            return f;
+        auto beta = ch.solve(xtv(x, wz));
+        for (auto &b : beta)
+            b = std::clamp(b, min_beta, max_beta);
+        f.beta = std::move(beta);
+        floored_means(f.beta, mu);
+        const double old = dev;
+        dev = deviance(mu);
+        if (!std::isfinite(dev))
+            return f;
+        if (std::abs(dev - old) / (std::abs(dev) + 0.1) <= tolerance) {
+            f.converged = true;
+            break;
+        }
+    }
+    f.deviance = dev;
+    f.floored = mu;
+    f.mu = matvec(x, f.beta);
+    for (std::size_t i = 0; i < n; ++i)
+        f.mu[i] = std::exp(f.mu[i] + offset[i]);
+    // Leverages diag(W^1/2 X (X'WX + ridge)^-1 X'W^1/2) at the floored weights.
+    for (std::size_t i = 0; i < n; ++i)
+        w[i] = mu[i] / (1 + mu[i] / k);
+    auto a = crossprod(x, w);
+    for (std::size_t j = 0; j < p; ++j)
+        a(j, j) += ridge;
+    const Cholesky ch(a, 1e-14, false);
+    if (!ch.ok) {
+        f.converged = false;
+        return f;
+    }
+    const auto inverse = ch.inverse();
+    f.hat.assign(n, 0);
+    for (std::size_t i = 0; i < n; ++i) {
+        double h = 0;
+        for (std::size_t r = 0; r < p; ++r)
+            for (std::size_t c = 0; c < p; ++c)
+                h += x(i, r) * inverse(r, c) * x(i, c);
+        f.hat[i] = w[i] * h;
+    }
+    return f;
+}
 } // namespace detail
 // Median-of-ratios size factors (Anders and Huber 2010). `ratio` uses genes with
 // no zero count; `poscounts` takes each gene's geometric mean as the n-th root of
@@ -633,6 +739,52 @@ inline NbFixedFits nb_fixed_fits(const Matrix &design, const Matrix &counts,
     });
     return out;
 }
+// floored_nb_fit for every feature (counts observations x features, log
+// size-factor offsets): the fits of DESeq2 and PyDESeq2's irls, with fitted
+// counts floored at min_mu inside the iterations. Fitted values are the
+// unfloored means, hat values those of the floored weights.
+inline NbFixedFits nb_floored_fits(const Matrix &design, const Matrix &counts,
+                                   const Vector &size_factors, const Vector &dispersions,
+                                   double min_mu = 0.5, double tolerance = 1e-8,
+                                   std::size_t max_iterations = 250, double min_beta = -30,
+                                   double max_beta = 30, int threads = 1) {
+    design.validate();
+    const std::size_t m = design.rows, p = design.cols, genes = counts.cols;
+    require(counts.rows == m && size_factors.size() == m && dispersions.size() == genes,
+            "nb_floored_fits dimensions mismatch");
+    require(min_mu > 0 && std::isfinite(min_mu), "min_mu must be positive");
+    Vector offset(m);
+    for (std::size_t i = 0; i < m; ++i) {
+        require(size_factors[i] > 0 && std::isfinite(size_factors[i]),
+                "size factors must be positive");
+        offset[i] = std::log(size_factors[i]);
+    }
+    NbFixedFits out;
+    out.coefficients = Matrix(genes, p, nan);
+    out.fitted = Matrix(m, genes, nan);
+    out.hat = Matrix(m, genes, nan);
+    out.converged.assign(genes, 0);
+    parallel_for(genes, threads, [&](auto j) {
+        const double alpha = dispersions[j];
+        if (!(alpha > 0) || !std::isfinite(alpha))
+            return;
+        Vector y(m);
+        for (std::size_t i = 0; i < m; ++i)
+            y[i] = counts(i, j);
+        const auto f = detail::floored_nb_fit(design, y, offset, alpha, min_mu, {}, max_iterations,
+                                              tolerance, min_beta, max_beta);
+        if (f.beta.size() != p || f.hat.size() != m)
+            return;
+        for (std::size_t k = 0; k < p; ++k)
+            out.coefficients(j, k) = f.beta[k];
+        for (std::size_t i = 0; i < m; ++i) {
+            out.fitted(i, j) = f.mu[i];
+            out.hat(i, j) = f.hat[i];
+        }
+        out.converged[j] = f.converged;
+    });
+    return out;
+}
 // Dispersion estimates (1 / theta) per feature at fixed means: the NB
 // likelihood, Cox-Reid adjusted when `cox_reid` (and the adjustment is defined
 // at the start), maximized by Newton steps in log dispersion from `start`. With
@@ -738,22 +890,44 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
     // rough moment dispersion; floored at min_mean.
     std::vector<Vector> mu0(genes), start0(genes);
     std::vector<unsigned char> usable(genes, 0);
-    // Rough moment dispersion from a least-squares fit of normalized counts on the
-    // design: the mean over samples of (r^2 - f) / f^2 on the residual df, with
-    // fitted values f (floored at 1e-3) and residuals r.
+    // Starting dispersion, as PyDESeq2 computes it (MIT; Muzellec et al. 2023;
+    // fit_rough_dispersions, fit_moments_dispersions), which reproduces DESeq2's
+    // starts: the smaller of a rough estimate from a least-squares fit of
+    // normalized counts on the design, the sum over samples of (r^2 - f) / f^2 on
+    // the residual df with fitted values f floored at 1 and residuals r (and at
+    // least 0), and the moments estimate (v - x m) / m^2 from the mean m and the
+    // variance v of the normalized counts and the mean x of the inverse size
+    // factors; clamped to the dispersion bounds. With size factors far apart (as in
+    // pseudobulk samples of very different numbers of cells) the moments estimate
+    // is often the smaller, and genes then start, and with keep_minimum_start stay,
+    // at the lower bound, as in DESeq2.
     detail::Cholesky least_squares(detail::crossprod(design, Vector(m, 1)));
     require(least_squares.ok, "singular bulk design");
+    double inverse_size = 0;
+    for (std::size_t i = 0; i < m; ++i)
+        inverse_size += 1 / sf[i];
+    inverse_size /= static_cast<double>(m);
     const auto moment_dispersion = [&](const Vector &y) {
         Vector nc(m);
-        for (std::size_t i = 0; i < m; ++i)
-            nc[i] = y[i] / sf[i];
-        const auto fitted = detail::matvec(design, least_squares.solve(detail::xtv(design, nc)));
-        double sum = 0;
+        double mean = 0;
         for (std::size_t i = 0; i < m; ++i) {
-            const double f = std::max(fitted[i], 1e-3), r = nc[i] - fitted[i];
-            sum += (r * r - f) / (f * f);
+            nc[i] = y[i] / sf[i];
+            mean += nc[i];
         }
-        return std::clamp(sum / (m - p), min_disp, max_disp);
+        mean /= static_cast<double>(m);
+        const auto fitted = detail::matvec(design, least_squares.solve(detail::xtv(design, nc)));
+        double rough = 0, variance = 0;
+        for (std::size_t i = 0; i < m; ++i) {
+            const double f = std::max(fitted[i], 1.0), r = nc[i] - f;
+            rough += (r * r - f) / (f * f);
+            variance += (nc[i] - mean) * (nc[i] - mean);
+        }
+        rough = std::max(0.0, rough / static_cast<double>(m - p));
+        variance /= static_cast<double>(m - 1);
+        double moments = (variance - inverse_size * mean) / (mean * mean);
+        if (std::isnan(moments))
+            moments = 0;
+        return std::clamp(std::min(rough, moments), min_disp, max_disp);
     };
     // Initial means for designs that are not group designs: an NB fit at the rough
     // dispersion, else a Poisson fit, else least-squares means of normalized counts.
@@ -803,10 +977,24 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
             mu.assign(m, 0);
             for (std::size_t i = 0; i < m; ++i)
                 mu[i] = sf[i] * sum[groups.group[i]] / size[groups.group[i]];
-        } else
+            for (double &v : mu)
+                v = std::max(v, o.min_mean);
+        } else {
             mu = initial_means(y, rough, start);
-        for (double &v : mu)
-            v = std::max(v, o.min_mean);
+            // DESeq2 fits these means with fitted counts floored at min_mean and
+            // estimates the dispersion at the unfloored means of that fit (as
+            // PyDESeq2 does): where a fitted count falls below min_mean the fit is
+            // redone so.
+            if (std::any_of(mu.begin(), mu.end(), [&](double v) { return !(v >= o.min_mean); })) {
+                const auto f = detail::floored_nb_fit(design, y, offset, rough, o.min_mean, start);
+                if (f.converged) {
+                    mu = f.mu;
+                    start = f.beta;
+                } else
+                    for (double &v : mu)
+                        v = std::max(v, o.min_mean);
+            }
+        }
         if (o.keep_minimum_start && rough <= min_disp) {
             g.dispersion_gene = min_disp;
             return;
@@ -980,11 +1168,72 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
             return full;
         }
         const double ln2 = std::log(2.0);
-        const bool boundary = hypothesis_boundary(full, target);
+        // DESeq2 fits with fitted counts floored at min_mean (minmu). Where a fitted
+        // count of the maximum likelihood fit falls below it, or a coefficient has
+        // no finite estimate, the fit is redone with the floor (floored_nb_fit), as
+        // PyDESeq2 does: the Wald test then uses the sandwich
+        // (H + 1e-6 I)^-1 H (H + 1e-6 I)^-1 with H = X'WX at the floored means, and
+        // Cook's distances the unfloored means and the leverages of that fit.
+        const auto below = [&](const FitResult &f) {
+            return f.has_boundary() || std::any_of(f.fitted.begin(), f.fitted.end(),
+                                                   [&](double v) { return !(v >= o.min_mean); });
+        };
+        std::optional<detail::FlooredFit> floored;
+        double floored_se = nan;
+        if (below(full)) {
+            auto refit = detail::floored_nb_fit(tested.x, y, offset, g.dispersion, o.min_mean,
+                                                full.coefficients);
+            if (refit.converged) {
+                // The Wald variance at the floored means (DESeq2 documents minmu
+                // for its Wald test; PyDESeq2 uses the unfloored means here).
+                Vector w(m);
+                for (std::size_t i = 0; i < m; ++i)
+                    w[i] = refit.floored[i] / (1 + g.dispersion * refit.floored[i]);
+                const auto information = detail::crossprod(tested.x, w);
+                auto ridged = information;
+                for (std::size_t c = 0; c < p; ++c)
+                    ridged(c, c) += 1e-6;
+                const detail::Cholesky ch(ridged, 1e-14, false);
+                if (ch.ok) {
+                    const auto inverse = ch.inverse();
+                    Vector hc(p);
+                    for (std::size_t r = 0; r < p; ++r)
+                        hc[r] = inverse(r, tested.column);
+                    double variance = 0;
+                    for (std::size_t r = 0; r < p; ++r)
+                        for (std::size_t c = 0; c < p; ++c)
+                            variance += hc[r] * information(r, c) * hc[c];
+                    floored_se = std::sqrt(variance);
+                }
+                // The fit Cook's distances read: unfloored means, floored weights and
+                // the inverse of the floored information, whose product gives the
+                // leverages.
+                for (std::size_t i = 0; i < m; ++i)
+                    w[i] = refit.floored[i] / (1 + g.dispersion * refit.floored[i]);
+                auto floored_information = detail::crossprod(tested.x, w);
+                for (std::size_t c = 0; c < p; ++c)
+                    floored_information(c, c) += 1e-6;
+                const detail::Cholesky fh(floored_information, 1e-14, false);
+                if (fh.ok) {
+                    full.coefficients = refit.beta;
+                    full.fitted = refit.mu;
+                    full.working_weights = w;
+                    full.covariance = fh.inverse();
+                    full.boundary_coefficients.assign(p, 0);
+                    floored = std::move(refit);
+                }
+            }
+        }
+        const bool boundary = !floored && hypothesis_boundary(full, target);
         if (hypothesis.df() == 1 && !boundary) {
-            const auto [estimate, se] = hypothesis_estimate(full, target);
-            g.log2_fold_change = estimate / ln2;
-            g.lfc_se = se / ln2;
+            if (floored) {
+                g.log2_fold_change = full.coefficients[tested.column] / ln2;
+                g.lfc_se = floored_se / ln2;
+            } else {
+                const auto [estimate, se] = hypothesis_estimate(full, target);
+                g.log2_fold_change = estimate / ln2;
+                g.lfc_se = se / ln2;
+            }
         }
         if (o.lrt) {
             auto null = fit(reduced, y, fo);
@@ -992,10 +1241,33 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
                 g.status = std::string("reduced_") + status_name(null.status);
                 return full;
             }
-            g.statistic = std::max(0.0, 2 * (full.log_likelihood - null.log_likelihood));
+            if (floored || below(null)) {
+                // Both fits with the floor: the statistic is the difference of their
+                // deviances at the floored means.
+                const auto full_floored =
+                    floored ? *floored
+                            : detail::floored_nb_fit(tested.x, y, offset, g.dispersion, o.min_mean,
+                                                     full.coefficients);
+                const auto null_floored = detail::floored_nb_fit(reduced, y, offset, g.dispersion,
+                                                                 o.min_mean, null.coefficients);
+                if (!full_floored.converged || !null_floored.converged) {
+                    g.status = "floored_fit_failed";
+                    return full;
+                }
+                g.statistic = std::max(0.0, null_floored.deviance - full_floored.deviance);
+            } else
+                g.statistic = std::max(0.0, 2 * (full.log_likelihood - null.log_likelihood));
             boost::math::chi_squared_distribution<double> chi(static_cast<double>(hypothesis.df()));
             g.p_value = boost::math::cdf(boost::math::complement(chi, g.statistic));
             g.status = full.has_boundary() ? "ok_boundary" : "ok";
+        } else if (floored) {
+            if (!(floored_se > 0) || !std::isfinite(floored_se)) {
+                g.status = "wald_floored";
+                return full;
+            }
+            g.statistic = full.coefficients[tested.column] / floored_se;
+            g.p_value = normal_tail(g.statistic, Side::both);
+            g.status = "ok";
         } else {
             const auto w = hypothesis_wald(full, target);
             if (!w.valid && boundary) {

@@ -532,6 +532,96 @@ int rapidglm_bulk_de(const rapidglm_dense *design, const rapidglm_sparse *counts
     });
 }
 
+void rapidglm_ql_options_init(rapidglm_ql_options *o) {
+    if (!o)
+        return;
+    std::memset(o, 0, sizeof *o);
+    const QlOptions d;
+    o->struct_size = sizeof *o;
+    o->coefficient = SIZE_MAX; // the last column
+    o->filter = d.filter;
+    o->min_count = d.min_count;
+    o->min_total_count = d.min_total_count;
+    o->large_n = d.large_n;
+    o->min_prop = d.min_prop;
+    o->tmm = d.tmm;
+    o->dispersion = d.dispersion;
+    o->prior_count = d.prior_count;
+    o->threads = 1;
+}
+
+int rapidglm_edger_ql(const rapidglm_dense *design, const rapidglm_sparse *counts,
+                      const rapidglm_ql_options *options, rapidglm_table **result) {
+    return guarded([&] {
+        require(result != nullptr, "result pointer required");
+        const auto c = effective(options, rapidglm_ql_options_init);
+        const auto x = dense(design);
+        const auto y = sparse(counts);
+        Hypothesis h =
+            Hypothesis::coefficient(x.cols, c.coefficient == SIZE_MAX ? x.cols - 1 : c.coefficient);
+        if (c.contrasts) {
+            require(c.contrast_rows > 0, "contrast_rows must be positive");
+            h.contrasts = Matrix(c.contrast_rows, x.cols);
+            std::copy(c.contrasts, c.contrasts + c.contrast_rows * x.cols,
+                      h.contrasts.values.begin());
+            h.null_space(); // validates the rows
+        }
+        QlOptions o;
+        o.filter = c.filter != 0;
+        o.min_count = c.min_count;
+        o.min_total_count = c.min_total_count;
+        o.large_n = c.large_n;
+        o.min_prop = c.min_prop;
+        o.tmm = c.tmm != 0;
+        o.norm_factors = optional_vector(c.norm_factors, x.rows);
+        o.dispersion = c.dispersion;
+        o.prior_count = c.prior_count;
+        o.threads = c.threads;
+        const auto r = edger_ql(x, y, h, o);
+        auto t = std::make_unique<rapidglm_table>();
+        t->rows = r.genes.size();
+        auto &gene = t->numeric("gene");
+        auto &status = t->text("status");
+        for (std::size_t i = 0; i < r.genes.size(); ++i) {
+            gene[i] = static_cast<double>(i);
+            status[i] = r.genes[i].status;
+        }
+        const std::vector<std::pair<const char *, double QlGene::*>> fields = {
+            {"total", &QlGene::total},
+            {"AveLogCPM", &QlGene::ave_log_cpm},
+            {"logFC", &QlGene::log_fc},
+            {"coefficient", &QlGene::coefficient},
+            {"unshrunk_coefficient", &QlGene::unshrunk_coefficient},
+            {"F", &QlGene::f},
+            {"PValue", &QlGene::p_value},
+            {"FDR", &QlGene::fdr},
+            {"deviance", &QlGene::deviance},
+            {"deviance_adj", &QlGene::deviance_adj},
+            {"df_residual_adj", &QlGene::df_residual_adj},
+            {"s2", &QlGene::s2},
+            {"s2_prior", &QlGene::s2_prior},
+            {"s2_post", &QlGene::s2_post},
+            {"df_total", &QlGene::df_total}};
+        for (const auto &[name, field] : fields) {
+            auto &column = t->numeric(name);
+            for (std::size_t i = 0; i < r.genes.size(); ++i)
+                column[i] = r.genes[i].*field;
+        }
+        t->scalars = {{"dispersion", r.dispersion},
+                      {"top_proportion", r.top_proportion},
+                      {"average_ql_dispersion", r.scale},
+                      {"df_prior", r.df_prior},
+                      {"minimum_group", r.minimum_group},
+                      {"kept", static_cast<double>(r.kept)},
+                      {"top_genes", static_cast<double>(r.top_genes)}};
+        t->vectors = {{"library_sizes", r.library_sizes},
+                      {"filtered_library_sizes", r.filtered_library_sizes},
+                      {"norm_factors", r.norm_factors},
+                      {"effective_library_sizes", r.effective_library_sizes}};
+        *result = t.release();
+    });
+}
+
 int rapidglm_bulk_adjust(const double *pvalue, const double *base_mean, size_t n, double alpha,
                          int independent_filtering, double *padj, double *threshold) {
     return guarded([&] {
@@ -558,6 +648,26 @@ int rapidglm_nb_fixed_fits(const rapidglm_dense *design, const rapidglm_dense *c
         const auto r = nb_fixed_fits(x, y, Vector(size_factors, size_factors + x.rows),
                                      Vector(dispersions, dispersions + y.cols), tolerance,
                                      max_iterations, min_beta, max_beta, threads);
+        std::copy(r.coefficients.values.begin(), r.coefficients.values.end(), coefficients);
+        std::copy(r.fitted.values.begin(), r.fitted.values.end(), fitted);
+        std::copy(r.hat.values.begin(), r.hat.values.end(), hat);
+        std::copy(r.converged.begin(), r.converged.end(), converged);
+    });
+}
+
+int rapidglm_nb_floored_fits(const rapidglm_dense *design, const rapidglm_dense *counts,
+                             const double *size_factors, const double *dispersions, double min_mu,
+                             double tolerance, size_t max_iterations, double min_beta,
+                             double max_beta, int threads, double *coefficients, double *fitted,
+                             double *hat, int *converged) {
+    return guarded([&] {
+        const auto x = dense(design);
+        const auto y = dense(counts);
+        require(size_factors && dispersions && coefficients && fitted && hat && converged,
+                "arrays required");
+        const auto r = nb_floored_fits(x, y, Vector(size_factors, size_factors + x.rows),
+                                       Vector(dispersions, dispersions + y.cols), min_mu, tolerance,
+                                       max_iterations, min_beta, max_beta, threads);
         std::copy(r.coefficients.values.begin(), r.coefficients.values.end(), coefficients);
         std::copy(r.fitted.values.begin(), r.fitted.values.end(), fitted);
         std::copy(r.hat.values.begin(), r.hat.values.end(), hat);

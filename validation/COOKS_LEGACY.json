@@ -1,8 +1,8 @@
 {
   "purpose": "bulk_de against DESeq2 1.48.2 with its default Cook's distances (legacy_cooks: DESeq2's robust dispersion as implemented in PyDESeq2, MIT) and with RapidGLM's own estimator (legacy_cooks false, the default before 1.2.0)",
   "command": "python3 scripts/validate_cooks.py --thyroid-output validation/COOKS_THYROID.json --legacy-output validation/COOKS_LEGACY.json",
-  "version": "1.2.0",
-  "commit": "4446d4249011fa120299376732deec5bb1522409",
+  "version": "1.3.0",
+  "commit": "303cae173dc64d6ec55dcdd0ffb7fbc61969973d",
   "datasets": {
     "airway": {
       "deseq2_discoveries": 4834,

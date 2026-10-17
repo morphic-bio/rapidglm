@@ -1,6 +1,6 @@
 {
  "purpose": "Validation of the bulk DE module (rapidglm bulk-de) against DESeq2 1.48.2.",
- "commit": "4446d4249011fa120299376732deec5bb1522409",
+ "commit": "303cae173dc64d6ec55dcdd0ffb7fbc61969973d",
  "worktree_dirty": true,
  "command": "python3 scripts/validate_bulk.py --work DIR --output validation/BULK_DE.json",
  "datasets": {
@@ -40,10 +40,10 @@
     "boundary_lrt": 40
    },
    "rapidglm_seconds": {
-    "1": 1.1061553554609418,
-    "8": 0.3499074215069413
+    "1": 1.084666233509779,
+    "8": 0.33049064595252275
    },
-   "deseq2_seconds": 6.049,
+   "deseq2_seconds": 6.017,
    "shrinkage": {
     "prior_variance": [
      [
@@ -88,8 +88,8 @@
      }
     },
     "seconds": {
-     "rapidglm_extra": 0.17515152599662542,
-     "deseq2_lfcshrink": 2.727
+     "rapidglm_extra": 0.20210106950253248,
+     "deseq2_lfcshrink": 2.719
     }
    },
    "identical_1_and_8_threads": true
@@ -129,10 +129,10 @@
     "ok": 1000
    },
    "rapidglm_seconds": {
-    "1": 0.0950438492000103,
-    "8": 0.022854595445096493
+    "1": 0.09641599282622337,
+    "8": 0.023824083618819714
    },
-   "deseq2_seconds": 1.146,
+   "deseq2_seconds": 1.137,
    "shrinkage": {
     "prior_variance": [
      [
@@ -185,8 +185,8 @@
      }
     },
     "seconds": {
-     "rapidglm_extra": 0.01934244204312563,
-     "deseq2_lfcshrink": 0.553
+     "rapidglm_extra": 0.019487272016704082,
+     "deseq2_lfcshrink": 0.557
     }
    },
    "identical_1_and_8_threads": true
@@ -242,10 +242,10 @@
     "replaced_deseq2": 0
    },
    "rapidglm_seconds": {
-    "1": 0.11185178533196449,
-    "8": 0.04139095451682806
+    "1": 0.11171783320605755,
+    "8": 0.04117507394403219
    },
-   "deseq2_seconds": 1.325,
+   "deseq2_seconds": 1.321,
    "shrinkage": {
     "prior_variance": [
      [
@@ -284,8 +284,8 @@
      }
     },
     "seconds": {
-     "rapidglm_extra": 0.013489791192114353,
-     "deseq2_lfcshrink": 1.174
+     "rapidglm_extra": 0.012611803598701954,
+     "deseq2_lfcshrink": 1.168
     }
    },
    "identical_1_and_8_threads": true
@@ -341,10 +341,10 @@
     "replaced_deseq2": 0
    },
    "rapidglm_seconds": {
-    "1": 0.11168617848306894,
-    "8": 0.0409438107162714
+    "1": 0.11157391779124737,
+    "8": 0.04108841344714165
    },
-   "deseq2_seconds": 1.315,
+   "deseq2_seconds": 1.316,
    "shrinkage": {
     "prior_variance": [
      [
@@ -383,8 +383,8 @@
      }
     },
     "seconds": {
-     "rapidglm_extra": 0.031245125457644463,
-     "deseq2_lfcshrink": 1.188
+     "rapidglm_extra": 0.016223983839154243,
+     "deseq2_lfcshrink": 1.181
     }
    },
    "identical_1_and_8_threads": true
@@ -439,10 +439,10 @@
     "replaced_deseq2": 79
    },
    "rapidglm_seconds": {
-    "1": 0.16358046885579824,
-    "8": 0.05334556847810745
+    "1": 0.16473106388002634,
+    "8": 0.05345880798995495
    },
-   "deseq2_seconds": 2.753,
+   "deseq2_seconds": 2.755,
    "shrinkage": {
     "prior_variance": [
      [
@@ -482,8 +482,8 @@
      }
     },
     "seconds": {
-     "rapidglm_extra": 0.022906950674951077,
-     "deseq2_lfcshrink": 0.948
+     "rapidglm_extra": 0.021142253652215004,
+     "deseq2_lfcshrink": 0.945000000000001
     }
    },
    "identical_1_and_8_threads": true
@@ -515,10 +515,10 @@
  },
  "passed": true,
  "load_average": [
-  2.18505859375,
-  2.37646484375,
-  2.6201171875
+  5.650390625,
+  4.72314453125,
+  5.32373046875
  ],
- "version": "1.2.0",
- "commit_note": "the source measured is this commit (v1.2.0-dev.1); it was made while the stages ran, and stages that started before it recorded be60928 with the same source uncommitted"
+ "version": "1.3.0",
+ "commit_note": "the source measured is this commit (v1.3.0-dev.1); it was made while the stages ran, and stages that started before it recorded 5a38191 with the same source uncommitted"
 }

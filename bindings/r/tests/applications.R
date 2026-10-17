@@ -1,4 +1,4 @@
-# bulk_de(), sceptre() and sceptre_grid() against the RapidGLM CLI on the same inputs.
+# bulk_de(), edger_ql(), sceptre() and sceptre_grid() against the RapidGLM CLI on the same inputs.
 # Usage: RAPIDGLM_CLI=build/rapidglm Rscript bindings/r/tests/applications.R
 library(rapidglm)
 cli <- Sys.getenv("RAPIDGLM_CLI")
@@ -88,6 +88,23 @@ frame <- bulk_de(counts, ~ batch + group, col_data, contrast = c("group", "B", "
 reference <- bulk_de(counts, x, coefficient = "groupB")
 stopifnot(identical(frame$pvalue, reference$pvalue), length(attr(frame, "run")$size_factors) == samples)
 stopifnot(inherits(try(bulk_de(counts, x, coefficients = 2:3), silent = TRUE), "try-error"))
+
+# Quasi-likelihood DE (edgeR's procedure) on the same counts.
+ql_files <- files[c("responses", "design")]
+ql_cases <- list(
+  list(cli = list(coefficient = 2, threads = 3), r = list(coefficient = "groupB", threads = 3)),
+  list(cli = list(contrast = c(0, 1, -1)), r = list(contrast = c(0, 1, -1))),
+  list(cli = list(coefficients = c(1, 2)), r = list(coefficients = c("batchy", "groupB"))),
+  list(cli = list(filter = FALSE, normalization = "none", dispersion = 0.1),
+       r = list(filter = FALSE, normalization = "none", dispersion = 0.1)))
+for (case in ql_cases) {
+  table <- run_cli("edger-ql", c(ql_files, case$cli))
+  frame <- do.call(edger_ql, c(list(counts, ~ batch + group, col_data), case$r))
+  same(table, frame, text = "status")
+}
+frame <- edger_ql(counts, ~ batch + group, col_data, contrast = c("group", "B", "A"))
+reference <- edger_ql(counts, x, coefficient = "groupB")
+stopifnot(identical(frame$PValue, reference$PValue), length(attr(frame, "run")$norm_factors) == samples)
 
 # Perturbation screen: high MOI, three targets and two non-targeting guides.
 cells <- 600

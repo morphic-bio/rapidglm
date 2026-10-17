@@ -18,7 +18,11 @@ Tools:
   pydeseq2-rapidglm the same with inference = rapidglm.pydeseq2.RapidGLMInference;
   deseq2            DESeq2 DESeq() + results(), parallel = MulticoreParam(threads);
   deseq2-glmgampoi  the same with fitType = "glmGamPoi" (DESeq2 does not
-                    parallelize it, so it runs on one worker only).
+                    parallelize it, so it runs on one worker only);
+  rapidglm-edger-cli the CLI (`edger-ql`), whole process including input parsing;
+  edger             edgeR's default quasi-likelihood workflow (DGEList,
+                    filterByExpr, normLibSizes, glmQLFit, glmQLFTest, topTags;
+                    one thread, scripts/reference_edger_timing.R).
 Perturbation datasets: the Gasperini et al. (2019) at-scale screen panel
   (gasperini: 207,324 cells; positive controls, 10,000 enhancer-gene pairs and
   5,000 non-targeting pairs) and a 50,000-cell subsample (gasperini50k).
@@ -279,6 +283,27 @@ def run_deseq2(fit_type):
     return run
 
 
+def run_edger_cli(binary, data, threads, out):
+    config = out / "config.json"
+    config.write_text(json.dumps({
+        "responses": str(data["dir"] / "counts.mtx"), "design": str(data["dir"] / "x.tsv"),
+        "coefficient": data["index"], "threads": threads, "output": str(out / "rapid"),
+    }))
+    t = time.perf_counter()
+    subprocess.run([binary, "edger-ql", config], check=True, env=ENV, capture_output=True)
+    seconds = time.perf_counter() - t
+    table = pd.read_csv(out / "rapid.tsv", sep="\t", usecols=["PValue", "FDR"], na_values="NA",
+                        keep_default_na=False)
+    return seconds, table.rename(columns={"PValue": "pvalue", "FDR": "padj"})
+
+
+def run_edger(binary, data, threads, out):
+    subprocess.run(["Rscript", str(ROOT / "scripts/reference_edger_timing.R"), str(data["dir"]),
+                    data["coefficient"], str(out), R_LIBS], check=True, env=ENV, capture_output=True)
+    seconds = json.loads((out / "timing.json").read_text())["seconds"]
+    return seconds, pd.read_csv(out / "genes.tsv", sep="\t", usecols=["pvalue", "padj"])
+
+
 RAPIDGLM_R_LIBS = f"{ROOT / 'validation/local-data/R_rapidglm'}:{ROOT / 'validation/local-data/R_library'}"
 
 
@@ -299,6 +324,8 @@ TOOLS = {
     "pydeseq2-rapidglm": (run_pydeseq2("rapidglm"), (1, 8)),
     "deseq2": (run_deseq2("parametric"), (1, 8)),
     "deseq2-glmgampoi": (run_deseq2("glmGamPoi"), (1,)),
+    "rapidglm-edger-cli": (run_edger_cli, (1, 8)),
+    "edger": (run_edger, (1,)),
 }
 
 
@@ -331,6 +358,7 @@ def bulk(args):
                 tables[(tool, threads)] = table
                 print(f"{name} {tool} t{threads} repeat {repeat}: {seconds:.2f} s {record}", flush=True)
         reference = tables.get(("deseq2", 1))
+        edger_reference = tables.get(("edger", 1))
         for (tool, threads), runs_ in timings.items():
             best = min(runs_, key=lambda r: r["seconds"])
             entry = {"dataset": name, "tool": tool, "threads": threads, "seconds": best["seconds"],
@@ -338,6 +366,8 @@ def bulk(args):
                      "contended": best["contended"], "runs": runs_}
             if reference is not None:
                 entry["agreement_with_deseq2"] = agreement(tables[(tool, threads)], reference)
+            if edger_reference is not None:
+                entry["agreement_with_edger"] = agreement(tables[(tool, threads)], edger_reference)
             results.append(entry)
     return results
 

@@ -13,6 +13,35 @@ distances use DESeq2's robust dispersion as implemented in PyDESeq2
 ([below](#legacy-cooks-distances-2026-10-01)). Other figures in sections with a
 date record what was measured then.
 
+## DESeq2's floored fits and starting dispersion (1.4.0, 2026-10-17)
+
+The Replogle et al. (2022) K562 pilot tested pseudobulk samples of each
+perturbation in each 10x lane (1-5 cells, size factors near 0.02) against the
+non-targeting cells of every lane (size factors near 18), with the lane in the
+design (49 columns, 74-96 samples). There `bulk-de` 1.3.0 found 1,408
+discoveries for GATA1 against DESeq2's 6,067. Black-box runs of PyDESeq2
+showed why: DESeq2 floors fitted counts at 0.5 inside its GLM fits (its
+documented `minmu`; PyDESeq2 with the floor removed gives 3,344), and starts
+each gene's dispersion at the smaller of a rough and a moments estimate, the
+latter negative when size factors differ this much, so 2,829 genes start and
+stay at 1e-8. 1.4.0 follows both, ported from PyDESeq2 (METHODS.md, steps 3
+and 8), and computes the Wald SE of floored fits at the floored means, which
+reproduces DESeq2's SEs (PyDESeq2 uses the unfloored means; on GATA1 its
+discoveries are 5,756).
+
+| | GATA1 discoveries (DESeq2 6,067) | Jaccard with DESeq2, 20 perturbations | airway Jaccard | kang Jaccard |
+|---|---|---|---|---|
+| 1.3.0 | 1,408 | 0.09-0.88 | 0.932 (5,164 vs 4,834) | 0.973 (618 vs 635) |
+| 1.4.0 | 6,062 | 0.97-1.00 (median abs. log10 p difference at most 0.008) | 0.986 (4,833 vs 4,834) | 1.000 (635 vs 635) |
+
+The simulations are unchanged (sim3 0.983, sim3b and sim8 1.0) and the gates
+pass. The fits change only for genes with a fitted count below 0.5 (or a
+coefficient without a finite estimate); a group of zeros now has DESeq2's
+finite fold change and Wald test instead of `boundary_lrt`. The PyDESeq2 back
+end (`rapidglm.pydeseq2.RapidGLMInference`) now makes PyDESeq2's floored fits
+(`nb_floored_fits`), so its results equal PyDESeq2's default (GATA1: the same
+5,756 genes).
+
 ## Gates
 
 The thresholds in `scripts/validate_bulk.py` were set after the development
@@ -187,11 +216,12 @@ they differ from RapidGLM's by 1.4 log2 units at the median.
   METHODS.md) was chosen on sim3 and confirmed on sim3b. It catches slightly
   more injected outliers than DESeq2 (63 and 86 against 61 and 82) with no
   false flags.
-- **Infinite fold changes.** When the tested coefficient has no finite estimate,
-  for example a group of zeros, DESeq2 reports a large finite fold change and a
-  Wald p-value. RapidGLM reports the LR test at the final dispersion and a
-  missing fold change (`boundary_lrt`): 40 airway genes, 3 of them discoveries
-  (DESeq2: 2).
+- **Infinite fold changes (before 1.4.0).** When the tested coefficient has no
+  finite estimate, for example a group of zeros, DESeq2 reports a large finite
+  fold change and a Wald p-value. RapidGLM 1.3.0 reported the LR test at the
+  final dispersion and a missing fold change (`boundary_lrt`): 40 airway genes,
+  3 of them discoveries (DESeq2: 2). From 1.4.0 it fits them with the floor, as
+  DESeq2 does (above).
 - **Failed fits: none since the Newton steps.** Two airway genes whose
   reference cell line has only zeros used to fail the final fit. The zero cell
   pushes four coefficients to infinity together, and under Fisher scoring the

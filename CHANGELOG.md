@@ -1,14 +1,62 @@
 # Changelog
 
-## 1.3.0 (development release 1.3.0-dev.1, 2026-10-10)
+## 1.4.0 (development release 1.4.0-dev.1, 2026-10-17)
+
+Bulk DE (`bulk-de`) now fits low counts as DESeq2 does, and two workflows are
+new: quasi-likelihood DE following edgeR 4 (`edger-ql`) and cis-QTL mapping
+(`qtl`, provisional). The perturbation workflow, single fits, batch fits and
+score scans are unchanged. The code of 1.4.0 is tagged `v1.4.0-dev.1` for
+testing; the benchmark receipts and README tables are those of 1.3.0 and follow
+in the release.
+
+**For a user of 1.3.0 who changes no option:** `bulk-de` results change for
+genes with a fitted count below 0.5 (low counts, groups of zeros, samples with
+small size factors such as pseudobulk samples of few cells) and for genes whose
+starting dispersion moves to the 1e-8 floor; the other genes are unchanged.
+Agreement with DESeq2 improves: airway Jaccard 0.932 to 0.986, kang 0.973 to
+1.000, and a Perturb-seq pseudobulk design from 0.09-0.88 to 0.97-1.00.
+
+- **DESeq2's floored fits in `bulk-de`** (`min_mean`, default 0.5). Where a
+  fitted count falls below the floor, or a coefficient has no finite estimate,
+  the gene is fitted as DESeq2 fits it, with fitted counts floored at 0.5 inside
+  the iterations (PyDESeq2's irls_solver, MIT, ported with attribution); its
+  Wald SE comes from the floored means, which reproduces DESeq2's. A group of
+  zeros now has DESeq2's finite fold change and Wald test instead of the LR
+  test with status `boundary_lrt`. The initial means of non-group designs use
+  the same fits.
+- **DESeq2's starting dispersion** in `bulk-de`: the smaller of the rough
+  (fitted values floored at 1) and moments estimates, as PyDESeq2 computes it.
+- **`nb_floored_fits`** (C `rapidglm_nb_floored_fits`, Python
+  `capi.nb_floored_fits`): batch fits with the floor. The PyDESeq2 back end
+  (`rapidglm.pydeseq2.RapidGLMInference`) uses them for `irls`, so it now gives
+  PyDESeq2's default results.
+- **Quasi-likelihood DE following edgeR 4** (`edger-ql`; C++ `edger_ql`,
+  `QlOptions`). The default workflow of edgeR 4.6.2: `filterByExpr`, TMM,
+  the common Cox-Reid dispersion of the most abundant genes, quasi-dispersions
+  from adjusted unit deviances with the average quasi-dispersion rule, their
+  moderation against average log CPM and quasi-likelihood F tests, written from
+  the papers, the documentation and black-box runs. On five of eight datasets
+  the discoveries at FDR 0.1 are edgeR's; on the GTEx thyroid sets the
+  differences trace to genes whose edgeR fits report deviances that are not
+  those of their fitted values ([METHODS.md](METHODS.md#quasi-likelihood-differential-expression)).
+  Scripts: `validate_edger.py`, `reference_edger.R`, `reference_edger_fits.R`.
+- **cis-QTL mapping** (`qtl`; C++ `cis_qtl`), after jaxQTL (MIT; Zhang et al.
+  2025): score tests of each cis variant against a covariate-only NB, Poisson
+  or Gaussian null, permutations that refit the null, and the Beta
+  approximation of the permutation maxima. Inputs: a phenotype BED, PLINK
+  genotypes, covariates and library sizes. Provisional. On Geuvadis chromosome
+  22 (580 genes, 462 samples) the Gaussian model's eGenes are FastQTL's and
+  tensorQTL's (Jaccard 0.99, the same lead variant for every gene) and the NB
+  model's are jaxQTL's NB eGenes (Jaccard 0.99): `scripts/compare_eqtl.py`.
+  The cross products of the scores run in register tiles (with AVX2 fused
+  multiply-adds where available), and Gaussian permutations are scored in
+  batches against a basis computed once per gene.
+
+## 1.3.0 (2026-10-10)
 
 The perturbation workflow (`sceptre`). Bulk DE, single fits, batch fits and
-score scans are unchanged.
-
-The code of 1.3.0 is complete and tagged `v1.3.0-dev.1` for testing. The
-application benchmark and SCEPTRE-agreement receipts, and the tables in
-README.md and docs/BENCHMARK.md, are still those of 1.2.0; they are replaced in
-the release.
+score scans are unchanged. The library is the code of the development release
+`v1.3.0-dev.1`; this release adds the receipts and documents measured with it.
 
 **For a user of 1.2.0 who changes no option:** every resampled p-value of
 `sceptre` changes, because a pair's draws are now keyed by the pair itself and
@@ -71,6 +119,23 @@ reproduces the tables of 1.2.0 byte for byte (checked on six runs).
 - Engine: `ResampleOptions::prescreen_seed` (a shared prescreen under its own
   seed), `adjust_pvalues(p, bonferroni, family_size)`, and
   `SceptreResult::null_fits`.
+- Every benchmark was measured again with this version
+  ([docs/BENCHMARK.md](docs/BENCHMARK.md)). The perturbation workflow is 4.5
+  times faster than SCEPTRE on 50,000 cells (one thread) and 4.4 times on
+  207,324 cells (eight threads), about a tenth faster than 1.2.0. With the new
+  draws the full screen gives 96 discoveries against SCEPTRE's 101 at the
+  benchmark's seed (Jaccard 0.89; 101 and 0.92 with the draws of 1.2.0). Over
+  six seeds the Jaccard index is 0.89 to 0.96, and 0.90 to 0.96 between two
+  RapidGLM seeds
+  ([validation/PERTURBATION_SEEDS.json](validation/PERTURBATION_SEEDS.json),
+  `scripts/validate_perturbation_seeds.py`).
+- The SCEPTRE-agreement receipt takes the mean discovery count of its gate G2
+  over 200 seeds (`--gate-seeds`) instead of ten. Over ten seeds the mean's
+  standard error is a third of the gate's margin on the public high-MOI panel,
+  and the outcome turned on the seeds: 12.4 (pass) with the draws of 1.2.0 and
+  13.2 (fail) with those of 1.3.0, for the same ten seeds. Over 200 seeds both
+  give 12.3 against SCEPTRE's 11, within the margin of 1.65
+  ([docs/SCEPTRE_STAGING.md](docs/SCEPTRE_STAGING.md)).
 
 ## 1.2.0 (2026-10-07)
 

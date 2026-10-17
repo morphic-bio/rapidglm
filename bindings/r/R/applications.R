@@ -101,6 +101,69 @@ bulk_de <- function(counts, design, col_data = NULL, coefficient = NULL, contras
   as_frame(r, colnames(y))
 }
 
+#' Quasi-likelihood differential expression following edgeR's procedure
+#'
+#' The default workflow of edgeR 4 (filterByExpr, TMM normalization, glmQLFit,
+#' glmQLFTest), written from its papers, documentation and black-box runs.
+#'
+#' @param counts genes x samples counts (matrix, data frame or sparse Matrix).
+#' @param design samples x columns design matrix, or a formula with `col_data`.
+#' @param col_data sample data for a design formula.
+#' @param coefficient tested column (name or 1-based index; default: the last).
+#' @param contrast numeric weights per design column, or
+#'   `c(variable, tested_level, reference_level)` for treatment-coded factors.
+#' @param coefficients several columns tested jointly.
+#' @param filter filter genes by expression as edgeR's filterByExpr does.
+#' @param normalization "tmm" (default) or "none".
+#' @param norm_factors normalization factors to use as given (one per sample).
+#' @param dispersion the NB dispersion; `NULL`: estimated as edgeR does.
+#' @return A data frame per gene (AveLogCPM, logFC, F, PValue, FDR,
+#'   quasi-dispersions, ...) with run-level values (dispersion, prior df, library
+#'   sizes and factors) in `attr(, "run")`.
+edger_ql <- function(counts, design, col_data = NULL, coefficient = NULL, contrast = NULL,
+                     coefficients = NULL, filter = TRUE, min_count = 10, min_total_count = 15,
+                     large_n = 10, min_prop = 0.7, normalization = c("tmm", "none"),
+                     norm_factors = NULL, dispersion = NULL, prior_count = 0.125, threads = 1) {
+  y <- as_observations(counts)
+  x <- as_design(design, col_data, nrow(y))
+  if (sum(!is.null(coefficient), !is.null(contrast), !is.null(coefficients)) > 1)
+    stop("give one of coefficient, contrast and coefficients", call. = FALSE)
+  column <- function(k) {
+    if (is.character(k)) {
+      j <- match(k, colnames(x))
+      if (anyNA(j)) stop(sprintf("no design column %s", k[is.na(j)][1]), call. = FALSE)
+      return(j)
+    }
+    as.integer(k)
+  }
+  o <- list(filter = as.numeric(filter), min_count = min_count, min_total_count = min_total_count,
+            large_n = large_n, min_prop = min_prop,
+            tmm = choice(match.arg(normalization), c(tmm = 1, none = 0), "normalization"),
+            prior_count = prior_count, threads = threads)
+  if (!is.null(dispersion)) o$dispersion <- dispersion
+  if (!is.null(norm_factors)) o$norm_factors <- as.numeric(norm_factors)
+  if (!is.null(coefficient)) o$coefficient <- column(coefficient) - 1
+  if (!is.null(contrast)) {
+    if (is.character(contrast)) {
+      stopifnot(length(contrast) == 3)
+      w <- numeric(ncol(x))
+      for (k in 2:3) {
+        j <- match(paste0(contrast[1], contrast[k]), colnames(x))
+        if (!is.na(j)) w[j] <- if (k == 2) 1 else -1
+      }
+      if (all(w == 0)) stop("no design column codes the contrast", call. = FALSE)
+      contrast <- w
+    }
+    o$contrasts <- matrix(as.numeric(contrast), nrow = 1)
+  }
+  if (!is.null(coefficients)) {
+    j <- column(coefficients)
+    o$contrasts <- diag(ncol(x))[j, , drop = FALSE]
+  }
+  r <- rapidglm_edger_ql_(x, y@p, y@i, y@x, nrow(y), ncol(y), o)
+  as_frame(r, colnames(y))
+}
+
 #' Perturbation screen analysis by the SCEPTRE method
 #'
 #' @param responses genes x cells counts; `assignments` guides x cells calls (nonzero = assigned).

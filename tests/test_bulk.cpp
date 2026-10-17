@@ -224,8 +224,12 @@ BOOST_AUTO_TEST_CASE(bulk_de_reports_zero_genes_and_infinite_changes) {
     BOOST_TEST(zero.base_mean == 0.0);
     BOOST_TEST(std::isnan(zero.p_value));
     BOOST_TEST(std::isnan(zero.adjusted_p));
-    BOOST_TEST(gone.status == "boundary_lrt");
-    BOOST_TEST(std::isnan(gone.log2_fold_change));
+    // A group of zeros: fitted with counts floored at 0.5 as DESeq2 fits them, so
+    // the fold change is finite and the Wald test applies (DESeq2 gives -9.35,
+    // SE 1.10 for such a gene).
+    BOOST_TEST(gone.status == "ok");
+    BOOST_TEST(gone.log2_fold_change < -5);
+    BOOST_TEST(std::isfinite(gone.lfc_se));
     BOOST_TEST(gone.p_value < 1e-6);
     BOOST_TEST(gone.adjusted_p < 0.1);
     BOOST_CHECK_THROW(bulk_de(b.x, dense_columns({{1, 2, 3, 4, 5, 6, 7, 8.5}}), o), std::exception);
@@ -335,7 +339,7 @@ BOOST_AUTO_TEST_CASE(bulk_de_normal_shrinkage) {
         }
     }
     BOOST_TEST(smaller == finite);
-    BOOST_TEST(shrunk.genes.back().status == "boundary_lrt");
+    BOOST_TEST(shrunk.genes.back().status == "ok");
     BOOST_TEST(shrunk.genes.back().shrunken_lfc < -1); // finite under the prior
     // A supplied, very wide prior returns the maximum likelihood change.
     o.lfc_prior_variance = {1e6, 1e8};

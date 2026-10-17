@@ -266,6 +266,52 @@ run_sceptre(const cpp11::doubles_matrix<> &design, const cpp11::integers &yp,
     return table(t);
 }
 
+[[cpp11::register]] cpp11::writable::list rapidglm_edger_ql_(cpp11::doubles_matrix<> design,
+                                                             cpp11::integers p, cpp11::integers i,
+                                                             cpp11::doubles x, int samples,
+                                                             int genes, cpp11::list o) {
+    const auto d = dense(design);
+    const auto y = sparse(p, i, x, samples, genes);
+    rapidglm_ql_options q;
+    rapidglm_ql_options_init(&q);
+    std::vector<double> contrasts, factors;
+    if (has(o, "coefficient"))
+        q.coefficient = static_cast<size_t>(number(o, "coefficient"));
+    if (has(o, "contrasts")) {
+        cpp11::doubles_matrix<> c(o["contrasts"]); // rows x design columns
+        for (int r = 0; r < c.nrow(); ++r)
+            for (int k = 0; k < c.ncol(); ++k)
+                contrasts.push_back(c(r, k));
+        q.contrasts = contrasts.data();
+        q.contrast_rows = static_cast<size_t>(c.nrow());
+    }
+    if (has(o, "norm_factors")) {
+        cpp11::doubles f(o["norm_factors"]);
+        factors.assign(f.begin(), f.end());
+        q.norm_factors = factors.data();
+    }
+    const auto integer = [&](const char *name, int &field) {
+        if (has(o, name))
+            field = static_cast<int>(number(o, name));
+    };
+    const auto real = [&](const char *name, double &field) {
+        if (has(o, name))
+            field = number(o, name);
+    };
+    integer("filter", q.filter);
+    integer("tmm", q.tmm);
+    integer("threads", q.threads);
+    real("min_count", q.min_count);
+    real("min_total_count", q.min_total_count);
+    real("large_n", q.large_n);
+    real("min_prop", q.min_prop);
+    real("dispersion", q.dispersion);
+    real("prior_count", q.prior_count);
+    rapidglm_table *t = nullptr;
+    check(rapidglm_edger_ql(&d.view, &y.view, &q, &t));
+    return table(t);
+}
+
 [[cpp11::register]] cpp11::writable::list
 rapidglm_sceptre_(cpp11::doubles_matrix<> design, cpp11::integers yp, cpp11::integers yi,
                   cpp11::doubles yx, int genes, cpp11::integers gp, cpp11::integers gi,

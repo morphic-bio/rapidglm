@@ -20,7 +20,8 @@ attr(grid_res, "tally")   # the pairs that failed pair QC, by target and kind
 ```
 
 - `bulk_de()` runs the DESeq2 procedure (written from its paper and
-  documentation). `sceptre()` runs the perturbation workflow on a list of
+  documentation) and `edger_ql()` edgeR 4's default quasi-likelihood workflow
+  (written from its papers, documentation and black-box runs). `sceptre()` runs the perturbation workflow on a list of
   pairs, and `sceptre_grid()` on targets and responses without a list. A pair's
   draws depend only on the seed, its response and its target (`response_ids`
   names the responses), so its row does not depend on what else is tested.

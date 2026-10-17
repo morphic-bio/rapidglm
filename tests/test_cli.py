@@ -29,10 +29,110 @@ class CLI(unittest.TestCase):
             family="poisson",
         )
         config.update(kwargs)
+        # None drops a default key.
+        config = {k: v for k, v in config.items() if v is not None}
         p = self.root / "config.json"
         p.write_text(json.dumps(config))
         r = subprocess.run([BINARY, command, p], text=True, capture_output=True)
         return r, config
+
+    def qtl_inputs(self, n=80, genes=3, per_gene=15, causal=(1, 7)):
+        """PLINK 1 genotypes, a phenotype BED, covariates and library sizes; gene
+        `causal[0]` rises with variant `causal[1]` of its window."""
+        import random
+        rng = random.Random(4)
+        samples = [f"S{i}" for i in range(n)]
+        bim, dosage, positions = [], [], []
+        for g in range(genes):
+            for k in range(per_gene):
+                v = len(bim)
+                pos = 1_000_000 * (g + 1) - 200_000 + 25_000 * k
+                bim.append(f"1\trs{v}\t0\t{pos}\tA\tG")
+                positions.append(pos)
+                af = rng.uniform(0.15, 0.5)
+                dosage.append([sum(rng.random() < af for _ in range(2)) for _ in range(n)])
+        self.file("geno.bim", "\n".join(bim) + "\n")
+        self.file("geno.fam", "".join(f"F{i} {s} 0 0 0 -9\n" for i, s in enumerate(samples)))
+        # Variant-major .bed: two bits per sample, first sample lowest; dosage counts allele 1
+        # (00 two copies, 10 one, 11 none; one call set missing (01)).
+        code = {2: 0b00, 1: 0b10, 0: 0b11}
+        data = bytearray([0x6C, 0x1B, 0x01])
+        for v, row in enumerate(dosage):
+            for start in range(0, n, 4):
+                byte = 0
+                for j, d in enumerate(row[start:start + 4]):
+                    bits = 0b01 if (v == 0 and start + j == 3) else code[d]
+                    byte |= bits << (2 * j)
+                data.append(byte)
+        (self.root / "geno.bed").write_bytes(bytes(data))
+        lib = [rng.uniform(5e5, 2e6) for _ in range(n)]
+        cov = [[rng.gauss(0, 1) for _ in range(n)] for _ in range(2)]
+        lines = ["#chr\tstart\tend\tgene_id\t" + "\t".join(samples)]
+        import math
+        for g in range(genes):
+            tss = 1_000_000 * (g + 1)
+            counts = []
+            for i in range(n):
+                eta = math.log(lib[i]) - 10 + 0.3 * cov[0][i]
+                if g == causal[0]:
+                    eta += 0.6 * dosage[g * per_gene + causal[1]][i]
+                mu = math.exp(eta) * rng.gammavariate(4, 0.25)
+                # A Poisson draw: by inversion for small means, else by its normal approximation.
+                if mu < 30:
+                    k, prob, u = 0, math.exp(-mu), rng.random()
+                    cum = prob
+                    while u > cum:
+                        k += 1
+                        prob *= mu / k
+                        cum += prob
+                else:
+                    k = max(0, round(rng.gauss(mu, math.sqrt(mu))))
+                counts.append(k)
+            lines.append(f"1\t{tss - 1}\t{tss}\tG{g}\t" + "\t".join(map(str, counts)))
+        self.file("pheno.bed", "\n".join(lines) + "\n")
+        self.file("cov.txt", "id\t" + "\t".join(samples) + "\n" +
+                  "".join(f"c{k}\t" + "\t".join(f"{x:.6f}" for x in row) + "\n" for k, row in enumerate(cov)))
+        self.file("lib.tsv", "sample\tsize\n" + "".join(f"{s}\t{x:.1f}\n" for s, x in zip(samples, lib)))
+        return dict(phenotypes=str(self.root / "pheno.bed"), genotypes=str(self.root / "geno"),
+                    covariates=str(self.root / "cov.txt"), library_sizes=str(self.root / "lib.tsv"))
+
+    def test_qtl_maps_cis_variants_from_plink_and_bed_inputs(self):
+        inputs = self.qtl_inputs()
+        rows = {}
+        for threads in (1, 3):
+            config = dict(inputs, output=str(self.root / f"qtl{threads}"), family="nb", window=250_000,
+                          permutations=100, nominal=True, seed=5, threads=threads)
+            path = self.file(f"qtl{threads}.json", json.dumps(config))
+            subprocess.run([str(BINARY), "qtl", path], check=True, capture_output=True)
+            with open(self.root / f"qtl{threads}.cis.tsv") as f:
+                rows[threads] = list(csv.DictReader(f, delimiter="\t"))
+        self.assertEqual(rows[1], rows[3])  # thread-invariant
+        table = {r["phenotype_id"]: r for r in rows[1]}
+        self.assertEqual(set(table), {"G0", "G1", "G2"})
+        self.assertTrue(all(r["status"] == "ok" for r in rows[1]))
+        # Windows of 250 kb around each TSS hold the variants at -200, -175, ..., +150 kb.
+        self.assertTrue(all(int(r["variants"]) == 15 for r in rows[1]))
+        self.assertEqual(table["G1"]["lead_variant"], "rs22")
+        self.assertLess(float(table["G1"]["beta_p"]), 0.01)
+        self.assertAlmostEqual(float(table["G1"]["permutation_p"]), 1 / 101)
+        self.assertEqual(table["G1"]["allele1"], "A")
+        with open(self.root / "qtl1.nominal.tsv") as f:
+            nominal = list(csv.DictReader(f, delimiter="\t"))
+        self.assertEqual(len(nominal), 45)
+        record = json.loads((self.root / "qtl1.run.json").read_text())
+        self.assertEqual((record["samples"], record["phenotypes_tested"], record["covariates"]), (80, 3, 2))
+        # min_maf drops variants (none has a minor allele frequency above 0.5); a
+        # missing library size is an error.
+        config = dict(inputs, output=str(self.root / "maf"), min_maf=0.6, permutations=0)
+        subprocess.run([str(BINARY), "qtl", self.file("maf.json", json.dumps(config))], check=True,
+                       capture_output=True)
+        with open(self.root / "maf.cis.tsv") as f:
+            self.assertTrue(all(r["status"] == "no_cis_variants" for r in csv.DictReader(f, delimiter="\t")))
+        self.assertEqual(json.loads((self.root / "maf.run.json").read_text())["variants"], 0)
+        self.file("lib.tsv", "sample\tsize\nS0\t100\n")
+        config = dict(inputs, output=str(self.root / "bad"), permutations=0)
+        self.assertNotEqual(subprocess.run([str(BINARY), "qtl", self.file("bad.json", json.dumps(config))],
+                                           capture_output=True).returncode, 0)
 
     def test_json_and_hashes(self):
         r, c = self.execute("fit", threads=2)
@@ -871,6 +971,53 @@ class CLI(unittest.TestCase):
             family="nb",
             coefficient=1,
         )
+
+    def test_edger_ql_tables_records_and_settings(self):
+        panel = {**self.nb_panel(), "family": None}
+        tables = []
+        for threads in (1, 3):
+            r, _ = self.execute("edger-ql", threads=threads, **panel)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            tables.append((self.root / "result.tsv").read_text())
+        self.assertEqual(tables[0], tables[1])
+        rows = list(csv.DictReader(tables[0].splitlines(), delimiter="\t"))
+        self.assertEqual(len(rows), 12)
+        for column in ("gene", "status", "AveLogCPM", "logFC", "F", "PValue", "FDR", "s2", "s2_prior",
+                       "s2_post", "df_residual_adj", "df_total"):
+            self.assertIn(column, rows[0])
+        record = json.loads((self.root / "result.run.json").read_text())
+        self.assertEqual(record["command"], "edger-ql")
+        self.assertEqual(record["kept"], sum(x["status"] != "filtered" for x in rows))
+        self.assertGreater(record["dispersion"], 0)
+        self.assertGreaterEqual(record["average_ql_dispersion"], 1)
+        self.assertGreater(record["df_prior"], 0)
+        samples = (self.root / "result.samples.tsv").read_text().splitlines()
+        self.assertEqual(samples[0], "sample\tlib_size\tlib_size_filtered\tnorm_factor\teffective_lib_size")
+        self.assertEqual(len(samples), 9)
+        # Without the filter every gene is kept; a supplied dispersion is used as given.
+        r, _ = self.execute("edger-ql", filter=False, dispersion=0.05, normalization="none", **panel)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        record = json.loads((self.root / "result.run.json").read_text())
+        self.assertEqual(record["kept"], 12)
+        self.assertEqual(record["dispersion"], 0.05)
+        self.assertIsNone(record["top_proportion"])
+        self.assertTrue(all(line.split("\t")[3] == "1" for line in
+                            (self.root / "result.samples.tsv").read_text().splitlines()[1:]))
+        # A contrast equal to the coefficient gives the same tests.
+        r, _ = self.execute("edger-ql", **panel)
+        base = list(csv.DictReader((self.root / "result.tsv").read_text().splitlines(), delimiter="\t"))
+        r, _ = self.execute("edger-ql", **{**{k: v for k, v in panel.items() if k != "coefficient"},
+                                           "contrast": [0, 1]})
+        self.assertEqual(r.returncode, 0, r.stderr)
+        contrast = list(csv.DictReader((self.root / "result.tsv").read_text().splitlines(), delimiter="\t"))
+        for a, b in zip(base, contrast):
+            if a["PValue"] != "NA":
+                self.assertAlmostEqual(float(a["PValue"]), float(b["PValue"]), places=9)
+        for extra, message in [(dict(family="nb"), "family is not an edger-ql setting"),
+                               (dict(normalization="upper"), "normalization must be tmm/none")]:
+            r, _ = self.execute("edger-ql", **{**panel, **extra})
+            self.assertEqual(r.returncode, 2, extra)
+            self.assertIn(message, r.stderr)
 
     def test_quasi_likelihood_is_the_nb_pseudobulk_default(self):
         tables = []

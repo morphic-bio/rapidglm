@@ -18,7 +18,7 @@ and is marked `contended` when that share exceeds a fifth.
 
 The results below, and those in [GLM_COMPARISON.md](GLM_COMPARISON.md) and
 [SOLVERS.md](SOLVERS.md), were measured on one workstation (Intel Core
-i9-13900KF, 125 GiB) with version 1.2.0, on 2026-10-06 and 2026-10-07.
+i9-13900KF, 125 GiB) with version 1.3.0, on 2026-10-09 and 2026-10-10.
 
 - **Cores.** The processor has eight performance cores and sixteen efficiency
   cores. Four logical CPUs, on two performance cores, were offline after
@@ -107,7 +107,7 @@ DESeq2 at 1 thread, or SCEPTRE at 1 thread, over the same genes or discovery
 pairs: the Jaccard index of BH discoveries at 0.1 and the Spearman correlation
 of p-values.
 
-## Results (version 1.2.0, 2026-10-07)
+## Results (version 1.3.0, 2026-10-10)
 
 Receipts:
 - [validation/APPLICATIONS_BULK.json](../validation/APPLICATIONS_BULK.json):
@@ -115,29 +115,33 @@ Receipts:
   with two;
 - [validation/APPLICATIONS_PERTURBATION.json](../validation/APPLICATIONS_PERTURBATION.json):
   one repeat;
+- [validation/PERTURBATION_SEEDS.json](../validation/PERTURBATION_SEEDS.json):
+  the full screen's agreement with SCEPTRE under several seeds;
 - [validation/ENGINE_BATCH.json](../validation/ENGINE_BATCH.json): 1,000 NB and
   Poisson responses on 5,000 observations
   ([GLM_COMPARISON.md](GLM_COMPARISON.md#many-responses-with-one-design));
 - [validation/CRT_SCALING.json](../validation/CRT_SCALING.json): the
-  conditional randomization test on larger panels.
+  conditional randomization test on larger panels;
+- [validation/UNTESTABLE_PAIRS.json](../validation/UNTESTABLE_PAIRS.json):
+  requests in which most pairs fail pair QC.
 
-No run was marked `contended`: other processes used at most 11% of a run's
+No run was marked `contended`: other processes used at most 9% of a run's
 CPUs in the bulk runs and 2% in the perturbation runs.
 
 Bulk DE, one thread / eight threads, in seconds:
 
 | Data | RapidGLM (R) | DESeq2 | DESeq2 + glmGamPoi | PyDESeq2 | PyDESeq2 + RapidGLM | Jaccard with DESeq2 (RapidGLM) |
 |---|---|---|---|---|---|---:|
-| airway, 8 samples | 0.99 / 0.29 | 6.04 / 2.68 | 15.2 | 53.2 / 12.2 | 3.20 / 3.32 | 0.932 |
-| thyroid, 32 samples | 4.34 / 0.77 | 31.3 / 7.45 | 37.9 | 105 / 20.4 | 7.80 / 5.47 | 0.984 |
-| thyroid, 128 samples | 9.49 / 1.72 | 119 / 31.3 | 86.1 | 115 / 22.9 | 13.8 / 5.52 | 0.997 |
-| thyroid, 647 samples | 34.7 / 6.48 | 482 / 83.9 | 272 | 173 / 35.6 | 43.5 / 13.3 | 1.000 |
+| airway, 8 samples | 1.02 / 0.28 | 6.09 / 2.75 | 15.4 | 53.5 / 12.5 | 3.21 / 3.36 | 0.932 |
+| thyroid, 32 samples | 4.35 / 0.78 | 31.6 / 7.56 | 38.2 | 105 / 20.7 | 7.90 / 5.54 | 0.984 |
+| thyroid, 128 samples | 9.56 / 1.74 | 119 / 31.3 | 86.3 | 116 / 23.0 | 13.7 / 5.54 | 0.997 |
+| thyroid, 647 samples | 35.1 / 6.55 | 481 / 83.8 | 272 | 173 / 37.4 | 43.3 / 13.3 | 1.000 |
 
-- **Speed-up over DESeq2:** 6.1×, 7.2×, 12.5× and 13.9× on one thread, and
-  9.3×, 9.7×, 18.2× and 13.0× on eight.
+- **Speed-up over DESeq2:** 6.0×, 7.3×, 12.4× and 13.7× on one thread, and
+  9.7×, 9.7×, 18.0× and 12.8× on eight.
 - **Interfaces:** the CLI, Python and the PyDESeq2-style API give the same
-  table as R, in similar times (on the 647-sample set 37.9, 35.1 and 36.1 s on
-  one thread, against 34.7 s from R).
+  table as R, in similar times (on the 647-sample set 38.6, 34.7 and 35.7 s on
+  one thread, against 35.1 s from R).
 - **PyDESeq2:** with RapidGLM as its inference back end PyDESeq2 takes 4 to 17
   times less on one thread. Most of what remains is PyDESeq2's own data
   handling, which is why eight threads gain little.
@@ -145,6 +149,7 @@ Bulk DE, one thread / eight threads, in seconds:
   distances. With RapidGLM's own estimator (`legacy_cooks: false`, the default
   before 1.2.0) the Jaccard indices at 128 and 647 samples are 0.579 and 0.904
   ([BULK_DE.md](BULK_DE.md#larger-multi-factor-designs)).
+- Bulk DE did not change in 1.3.0; these runs repeat those of 1.2.0 within 2%.
 
 Perturbation, in seconds, against SCEPTRE 0.99.0. Agreement is over the
 discovery pairs that both tools tested. Acceptance `ks` accepts the skew-normal
@@ -153,16 +158,26 @@ draws:
 
 | Data | Threads | Acceptance | RapidGLM (R / Python / CLI) | SCEPTRE | Discoveries (RapidGLM / SCEPTRE) | Jaccard | p-value Spearman |
 |---|---:|---|---|---:|---|---:|---:|
-| Gasperini, 50,000 cells | 1 | `ks` | 371 / 352 / 367 | 1,522 | 29 / 24 | 0.83 | 0.985 |
-| | 1 | default | 468 / 453 / 468 | 1,522 | 28 / 24 | 0.79 | 0.985 |
-| | 8 | `ks` | 63.8 / 54.1 / 55.1 | 251 | | | |
-| | 8 | default | 79.6 / 71.0 / 71.7 | 251 | | | |
-| Gasperini, 207,324 cells | 8 | `ks` | 336 / 291 / 298 | 1,507 | 101 / 101 | 0.92 | 0.986 |
-| | 8 | default | 450 / 419 / 415 | 1,507 | 101 / 101 | 0.92 | 0.986 |
+| Gasperini, 50,000 cells | 1 | `ks` | 336 / 337 / 344 | 1,517 | 28 / 24 | 0.79 | 0.985 |
+| | 1 | default | 431 / 428 / 436 | 1,517 | 28 / 24 | 0.79 | 0.985 |
+| | 8 | `ks` | 59.4 / 52.1 / 52.8 | 251 | | | |
+| | 8 | default | 75.3 / 68.4 / 68.5 | 251 | | | |
+| Gasperini, 207,324 cells | 8 | `ks` | 335 / 306 / 291 | 1,473 | 96 / 101 | 0.89 | 0.986 |
+| | 8 | default | 446 / 411 / 406 | 1,473 | 96 / 101 | 0.89 | 0.986 |
 
-- **Speed-up over SCEPTRE** with `ks`, from R: 4.1× (50,000 cells, one thread),
-  3.9× (eight threads) and 4.5× (207,324 cells, eight threads). With the
-  defaults: 3.2×, 3.2× and 3.4×.
+- **Speed-up over SCEPTRE** with `ks`, from R: 4.5× (50,000 cells, one thread),
+  4.2× (eight threads) and 4.4× (207,324 cells, eight threads). With the
+  defaults: 3.5×, 3.3× and 3.3×. The runs are about a tenth faster than with
+  1.2.0, which fitted a null model for every response and gathered the cells of
+  every pair before pair QC.
+- **Agreement turns on the draws.** From 1.3.0 a pair's draws are keyed by the
+  pair itself, so these runs use other draws than those of 1.2.0, which made
+  29 and 101 discoveries (Jaccard 0.83 and 0.92) with the same seed. On the
+  full screen six seeds give 96 to 102 discoveries and Jaccard indices
+  with SCEPTRE of 0.89 to 0.96; two RapidGLM seeds overlap at
+  0.90 to 0.96
+  ([PERTURBATION_SEEDS.json](../validation/PERTURBATION_SEEDS.json)). With
+  `stream_keys: "position"` the 1.2.0 tables are reproduced byte for byte.
 - The CLI's times include parsing the MatrixMarket input: 1.4 GB for the 50,000
   cells and 6 GB for all cells.
 
@@ -173,10 +188,35 @@ efficiency cores:
 
 | Targets × genes | Pairs tested | Seconds (`ks` / default) | Draws, millions (`ks` / default) | Discoveries (`ks` / default) |
 |---|---:|---|---|---|
-| 50 × 1,000 | 48,596 | 134 / 133 | 29.4 / 31.0 | 6 / 6 |
-| 200 × 1,000 | 193,824 | 416 / 440 | 116.5 / 122.3 | 5 / 5 |
-| 100 × 7,418 | 721,266 | 1,676 / 1,741 | 436.1 / 454.8 | 22 / 14 |
+| 50 × 1,000 | 48,596 | 123 / 128 | 29.4 / 31.0 | 6 / 6 |
+| 200 × 1,000 | 193,824 | 398 / 421 | 116.8 / 122.4 | 5 / 5 |
+| 100 × 7,418 | 721,266 | 1,577 / 1,662 | 437.0 / 456.7 | 25 / 14 |
 
-On the largest panel the defaults leave 14 of the 22 discoveries made with
-`ks`. Direct counts of the tail contradict four of the eight that are dropped,
-and none of the 14 ([validation/SKEW_NORMAL_CHECK.json](../validation/SKEW_NORMAL_CHECK.json)).
+On the largest panel the defaults leave 14 of the 25 discoveries made with
+`ks`. Of the eleven that are dropped, direct counts of the tail contradict
+five and one was not counted; they contradict none of the 14
+([validation/SKEW_NORMAL_CHECK.json](../validation/SKEW_NORMAL_CHECK.json)).
+
+Requests in which most pairs fail pair QC. A synthetic screen (20,000 cells,
+300 targets and 10 non-targeting groups, 6,000 genes and 40,000 peaks, most
+nonzero in 0.2–3% of cells; `scripts/benchmark_untestable_pairs.py`) in which
+about 5% of the target–feature pairs pass pair QC, run with
+`sequential_screen` and `early_stop_p: 0.002` on 12 threads. Wall seconds /
+peak memory in GB, for every pair listed, for only the passing pairs listed,
+and for the targets and responses named without a list (`targets`):
+
+| Run (pairs requested; passing) | 1.2.0, listed | 1.2.0, passing only | 1.3.0, listed | 1.3.0, passing only | 1.3.0, named |
+|---|---|---|---|---|---|
+| Genes, high MOI (1.86 million; 101,564) | 45.7 / 1.97 | 41.0 / 0.40 | 42.9 / 1.36 | 39.4 / 0.37 | 38.7 / 0.34 |
+| Peaks, high MOI (12.4 million; 645,408) | 202 / 11.9 | 168 / 1.08 | 192 / 7.87 | 167 / 1.16 | 167 / 1.05 |
+| Genes, low MOI (1.86 million; 60,024) | 12.8 / 1.80 | 5.5 / 0.12 | 8.8 / 1.16 | 5.5 / 0.12 | 5.5 / 0.12 |
+| Peaks, low MOI (12.4 million; 373,181) | 87.0 / 11.8 | 38.0 / 0.67 | 59.3 / 7.52 | 36.7 / 0.67 | 36.7 / 0.67 |
+
+- With 1.3.0 the tested pairs have identical rows in all three; with 1.2.0
+  listing only the passing pairs changed their p-values, because draws were
+  keyed by a pair's place in the list.
+- Naming the targets and responses costs what listing only the passing pairs
+  costs, without the caller having to find them.
+- A listed pair that is not tested costs about 0.57 kB of memory (0.92 kB in
+  1.2.0). What a full list still costs in time is reading it and writing a row
+  for every pair.

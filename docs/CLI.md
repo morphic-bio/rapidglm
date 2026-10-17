@@ -221,8 +221,8 @@ are rejected.
 | `size_factors` | `ratio` (default; genes without zeros) or `poscounts` |
 | `size_factor_values` | Optional vector file of size factors to use as given |
 | `trend` | `parametric` (default; falls back to `local` if it fails), `local` or `mean` |
-| `min_mean` | Floor on the initial fitted counts (default 0.5) |
-| `keep_minimum_start` | Keep the 1e-8 floor for genes whose rough dispersion is at it, as DESeq2's output does (default true) |
+| `min_mean` | DESeq2's `minmu`: the floor on fitted counts in its fits (default 0.5); genes with a fitted count below it are fitted with the floor ([METHODS.md](../METHODS.md#bulk-differential-expression)) |
+| `keep_minimum_start` | Keep the 1e-8 floor for genes whose starting dispersion is at it, as DESeq2's output does (default true) |
 | `outlier_sd` | Dispersion outliers, above the trend by this many residual SDs, keep their gene-wise value (default 2) |
 | `cooks_filter`, `cooks_cutoff` | Flag Cook's outliers (default true); cutoff (default 0: the 0.99 quantile of F(p, m − p)) |
 | `legacy_cooks` | Compute Cook's distances with DESeq2's robust dispersion as implemented in PyDESeq2 (MIT; Muzellec et al. 2023), which reproduces DESeq2's outlier flags (default true from 1.2.0; false: RapidGLM's own estimator, which flags more genes in designs with many small groups). Recorded as `cooks_dispersion` in the run record |
@@ -236,8 +236,12 @@ The table has DESeq2's column names: `gene`, `status`, `baseMean`,
 `dispMAP`, `dispersion`, `dispOutlier`, `maxCooks` and `replaced`. Statuses:
 - `ok`, or `ok_boundary` under `lrt` when another coefficient has no finite estimate;
 - `all_zero`;
-- `boundary_lrt`: the tested coefficient has no finite estimate, so the LR test
-  is reported and the fold change is `NA`;
+- `boundary_lrt`: the tested coefficient has no finite estimate and the fit
+  with fitted counts floored at `min_mean` failed, so the LR test is reported
+  and the fold change is `NA` (from 1.4.0 a group of zeros has a finite fold
+  change and a Wald test, as in DESeq2);
+- `wald_floored`, `floored_fit_failed`: the floored fit gave no Wald SE, or
+  under `lrt` failed;
 - `cooks_outlier`: the p-value is removed;
 - `fit_<status>`, `reduced_<status>` and `wald_<status>` for failed fits.
 
@@ -250,6 +254,40 @@ mean), `log_residual_variance`, `prior_variance`, `cooks_cutoff`,
 (log2 scale, one per design column; empty without shrinkage).
 `.filter.tsv` lists the filter's quantiles, rejections and LOWESS fit. These
 keys are rejected by other commands.
+
+## Quasi-likelihood differential expression (edgeR's procedure)
+
+`edger-ql` runs the default quasi-likelihood pipeline of edgeR 4 on sample
+counts: filtering by expression, TMM normalization, one NB dispersion, quasi-
+dispersions from adjusted unit deviances, their empirical Bayes moderation
+against average log CPM, and quasi-likelihood F tests
+([METHODS.md](../METHODS.md#quasi-likelihood-differential-expression)).
+`responses` holds counts (genes × samples) and `design` includes the intercept;
+`coefficient`, `coefficients` and `contrast` choose the hypothesis as above
+(default: the last column). Offsets come from the normalized library sizes, so
+`offset`, `weights`, `family`, `covariates`, `formula` and `units` are
+rejected.
+
+| Key | Meaning |
+|---|---|
+| `filter` | Filter by expression as edgeR's `filterByExpr` (default true) |
+| `min_count`, `min_total_count`, `large_n`, `min_prop` | The filter's settings (defaults 10, 15, 10, 0.7) |
+| `normalization` | `tmm` (default) or `none` (factors of 1) |
+| `dispersion` | The NB dispersion to use; default: estimated, as the common Cox-Reid dispersion of the most abundant genes |
+| `prior_count` | Prior count of the reported log fold changes (default 0.125) |
+
+The table has one row per gene with edgeR's column names where there is one:
+`gene`, `status` (`ok`, `filtered`, `fit_failed`), `total`, `AveLogCPM`,
+`logFC` (log2, from the counts plus prior counts), `coefficient` (the same on
+the natural-log scale), `unshrunk_coefficient` (maximum likelihood), `F`,
+`PValue`, `FDR` (Benjamini-Hochberg over the kept genes), `deviance`,
+`deviance_adj`, `df_residual_adj`, `s2`, `s2_prior`, `s2_post` and `df_total`.
+Filtered genes have missing values. `.samples.tsv` lists the library sizes
+before and after filtering, the normalization factors and the effective library
+sizes. The run record adds `kept`, `minimum_group` (the filter's minimum number
+of samples), `dispersion`, `top_proportion` and `top_genes` (the genes the
+dispersion was estimated from), `average_ql_dispersion` (the scale the
+dispersion is divided by for the fits), `df_prior` and `discoveries_fdr_0_1`.
 
 ## Perturbation workflow
 

@@ -156,6 +156,15 @@ int rapidglm_nb_fixed_fits(const rapidglm_dense *design, const rapidglm_dense *c
                            const double *size_factors, const double *dispersions, double tolerance,
                            size_t max_iterations, double min_beta, double max_beta, int threads,
                            double *coefficients, double *fitted, double *hat, int *converged);
+/* The same fits as DESeq2 and PyDESeq2's irls make them: fitted counts floored at
+ * min_mu inside the iterations (ridge 1e-6, coefficients within [min_beta,
+ * max_beta], deviance tolerance `tolerance`, at most max_iterations steps);
+ * fitted = the unfloored means, hat from the floored weights. */
+int rapidglm_nb_floored_fits(const rapidglm_dense *design, const rapidglm_dense *counts,
+                             const double *size_factors, const double *dispersions, double min_mu,
+                             double tolerance, size_t max_iterations, double min_beta,
+                             double max_beta, int threads, double *coefficients, double *fitted,
+                             double *hat, int *converged);
 /* Dispersions at fixed means `mu` from `start`: NB likelihood, Cox-Reid adjusted
  * when cox_reid, plus a normal prior on log dispersion centred at log(start)
  * when prior_variance > 0 (MAP estimates); clamped to the bounds. With
@@ -166,6 +175,31 @@ int rapidglm_nb_dispersions(const rapidglm_dense *design, const rapidglm_dense *
                             double max_dispersion, double prior_variance, int cox_reid,
                             int keep_minimum_start, int threads, double *dispersions,
                             int *converged);
+
+/* Quasi-likelihood differential expression following edgeR 4's default
+ * workflow (filterByExpr, TMM, glmQLFit, glmQLFTest); counts are samples x genes. */
+typedef struct {
+    size_t struct_size;
+    size_t coefficient;      /* tested column (default: the last) */
+    const double *contrasts; /* NULL, or contrast_rows x columns, row-major */
+    size_t contrast_rows;    /* 1 row: a contrast; several: a joint test */
+    int filter;              /* filter by expression (default 1) */
+    double min_count, min_total_count, large_n, min_prop; /* defaults 10, 15, 10, 0.7 */
+    int tmm;                    /* TMM factors (default 1); 0: factors of 1 */
+    const double *norm_factors; /* NULL or one per sample, used as given */
+    double dispersion;          /* NB dispersion; NaN (default): estimated */
+    double prior_count;         /* of the log fold changes (default 0.125) */
+    int threads;
+} rapidglm_ql_options;
+void rapidglm_ql_options_init(rapidglm_ql_options *options);
+
+/* Columns: gene, status, total, AveLogCPM, logFC, coefficient,
+ * unshrunk_coefficient, F, PValue, FDR, deviance, deviance_adj, df_residual_adj,
+ * s2, s2_prior, s2_post, df_total. Scalars: dispersion, top_proportion,
+ * average_ql_dispersion, df_prior, minimum_group, kept, top_genes. Vectors:
+ * library_sizes, filtered_library_sizes, norm_factors, effective_library_sizes. */
+int rapidglm_edger_ql(const rapidglm_dense *design, const rapidglm_sparse *counts,
+                      const rapidglm_ql_options *options, rapidglm_table **result);
 
 /* Perturbation (SCEPTRE-method) workflow. */
 enum { RAPIDGLM_PAIR_DISCOVERY = 0, RAPIDGLM_PAIR_NEGATIVE = 1, RAPIDGLM_PAIR_POSITIVE = 2 };

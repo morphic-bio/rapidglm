@@ -109,6 +109,26 @@ class CAPI(unittest.TestCase):
         frame = rapidglm.bulk_de(x, named)
         self.assertEqual(frame.index[5], "g5")
 
+    def test_edger_ql_matches_cli(self):
+        x, counts = self.bulk_data()
+        files = dict(design=write_design(self.root / "design.tsv", x),
+                     responses=write_market(self.root / "counts.mtx", counts))
+        cases = [
+            (dict(coefficient=2, threads=3), dict(coefficient=2, threads=3)),
+            (dict(contrast=[0, 1, -1]), dict(contrast=[0, 1, -1])),
+            (dict(coefficients=[1, 2]), dict(coefficients=[1, 2])),
+            (dict(filter=False, normalization="none", dispersion=0.1),
+             dict(filter=False, normalization="none", dispersion=0.1)),
+        ]
+        for config, arguments in cases:
+            with self.subTest(**{k: str(v) for k, v in arguments.items()}):
+                table, record = self.cli("edger-ql", **files, **config)
+                frame = rapidglm.edger_ql(x, sp.csr_matrix(counts), **arguments)
+                self.assert_same(table, frame, text=("status",))
+                self.assertEqual(frame.attrs["df_prior"], record["df_prior"])
+                self.assertEqual(frame.attrs["dispersion"], record["dispersion"])
+                self.assertEqual(frame.attrs["kept"], record["kept"])
+
     def test_fit_batch_and_scan_match_cli(self):
         x, counts = self.bulk_data()
         files = dict(design=write_design(self.root / "design.tsv", x),
