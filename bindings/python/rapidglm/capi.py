@@ -90,6 +90,25 @@ class _BulkOptions(ctypes.Structure):
     ]
 
 
+class _QlOptions(ctypes.Structure):
+    _fields_ = [
+        ("struct_size", _size),
+        ("coefficient", _size),
+        ("contrasts", _double_p),
+        ("contrast_rows", _size),
+        ("filter", ctypes.c_int),
+        ("min_count", ctypes.c_double),
+        ("min_total_count", ctypes.c_double),
+        ("large_n", ctypes.c_double),
+        ("min_prop", ctypes.c_double),
+        ("tmm", ctypes.c_int),
+        ("norm_factors", _double_p),
+        ("dispersion", ctypes.c_double),
+        ("prior_count", ctypes.c_double),
+        ("threads", ctypes.c_int),
+    ]
+
+
 class _SceptreOptions(ctypes.Structure):
     _fields_ = [
         ("struct_size", _size),
@@ -208,6 +227,12 @@ def _library():
     if _lib is not None:
         return _lib
     lib = _load()
+    # The feature/API version must be established before binding newer symbols.
+    api = lib.rapidglm_c_api_version
+    api.restype, api.argtypes = ctypes.c_int, []
+    actual = api()
+    if actual != 2:
+        raise OSError(f"librapidglm_c has C API version {actual}, need 2")
     table_p = ctypes.c_void_p
     signatures = {
         "rapidglm_version": (ctypes.c_char_p, []),
@@ -228,6 +253,7 @@ def _library():
         "rapidglm_table_free": (None, [table_p]),
         "rapidglm_fit_options_init": (None, [ctypes.POINTER(_FitOptions)]),
         "rapidglm_bulk_options_init": (None, [ctypes.POINTER(_BulkOptions)]),
+        "rapidglm_ql_options_init": (None, [ctypes.POINTER(_QlOptions)]),
         "rapidglm_sceptre_options_init": (None, [ctypes.POINTER(_SceptreOptions), ctypes.c_int]),
         "rapidglm_scan_options_init": (None, [ctypes.POINTER(_ScanOptions)]),
         "rapidglm_fit_batch": (
@@ -249,6 +275,15 @@ def _library():
                 ctypes.POINTER(table_p),
             ],
         ),
+        "rapidglm_edger_ql": (
+            ctypes.c_int,
+            [
+                ctypes.POINTER(_Dense),
+                ctypes.POINTER(_Sparse),
+                ctypes.POINTER(_QlOptions),
+                ctypes.POINTER(table_p),
+            ],
+        ),
         "rapidglm_bulk_adjust": (
             ctypes.c_int,
             [_double_p, _double_p, _size, ctypes.c_double, ctypes.c_int, _double_p, _double_p],
@@ -257,6 +292,12 @@ def _library():
             ctypes.c_int,
             [ctypes.POINTER(_Dense), ctypes.POINTER(_Dense), _double_p, _double_p, ctypes.c_double, _size,
              ctypes.c_double, ctypes.c_double, ctypes.c_int, _double_p, _double_p, _double_p, _int_p],
+        ),
+        "rapidglm_nb_floored_fits": (
+            ctypes.c_int,
+            [ctypes.POINTER(_Dense), ctypes.POINTER(_Dense), _double_p, _double_p, ctypes.c_double,
+             ctypes.c_double, _size, ctypes.c_double, ctypes.c_double, ctypes.c_int, _double_p, _double_p,
+             _double_p, _int_p],
         ),
         "rapidglm_nb_dispersions": (
             ctypes.c_int,
@@ -326,8 +367,6 @@ def _library():
         function = getattr(lib, name)
         function.restype = restype
         function.argtypes = argtypes
-    if lib.rapidglm_c_api_version() != 1:
-        raise OSError(f"librapidglm_c has C API version {lib.rapidglm_c_api_version()}, need 1")
     _lib = lib
     return lib
 
@@ -519,6 +558,8 @@ def bulk_de(design, counts, coefficient=None, contrast=None, coefficients=None, 
     if sum(given) > 1:
         raise ValueError("give one of coefficient, contrast and coefficients")
     if coefficient is not None:
+        if not 0 <= coefficient < x.cols or int(coefficient) != coefficient:
+            raise ValueError("coefficient outside the design")
         o.coefficient = int(coefficient)
     rows = None
     if contrast is not None:
@@ -526,6 +567,8 @@ def bulk_de(design, counts, coefficient=None, contrast=None, coefficients=None, 
     if coefficients is not None:
         rows = np.zeros((len(coefficients), x.cols))
         for r, j in enumerate(coefficients):
+            if not 0 <= j < x.cols or int(j) != j:
+                raise ValueError("coefficient outside the design")
             rows[r, int(j)] = 1
     if rows is not None:
         if rows.shape[1] != x.cols:
@@ -555,6 +598,68 @@ def bulk_de(design, counts, coefficient=None, contrast=None, coefficients=None, 
         o.seed = int(seed)
     o.threads = int(threads)
     frame = _call(lib.rapidglm_bulk_de, ctypes.byref(x), ctypes.byref(y), ctypes.byref(o))
+    del xa, ya, keep
+    names = _feature_names(counts)
+    if names is not None:
+        frame.index = pd.Index(names, name="gene_name")
+    return frame
+
+
+def edger_ql(design, counts, coefficient=None, contrast=None, coefficients=None, filter=True,
+             min_count=None, min_total_count=None, large_n=None, min_prop=None, normalization="tmm",
+             norm_factors=None, dispersion=None, prior_count=None, threads=1):
+    """Quasi-likelihood differential expression following edgeR 4's default
+    workflow (filterByExpr, TMM, glmQLFit, glmQLFTest); counts are samples x
+    genes. Tests the last design column unless ``coefficient`` (a column
+    index), ``contrast`` (one weight per column) or ``coefficients`` (several
+    columns tested jointly) is given. ``normalization`` is "tmm" or "none";
+    ``norm_factors`` (one per sample) are used as given; ``dispersion`` fixes the
+    NB dispersion (default: estimated as edgeR does).
+
+    Columns: gene, status, total, AveLogCPM, logFC, coefficient,
+    unshrunk_coefficient, F, PValue, FDR, deviance, deviance_adj,
+    df_residual_adj, s2, s2_prior, s2_post, df_total. ``attrs`` holds
+    dispersion, top_proportion, average_ql_dispersion, df_prior,
+    minimum_group, kept, top_genes and the library sizes and factors."""
+    lib = _library()
+    x, xa = _dense(design)
+    y, ya = _sparse(counts, "counts")
+    o = _QlOptions()
+    lib.rapidglm_ql_options_init(ctypes.byref(o))
+    keep = []
+    given = [v is not None for v in (coefficient, contrast, coefficients)]
+    if sum(given) > 1:
+        raise ValueError("give one of coefficient, contrast and coefficients")
+    if coefficient is not None:
+        if not 0 <= coefficient < x.cols or int(coefficient) != coefficient:
+            raise ValueError("coefficient outside the design")
+        o.coefficient = int(coefficient)
+    rows = None
+    if contrast is not None:
+        rows = np.atleast_2d(np.asarray(contrast, dtype=np.float64))
+    if coefficients is not None:
+        rows = np.zeros((len(coefficients), x.cols))
+        for r, j in enumerate(coefficients):
+            if not 0 <= j < x.cols or int(j) != j:
+                raise ValueError("coefficient outside the design")
+            rows[r, int(j)] = 1
+    if rows is not None:
+        if rows.shape[1] != x.cols:
+            raise ValueError(f"contrasts need {x.cols} weights per row")
+        o.contrasts, a = _doubles(rows)
+        o.contrast_rows = rows.shape[0]
+        keep.append(a)
+    o.filter = int(bool(filter))
+    for field, value in (("min_count", min_count), ("min_total_count", min_total_count),
+                         ("large_n", large_n), ("min_prop", min_prop), ("prior_count", prior_count),
+                         ("dispersion", dispersion)):
+        if value is not None:
+            setattr(o, field, float(value))
+    o.tmm = int(_choice("normalization", normalization, {"tmm": 1, "none": 0}))
+    o.norm_factors, a = _doubles(norm_factors, x.rows, "norm_factors")
+    keep.append(a)
+    o.threads = int(threads)
+    frame = _call(lib.rapidglm_edger_ql, ctypes.byref(x), ctypes.byref(y), ctypes.byref(o))
     del xa, ya, keep
     names = _feature_names(counts)
     if names is not None:
@@ -601,6 +706,33 @@ def nb_fixed_fits(design, counts, size_factors, dispersions, tolerance=1e-8, max
         raise ValueError(lib.rapidglm_last_error().decode())
     del xa, ya, sfa, da
     return beta, mu, hat, converged.astype(bool)
+
+
+def nb_floored_fits(design, counts, size_factors, dispersions, min_mu=0.5, tolerance=1e-8,
+                    max_iterations=250, min_beta=-30.0, max_beta=30.0, threads=1, return_optimizer=False):
+    """NB GLM fits as DESeq2 and PyDESeq2's irls make them: fitted counts floored
+    at ``min_mu`` inside the iterations. counts: observations x features (dense).
+    Returns (coefficients [features x columns, natural log], fitted [observations
+    x features, unfloored means], hat values [observations x features, from the
+    floored weights], converged [features]). With return_optimizer=True,
+    append a mask of successful native bounded-optimizer fallbacks."""
+    lib = _library()
+    x, xa = _dense(design)
+    y, ya = _dense(counts, "counts")
+    n, genes, p = x.rows, y.cols, x.cols
+    sf, sfa = _doubles(size_factors, n, "size_factors")
+    d, da = _doubles(dispersions, genes, "dispersions")
+    beta, mu, hat = np.empty((genes, p)), np.empty((n, genes)), np.empty((n, genes))
+    converged = np.empty(genes, dtype=np.intc)
+    status = lib.rapidglm_nb_floored_fits(
+        ctypes.byref(x), ctypes.byref(y), sf, d, float(min_mu), float(tolerance), int(max_iterations),
+        float(min_beta), float(max_beta), int(threads), beta.ctypes.data_as(_double_p),
+        mu.ctypes.data_as(_double_p), hat.ctypes.data_as(_double_p), converged.ctypes.data_as(_int_p))
+    if status != 0:
+        raise ValueError(lib.rapidglm_last_error().decode())
+    del xa, ya, sfa, da
+    result = (beta, mu, hat, converged.astype(bool))
+    return (*result, converged == 2) if return_optimizer else result
 
 
 def nb_dispersions(design, counts, mu, start, min_dispersion=1e-8, max_dispersion=10.0,

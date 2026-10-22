@@ -1,0 +1,40 @@
+{
+  "reference_version": "1.48.2",
+  "method": "Invert public cooks, H and mu assays directly in R, without a decimal TSV round trip; exclude genes with the public replace flag.",
+  "replacement_flagged_genes_excluded": 283,
+  "all_eligible": {
+    "genes": 28486,
+    "sample_values": 3646208,
+    "median_relative_range": 7.80976352708935e-16,
+    "q95_relative_range": 1.1180915748599e-15,
+    "max_relative_range": 3.02661749829181e-09,
+    "max_absolute_range": 1.47175827081014e-10,
+    "all_relative_ranges_at_most_1e_12": false
+  },
+  "all_means_at_least_0_5": {
+    "genes": 28212,
+    "sample_values": 3611136,
+    "median_relative_range": 7.80027740723543e-16,
+    "q95_relative_range": 1.10516480923824e-15,
+    "max_relative_range": 4.68375338513738e-15,
+    "max_absolute_range": 2.8421709430404e-14,
+    "all_relative_ranges_at_most_1e_12": true
+  },
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "untimed": true,
+  "cpus": "0-7",
+  "timing_lock": false,
+  "timing_usable": false,
+  "dataset": "GTEx thyroid128",
+  "counts_sha256": "f2dbd9877f6235b7e82b3d76923821410a0fa596fe6b7037964c7d7d154445bc",
+  "command": "taskset -c 0-7 env OPENBLAS_NUM_THREADS=1 Rscript scripts/reference_cooks_inversion.R validation/work/benchmark/thyroid128 sex[T.female] OUT R_LIBS",
+  "calculator_source": "# Public DESeq2 calls only. Arguments match scripts/reference_bulk.R.\n# Run from the repository root; the reference script leaves its public outputs in scope.\nsource(\"scripts/reference_bulk.R\")\nmu0 <- assays(dds)[[\"mu\"]]\nhat0 <- assays(dds)[[\"H\"]]\ncook0 <- assays(dds)[[\"cooks\"]]\nflag <- as.logical(mcols(dds)$replace)\nflag[is.na(flag)] <- FALSE\nalpha0 <- ((counts-mu0)^2*hat0/(ncol(X)*cook0*(1-hat0)^2)-mu0)/mu0^2\nvalid <- is.finite(alpha0) & is.finite(hat0) & is.finite(cook0) & cook0 > 0 & mu0 > 0 & hat0 > 0 & hat0 < 1\nvalid[flag, ] <- FALSE\nsummarize <- function(mask) {\n  ii <- which(rowSums(mask) >= 2)\n  relative <- absolute <- numeric(length(ii))\n  for (k in seq_along(ii)) {\n    a <- alpha0[ii[k], mask[ii[k], ]]\n    absolute[k] <- diff(range(a))\n    relative[k] <- absolute[k]/max(abs(median(a)), 1e-300)\n  }\n  list(genes = length(ii), sample_values = sum(mask[ii, , drop=FALSE]),\n       median_relative_range = unname(median(relative)),\n       q95_relative_range = unname(quantile(relative, .95)),\n       max_relative_range = max(relative), max_absolute_range = max(absolute),\n       all_relative_ranges_at_most_1e_12 = max(relative) <= 1e-12)\n}\nresult <- list(reference_version = as.character(packageVersion(\"DESeq2\")),\n               method = \"Invert public cooks, H and mu assays directly in R, without a decimal TSV round trip; exclude genes with the public replace flag.\",\n               replacement_flagged_genes_excluded = sum(flag),\n               all_eligible = summarize(valid),\n               all_means_at_least_0_5 = summarize(valid & apply(mu0 >= .5, 1, all)))\njsonlite::write_json(result, file.path(out, \"inversion_in_memory.json\"), auto_unbox=TRUE, digits=NA, pretty=TRUE)\nprint(result)\n",
+  "reference_script_sha256": "5087e0fc17a1900f1862d91e546e31cea25c1cbf97ba627592bcdfc73c443cf7",
+  "interpretation": "The1e-12 relative consistency claim is supported for the declared all-means>=0.5 subset, not universally across low-mean genes. Inversion subtracts nearly equal values at very small mu; that conditioning also amplifies TSV export rounding. This is not evidence of a reference-tool error.",
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

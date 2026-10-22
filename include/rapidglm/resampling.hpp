@@ -2,7 +2,8 @@
 #include "inference.hpp"
 #include "sparse.hpp"
 #include <array>
-#if defined(__x86_64__) && (defined(__GNUC__) || defined(__clang__))
+#if defined(__x86_64__) && !defined(RAPIDGLM_FORCE_PORTABLE) &&                                    \
+    (defined(__GNUC__) || defined(__clang__))
 #include <immintrin.h>
 #endif
 #if defined(__aarch64__) && (defined(__GNUC__) || defined(__clang__))
@@ -83,7 +84,8 @@ inline Stream keyed_stream(std::uint64_t seed, std::uint32_t domain, std::uint64
     return {w[0] | (static_cast<std::uint64_t>(w[1]) << 32), w[2]};
 }
 namespace detail {
-#if defined(__x86_64__) && (defined(__GNUC__) || defined(__clang__))
+#if defined(__x86_64__) && !defined(RAPIDGLM_FORCE_PORTABLE) &&                                    \
+    (defined(__GNUC__) || defined(__clang__))
 #define RAPIDGLM_PHILOX_AVX2 1
 // Low and high words of the 64-bit products of every 32-bit lane of c with m.
 __attribute__((target("avx2"))) inline void philox_multiply_avx2(__m256i c, __m256i m, __m256i &low,
@@ -233,7 +235,8 @@ inline void ars_blocks_portable(const std::uint64_t *counters, unsigned lanes,
         out[2 * l + 1] = w[2] | static_cast<std::uint64_t>(w[3]) << 32;
     }
 }
-#if defined(__x86_64__) && (defined(__GNUC__) || defined(__clang__))
+#if defined(__x86_64__) && !defined(RAPIDGLM_FORCE_PORTABLE) &&                                    \
+    (defined(__GNUC__) || defined(__clang__))
 #define RAPIDGLM_ARS_HARDWARE 1
 #define RAPIDGLM_ARS_TARGET __attribute__((target("aes")))
 // Inlined into its two callers, so that with constant lanes and rounds the
@@ -1182,6 +1185,18 @@ struct SkewFit {
 };
 // With `sorted_values`, the values in ascending order are returned there as
 // well (the fit sorts them for its KS discrepancy), whether or not it is valid.
+namespace detail {
+// The standard skew-normal CDF Phi(z) - 2 T(z, shape), at double precision.
+// Used only for the absolute KS discrepancy on ARM64. Evaluating Boost's
+// distribution CDF per draw promotes several inner calls to software binary128
+// there; the inferential tail below still uses the original distribution CDF.
+inline double skew_normal_ks_cdf(double z, double shape) {
+    using Policy = boost::math::policies::policy<boost::math::policies::promote_double<false>>;
+    return std::clamp(0.5 * std::erfc(-z / std::sqrt(2.0)) -
+                          2 * boost::math::owens_t(z, shape, Policy()),
+                      0.0, 1.0);
+}
+} // namespace detail
 inline SkewFit fit_skew_normal(const Vector &values, Vector *sorted_values = nullptr) {
     SkewFit out;
     if (sorted_values) {
@@ -1212,7 +1227,9 @@ inline SkewFit fit_skew_normal(const Vector &values, Vector *sorted_values = nul
     out.scale = std::sqrt(m2 / (1 - 2 * delta * delta / pi));
     out.shape = delta / std::sqrt(1 - delta * delta);
     out.location = mean - out.scale * delta * std::sqrt(2 / pi);
+#if !defined(__aarch64__)
     boost::math::skew_normal_distribution<double> sn(out.location, out.scale, out.shape);
+#endif
     Vector local;
     if (!sorted_values) {
         local = values;
@@ -1221,7 +1238,12 @@ inline SkewFit fit_skew_normal(const Vector &values, Vector *sorted_values = nul
     const Vector &sorted = sorted_values ? *sorted_values : local;
     out.discrepancy = 0;
     for (std::size_t i = 0; i < sorted.size(); ++i) {
-        double cdf = boost::math::cdf(sn, sorted[i]);
+#if defined(__aarch64__)
+        const double cdf =
+            detail::skew_normal_ks_cdf((sorted[i] - out.location) / out.scale, out.shape);
+#else
+        const double cdf = boost::math::cdf(sn, sorted[i]);
+#endif
         out.discrepancy =
             std::max({out.discrepancy, std::abs(cdf - static_cast<double>(i) / sorted.size()),
                       std::abs(cdf - static_cast<double>(i + 1) / sorted.size())});

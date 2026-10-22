@@ -39,7 +39,8 @@ the runpath of tests and examples.
 Muzellec et al. 2023, Bioinformatics 39:btad547), ported from its source with
 the author's approval: the same steps, defaults and result columns as
 `DeseqDataSet.deseq2()` and `DeseqStats.summary()`. NB fits and dispersions
-run in RapidGLM, as with `rapidglm.pydeseq2.RapidGLMInference` in Python. The
+run in RapidGLM using unfloored fits; the Python inference backend uses floored
+fits from 1.4.0. The
 independent-filtering lowess follows PyDESeq2's, which is adapted from
 Alexandre Gramfort's (BSD 3-clause). Differences are listed in
 [src/deseq/mod.rs](src/deseq/mod.rs); the main ones:
@@ -51,9 +52,15 @@ Alexandre Gramfort's (BSD 3-clause). Differences are listed in
   L-BFGS-B's tolerance;
 - Cook's distances at samples with leverage 1 are 0 instead of 0 / 0 in
   floating point (often infinite), which changes which genes are flagged when
-  some samples are alone in their design cell;
+  some samples have leverage one; singleton design cells alone do not imply it;
 - designs are matrices and contrasts vectors (no formulas); the iterative size
   factors and apeGLM shrinkage are not ported.
 
 `tests/compare_pydeseq2.py` runs PyDESeq2 with the RapidGLM back end on a
 dataset and compares the results with `examples/deseq.rs`.
+
+The Rust DESeq workflow currently uses unfloored NB fits. It therefore differs
+from the Python inference backend's floored fits introduced in 1.4.0;
+low-count and boundary-fit results are not expected to match that backend.
+Singleton design cells in the comparison receipt do not imply leverage one
+in an additive design.

@@ -631,9 +631,12 @@ are unchanged by this model flag. Until 2026-09-29 the default was
 `bulk_de` (CLI `bulk-de`) follows the procedure published for DESeq2
 ([Love, Huber & Anders 2014](https://doi.org/10.1186/s13059-014-0550-8)) and
 its [documentation](https://bioconductor.org/packages/release/bioc/html/DESeq2.html).
-No DESeq2 or PyDESeq2 source was read. DESeq2 1.48.2 was run only as a black
-box, and details the documentation leaves open were calibrated from its
-outputs; they are marked *calibrated* below. Counts are samples × genes
+No DESeq2 source was read. DESeq2 1.48.2 was run only as a black box, and
+details the documentation leaves open were calibrated from its outputs; they
+are marked *calibrated* below. From 1.2.0 the robust dispersion of Cook's
+distances, and from 1.4.0 the starting dispersion and the floored fits, follow
+PyDESeq2's implementation (MIT; Muzellec et al. 2023; see DEPENDENCIES.md),
+which PyDESeq2 states follows DESeq2's code. Counts are samples × genes
 (m samples, p design columns, m > p), tested coefficient j.
 
 1. **Size factors** ([Anders & Huber 2010](https://doi.org/10.1186/gb-2010-11-10-r106)).
@@ -643,12 +646,18 @@ outputs; they are marked *calibrated* below. Counts are samples × genes
    factors are scaled to geometric mean 1. Factors can also be supplied.
 2. **Base mean** μ̄_g = mean_i y_ig / s_i. All-zero genes are reported and skipped.
 3. **Initial means.** For designs with as many distinct rows as columns,
-   μ̂_i = s_i × the mean normalized count of i's design cell. Otherwise an NB fit
-   at the rough dispersion below, falling back to Poisson and then to least
-   squares. Means are floored at 0.5. The rough dispersion regresses the
-   normalized counts on the design by least squares (fitted f floored at 1e-3,
-   residual r) and takes Σ_i (r_i² − f_i) / f_i² / (m − p), clamped to
-   [1e-8, max(10, m)].
+   μ̂_i = s_i × the mean normalized count of i's design cell, floored at 0.5.
+   Otherwise an NB fit at the starting dispersion below, falling back to
+   Poisson and then to least squares; where a fitted count falls below 0.5 the
+   fit is redone with fitted counts floored at 0.5 (the floored fits, step 8)
+   and its unfloored means are used, as in DESeq2 and PyDESeq2. The starting
+   dispersion (PyDESeq2) is the smaller of a rough value, from a least-squares
+   regression of the normalized counts on the design (fitted f floored at 1,
+   residual r): max(0, Σ_i (r_i² − f_i) / f_i² / (m − p)), and a moments value,
+   (v − x̄ μ̄) / μ̄² with v the variance of the normalized counts and x̄ the mean
+   of 1 / s_i; clamped to [1e-8, max(10, m)]. When the size factors differ
+   widely (pseudobulk samples of very different numbers of cells) the moments
+   value is often negative, so such genes start, and keep, 1e-8 (step 4).
 4. **Gene-wise dispersion** α_g maximizes the Cox-Reid adjusted profile
    likelihood at μ̂ (Newton in log θ from the rough value). *Calibrated:* genes
    whose rough value is at the 1e-8 floor keep 1e-8, as in DESeq2's output
@@ -670,9 +679,29 @@ outputs; they are marked *calibrated* below. Counts are samples × genes
    from the trend. Dispersion outliers, log α_g > log α_tr + 2 s_lr, keep α_g.
 8. **Test.** An NB GLM at the final α with offsets log s_i. Wald z = β_j / SE_j,
    or the LR test against the model without column j (χ²₁). log2 fold change
-   = β_j / log 2. When β_j has no finite estimate (for example a group of
-   zeros), the Wald test is undefined; the LR test at the final α is reported
-   instead with status `boundary_lrt` and a missing fold change.
+   = β_j / log 2. DESeq2 fits with fitted counts floored at `min_mean` (0.5,
+   its documented `minmu`): where a fitted count of the maximum likelihood fit
+   falls below it, or a coefficient has no finite estimate (for example a group
+   of zeros), the gene is refitted with the floor, by PyDESeq2's iterations
+   (iteratively reweighted least squares on μ_f = max(s exp(Xβ), 0.5), ridge
+   1e-6, coefficients within [−30, 30], until the deviance changes by at most
+   1e-8 of itself plus 0.1). Its Wald SE is the sandwich
+   (H + 10⁻⁶ I)⁻¹ H (H + 10⁻⁶ I)⁻¹ with H = X'WX at the floored means
+   (*calibrated*: DESeq2's SEs; PyDESeq2 uses the unfloored means here), its LR
+   statistic the difference of the two likelihood deviances at the returned,
+   unfloored means (calibrated by public `nbinomLRT` runs), and its Cook's
+   distances use the unfloored means and the leverages of the floored weights.
+   A group of zeros then has a finite fold change. The C++ test example gives
+   about −9.390, SE 1.055; the separate R-simulated calibration gave −9.35,
+   SE 1.10 in both tools. Failed floored fits report `floored_fit_failed`.
+   Bulk bounds and ridge scale with the design columns' maximum magnitudes;
+   the sandwich expression above uses normalized columns and is transformed
+   back to input units. Crossing a bound or reaching the IRLS limit triggers bounded optimization.
+   The Python inference interface retains PyDESeq2's coefficient units and
+   hands every native optimizer fallback, failed fit and bound-active fit back
+   to its default inference. Boundary warm starts outside the bounds restart
+   from the least-squares initialization instead of clipping a coefficient
+   vector whose linear predictors are valid only before clipping.
 9. **Cook's distance** ([Cook 1977](https://doi.org/10.2307/1268249)):
    D_i = R_i² / p × h_i / (1 − h_i)², with R_i = (y_i − μ_i) / √(μ_i + α_rob μ_i²)
    and h_i the hat values of the final fit. The cutoff is the 0.99 quantile
@@ -691,9 +720,15 @@ outputs; they are marked *calibrated* below. Counts are samples × genes
      - **Flagging.** A gene is not flagged when three or more samples have
        larger counts than the sample with the largest distance.
 
-     These values equal those recovered from DESeq2's outputs to 1e-12, and
-     they reproduce DESeq2's discoveries
-     ([BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01)).
+     These rules follow the public PyDESeq2 implementation. The historical
+     claim of equality to inverted DESeq2 dispersions is not established by
+     the current receipts. The public-assay inversion check supports per-gene
+     consistency within 1e-12 on a declared subset with all fitted means at
+     least 0.5; its maximum relative range is 4.684e-15 there and 3.027e-9 over
+     all eligible genes, including low means. This is a check of the reference
+     inversion, rather than of equality to the native estimator. See
+     [COOKS_INVERSION.json](validation/receipts/v1.4.0-r2/COOKS_INVERSION.json)
+     and [BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01).
    - With `legacy_cooks: false`, α_rob is RapidGLM's own estimator, the default
      before 1.2.0. It pools the squared scaled MADs of the normalized counts
      within design cells of at least three samples (the ordinary variance if
@@ -712,8 +747,11 @@ outputs; they are marked *calibrated* below. Counts are samples × genes
     rule is *calibrated*), and the BH rejections at α are counted. A LOWESS
     ([Cleveland 1979](https://doi.org/10.1080/01621459.1979.10481038); span
     0.2, *calibrated*, with three robustness passes) is fitted to rejections
-    over θ. The chosen θ is the lowest whose rejections exceed the curve's
-    maximum minus the residual SD, √(Σ residual² / 49). BH adjustment then runs
+    over θ. If the maximum rejection count is at most ten, choose the first θ.
+    Otherwise choose the lowest θ whose rejections exceed the curve's maximum
+    minus the residual RMS, calculated over quantiles with positive rejections.
+    These are calibrated rules following PyDESeq2, checked against black-box
+    DESeq2 results. BH adjustment then runs
     over the passing genes with p-values; the others get `NA`.
 11. **Fold-change shrinkage** (optional, `lfc_shrink=normal`): the paper's
     empirical normal prior, as DESeq2's `lfcShrink(type = "normal")` computes it
@@ -738,6 +776,115 @@ outputs; they are marked *calibrated* below. Counts are samples × genes
       consistent with the test (a RapidGLM choice). DESeq2's `lfcShrink` uses the
       original counts (black-box observation).
 
+**Final 1.4.0 agreement with DESeq2 1.48.2.** On the five validation
+datasets, discovery Jaccard ranges from 0.9834
+to 1.0000; p-value Spearman is at least
+0.999813. The one- and eight-thread
+tables are byte-identical on every dataset. Size factors differ by at most
+4.108e-15 relative.
+These are final-code measurements from [BULK_DE.json](validation/BULK_DE.json);
+[the bulk report](docs/BULK_DE.md) gives the simulations, null checks,
+shrinkage, Cook's-distance and pseudobulk comparisons.
+
+## Quasi-likelihood differential expression
+
+`edger_ql` (CLI `edger-ql`) follows the default quasi-likelihood workflow of
+edgeR 4 (`filterByExpr`, `normLibSizes`, `glmQLFit`, `glmQLFTest`; Chen, Chen,
+Lun, Baldoni and Smyth 2025, NAR 53:gkaf018; Lund et al. 2012). It was written
+from the papers, the documentation of edgeR and limma and black-box runs of
+edgeR 4.6.2; no edgeR or limma source was read. Rules the documentation leaves
+open were settled by the black-box runs, recorded with the evidence for each in
+the specification the implementation follows (`docs/EDGER_QL_SPEC.md`).
+
+1. **Filtering.** A gene is kept when its count per million of library, at
+   least `min_count` reads per median library (10), holds in at least m
+   samples and its total is at least `min_total_count` (15). m is the inverse of
+   the largest leverage of the design, grown beyond `large_n` (10) by
+   `min_prop` (0.7) per sample. Library sizes are then recomputed over the kept
+   genes.
+2. **TMM** (Robinson and Oshlack 2010). The reference sample has the upper
+   quartile of count shares closest to their mean. For each sample, genes with
+   reads in it and the reference are trimmed by 30% of log ratios and 5% of
+   average log shares at each end (average ranks for ties), and the factor is
+   the inverse-variance weighted mean log ratio. Factors are scaled to a product
+   of 1.
+3. **Average log CPM.** A one-group NB fit at dispersion 0.05 of the counts
+   plus 2 × library / mean library, with offsets log(library + 4 × library /
+   mean library).
+4. **The NB dispersion φ.** The Cox-Reid adjusted profile likelihood summed
+   over the ceil(t G) genes of highest average log CPM, t = 0.02 + 0.98 (20 /
+   (G √(n − p)))^(1/3) (1 when G √(n − p) ≤ 20), maximized in φ^(1/4) on
+   [0, 4^(1/4)] by Brent's method (tolerance 1e-5).
+5. **Quasi-dispersions.** Each gene is fitted at the working dispersion φ/a.
+   Each observation's unit deviance d is divided by s and given df (1 − h) k,
+   with k = 2E²/V and s = V/(2E) the mean and variance of the NB unit deviance
+   at mean μ/a and dispersion φ and h the leverage; the gene's s² is the sum of
+   the first over the sum of the second. The scale a is max(1, the 0.9 quantile
+   of the fourth power of the LOWESS fit (span 0.5, three robustness passes) of
+   s²^(1/4) on average log CPM), computed at a = 1 and again at that value, with
+   the genes refitted each time. The moments E and V are exact (*RapidGLM
+   choice*): sums over the NB distribution, counts above 1000 by quadrature,
+   tabulated per dispersion on 64 points per decade of the mean. edgeR uses an
+   approximation of them that differs from the exact values by up to about 1e-3
+   for dispersions up to 0.3 and by more at larger dispersions and means; it is
+   not documented.
+6. **Moderation** (Smyth 2004, with limma's weighting for unequal df). s² is
+   floored at 1e-12 of its median; the log-moment terms log s² − ψ(d/2) +
+   log(d/2) are weighted by 1/ψ'(d/2) and smoothed against average log CPM by a
+   weighted LOWESS (span 0.3 + 0.7 (500/G)^(1/3), 1 for G ≤ 500; anchors at
+   1/200 of the range); the prior df d0 maximizes the likelihood of the scaled F
+   model with the prior scale tied to the trend by ψ(d0/2) − log(d0/2). Its
+   search ends at 8134.84478, the value edgeR 4.6.2 reports when the
+   likelihood keeps increasing. s²_post = (d0 s²_prior + d s²)/(d0 + d).
+7. **Tests.** F = (D_reduced − D_full)/(q s²_post) on q and d0 + d df, with
+   deviances at φ/a; Benjamini-Hochberg over the kept genes.
+   The total denominator df is uncapped in RapidGLM. On the 12-gene/8-sample
+   CLI fixture, public edgeR reports df.total=72 versus about 8140.82 here;
+   gene 0 has p=.24615077 versus .24226256. The fixture's absolute .005
+   p-value tolerance does not establish identical tails for small panels.
+   See [EDGER_SMALL_PANEL_LIMITATION.json](validation/receipts/v1.4.0-r2/EDGER_SMALL_PANEL_LIMITATION.json).
+8. **Fold changes.** From fits at φ/a of the counts plus 0.125 × library /
+   mean library with offsets log(library + 0.25 × library / mean library).
+
+Fits at a fixed dispersion are by Newton's method (observed information),
+warm-started across passes: whole steps while the Newton decrement (about twice
+the deviance still to gain) shrinks, then steps halved until the deviance does
+not increase, until the decrement is below 1e-14 × (100 + the gene's total
+count). After a whole step, convergence is confirmed without a new
+factorization when the decrement computed with the previous information, times
+exp of the largest change in a linear predictor (which bounds the change of
+every weight), is below that threshold; otherwise the next step computes the
+decrement. The bound assumes well-conditioned information. Near a group of
+zeros and fitted means around 1e-12, rounding can make the shortcut stop before
+the full test; observed differences in statistics are negligible. A fit that
+does not converge in 60 steps is refitted by `fit`.
+Leverages come from the Cholesky factor of X'WX, or from a Householder QR of
+W^(1/2)X when fitted means near zero make that factor ill-conditioned.
+
+**Final 1.4.0 agreement with edgeR 4.6.2** (eight datasets).
+The kept-gene sets are identical. Maximum discrepancies are
+5.107e-15 relative for TMM
+factors, 6.509e-12 absolute
+for average log CPM and
+3.398e-05
+relative for the common dispersion. At FDR 0.1, discoveries are identical on
+airway, kang, sim3, sim3b, sim8. On the thyroid subsets, black-box checks of edgeR's
+public fitted values identify inconsistent reported deviances or failed fits
+in 22,
+7 and
+9 genes (32, 128 and 647 samples).
+Without reading edgeR's implementation, the reason for those reported
+deviances cannot be established. Over the other genes, with BH recalculated
+on that subset, discovery counts are:
+
+| Samples | RapidGLM | edgeR | Shared |
+|---|---:|---:|---:|
+| 32 | 1,370 | 1,363 | 1,363 |
+| 128 | 822 | 821 | 821 |
+| 647 | 7,480 | 7,477 | 7,477 |
+
+Source: [EDGER_QL.json](validation/EDGER_QL.json), from the complete final release run.
+
 ## Other applications
 
 Pseudobulk sums cells within caller-specified sample/group units and fits sample
@@ -749,3 +896,94 @@ direction of [Signac](https://stuartlab.org/signac/reference/findmarkers).
 Dose trend tests a supplied numeric dose column using the selected GLM family.
 Count-model assumptions for RNA, peaks and antibodies are identical NB2 working
 assumptions, not assertions that each modality follows an NB sampling law.
+
+`edger-ql` accepts nonnegative integer counts only; fractional counts are
+rejected before normalization or likelihood evaluation. This is a RapidGLM
+input restriction; edgeR also supports workflows using fractional counts.
+
+Additional edgeR workflow choices: dispersion genes must have row sums at
+least 5. Every trial dispersion uses this same set; if any gene fails, that
+objective value is invalid. The likelihood-ratio statistic is clamped at zero,
+and BH adjustment includes only finite p-values. RapidGLM currently uses all
+selected dispersion genes, including when there are more than 10,000; edgeR's
+systematic 10,000-row subset is not implemented. The moderation LOWESS anchor
+spacing is range/200, including at most 200 distinct abundances; this is a
+RapidGLM choice, differing from the black-box specification's zero spacing
+for small sets. The prior-df search is bounded by 8134.84478 but returns its
+numerical interior optimum (about 8134.8433 at the upper boundary), rather than
+that exact endpoint. Counts occupy the sparse input and a dense kept-gene
+matrix; TMM temporarily transposes the dense matrix. These memory costs remain.
+
+## Cis-QTL mapping
+
+`cis_qtl` and `rapidglm qtl` test each dosage by its efficient score against a
+covariate-only Gaussian, Poisson or NB null. With working weights W and score
+residual r, U = g'r − g'WX(X'WX)⁻¹X'r and I = g'Wg − g'WX(X'WX)⁻¹X'Wg.
+The reported z is U / sqrt(I × scale); the one-step estimate is U/I and its
+SE sqrt(scale/I). Gaussian scale is the residual variance, count-model scale
+is one. Missing dosages are imputed to each variant's observed mean.
+
+Each phenotype's inclusive cis window is [start−window, end+window]. CLI
+BED intervals are zero-based half-open and convert to the 1-based inclusive
+[start+1,end]; point records with start=end anchor at that supplied coordinate.
+PLINK allele A1 (ALT in plink2-generated files) is counted. Genotypes and
+covariates are matched to BED sample IDs. Tied positions retain input order;
+exact score ties select the first variant in that order.
+
+Each permutation shuffles the response and log-library offset together and
+refits the null. For unweighted Gaussian fits without offsets, ridge or robust
+covariance, the permutation scores instead use a projection computed once per
+gene. The observed information basis supplies S = Q'G and I = diag(G'G) −
+diag(S'S), where Q = X D⁻¹L⁻ᵀ and LL' = D⁻¹(X'X)D⁻¹. Thus Q has orthonormal
+columns, G_res = G − QS, and G_res'(I−QQ')y_perm = G_res'y_perm.
+
+Batches of 512 responses retain the existing CounterRng streams and shuffle
+order. Packed matrix products give Y_perm'G_res and Y_perm'Q; each scale is
+(|y|² − |Q'y_perm|²)/(n−p). If the residual squared norm is at most 1e-6 of
+|y|², explicit least-squares residuals supply both the scale and the score
+input to avoid cancellation. The observed statistics and information are
+unchanged. Matrix products use 128-sample by 128-column cache panels and
+six-by-eight register tiles, with runtime-dispatched AVX2/FMA and a portable
+path. Every sum visits samples in order across panels; packing buffers belong
+to the calling gene worker. No external BLAS matrix product is used, preserving
+independence from its build and avoiding shared packing-buffer contention.
+
+Successful maxima give the empirical p=(1+extreme)/(1+successful). Fewer than ten usable
+permutations gives `permutations_failed`. Singular null information becomes a
+per-gene status; singular permutation information is counted as a failed draw.
+The Beta calibration follows jaxQTL's noncentral chi-square reference and
+maximum-likelihood Beta shapes (credited in DEPENDENCIES.md). Nearly constant
+maxima fail calibration using a relative variance test; failed shapes and
+noncentrality are NaN, with `ok_beta_failed` retaining nominal results.
+
+Only chromosomes present in the phenotype BED are decoded. MAF filtering
+compacts the dosage matrix in place, although capacity remains allocated until
+the scan ends. Nominal output retains all cis pairs in memory; flattening
+releases each gene's temporary vector as it is copied. For very large scans,
+partition phenotypes by chromosome and omit `nominal` when it is unnecessary.
+This memory constraint has not been validated by a genome-wide run.
+
+**Final 1.4.0 QTL agreement.** On Geuvadis chromosome 22 (580 genes,
+462 samples), Gaussian 10,000-permutation calibration finds
+267 eGenes at Storey q < 0.05. Discovery Jaccard is
+1.0000 with
+FastQTL's adaptive 1,000–10,000 run and
+0.9963
+with tensorQTL at 10,000 permutations. NB at 1,000 permutations finds
+168 eGenes, with Jaccard
+0.9882 against
+jaxQTL NB at the same budget. Full metrics and limitations are in
+[EQTL_COMPARE.json](validation/EQTL_COMPARE.json) and
+[the QTL report](docs/QTL_GAUSSIAN_SPEED.md). This panel does not establish
+genome-wide performance or agreement.
+
+On ARM64, the KS discrepancy of the skew-normal fit uses the double-precision
+CDF identity Phi(z) − 2 T(z, shape), with promotion disabled for Owen's T.
+Its absolute error is checked against the promoted Boost distribution CDF on
+a grid of shapes and statistics. The inferential tail and strict tail-soundness
+checks retain their distribution CDF and quantiles. Integer generator streams
+are unchanged; floating-point statistics and fitted-tail p-values can round
+differently across architectures. Exact empirical-p comparisons are recorded
+in the historical [dev.3 ARM64 study](validation/ARM64_DEV3.json), without
+relaxing its comparison criteria. The final selected test suite has its own
+[ARM64 receipt](validation/ARM64.json).

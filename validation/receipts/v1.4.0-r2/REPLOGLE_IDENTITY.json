@@ -1,0 +1,68 @@
+{
+  "purpose": "Current pilot SC tables compared byte-for-byte with the original v1.4.0 tables; no new perturbation stage outside the explicitly requested pilot.",
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "single_cell": {
+    "strict": {
+      "old_sha256": "cb7de32c2af2b9ef4185878dde371230ba1cf0a81215a26d1330ae4511655865",
+      "new_sha256": "cb7de32c2af2b9ef4185878dde371230ba1cf0a81215a26d1330ae4511655865",
+      "table_byte_identical": true,
+      "rows": 181280,
+      "statuses": {
+        "ok": 174761,
+        "failed_pair_qc": 6519
+      },
+      "new_timing": {
+        "load_before": 2.86,
+        "wall_seconds": 1925.9,
+        "cpu_seconds": 21783.5,
+        "peak_rss_gb": 2.28,
+        "load_average": 15.5,
+        "workflow_wall_seconds": 1925.764512158,
+        "null_fits": 174761
+      }
+    },
+    "ks": {
+      "old_sha256": "0fd225ddb535f62809958e9039ebf16cbbf700385130525ff006e141b386435e",
+      "new_sha256": "0fd225ddb535f62809958e9039ebf16cbbf700385130525ff006e141b386435e",
+      "table_byte_identical": true,
+      "rows": 181280,
+      "statuses": {
+        "ok": 174761,
+        "failed_pair_qc": 6519
+      },
+      "new_timing": {
+        "load_before": 3.47,
+        "wall_seconds": 722.72,
+        "cpu_seconds": 10298.8,
+        "peak_rss_gb": 2.07,
+        "load_average": 17.15,
+        "workflow_wall_seconds": 722.598628297,
+        "null_fits": 174761
+      }
+    }
+  },
+  "sceptre": {
+    "discovery.tsv": {
+      "old_sha256": "689566aeee5d97c5ec34be59e596788076458c285a24ed59a31eb064b0184ec1",
+      "new_sha256": "689566aeee5d97c5ec34be59e596788076458c285a24ed59a31eb064b0184ec1",
+      "table_byte_identical": true
+    },
+    "power.tsv": {
+      "old_sha256": "5e0697a46a22a7269827751286c6861b92669850e8feea6ac64cbaee457e8ff1",
+      "new_sha256": "5e0697a46a22a7269827751286c6861b92669850e8feea6ac64cbaee457e8ff1",
+      "table_byte_identical": true
+    },
+    "calibration.tsv": {
+      "old_sha256": "8a47b6aa2a16bc5ba7daed5c08d95a6f922fce458960c19e1a83e0c945cc1aec",
+      "new_sha256": "8a47b6aa2a16bc5ba7daed5c08d95a6f922fce458960c19e1a83e0c945cc1aec",
+      "table_byte_identical": true
+    }
+  },
+  "negative_comparison_scope": "The reference public calibration call draws its own pairs. The corrected comparison scores only132 exact shared response/guide-target pairs, rather than comparing native9713 toreference10000 different pairs. Each method has6/132 <=.05 and1/132 <=.01. This small intersection limits calibration precision.",
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

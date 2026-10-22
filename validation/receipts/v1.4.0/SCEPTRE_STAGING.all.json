@@ -1,0 +1,311 @@
+{
+  "purpose": "Concordance of the perturbation workflow with SCEPTRE 0.99.0 under its staging rule.",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "worktree_dirty": false,
+  "command": "python3 scripts/validate_sceptre_staging.py --work DIR --output validation/SCEPTRE_STAGING.json --sceptre-library LIB",
+  "version": "1.4.0",
+  "fit_check": "screen_0.02 and screen_0: ks (SCEPTRE's acceptance of the skew-normal fit); defaults_screen_0.02: RapidGLM's defaults (strict, with confirmation draws)",
+  "panels": {
+    "S1_public": {
+      "pairs": 66,
+      "sceptre_discoveries": 32,
+      "screen_0.02": {
+        "discoveries": [
+          31,
+          30,
+          31,
+          31,
+          32,
+          31,
+          31,
+          31,
+          31,
+          31
+        ],
+        "mean_discoveries": 31.0,
+        "jaccard_native_sceptre": {
+          "mean": 0.962784090909091,
+          "min": 0.9090909090909091,
+          "max": 1.0
+        },
+        "jaccard_native_native": {
+          "mean": 0.9475100467035952,
+          "min": 0.8787878787878788
+        },
+        "gate_seeds": {
+          "seeds": 200,
+          "mean_discoveries": 31.095,
+          "standard_error": 0.07654522097604367,
+          "min_discoveries": 29,
+          "max_discoveries": 34,
+          "jaccard_native_sceptre_mean": 0.9632088346702318
+        },
+        "stage2_agreement_mean": 0.9681818181818181
+      },
+      "statistic_max_abs_difference_from_sceptre": 2.2322353165904474e-07,
+      "screen_0": {
+        "discoveries": [
+          32,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          31,
+          32,
+          31
+        ],
+        "mean_discoveries": 31.2,
+        "jaccard_native_sceptre": {
+          "mean": 0.975,
+          "min": 0.96875,
+          "max": 1.0
+        },
+        "jaccard_native_native": {
+          "mean": 0.9722222222222222,
+          "min": 0.9375
+        },
+        "stage2_agreement_mean": 0.5454545454545453
+      },
+      "defaults_screen_0.02": {
+        "discoveries": [
+          31,
+          30,
+          31,
+          31,
+          32,
+          31,
+          31,
+          31,
+          31,
+          31
+        ],
+        "mean_discoveries": 31.0,
+        "jaccard_native_sceptre": {
+          "mean": 0.962784090909091,
+          "min": 0.9090909090909091,
+          "max": 1.0
+        },
+        "jaccard_native_native": {
+          "mean": 0.9475100467035952,
+          "min": 0.8787878787878788
+        },
+        "stage2_agreement_mean": 0.9681818181818181
+      },
+      "defaults_same_discoveries_as_ks_seeds": 10,
+      "G1_floor": true,
+      "G2_counts": true,
+      "G2_counts_ten_seeds": true
+    },
+    "S2_public": {
+      "pairs": 66,
+      "sceptre_discoveries": 11,
+      "screen_0.02": {
+        "discoveries": [
+          11,
+          13,
+          12,
+          14,
+          12,
+          11,
+          16,
+          15,
+          16,
+          12
+        ],
+        "mean_discoveries": 13.2,
+        "jaccard_native_sceptre": {
+          "mean": 0.8342765567765568,
+          "min": 0.6875,
+          "max": 1.0
+        },
+        "jaccard_native_native": {
+          "mean": 0.8113499455862716,
+          "min": 0.6470588235294118
+        },
+        "gate_seeds": {
+          "seeds": 200,
+          "mean_discoveries": 12.315,
+          "standard_error": 0.11288307198025085,
+          "min_discoveries": 9,
+          "max_discoveries": 17,
+          "jaccard_native_sceptre_mean": 0.8826053199251729
+        },
+        "stage2_agreement_mean": 0.9545454545454547
+      },
+      "statistic_max_abs_difference_from_sceptre": 2.384673306043972e-07,
+      "screen_0": {
+        "discoveries": [
+          14,
+          18,
+          15,
+          16,
+          17,
+          17,
+          13,
+          16,
+          16,
+          16
+        ],
+        "mean_discoveries": 15.8,
+        "jaccard_native_sceptre": {
+          "mean": 0.7020430223371401,
+          "min": 0.6111111111111112,
+          "max": 0.8461538461538461
+        },
+        "jaccard_native_native": {
+          "mean": 0.8947441588721259,
+          "min": 0.7222222222222222
+        },
+        "stage2_agreement_mean": 0.8333333333333334
+      },
+      "defaults_screen_0.02": {
+        "discoveries": [
+          11,
+          13,
+          12,
+          14,
+          12,
+          11,
+          16,
+          15,
+          16,
+          12
+        ],
+        "mean_discoveries": 13.2,
+        "jaccard_native_sceptre": {
+          "mean": 0.8342765567765568,
+          "min": 0.6875,
+          "max": 1.0
+        },
+        "jaccard_native_native": {
+          "mean": 0.8113499455862716,
+          "min": 0.6470588235294118
+        },
+        "stage2_agreement_mean": 0.9545454545454547
+      },
+      "defaults_same_discoveries_as_ks_seeds": 10,
+      "G1_floor": true,
+      "G2_counts": true,
+      "G2_counts_ten_seeds": false
+    }
+  },
+  "stage_probe": {
+    "pairs": 1500,
+    "stages": {
+      "1": 1469,
+      "2": 31
+    },
+    "promoted_fraction": 0.020666666666666667,
+    "smallest_first_stage_p": 0.024,
+    "first_stage_p_times_500_all_even": true
+  },
+  "sceptre_results_independent_of_r_seed": {
+    "S1_public": true,
+    "S2_public": true
+  },
+  "null_calibration_with_screen": [
+    {
+      "family": "poisson",
+      "predictor": "binary",
+      "calibration": "permutation",
+      "valid": 2400,
+      "rejections_05": 119,
+      "rate_01": 0.012083333333333333,
+      "interval_999": [
+        86,
+        157
+      ],
+      "ks": 0.01516666666666655,
+      "ks_critical_999": 0.03971894976744735,
+      "passed": true
+    },
+    {
+      "family": "poisson",
+      "predictor": "binary",
+      "calibration": "crt",
+      "valid": 2400,
+      "rejections_05": 130,
+      "rate_01": 0.010416666666666666,
+      "interval_999": [
+        86,
+        157
+      ],
+      "ks": 0.015500000000000014,
+      "ks_critical_999": 0.03971894976744735,
+      "passed": true
+    },
+    {
+      "family": "poisson",
+      "predictor": "continuous",
+      "calibration": "permutation",
+      "valid": 2400,
+      "rejections_05": 98,
+      "rate_01": 0.007083333333333333,
+      "interval_999": [
+        86,
+        157
+      ],
+      "ks": 0.01575,
+      "ks_critical_999": 0.03971894976744735,
+      "passed": true
+    },
+    {
+      "family": "nb",
+      "predictor": "binary",
+      "calibration": "permutation",
+      "valid": 2400,
+      "rejections_05": 106,
+      "rate_01": 0.009583333333333333,
+      "interval_999": [
+        86,
+        157
+      ],
+      "ks": 0.021666666666666667,
+      "ks_critical_999": 0.03971894976744735,
+      "passed": true
+    },
+    {
+      "family": "nb",
+      "predictor": "binary",
+      "calibration": "crt",
+      "valid": 2400,
+      "rejections_05": 105,
+      "rate_01": 0.007916666666666667,
+      "interval_999": [
+        86,
+        157
+      ],
+      "ks": 0.027166666666666617,
+      "ks_critical_999": 0.03971894976744735,
+      "passed": true
+    },
+    {
+      "family": "nb",
+      "predictor": "continuous",
+      "calibration": "permutation",
+      "valid": 2400,
+      "rejections_05": 98,
+      "rate_01": 0.007916666666666667,
+      "interval_999": [
+        86,
+        157
+      ],
+      "ks": 0.01841666666666658,
+      "ks_critical_999": 0.03971894976744735,
+      "passed": true
+    }
+  ],
+  "gates": {
+    "G1_floor": true,
+    "G2_counts": true,
+    "G3_null": true
+  },
+  "passed": true,
+  "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
+  }
+}

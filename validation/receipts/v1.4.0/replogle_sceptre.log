@@ -1,0 +1,2 @@
+{"timed_command_ready_utc": "2026-10-22T13:36:32Z", "load_average": [3.07958984375, 10.396484375, 11.9296875], "cpus": "16-31", "waited_for_quiet_seconds": 120.49}
+{"load_before": 2.43, "wall_seconds": 3164.09, "cpu_seconds": 49848.9, "peak_rss_gb": 2.98, "load_average": 11.96, "version": "0.99.0", "workers": 16, "formula": "~ log_umi + log_detected + mito + batch", "setup_seconds": 5.602, "calibration_seconds": 100.632, "power_seconds": 4.766, "discovery_seconds": 3036.963, "seconds": 3142.361}

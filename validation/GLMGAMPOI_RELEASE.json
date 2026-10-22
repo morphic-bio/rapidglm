@@ -1,0 +1,271 @@
+{
+  "purpose": "glmGamPoi's development version, as timed in ENGINE_BATCH.json and APPLICATIONS_BULK.json (1.25.1), against its Bioconductor 3.21 release (1.20.0), the version that ships with DESeq2 1.48.2. Both run on the same inputs with the harness's own pieces: the glm_gp script of benchmarks/glm/batch.py (best of three fits of 1,000 NB responses) and DESeq2 with fitType = \"glmGamPoi\" on the four bulk datasets (scripts/reference_bulk_timing.R, one worker). Within each repeat the two versions run back to back; the receipt keeps the fastest repeat.",
+  "command": "flock LOCK taskset -c 16 python3 scripts/benchmark_glmgampoi_release.py --release-library DIR --work DIR --output validation/GLMGAMPOI_RELEASE.json",
+  "commit": "06afa910bf32525145eefddf5337b321abaef84d",
+  "host_note": "One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-14; CPU 16 (an efficiency core), one thread, under the shared timing lock. Other sessions ran untimed jobs on other CPUs; the load average before each run is in runs.",
+  "versions": {
+    "development": "1.25.1",
+    "release": "1.20.0 (Bioconductor 3.21)",
+    "deseq2": "1.48.2"
+  },
+  "tasks": [
+    {
+      "task": "batch glm_gp",
+      "seconds": {
+        "1.25.1": 5.954,
+        "1.20.0": 5.983
+      },
+      "release_over_development": 1.004870675176352
+    },
+    {
+      "task": "DESeq2+glmGamPoi airway",
+      "seconds": {
+        "1.25.1": 15.894,
+        "1.20.0": 15.92
+      },
+      "release_over_development": 1.0016358374229268
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid32",
+      "seconds": {
+        "1.25.1": 39.261,
+        "1.20.0": 39.288
+      },
+      "release_over_development": 1.0006877053564605
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid128",
+      "seconds": {
+        "1.25.1": 88.173,
+        "1.20.0": 87.81
+      },
+      "release_over_development": 0.9958830934639856
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid",
+      "seconds": {
+        "1.25.1": 275.998,
+        "1.20.0": 277.432
+      },
+      "release_over_development": 1.0051956898238394
+    }
+  ],
+  "release_over_development": {
+    "min": 0.9958830934639856,
+    "max": 1.0051956898238394
+  },
+  "runs": [
+    {
+      "task": "batch glm_gp",
+      "requested": "1.25.1",
+      "seconds": 5.954,
+      "version": "1.25.1",
+      "load": 6.96484375
+    },
+    {
+      "task": "batch glm_gp",
+      "requested": "1.20.0",
+      "seconds": 5.983,
+      "version": "1.20.0",
+      "load": 7.3623046875
+    },
+    {
+      "task": "DESeq2+glmGamPoi airway",
+      "requested": "1.25.1",
+      "repeat": 0,
+      "seconds": 15.894,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 7.5263671875
+    },
+    {
+      "task": "DESeq2+glmGamPoi airway",
+      "requested": "1.20.0",
+      "repeat": 0,
+      "seconds": 15.92,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 7.90380859375
+    },
+    {
+      "task": "DESeq2+glmGamPoi airway",
+      "requested": "1.25.1",
+      "repeat": 1,
+      "seconds": 16.075,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 8.2333984375
+    },
+    {
+      "task": "DESeq2+glmGamPoi airway",
+      "requested": "1.20.0",
+      "repeat": 1,
+      "seconds": 15.934,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 7.94970703125
+    },
+    {
+      "task": "DESeq2+glmGamPoi airway",
+      "requested": "1.25.1",
+      "repeat": 2,
+      "seconds": 15.971,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 7.67919921875
+    },
+    {
+      "task": "DESeq2+glmGamPoi airway",
+      "requested": "1.20.0",
+      "repeat": 2,
+      "seconds": 15.941,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 8.283203125
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid32",
+      "requested": "1.25.1",
+      "repeat": 0,
+      "seconds": 39.341,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 8.2470703125
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid32",
+      "requested": "1.20.0",
+      "repeat": 0,
+      "seconds": 39.787,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 9.39990234375
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid32",
+      "requested": "1.25.1",
+      "repeat": 1,
+      "seconds": 39.606,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 9.47900390625
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid32",
+      "requested": "1.20.0",
+      "repeat": 1,
+      "seconds": 39.288,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 9.46337890625
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid32",
+      "requested": "1.25.1",
+      "repeat": 2,
+      "seconds": 39.261,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 8.970703125
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid32",
+      "requested": "1.20.0",
+      "repeat": 2,
+      "seconds": 39.328,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 8.921875
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid128",
+      "requested": "1.25.1",
+      "repeat": 0,
+      "seconds": 88.96,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 8.68359375
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid128",
+      "requested": "1.20.0",
+      "repeat": 0,
+      "seconds": 88.911,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 9.81591796875
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid128",
+      "requested": "1.25.1",
+      "repeat": 1,
+      "seconds": 88.262,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 7.8701171875
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid128",
+      "requested": "1.20.0",
+      "repeat": 1,
+      "seconds": 87.957,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 8.01806640625
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid128",
+      "requested": "1.25.1",
+      "repeat": 2,
+      "seconds": 88.173,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 7.15283203125
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid128",
+      "requested": "1.20.0",
+      "repeat": 2,
+      "seconds": 87.81,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 7.4794921875
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid",
+      "requested": "1.25.1",
+      "repeat": 0,
+      "seconds": 275.998,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 7.03125
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid",
+      "requested": "1.20.0",
+      "repeat": 0,
+      "seconds": 277.432,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 8.2939453125
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid",
+      "requested": "1.25.1",
+      "repeat": 1,
+      "seconds": 279.439,
+      "glmGamPoi": "1.25.1",
+      "deseq2": "1.48.2",
+      "load": 10.09228515625
+    },
+    {
+      "task": "DESeq2+glmGamPoi thyroid",
+      "requested": "1.20.0",
+      "repeat": 1,
+      "seconds": 295.772,
+      "glmGamPoi": "1.20.0",
+      "deseq2": "1.48.2",
+      "load": 10.1884765625
+    }
+  ]
+}

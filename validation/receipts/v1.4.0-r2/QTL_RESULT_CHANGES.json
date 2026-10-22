@@ -1,0 +1,242 @@
+{
+  "purpose": "Compare the same 1,000-permutation native QTL inputs before/after review.",
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "models": {
+    "gaussian": {
+      "rows": 580,
+      "old_statuses": {
+        "ok": 580
+      },
+      "new_statuses": {
+        "ok": 580
+      },
+      "old_table_sha256": "cda1e23b7e3a80d18f7ce0a4b9b248d25f7c679f1f9aec3c11d01c2a65a38404",
+      "new_table_sha256": "be868d52b27d9d26944930b93d425c990b6138261d98997f8dd0c1fceb3a5a5b",
+      "new_columns": [
+        "permutations_failed"
+      ],
+      "common_numeric": {
+        "chrom": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "start": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "end": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "variants": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "lead_position": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "statistic": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "p_value": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "estimate": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "standard_error": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "theta": {
+          "exact_mismatches": 0,
+          "finite_pairs": 0,
+          "max_absolute_difference": null,
+          "max_relative_to_old": null
+        },
+        "permutations": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "permutation_p": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "beta_p": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "beta_k": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "beta_n": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "reference_ncp": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        }
+      },
+      "changed_leads": [],
+      "failed_permutations_total": 0
+    },
+    "nb": {
+      "rows": 580,
+      "old_statuses": {
+        "ok": 580
+      },
+      "new_statuses": {
+        "ok": 580
+      },
+      "old_table_sha256": "b38d91d6e247e83f8e03a1b4d7a116f6555fe19c33035eb6419bf14387d86b47",
+      "new_table_sha256": "7292b58d54d5f8e403fa47d6ee7ba3f98aebea216d72cf6e4f2a68d40a54df1b",
+      "new_columns": [
+        "permutations_failed"
+      ],
+      "common_numeric": {
+        "chrom": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "start": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "end": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "variants": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "lead_position": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "statistic": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "p_value": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "estimate": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "standard_error": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "theta": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "permutations": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "permutation_p": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "beta_p": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "beta_k": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "beta_n": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        },
+        "reference_ncp": {
+          "exact_mismatches": 0,
+          "finite_pairs": 580,
+          "max_absolute_difference": 0.0,
+          "max_relative_to_old": 0.0
+        }
+      },
+      "changed_leads": [],
+      "failed_permutations_total": 0
+    }
+  },
+  "recipe_commit": "239cfe9a99bdd6e17724fb3353e3343cba167ca7",
+  "recipe_path": "scripts/compare_review_qtl.py",
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

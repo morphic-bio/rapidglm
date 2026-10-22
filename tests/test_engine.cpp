@@ -1003,3 +1003,14 @@ BOOST_AUTO_TEST_CASE(nb_ml_keeps_the_poisson_limit_when_it_beats_an_interior_max
     interior.theta = 43.57;
     BOOST_TEST(f.log_likelihood > fit(x, y, interior).log_likelihood + 4);
 }
+
+BOOST_AUTO_TEST_CASE(double_precision_ks_cdf_matches_promoted_reference) {
+    for (double shape : {-20., -5., -2., 0., 2., 5., 20.}) {
+        boost::math::skew_normal_distribution<double> reference(0, 1, shape);
+        for (int i = -100; i <= 100; ++i) {
+            const double z = i / 10.;
+            BOOST_TEST(std::abs(detail::skew_normal_ks_cdf(z, shape) -
+                                boost::math::cdf(reference, z)) < 2e-14);
+        }
+    }
+}

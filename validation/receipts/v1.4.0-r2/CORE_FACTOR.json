@@ -1,0 +1,199 @@
+{
+  "purpose": "Untimed analysis of the original v1.4.0 solver performance-core control; no new timing runs.",
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "measurement_collection": "v1.4.0",
+  "raw_measurement_commit": "not recorded in the raw solver JSON",
+  "controls": 22,
+  "efficiency_cpus": "16",
+  "performance_cpus": "4",
+  "minimum_ratio": 1.6558813229299452,
+  "maximum_ratio": 2.0873008888497755,
+  "rounded_range": [
+    1.7,
+    2.1
+  ],
+  "historical_v1_3_SOLVERS_recorded_range": [
+    1.663,
+    2.081
+  ],
+  "source_sha256": {
+    "validation/work/benchmark/receipts/v1.4.0/solv_airway_fixed.json": "087db57d6492dc86f2ee8f4633b89366d6af20722a42a883d166896cde08bcc6",
+    "validation/work/benchmark/receipts/v1.4.0/pcore-control/solv_airway_fixed.json": "ba10bf1c825fd7e2a09be89fc5e7fd7bf07ad562e1063b4d9f73d2d964b66cc3",
+    "validation/work/benchmark/receipts/v1.4.0/solv_airway_joint.json": "5653350cc57299b8c48831d1939a17013a565c60f0f7538e41fa21108f07577c",
+    "validation/work/benchmark/receipts/v1.4.0/pcore-control/solv_airway_joint.json": "dfa056ad976f4f13aab2a1bc270733f3000fda106c39bc85f0eb804384c23c6a",
+    "validation/work/benchmark/receipts/v1.4.0/solv_thyroid_fixed.json": "691ae065d886c1782493ad020908ae82787bf799af8b560c2e59c39020da4e44",
+    "validation/work/benchmark/receipts/v1.4.0/pcore-control/solv_thyroid_fixed.json": "d2ded7deab551995d5cefdb9c1f92c121b848d5fd65c0d663cf24c7c508ac5d5"
+  },
+  "rows": [
+    {
+      "case": "airway_fixed",
+      "method": "rapidglm_newton",
+      "efficiency_seconds": 0.216837,
+      "performance_seconds": 0.111712,
+      "ratio": 1.9410358779719277
+    },
+    {
+      "case": "airway_fixed",
+      "method": "rapidglm_newton_plain",
+      "efficiency_seconds": 0.234533,
+      "performance_seconds": 0.12133,
+      "ratio": 1.9330173905876535
+    },
+    {
+      "case": "airway_fixed",
+      "method": "ceres_levenberg_marquardt/ceres_default",
+      "efficiency_seconds": 0.339756,
+      "performance_seconds": 0.163411,
+      "ratio": 2.079150118413081
+    },
+    {
+      "case": "airway_fixed",
+      "method": "ceres_dogleg/ceres_default",
+      "efficiency_seconds": 0.35577,
+      "performance_seconds": 0.170445,
+      "ratio": 2.0873008888497755
+    },
+    {
+      "case": "airway_fixed",
+      "method": "ceres_lbfgs/ceres_default",
+      "efficiency_seconds": 0.447441,
+      "performance_seconds": 0.262619,
+      "ratio": 1.7037647694949718
+    },
+    {
+      "case": "airway_fixed",
+      "method": "ceres_levenberg_marquardt/tight",
+      "efficiency_seconds": 0.472889,
+      "performance_seconds": 0.237173,
+      "ratio": 1.9938568049482868
+    },
+    {
+      "case": "airway_fixed",
+      "method": "ceres_dogleg/tight",
+      "efficiency_seconds": 0.703794,
+      "performance_seconds": 0.36464,
+      "ratio": 1.9301064063185607
+    },
+    {
+      "case": "airway_fixed",
+      "method": "ceres_lbfgs/tight",
+      "efficiency_seconds": 0.591042,
+      "performance_seconds": 0.356935,
+      "ratio": 1.6558813229299452
+    },
+    {
+      "case": "airway_joint",
+      "method": "rapidglm_newton",
+      "efficiency_seconds": 1.06682,
+      "performance_seconds": 0.621512,
+      "ratio": 1.7164913951782108
+    },
+    {
+      "case": "airway_joint",
+      "method": "rapidglm_newton_plain",
+      "efficiency_seconds": 1.16026,
+      "performance_seconds": 0.677554,
+      "ratio": 1.7124243971698199
+    },
+    {
+      "case": "airway_joint",
+      "method": "ceres_bfgs/ceres_default",
+      "efficiency_seconds": 1.24357,
+      "performance_seconds": 0.731306,
+      "ratio": 1.7004783223438615
+    },
+    {
+      "case": "airway_joint",
+      "method": "ceres_lbfgs/ceres_default",
+      "efficiency_seconds": 1.23611,
+      "performance_seconds": 0.72173,
+      "ratio": 1.7127041968603218
+    },
+    {
+      "case": "airway_joint",
+      "method": "ceres_bfgs/tight",
+      "efficiency_seconds": 1.9128,
+      "performance_seconds": 1.14905,
+      "ratio": 1.6646795178625824
+    },
+    {
+      "case": "airway_joint",
+      "method": "ceres_lbfgs/tight",
+      "efficiency_seconds": 2.16582,
+      "performance_seconds": 1.2937,
+      "ratio": 1.674128468733091
+    },
+    {
+      "case": "thyroid_fixed",
+      "method": "rapidglm_newton",
+      "efficiency_seconds": 7.0703,
+      "performance_seconds": 3.58313,
+      "ratio": 1.9732189454471367
+    },
+    {
+      "case": "thyroid_fixed",
+      "method": "rapidglm_newton_plain",
+      "efficiency_seconds": 7.81292,
+      "performance_seconds": 4.02689,
+      "ratio": 1.9401870922722002
+    },
+    {
+      "case": "thyroid_fixed",
+      "method": "ceres_levenberg_marquardt/ceres_default",
+      "efficiency_seconds": 10.3157,
+      "performance_seconds": 5.88716,
+      "ratio": 1.752237071864872
+    },
+    {
+      "case": "thyroid_fixed",
+      "method": "ceres_dogleg/ceres_default",
+      "efficiency_seconds": 10.6261,
+      "performance_seconds": 6.0215,
+      "ratio": 1.7646931827617702
+    },
+    {
+      "case": "thyroid_fixed",
+      "method": "ceres_lbfgs/ceres_default",
+      "efficiency_seconds": 15.698,
+      "performance_seconds": 8.17053,
+      "ratio": 1.9212951913768141
+    },
+    {
+      "case": "thyroid_fixed",
+      "method": "ceres_levenberg_marquardt/tight",
+      "efficiency_seconds": 15.3282,
+      "performance_seconds": 8.9686,
+      "ratio": 1.709096180005798
+    },
+    {
+      "case": "thyroid_fixed",
+      "method": "ceres_dogleg/tight",
+      "efficiency_seconds": 15.8373,
+      "performance_seconds": 9.13245,
+      "ratio": 1.7341786705648539
+    },
+    {
+      "case": "thyroid_fixed",
+      "method": "ceres_lbfgs/tight",
+      "efficiency_seconds": 31.9,
+      "performance_seconds": 16.8262,
+      "ratio": 1.8958528960787342
+    }
+  ],
+  "public_receipt_note_corrections": [
+    "validation/RUST_DESEQ.json",
+    "validation/GLM_COMPARISON.json",
+    "validation/ENGINE_BATCH.json",
+    "validation/CRT_SCALING.json",
+    "validation/APPLICATIONS_PERTURBATION.json",
+    "validation/APPLICATIONS_BULK.json",
+    "validation/SOLVERS.json"
+  ],
+  "metadata_check": "Only the stated core-factor wording changes in these existing public JSONs; all keys, numeric measurements and other strings remain identical.",
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

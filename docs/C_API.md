@@ -11,6 +11,7 @@ to the C++ calls (`tests/test_c_api.cpp`).
 |---|---|---|
 | `rapidglm_fit_batch` | `fit_batch` | `fit` |
 | `rapidglm_bulk_de` | `bulk_de` | `bulk-de` |
+| `rapidglm_edger_ql` | `edger_ql` | `edger-ql` |
 | `rapidglm_sceptre` | `sceptre` | `sceptre` |
 | `rapidglm_sceptre_grid` | `sceptre_grid` | `sceptre` with `targets` |
 | `rapidglm_scan` | `score_scan` | `scan` |
@@ -109,3 +110,13 @@ tally of the pairs that fail pair QC by target and kind.
   bit for bit: `fit_batch`; `bulk_de` with shrinkage and a contrast; `score_scan`;
   `sceptre` with each stream key and adjustment family; and `sceptre_grid`.
 - Both run under ctest, with and without the sanitizers.
+
+C API feature version 2 adds the 1.4.0 entry points. Python checks this version
+before resolving symbols; rebuild bindings and libraries together. Existing
+legacy entry points remain available.
+
+For `rapidglm_nb_floored_fits`, a nonzero convergence code indicates success:
+1 means IRLS convergence, 2 means native bounded-optimizer convergence.
+The Python wrapper returns booleans by default; `return_optimizer=True` also
+returns the optimizer mask so `RapidGLMInference.irls` can delegate every such
+fallback to PyDESeq2's default inference.

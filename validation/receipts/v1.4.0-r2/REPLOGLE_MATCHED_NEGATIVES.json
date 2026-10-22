@@ -1,0 +1,67 @@
+{
+  "purpose": "Untimed matched-pair calibration check using public SCEPTRE pilot outputs.",
+  "timed": false,
+  "cpus": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "measured_engine_commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "recipe_sha256": "3f6674503d55e4418756f7866b743192f7ea211d13b2a0b7887088129ecf55ba",
+  "recipe_source": "#!/usr/bin/env python3\n\"\"\"Untimed matched-pair calibration check using public SCEPTRE pilot outputs.\"\"\"\nimport argparse\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path\nimport subprocess\nimport numpy as np\nimport pandas as pd\n\nROOT = next(p for p in Path(__file__).resolve().parents if (p / 'scripts/replogle_pilot.py').exists())\n\n\ndef sha(path):\n    return hashlib.sha256(path.read_bytes()).hexdigest()\n\n\ndef main():\n    p = argparse.ArgumentParser(description=__doc__)\n    p.add_argument('--pilot', type=Path, required=True)\n    p.add_argument('--work', type=Path, required=True)\n    p.add_argument('--output', type=Path, required=True)\n    p.add_argument('--binary', type=Path, default=ROOT / 'build/rapidglm')\n    p.add_argument('--threads', type=int, default=8)\n    args = p.parse_args()\n    if not set(os.sched_getaffinity(0)) <= set(range(8)):\n        p.error('Run untimed on CPUs 0-7 with taskset -c 0-7')\n    pilot, work = args.pilot.resolve(), args.work.resolve()\n    work.mkdir(parents=True, exist_ok=True)\n    refpath = pilot / 'runs/sceptre_w16/calibration.tsv'\n    ref = pd.read_csv(refpath, sep='\\t')\n    keys = ['response_id', 'grna_target']\n    if ref.duplicated(keys).any():\n        raise ValueError('Reference calibration has duplicate response/target pairs')\n    responses = (pilot / 'sc/responses.txt').read_text().split()\n    index = {name: i for i, name in enumerate(responses)}\n    guides = pd.read_csv(pilot / 'sc/guides.tsv', sep='\\t')\n    targets = set(guides.loc[guides.non_targeting == 1, 'target'])\n    if not ref.response_id.isin(index).all() or not ref.grna_target.isin(targets).all():\n        raise ValueError('A reference pair is outside the prepared public native panel')\n    pairs = pd.DataFrame({'response': ref.response_id.map(index), 'target': ref.grna_target, 'kind': 'negative'})\n    pairpath = work / 'pairs.tsv'\n    pairs.sort_values(['target', 'response']).to_csv(pairpath, sep='\\t', index=False)\n    base = ref[keys + ['p_value', 'pass_qc']].rename(columns={'p_value': 'reference_p'})\n    native = {}\n    env = {**os.environ, 'OPENBLAS_NUM_THREADS': '1', 'OMP_NUM_THREADS': '1'}\n    for mode, suffix in [('strict', ''), ('ks', '_ks')]:\n        config = json.loads((pilot / f'runs/rapidglm_t16{suffix}.json').read_text())\n        prefix = work / mode\n        config.update(pairs=str(pairpath), threads=args.threads, output=str(prefix), fit_check=mode)\n        cfgpath = work / f'{mode}.json'\n        cfgpath.write_text(json.dumps(config, indent=2) + '\\n')\n        subprocess.run([str(args.binary), 'sceptre', str(cfgpath)], env=env, check=True,\n                       stdout=subprocess.DEVNULL)\n        tablepath = Path(str(prefix) + '.tsv')\n        table = pd.read_csv(tablepath, sep='\\t', na_values='NA')\n        table['response_id'] = table.response.map(lambda i: responses[i])\n        ok = table[table.status.str.startswith('ok') & np.isfinite(table.p_value)]\n        selected = ok[['response_id', 'target', 'p_value']].rename(columns={'target': 'grna_target', 'p_value': mode + '_p'})\n        base = base.merge(selected, on=keys, how='inner', validate='one_to_one')\n        native[mode] = {'rows': len(table), 'statuses': table.status.value_counts().to_dict(),\n                        'finite_ok': len(ok), 'table_sha256': sha(tablepath)}\n    base = base[base.pass_qc & np.isfinite(base.reference_p)].copy()\n    rows = {}\n    for label in ['reference', 'strict', 'ks']:\n        values = base[label + '_p'].to_numpy()\n        rows[label] = {f'count_below_{cutoff}': int((values <= cutoff).sum()) for cutoff in [.05, .01]}\n        rows[label].update({f'fraction_below_{cutoff}': float((values <= cutoff).mean()) for cutoff in [.05, .01]})\n    source = json.loads((ROOT / 'validation/receipts/v1.4.0-r2/source.json').read_text())\n    result = {'purpose': __doc__, 'timed': False, 'cpus': sorted(os.sched_getaffinity(0)),\n              'version': subprocess.check_output([str(args.binary), '--version'], text=True).strip(),\n              'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),\n              'measured_engine_commit': source['commit'],\n              'recipe_sha256': sha(Path(__file__)),\n              'recipe_source': Path(__file__).read_text(),\n              'reference_calibration_sha256': sha(refpath), 'pair_file_sha256': sha(pairpath),\n              'reference_pairs': len(ref), 'common_tested_all_three': len(base),\n              'native': native, 'same_pair_fractions': rows,\n              'scope': 'Independent untimed calibration check on the reference-selected control pairs. Pilot timing and original-panel agreement remain separate.'}\n    if not len(base):\n        raise ValueError('No finite common calibration pairs')\n    args.output.write_text(json.dumps(result, indent=2) + '\\n')\n    print(json.dumps(result, indent=2))\n\n\nif __name__ == '__main__':\n    main()\n",
+  "reference_calibration_sha256": "8a47b6aa2a16bc5ba7daed5c08d95a6f922fce458960c19e1a83e0c945cc1aec",
+  "pair_file_sha256": "368d3b2522919630a6a6220d98f36bc5d0ea7426ff3c5c7f08b5d250f3673b2c",
+  "reference_pairs": 10000,
+  "common_tested_all_three": 10000,
+  "native": {
+    "strict": {
+      "rows": 10000,
+      "statuses": {
+        "ok": 10000
+      },
+      "finite_ok": 10000,
+      "table_sha256": "d5864382777f4978206e0c58f428acd09c504223a102b3531e97f65607280a35"
+    },
+    "ks": {
+      "rows": 10000,
+      "statuses": {
+        "ok": 10000
+      },
+      "finite_ok": 10000,
+      "table_sha256": "d5864382777f4978206e0c58f428acd09c504223a102b3531e97f65607280a35"
+    }
+  },
+  "same_pair_fractions": {
+    "reference": {
+      "count_below_0.05": 489,
+      "count_below_0.01": 89,
+      "fraction_below_0.05": 0.0489,
+      "fraction_below_0.01": 0.0089
+    },
+    "strict": {
+      "count_below_0.05": 492,
+      "count_below_0.01": 95,
+      "fraction_below_0.05": 0.0492,
+      "fraction_below_0.01": 0.0095
+    },
+    "ks": {
+      "count_below_0.05": 492,
+      "count_below_0.01": 95,
+      "fraction_below_0.05": 0.0492,
+      "fraction_below_0.01": 0.0095
+    }
+  },
+  "scope": "Independent untimed calibration check on the reference-selected control pairs. Pilot timing and original-panel agreement remain separate.",
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

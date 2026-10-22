@@ -1,0 +1,118 @@
+{
+  "purpose": "bulk_de against DESeq2 1.48.2 with its default Cook's distances (legacy_cooks: DESeq2's robust dispersion as implemented in PyDESeq2, MIT) and with RapidGLM's own estimator (legacy_cooks false, the default before 1.2.0)",
+  "command": "python3 scripts/validate_cooks.py --thyroid-output validation/COOKS_THYROID.json --legacy-output validation/COOKS_LEGACY.json",
+  "version": "1.4.0",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "datasets": {
+    "airway": {
+      "deseq2_discoveries": 4834,
+      "default": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "cooks_flagged": 0,
+        "replaced_genes": 0
+      },
+      "own_estimator": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "cooks_flagged": 0,
+        "replaced_genes": 0
+      }
+    },
+    "kang": {
+      "deseq2_discoveries": 635,
+      "default": {
+        "discoveries": 635,
+        "jaccard": 1.0,
+        "cooks_flagged": 0,
+        "replaced_genes": 0
+      },
+      "own_estimator": {
+        "discoveries": 635,
+        "jaccard": 1.0,
+        "cooks_flagged": 0,
+        "replaced_genes": 0
+      }
+    },
+    "sim3": {
+      "deseq2_discoveries": 239,
+      "default": {
+        "discoveries": 239,
+        "jaccard": 0.983402489626556,
+        "cooks_flagged": 61,
+        "replaced_genes": 0
+      },
+      "own_estimator": {
+        "discoveries": 239,
+        "jaccard": 0.983402489626556,
+        "cooks_flagged": 63,
+        "replaced_genes": 0
+      }
+    },
+    "sim3b": {
+      "deseq2_discoveries": 201,
+      "default": {
+        "discoveries": 201,
+        "jaccard": 1.0,
+        "cooks_flagged": 82,
+        "replaced_genes": 0
+      },
+      "own_estimator": {
+        "discoveries": 200,
+        "jaccard": 0.9950248756218906,
+        "cooks_flagged": 86,
+        "replaced_genes": 0
+      }
+    },
+    "sim8": {
+      "deseq2_discoveries": 253,
+      "default": {
+        "discoveries": 253,
+        "jaccard": 1.0,
+        "cooks_flagged": 0,
+        "replaced_genes": 79
+      },
+      "own_estimator": {
+        "discoveries": 253,
+        "jaccard": 1.0,
+        "cooks_flagged": 0,
+        "replaced_genes": 78
+      }
+    },
+    "thyroid128": {
+      "deseq2_discoveries": 792,
+      "default": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "cooks_flagged": 219,
+        "replaced_genes": 67
+      },
+      "own_estimator": {
+        "discoveries": 463,
+        "jaccard": 0.5806045340050378,
+        "cooks_flagged": 753,
+        "replaced_genes": 284
+      }
+    },
+    "thyroid": {
+      "deseq2_discoveries": 7177,
+      "default": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "cooks_flagged": 3,
+        "replaced_genes": 98
+      },
+      "own_estimator": {
+        "discoveries": 6586,
+        "jaccard": 0.9046498754497647,
+        "cooks_flagged": 427,
+        "replaced_genes": 1109
+      }
+    }
+  },
+  "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
+  }
+}

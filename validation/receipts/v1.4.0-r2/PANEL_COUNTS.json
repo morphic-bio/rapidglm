@@ -1,0 +1,17 @@
+{
+  "version": "1.4.0-dev.3",
+  "commit": "7c37bd63ca324bef6a5b4e0e1a5fd634cb157ed9",
+  "input": "validation/work/benchmark/gasperini/pairs.tsv",
+  "sha256": "cd15aa7e09790510094fef63106eb4e7a51331507085ca598653f39cf7a9a4ca",
+  "pairs_by_kind": {
+    "discovery": 10000,
+    "negative": 5000,
+    "positive": 130
+  },
+  "untimed": true,
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "7c37bd63ca324bef6a5b4e0e1a5fd634cb157ed9",
+    "worktree_dirty": false
+  }
+}

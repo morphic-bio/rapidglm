@@ -1,0 +1,492 @@
+{
+ "version": "1.4.0",
+ "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+ "measured_tag": "v1.4.0-dev.4",
+ "native_cpp_cases": 172,
+ "portable_cpp_cases": 172,
+ "native_c99": true,
+ "portable_c99": true,
+ "native_cli_cases": 28,
+ "portable_cli_cases": 28,
+ "python_cpp_binding_statsmodels": "passed",
+ "python_c_api_cases": 10,
+ "python_deseq_cases": 4,
+ "r_parity_and_applications": "passed",
+ "rust_unit_cases": 5,
+ "rust_integration_cases": 3,
+ "rust_doc_cases": 1,
+ "quiet_guard_cases": 3,
+ "replogle_and_qtl_recipe_tests": "passed",
+ "container_suites": "passed on clean clone of v1.4.0-dev.4",
+ "arm64_selected_cases": 29,
+ "arm64_assertions": 5281712,
+ "arm64_c99": true,
+ "arm64_cli_cases": 28,
+ "format": "all tracked C/C++ files passed",
+ "log_sha256": {
+  "native-cpp-c99.log": "2580ffd48aeb551de8b4587d557f18768723d7b4d35b87d5eebf8be5d42e5ed2",
+  "portable-cpp-c99.log": "3c308c0f3304e67ed79d78f45396b9a3c24d018d4d9edd762a8eb6ebbc8bae32",
+  "native-cli.log": "40a1420d8ceeb839385292f27c2ed7ddc841673927f9ce7b5b88adfeb9149f13",
+  "portable-cli.log": "5058b0f0c377100eb498a718548b83df4b6ef8efd20bf7f6e0829d1224c0b542",
+  "bindings.log": "6e94085bf76134885fbf4608ebb454811d63f31ff4a91529255d487e73e17d1f",
+  "rust.log": "b3ddabf71356c264bfb1f56578c86335d225a98e13caacbb38073de09b111598",
+  "quiet-run.log": "199ba496f288116d36c62f29346d4fbf0bd75745a1c893abfcbdaa4c6d5b1033",
+  "replogle-recipe.log": "8fc491c33af10c373d8f98a2362fd7e66cdc6c96497aa5aa59d429264ca5ac92",
+  "qtl-recipe.log": "a52c1ff8889b999d6fe8749db50643a0137218a538230cf4806a56ad932bd101",
+  "candidate-container-tests.log": "a0f84078f250380adbdded9ba757465b64999fe77468ccbc5a9738113092478e",
+  "arm64/unit-tests.log": "e03e0a66c2677fd6a16a9bc3ded5da366b3d4faff5cc4df56d098f29a85151dc",
+  "arm64/c-api-test.log": "bc8fc80e015f65a159b5687f41963cd0b392509a921833892fdd6b3766c07541",
+  "arm64/cli-tests.log": "dc3a32c058117c1aeedc7788c1c08aa1528d8297945c3f42312aa1d8589ed503",
+  "format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "final-container-tests.log": "611a5381e1b956ef1ddfddae09fe815d62f24258eb9b4bcd04352962ca6e9edc"
+ },
+ "source_identity": {
+  "candidate_container_commit": "eb4aae9ddff5768f6d881eb7d1fff21878ba0be8",
+  "final_candidate_commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "library_bindings_tests_build_files_identical": true,
+  "scopes": [
+   "include",
+   "src",
+   "CMakeLists.txt",
+   "cmake",
+   "Dockerfile",
+   "bindings/python/rapidglm",
+   "bindings/r",
+   "bindings/rust/src",
+   "bindings/rust/Cargo.toml",
+   "bindings/rust/build.rs",
+   "tests"
+  ],
+  "only_changes_after_container_checkout": "Release runner and benchmark timing guards/reference-path configuration."
+ },
+ "native_commands": {
+  "native-configure": {
+   "command": [
+    "cmake",
+    "-S",
+    "/mnt/pikachu/rapidglm",
+    "-B",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-native",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DRAPIDGLM_PYTHON=OFF",
+    "-DRAPIDGLM_FORCE_PORTABLE=OFF",
+    "-DBLAS_openblas_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so",
+    "-DBLA_VENDOR=OpenBLAS",
+    "-DLAPACKE_INCLUDE_DIR=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/include",
+    "-DLAPACKE_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/liblapacke.a",
+    "-DLAPACK_openblas_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so"
+   ],
+   "exit": 0,
+   "wall_seconds": 0.4560048580169678
+  },
+  "native-build": {
+   "command": [
+    "cmake",
+    "--build",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-native",
+    "--parallel",
+    "4"
+   ],
+   "exit": 0,
+   "wall_seconds": 64.60751080513
+  },
+  "native-cpp-c99": {
+   "command": [
+    "ctest",
+    "--test-dir",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-native",
+    "-V"
+   ],
+   "exit": 0,
+   "wall_seconds": 88.31737470626831
+  },
+  "native-cli": {
+   "command": [
+    "python3",
+    "tests/test_cli.py",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-native/rapidglm"
+   ],
+   "exit": 0,
+   "wall_seconds": 1.751283884048462
+  },
+  "portable-configure": {
+   "command": [
+    "cmake",
+    "-S",
+    "/mnt/pikachu/rapidglm",
+    "-B",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-portable",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DRAPIDGLM_PYTHON=OFF",
+    "-DRAPIDGLM_FORCE_PORTABLE=ON",
+    "-DBLAS_openblas_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so",
+    "-DBLA_VENDOR=OpenBLAS",
+    "-DLAPACKE_INCLUDE_DIR=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/include",
+    "-DLAPACKE_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/liblapacke.a",
+    "-DLAPACK_openblas_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so"
+   ],
+   "exit": 0,
+   "wall_seconds": 0.49651670455932617
+  },
+  "portable-build": {
+   "command": [
+    "cmake",
+    "--build",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-portable",
+    "--parallel",
+    "4"
+   ],
+   "exit": 0,
+   "wall_seconds": 62.383119344711304
+  },
+  "portable-cpp-c99": {
+   "command": [
+    "ctest",
+    "--test-dir",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-portable",
+    "-V"
+   ],
+   "exit": 0,
+   "wall_seconds": 128.56599688529968
+  },
+  "portable-cli": {
+   "command": [
+    "python3",
+    "tests/test_cli.py",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-portable/rapidglm"
+   ],
+   "exit": 0,
+   "wall_seconds": 2.038055181503296
+  },
+  "bindings": {
+   "command": [
+    "bash",
+    "scripts/check_bindings.sh"
+   ],
+   "exit": 0,
+   "wall_seconds": 35.15788435935974
+  },
+  "rust": {
+   "command": [
+    "cargo",
+    "test",
+    "--release"
+   ],
+   "exit": 0,
+   "wall_seconds": 1.6983592510223389
+  },
+  "quiet-run": {
+   "command": [
+    "python3",
+    "tests/test_quiet_run.py"
+   ],
+   "exit": 0,
+   "wall_seconds": 0.04076504707336426
+  },
+  "replogle-recipe": {
+   "command": [
+    "python3",
+    "tests/test_replogle.py"
+   ],
+   "exit": 0,
+   "wall_seconds": 0.19340014457702637
+  },
+  "qtl-recipe": {
+   "command": [
+    "python3",
+    "tests/test_qtl_recipe.py"
+   ],
+   "exit": 0,
+   "wall_seconds": 0.3623330593109131
+  }
+ },
+ "container_commands": {
+  "candidate-clone": {
+   "command": [
+    "git",
+    "clone",
+    "--quiet",
+    "--no-hardlinks",
+    "--branch",
+    "feat/engine",
+    "/mnt/pikachu/rapidglm",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/candidate-clone"
+   ],
+   "exit": 0,
+   "wall_seconds": 0.14666366577148438
+  },
+  "candidate-image-build": {
+   "command": [
+    "docker",
+    "build",
+    "--cpuset-cpus",
+    "0-7",
+    "--cpu-shares",
+    "128",
+    "-t",
+    "rapidglm:1.4.0",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/candidate-clone"
+   ],
+   "exit": 0,
+   "wall_seconds": 304.9284300804138
+  },
+  "candidate-container-tests": {
+   "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--cpuset-cpus",
+    "0-7",
+    "rapidglm:1.4.0",
+    "nice",
+    "-n",
+    "10",
+    "bash",
+    "scripts/container_tests.sh"
+   ],
+   "exit": 0,
+   "wall_seconds": 99.94076895713806
+  },
+  "arm64-build-tests": {
+   "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--cpuset-cpus",
+    "0-7",
+    "-e",
+    "BUILD_JOBS=4",
+    "-v",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/candidate-clone:/src:ro",
+    "-v",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/arm64:/out",
+    "rapidglm-arm64-review-toolchain:local",
+    "nice",
+    "-n",
+    "10",
+    "bash",
+    "/src/scripts/build_arm64.sh",
+    "ars_*,philox_*,exponential_ziggurat*,thinned_*,hazard_*,batched_*,kernels_agree_with_direct_sums,market_reader_is_independent_of_entry_order,sha1_matches_published_digests,leverages_and_fixed_dispersion_fits,rank_windows_equal_average_rank_trims,edger_ql_finds_changed_genes_and_is_reproducible,count_loader_equals_the_csc_reader,deviance_moment_table_interpolates,*qtl*,blocked_product_kernels_agree_with_direct_sums,beta_maximum_likelihood_recovers_its_parameters,cis_windows_and_nominal_pairs"
+   ],
+   "exit": 0,
+   "wall_seconds": 984.3843431472778
+  }
+ },
+ "final_build_and_container_checks": {
+  "final-configure": {
+   "command": [
+    "cmake",
+    "-S",
+    ".",
+    "-B",
+    "build",
+    "-DCMAKE_BUILD_TYPE=Release"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:29:55.534084+00:00",
+   "wall_seconds": 0.09867715835571289
+  },
+  "final-native-build": {
+   "command": [
+    "cmake",
+    "--build",
+    "build",
+    "--clean-first",
+    "--parallel",
+    "4"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:29:55.632919+00:00",
+   "wall_seconds": 69.97370481491089
+  },
+  "final-glm-reference": {
+   "command": [
+    "g++",
+    "-std=c++17",
+    "-fext-numeric-literals",
+    "-O3",
+    "-DNDEBUG",
+    "benchmarks/glm/reference.cpp",
+    "-o",
+    "/mnt/pikachu/rapidglm/validation/work/benchmark/runs-v1.4.0-final/bin/glm_reference",
+    "-lquadmath"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:31:05.606839+00:00",
+   "wall_seconds": 0.5003805160522461
+  },
+  "final-r-install": {
+   "command": [
+    "R",
+    "CMD",
+    "INSTALL",
+    "--preclean",
+    "--library=validation/local-data/R_rapidglm",
+    "bindings/r"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:31:06.114376+00:00",
+   "wall_seconds": 23.23519802093506
+  },
+  "final-r-version": {
+   "command": [
+    "Rscript",
+    "-e",
+    "library(rapidglm, lib.loc=\"validation/local-data/R_rapidglm\"); stopifnot(as.character(packageVersion(\"rapidglm\")) == \"1.4.0\"); print(packageVersion(\"rapidglm\")); print(file.info(system.file(package=\"rapidglm\"))$mtime)"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:31:29.349749+00:00",
+   "wall_seconds": 0.07250189781188965
+  },
+  "final-rust-example": {
+   "command": [
+    "cargo",
+    "build",
+    "--release",
+    "--example",
+    "deseq"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:31:29.422434+00:00",
+   "wall_seconds": 0.06398558616638184
+  },
+  "measured-clone": {
+   "command": [
+    "git",
+    "clone",
+    "--quiet",
+    "--no-hardlinks",
+    "--branch",
+    "v1.4.0-dev.4",
+    "/mnt/pikachu/rapidglm",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/measured-clone"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:31:29.487015+00:00",
+   "wall_seconds": 0.1021885871887207
+  },
+  "final-image-build": {
+   "command": [
+    "docker",
+    "build",
+    "--cpuset-cpus",
+    "0-7",
+    "--cpu-shares",
+    "128",
+    "-t",
+    "rapidglm:1.4.0",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/measured-clone"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:31:29.589370+00:00",
+   "wall_seconds": 105.87828040122986
+  },
+  "final-solvers-image-build": {
+   "command": [
+    "docker",
+    "build",
+    "--cpuset-cpus",
+    "0-7",
+    "--cpu-shares",
+    "128",
+    "-t",
+    "rapidglm-solvers:1.4.0",
+    "-f",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/Dockerfile.solvers",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/measured-clone"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:33:15.474119+00:00",
+   "wall_seconds": 38.2326602935791
+  },
+  "final-container-tests": {
+   "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--cpuset-cpus",
+    "0-7",
+    "rapidglm:1.4.0",
+    "nice",
+    "-n",
+    "10",
+    "bash",
+    "scripts/container_tests.sh"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:33:53.707446+00:00",
+   "wall_seconds": 99.62264275550842
+  },
+  "final-container-version": {
+   "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--cpuset-cpus",
+    "0-7",
+    "rapidglm:1.4.0",
+    "rapidglm",
+    "--version"
+   ],
+   "exit": 0,
+   "started_utc": "2026-10-21T11:35:33.340578+00:00",
+   "wall_seconds": 0.595020055770874
+  }
+ },
+ "_provenance": {
+  "version": "1.4.0",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "worktree_dirty": false
+ },
+ "host_note": "These correctness checks ran on CPUs 0-7 under nice 10 before the final-policy timing restart. Their source-identity evidence and pass/fail results remain valid. Elapsed times are test diagnostics; they do not belong to the final benchmark collection or its CPU-policy audit.",
+ "_timing_scope": "Retained correctness checks; elapsed diagnostics are not benchmark measurements.",
+ "_benchmark_host_configuration": {
+  "workstation": "Intel Core i9-13900KF",
+  "ram_gib": 125,
+  "bios_version": "1836",
+  "bios_date": "04/16/2026",
+  "microcode": "0x133",
+  "power_limits": {
+   "long_term": {
+    "power_limit_watts": 253.0,
+    "time_window_microseconds": 55967744
+   },
+   "short_term": {
+    "power_limit_watts": 253.0,
+    "time_window_microseconds": 2440
+   }
+  },
+  "memory": {
+   "modules": 4,
+   "module_gib": 32,
+   "configured_rate_mt_per_second": 4200,
+   "evidence": "Final host setting supplied by the user; BIOS/microcode and RAPL limits independently read at preflight."
+  },
+  "faulty_performance_cores": {
+   "physical_cores": 2,
+   "logical_cpus": [
+    8,
+    9,
+    10,
+    11
+   ],
+   "maximum_khz": 2200000,
+   "thread_siblings": {
+    "8": "8-9",
+    "9": "8-9",
+    "10": "10-11",
+    "11": "10-11"
+   },
+   "timed": false
+  },
+  "cap_faulty_cores_service": {
+   "enabled": true,
+   "executable": "/usr/local/sbin/cap-faulty-cores"
+  },
+  "fixed_cpu_clock_service": {
+   "enabled": false
+  },
+  "reproducibility": "Every timed run is pinned to identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Absolute seconds from other host settings are not directly comparable; matched tool speed-up ratios are the comparison of interest.",
+  "verified_utc": "2026-10-22T00:08:31.141014+00:00"
+ }
+}

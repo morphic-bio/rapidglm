@@ -164,17 +164,22 @@ def run(binary, work, name, config, cpus):
     out.parent.mkdir(parents=True, exist_ok=True)
     config = {**config, "output": str(out)}
     (out.parent / f"{name}.json").write_text(json.dumps(config))
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        from quiet_run import wait_quiet
+        wait_quiet(cpus, label=f"untestable {name}")
+    load_before = os.getloadavg()[0]
     start = time.time()
     r = subprocess.run(["/usr/bin/time", "-v", "taskset", "-c", cpus, str(binary), "sceptre",
                         str(out.parent / f"{name}.json")], capture_output=True, text=True,
                        env={**os.environ, "OPENBLAS_NUM_THREADS": "1"})
     wall = time.time() - start
+    (out.parent / f"{name}.time.log").write_text(r.stderr)
     if r.returncode:
         raise SystemExit(f"{name} failed: {r.stderr[-2000:]}")
     record = json.loads(pathlib.Path(str(out) + ".run.json").read_text())
     rss = int(re.search(r"Maximum resident set size \(kbytes\): (\d+)", r.stderr).group(1))
     cpu = sum(float(re.search(rf"{k} time \(seconds\): (\S+)", r.stderr).group(1)) for k in ("User", "System"))
-    return {"process_wall_seconds": round(wall, 2), "workflow_wall_seconds": round(record["wall_seconds"], 2),
+    return {"load_before": load_before, "process_wall_seconds": round(wall, 2), "workflow_wall_seconds": round(record["wall_seconds"], 2),
             "cpu_seconds": round(cpu, 1), "peak_rss_gb": round(rss / 1e6, 2),
             "null_fits": record.get("null_fits"), "load_average": os.getloadavg()[0]}
 

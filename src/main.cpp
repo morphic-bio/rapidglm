@@ -1,4 +1,6 @@
+#include "edger_cli.hpp"
 #include "io.hpp"
+#include "qtl_cli.hpp"
 #include "tiles.hpp"
 #include <chrono>
 #include <ctime>
@@ -17,19 +19,19 @@ int main(int argc, char **argv) {
             return 0;
         }
         if (argc < 2 || (argc == 2 && std::string(argv[1]) == "--help")) {
-            std::cout
-                << "rapidglm " << version
-                << "\nUsage: rapidglm <fit|scan|sceptre|bulk-de|pseudobulk-de|da-lr|dose-trend> "
-                   "config.json\nResponses: feature-by-observation MatrixMarket; design: "
-                   "observation-by-predictor numeric TSV.\nSee docs/CLI.md for the "
-                   "configuration contract.\n";
+            std::cout << "rapidglm " << version
+                      << "\nUsage: rapidglm "
+                         "<fit|scan|sceptre|bulk-de|edger-ql|pseudobulk-de|da-lr|dose-trend|qtl> "
+                         "config.json\nResponses: feature-by-observation MatrixMarket; design: "
+                         "observation-by-predictor numeric TSV.\nSee docs/CLI.md for the "
+                         "configuration contract.\n";
             return 0;
         }
         require(argc == 3, "expected command and JSON configuration");
         std::string command = argv[1];
         require(command == "fit" || command == "scan" || command == "sceptre" ||
                     command == "bulk-de" || command == "pseudobulk-de" || command == "da-lr" ||
-                    command == "dose-trend",
+                    command == "dose-trend" || command == "qtl" || command == "edger-ql",
                 "unknown command");
         auto start = std::chrono::steady_clock::now();
         io::Tree config;
@@ -40,6 +42,10 @@ int main(int argc, char **argv) {
         boost::property_tree::read_json(config_stream, config);
         std::map<std::string, std::string> hashes;
         hashes[argv[2]] = io::file_sha1(argv[2]);
+        if (command == "qtl")
+            return io::run_qtl(config, argv[2], hashes, start);
+        if (command == "edger-ql")
+            return io::run_edger_ql(config, argv[2], hashes, start);
         // A tiled run keeps its inputs' fingerprints in the checkpoint directory:
         // a file whose size and modification time are those recorded there is not
         // read again to hash it (each tile task is a process of its own).

@@ -3,8 +3,8 @@
 //! [`DeseqDataSet`] and [`DeseqStats`] follow PyDESeq2 0.5.2 (MIT licence,
 //! Copyright (c) 2022 Owkin; Muzellec et al., Bioinformatics 2023): the same
 //! steps, defaults and result columns, ported from its source. The per-gene
-//! optimizations run in RapidGLM through the C interface, as with
-//! `rapidglm.pydeseq2.RapidGLMInference` in Python: NB fits at fixed dispersion
+//! optimizations run in RapidGLM through the C interface. This port uses
+//! unfloored NB fits, unlike the Python inference backend from 1.4.0: fixed-dispersion fits
 //! (`rapidglm_nb_fixed_fits`) and gene-wise and MAP dispersions
 //! (`rapidglm_nb_dispersions`). Differences from PyDESeq2's default inference:
 //!
@@ -15,7 +15,7 @@
 //! - the parametric trend's gamma GLM is fitted by Fisher scoring rather than
 //!   L-BFGS-B (same optimum);
 //! - Cook's distances at samples with leverage 1 (a count fitted exactly, as
-//!   for a sample alone in its design cell) are 0 rather than PyDESeq2's
+//!   in a saturated design cell; singleton cells in additive designs need not have leverage one) are 0 rather than PyDESeq2's
 //!   floating-point value of 0 / 0;
 //! - genes whose fixed-dispersion MLE does not exist (an all-zero group, for
 //!   example) get a bounded fit in [-30, 30] with PyDESeq2's 1e-6 ridge, by

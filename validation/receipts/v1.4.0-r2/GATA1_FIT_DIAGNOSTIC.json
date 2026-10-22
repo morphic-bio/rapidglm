@@ -1,0 +1,57 @@
+{
+  "purpose": "Independent one-factor reduced-model check for the public GATA1 pilot.",
+  "timed": false,
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "gene": 2779,
+  "samples": 92,
+  "reduced_design_groups": 48,
+  "native": {
+    "F": 797.5486821406291,
+    "PValue": 1.6524692375650808e-167,
+    "full_deviance": 88.12414615839363,
+    "s2_post": 1.0148744329783794,
+    "implied_reduced_deviance": 897.5359127185184
+  },
+  "reference": {
+    "F": 872.327481976768,
+    "PValue": 2.9285426705104802e-182,
+    "fit_check": {
+      "full_reported": 88.1247738885275,
+      "full_at_fitted": 88.1247738885275,
+      "full_iter": 10,
+      "full_failed": false,
+      "reduced_reported": 973.401416419569,
+      "reduced_at_fitted": 973.401416419569
+    }
+  },
+  "independent_at_native_dispersion": {
+    "working_dispersion": 0.09037723601071235,
+    "reduced_deviance": 897.5359127185186,
+    "maximum_absolute_group_score": 1.7886602669957462e-13
+  },
+  "independent_at_reference_dispersion": {
+    "working_dispersion": 0.09037531663576891,
+    "reduced_deviance": 897.5434333765975,
+    "maximum_absolute_group_score": 1.788685915243352e-13
+  },
+  "native_deviance_difference_from_independent": -2.2737367544323206e-13,
+  "reference_reduced_difference_from_independent": 75.85798304297157,
+  "method": "Drop perturbed; each distinct remaining design row is a lane. Solve each nonzero lane score sum((y-mu)/(1+phi*mu))=0 by bracketed root search; zero-count lanes use their mu=0 likelihood limit. Evaluate the NB unit deviance with log1p. Both checks use public reference effective-library offsets.",
+  "scope": "Reported and at-fitted reference deviances agree in this example. The independently solved reduced objective differs from that public fit; reference reduced iteration/failure metadata is absent, so no failure flag is inferred.",
+  "input_sha256": {
+    "counts.mtx": "28dd9e778c0562a9c12f06ff927ac8d2d2008aa0ee4d877c89f83741baec97a7",
+    "design.tsv": "247e0ca566a17a3125432202c235b539c24ff6f3e2d3b56edf82d92a6fd96731",
+    "edger/samples.tsv": "15b8883568bbab1bafbaae94f11dbb3a52149771f56df380059ae41142d96843",
+    "edger/reference.json": "06ca537258cbf1bbddc0ed4e3357d543fe880ab26a922ea1b81fcd6179f98101",
+    "edger_ql.run.json": "65bd7178159c9c2e420312067754b6c21e3b8916d70f66e0ca35250a4fa496a5",
+    "edger/fit_check.tsv": "d7f9b8ea5a8b8c13f3f4231ac7eebc3494413a74ad35d72ffd3f48f94690bc11"
+  },
+  "recipe_sha256": "cc6690e1149e49ea81003a8da0ead70e28fce194d12ef9f8f699454bc7ee50b1",
+  "recipe_source": "#!/usr/bin/env python3\n\"\"\"Independent one-factor reduced-model check for the public GATA1 pilot.\"\"\"\nimport argparse\nimport hashlib\nimport json\nfrom pathlib import Path\nimport subprocess\nimport numpy as np\nimport pandas as pd\nfrom scipy.io import mmread\nfrom scipy.optimize import brentq\nfrom scipy.special import xlogy\nfrom threadpoolctl import threadpool_limits\n\n\ndef main():\n    parser = argparse.ArgumentParser(description=__doc__)\n    parser.add_argument('--dataset', type=Path, required=True)\n    parser.add_argument('--gene', type=int, default=2779)\n    parser.add_argument('--output', type=Path, required=True)\n    args = parser.parse_args()\n    p = args.dataset.resolve()\n    with threadpool_limits(limits=1):\n        counts = mmread(p / 'counts.mtx').tocsr()\n    y = counts[args.gene].toarray().ravel()\n    design = pd.read_csv(p / 'design.tsv', sep='\\t').drop(columns='perturbed').to_numpy()\n    _, groups = np.unique(design, axis=0, return_inverse=True)\n    with threadpool_limits(limits=1):\n        rank = np.linalg.matrix_rank(design)\n    if rank != len(np.unique(groups)):\n        raise ValueError('Reduced design is not a complete one-factor group basis')\n    library = pd.read_csv(p / 'edger/samples.tsv', sep='\\t').effective_lib_size.to_numpy()\n    shared = json.loads((p / 'edger/reference.json').read_text())['ql']\n    run = json.loads((p / 'edger_ql.run.json').read_text())\n    native = pd.read_csv(p / 'edger_ql.tsv', sep='\\t').set_index('gene').loc[args.gene]\n    reference = pd.read_csv(p / 'edger/genes_ql.tsv', sep='\\t').set_index('gene').loc[args.gene]\n    check = pd.read_csv(p / 'edger/fit_check.tsv', sep='\\t').set_index('gene').loc[args.gene]\n    def solve(phi):\n        mu = np.zeros_like(y, dtype=float)\n        residuals = []\n        for group in np.unique(groups):\n            mask = groups == group\n            if y[mask].sum() == 0:\n                continue\n            start = np.log(y[mask].sum() / library[mask].sum())\n            def score(beta):\n                fitted = library[mask] * np.exp(beta)\n                return np.sum((y[mask] - fitted) / (1 + phi * fitted))\n            beta = brentq(score, start - 50, start + 50, xtol=1e-13)\n            mu[mask] = library[mask] * np.exp(beta)\n            residuals.append(abs(score(beta)))\n        keep = mu > 0\n        if phi > 0:\n            k = 1 / phi\n            deviance = 2 * np.sum(xlogy(y[keep], y[keep] / mu[keep]) +\n                                 (y[keep] + k) * np.log1p((mu[keep] - y[keep]) / (y[keep] + k)))\n        else:\n            deviance = 2 * np.sum(xlogy(y[keep], y[keep] / mu[keep]) - y[keep] + mu[keep])\n        return {'working_dispersion': phi, 'reduced_deviance': float(deviance),\n                'maximum_absolute_group_score': max(residuals)}\n    root_native = solve(run['dispersion'] / run['average_ql_dispersion'])\n    root_reference = solve(shared['dispersion'] / shared['average_ql_dispersion'])\n    implied_native = float(native.deviance + native.F * native.s2_post)\n    result = {'purpose': __doc__, 'timed': False, 'version': run['version'],\n              'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),\n              'gene': args.gene, 'samples': len(y), 'reduced_design_groups': len(np.unique(groups)),\n              'native': {'F': float(native.F), 'PValue': float(native.PValue), 'full_deviance': float(native.deviance),\n                         's2_post': float(native.s2_post), 'implied_reduced_deviance': implied_native},\n              'reference': {'F': float(reference.F), 'PValue': float(reference.PValue),\n                            'fit_check': {k: (v.item() if hasattr(v, 'item') else v) for k, v in check.items()}},\n              'independent_at_native_dispersion': root_native,\n              'independent_at_reference_dispersion': root_reference,\n              'native_deviance_difference_from_independent': implied_native - root_native['reduced_deviance'],\n              'reference_reduced_difference_from_independent': float(check.reduced_reported) - root_reference['reduced_deviance'],\n              'method': 'Drop perturbed; each distinct remaining design row is a lane. Solve each nonzero lane score sum((y-mu)/(1+phi*mu))=0 by bracketed root search; zero-count lanes use their mu=0 likelihood limit. Evaluate the NB unit deviance with log1p. Both checks use public reference effective-library offsets.',\n              'scope': 'Reported and at-fitted reference deviances agree in this example. The independently solved reduced objective differs from that public fit; reference reduced iteration/failure metadata is absent, so no failure flag is inferred.',\n              'input_sha256': {name: hashlib.sha256((p / name).read_bytes()).hexdigest()\n                               for name in ['counts.mtx', 'design.tsv', 'edger/samples.tsv', 'edger/reference.json', 'edger_ql.run.json', 'edger/fit_check.tsv']},\n              'recipe_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),\n              'recipe_source': Path(__file__).read_text()}\n    args.output.write_text(json.dumps(result, indent=2) + '\\n')\n    print(json.dumps({k: v for k, v in result.items() if k not in ['recipe_source', 'input_sha256']}, indent=2))\n\n\nif __name__ == '__main__':\n    main()\n",
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

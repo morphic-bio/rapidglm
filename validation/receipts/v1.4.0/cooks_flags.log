@@ -1,0 +1,23 @@
+1.48.2 
+{
+ "deseq2": {
+  "flagged": 224,
+  "genes_with_replaced_counts": 68,
+  "distances_unchanged_by_replacement": true,
+  "flags_from_own_distances_cells_3_to_6": {
+   "genes": 224,
+   "equal": true
+  },
+  "with_three_larger_counts_exception": {
+   "genes": 224,
+   "equal": true
+  }
+ },
+ "rapidglm": {
+  "flagged": 219,
+  "genes_with_replaced_counts": 67
+ },
+ "flagged_by_both": 217
+}
+DESeq2 only: {'counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement': 5, 'design level with all-zero counts: no finite bulk_de distance': 2}
+RapidGLM only: {'counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement': 2}

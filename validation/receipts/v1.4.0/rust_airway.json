@@ -1,0 +1,57 @@
+{
+  "data": "validation/work/bulk/airway",
+  "samples": 8,
+  "genes": 22369,
+  "pydeseq2_rapidglm_seconds": 2.57,
+  "rust_seconds": 0.22,
+  "rust_log": "RapidGLM 1.4.0 (C API 2)\n22369 genes, 8 samples in 0.18 s; 3917 at padj < 0.05; 0 refitted, 0 Cook's outliers, 1 bounded fits",
+  "columns": {
+    "baseMean": {
+      "max_relative": 7.167681902154538e-16,
+      "over_1e-6": 0,
+      "over_1e-3": 0,
+      "missing_mismatch": 0
+    },
+    "log2FoldChange": {
+      "max_relative": 1704.3612758373922,
+      "over_1e-6": 21375,
+      "over_1e-3": 8017,
+      "missing_mismatch": 0
+    },
+    "lfcSE": {
+      "max_relative": 9.508913245109861,
+      "over_1e-6": 22331,
+      "over_1e-3": 19302,
+      "missing_mismatch": 0
+    },
+    "stat": {
+      "max_relative": 1675.252067094521,
+      "over_1e-6": 22368,
+      "over_1e-3": 19180,
+      "missing_mismatch": 0
+    },
+    "pvalue": {
+      "max_relative": 12104.752560220011,
+      "over_1e-6": 22359,
+      "over_1e-3": 18991,
+      "missing_mismatch": 0
+    },
+    "padj": {
+      "max_relative": 5484.760733310865,
+      "over_1e-6": 18031,
+      "over_1e-3": 16325,
+      "missing_mismatch": 0
+    }
+  },
+  "calls": {
+    "rust": 3917,
+    "pydeseq2": 3882,
+    "both": 3882,
+    "jaccard": 0.9910645902476385
+  },
+  "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
+  }
+}

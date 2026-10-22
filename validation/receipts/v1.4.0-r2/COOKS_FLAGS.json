@@ -1,0 +1,176 @@
+{
+  "purpose": "Why bulk_de and DESeq2 1.48.2 set aside different genes as Cook's outliers on the 128-sample GTEx thyroid set, from black-box outputs.",
+  "command": "python3 scripts/validate_cooks_flags.py --output validation/COOKS_FLAGS.json",
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "dataset": "thyroid128 (validation/work/benchmark/thyroid128), coefficient sex[T.female]",
+  "cutoff": 2.3416695968548935,
+  "samples_by_cell_size": {
+    "1-2": 35,
+    "3-6": 49,
+    "7+": 44
+  },
+  "deseq2": {
+    "flagged": 224,
+    "genes_with_replaced_counts": 68,
+    "distances_unchanged_by_replacement": true,
+    "flags_from_own_distances_cells_3_to_6": {
+      "genes": 224,
+      "equal": true
+    },
+    "with_three_larger_counts_exception": {
+      "genes": 224,
+      "equal": true
+    }
+  },
+  "rapidglm": {
+    "flagged": 219,
+    "genes_with_replaced_counts": 67
+  },
+  "flagged_by_both": 217,
+  "deseq2_only": {
+    "genes": 7,
+    "by_reason": {
+      "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement": 5,
+      "design level with all-zero counts: no finite bulk_de distance": 2
+    },
+    "detail": [
+      {
+        "gene": 381,
+        "base_mean": 5.12684211270668,
+        "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+        "all_zero_levels": [],
+        "deseq2_max_cooks_over_cutoff": 1.6117190776491048,
+        "rapidglm_max_cooks_over_cutoff": 0.8960111823895317,
+        "replaced": {
+          "deseq2": true,
+          "rapidglm": true
+        },
+        "dispersion_rapidglm": 4.84133942619242
+      },
+      {
+        "gene": 4120,
+        "base_mean": 5.81280590584081,
+        "reason": "design level with all-zero counts: no finite bulk_de distance",
+        "all_zero_levels": [
+          "age[T.age40_49]",
+          "age[T.age70_79]"
+        ],
+        "deseq2_max_cooks_over_cutoff": 1.0852620237735993,
+        "rapidglm_max_cooks_over_cutoff": NaN,
+        "replaced": {
+          "deseq2": true,
+          "rapidglm": false
+        },
+        "dispersion_rapidglm": 36.28009766463504
+      },
+      {
+        "gene": 8429,
+        "base_mean": 79.4307788421398,
+        "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+        "all_zero_levels": [],
+        "deseq2_max_cooks_over_cutoff": 3.2827344758849026,
+        "rapidglm_max_cooks_over_cutoff": 3.0746156897184074,
+        "replaced": {
+          "deseq2": true,
+          "rapidglm": true
+        },
+        "dispersion_rapidglm": 4.420944397857232
+      },
+      {
+        "gene": 8499,
+        "base_mean": 3.62705079791712,
+        "reason": "design level with all-zero counts: no finite bulk_de distance",
+        "all_zero_levels": [
+          "hardy[T.hardy1]",
+          "age[T.age70_79]"
+        ],
+        "deseq2_max_cooks_over_cutoff": 3.3666021847255063,
+        "rapidglm_max_cooks_over_cutoff": NaN,
+        "replaced": {
+          "deseq2": true,
+          "rapidglm": false
+        },
+        "dispersion_rapidglm": 103.63070883287882
+      },
+      {
+        "gene": 12204,
+        "base_mean": 39.2489682526166,
+        "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+        "all_zero_levels": [],
+        "deseq2_max_cooks_over_cutoff": 2.872176151585817,
+        "rapidglm_max_cooks_over_cutoff": 0.39748132729402935,
+        "replaced": {
+          "deseq2": true,
+          "rapidglm": true
+        },
+        "dispersion_rapidglm": 1.4392980006564922
+      },
+      {
+        "gene": 19303,
+        "base_mean": 33.833918206705,
+        "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+        "all_zero_levels": [],
+        "deseq2_max_cooks_over_cutoff": 1.2717385962839562,
+        "rapidglm_max_cooks_over_cutoff": 0.9172273162547214,
+        "replaced": {
+          "deseq2": true,
+          "rapidglm": true
+        },
+        "dispersion_rapidglm": 0.579223444466396
+      },
+      {
+        "gene": 25911,
+        "base_mean": 46.9233222502218,
+        "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+        "all_zero_levels": [],
+        "deseq2_max_cooks_over_cutoff": 1.3000999845024732,
+        "rapidglm_max_cooks_over_cutoff": 0.7838877628979972,
+        "replaced": {
+          "deseq2": true,
+          "rapidglm": true
+        },
+        "dispersion_rapidglm": 1.214691387003768
+      }
+    ]
+  },
+  "rapidglm_only": {
+    "genes": 2,
+    "by_reason": {
+      "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement": 2
+    },
+    "detail": [
+      {
+        "gene": 5672,
+        "base_mean": 5.40601682532048,
+        "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+        "all_zero_levels": [],
+        "deseq2_max_cooks_over_cutoff": 0.8688259006645643,
+        "rapidglm_max_cooks_over_cutoff": 1.026216561495669,
+        "replaced": {
+          "deseq2": true,
+          "rapidglm": true
+        },
+        "dispersion_rapidglm": 0.7120661701275851
+      },
+      {
+        "gene": 11839,
+        "base_mean": 121.467894799517,
+        "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+        "all_zero_levels": [],
+        "deseq2_max_cooks_over_cutoff": 0.7832851038939844,
+        "rapidglm_max_cooks_over_cutoff": 1.364322763177145,
+        "replaced": {
+          "deseq2": true,
+          "rapidglm": true
+        },
+        "dispersion_rapidglm": 2.3260542046784014
+      }
+    ]
+  },
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

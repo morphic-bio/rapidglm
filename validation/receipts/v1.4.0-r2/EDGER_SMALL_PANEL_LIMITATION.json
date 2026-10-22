@@ -1,0 +1,172 @@
+{
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "untimed": true,
+  "cpus": "0-7",
+  "timing_usable": false,
+  "reference": "edgeR4.6.2 public reference_edger.R output in tests/fixtures/edger_nb_panel.json",
+  "limitation": "On this12-gene,8-sample panel, edgeR df_total is72; native uses prior df plus adjusted residual df. This small-panel cap is not implemented. The fixture pins F and other steps tightly but allows absolute PValue difference .005; it does not establish identical tails. The specification no-cap observation is limited to its larger calibration panels.",
+  "rows": [
+    {
+      "gene": 0,
+      "native": {
+        "F": 1.3675787646258333,
+        "PValue": 0.24226255969704186,
+        "df_total": 8140.821208296685
+      },
+      "edgeR": {
+        "F": 1.36719559479833,
+        "PValue": 0.246150771367215,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 1,
+      "native": {
+        "F": 124.60338579037868,
+        "PValue": 1.0040176715444671e-28,
+        "df_total": 8140.842797732894
+      },
+      "edgeR": {
+        "F": 124.515415254286,
+        "PValue": 2.33998160844875e-17,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 2,
+      "native": {
+        "F": 3.7443447440109234,
+        "PValue": 0.05302109427577436,
+        "df_total": 8140.843052889334
+      },
+      "edgeR": {
+        "F": 3.74144091806309,
+        "PValue": 0.0570087249912186,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 3,
+      "native": {
+        "F": 0.03697826722472147,
+        "PValue": 0.8475140977920542,
+        "df_total": 8140.843050119447
+      },
+      "edgeR": {
+        "F": 0.0369496407884536,
+        "PValue": 0.848108740963795,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 4,
+      "native": {
+        "F": 0.8427336825514571,
+        "PValue": 0.35864330112630455,
+        "df_total": 8140.843055685411
+      },
+      "edgeR": {
+        "F": 0.842078899552864,
+        "PValue": 0.36186663146839,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 5,
+      "native": {
+        "F": 0.31037409547014616,
+        "PValue": 0.5774660320374596,
+        "df_total": 8140.843054770863
+      },
+      "edgeR": {
+        "F": 0.310133107017673,
+        "PValue": 0.579325533369556,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 6,
+      "native": {
+        "F": 0.04283071782612215,
+        "PValue": 0.8360495259445797,
+        "df_total": 8140.843055685351
+      },
+      "edgeR": {
+        "F": 0.0427974398688713,
+        "PValue": 0.836691097600341,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 7,
+      "native": {
+        "F": 1.4871553095609527,
+        "PValue": 0.2226936848608147,
+        "df_total": 8140.8430510515545
+      },
+      "edgeR": {
+        "F": 1.48600334873086,
+        "PValue": 0.226816383658721,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 8,
+      "native": {
+        "F": 1.5396051654488145,
+        "PValue": 0.21471234083593527,
+        "df_total": 8140.8430529156885
+      },
+      "edgeR": {
+        "F": 1.53841115547329,
+        "PValue": 0.218881265321763,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 9,
+      "native": {
+        "F": 0.7845623737320141,
+        "PValue": 0.37577558798086075,
+        "df_total": 8140.843051992457
+      },
+      "edgeR": {
+        "F": 0.783954281644506,
+        "PValue": 0.378882032565629,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 10,
+      "native": {
+        "F": 2.5647244799674587,
+        "PValue": 0.1093103932321154,
+        "df_total": 8140.843053830236
+      },
+      "edgeR": {
+        "F": 2.56273431531755,
+        "PValue": 0.113788134743144,
+        "df_total": 72.0
+      }
+    },
+    {
+      "gene": 11,
+      "native": {
+        "F": 0.24157971598734165,
+        "PValue": 0.6230807326361497,
+        "df_total": 8140.843051974622
+      },
+      "edgeR": {
+        "F": 0.241392441767444,
+        "PValue": 0.624696611968621,
+        "df_total": 72.0
+      }
+    }
+  ],
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

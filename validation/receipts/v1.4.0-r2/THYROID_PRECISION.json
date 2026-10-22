@@ -1,0 +1,87 @@
+{
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "reference_version": "1.48.2",
+  "untimed": true,
+  "cpus": "0-7",
+  "timing_lock": false,
+  "timing_usable": false,
+  "dataset": "GTEx thyroid128",
+  "counts_sha256": "f2dbd9877f6235b7e82b3d76923821410a0fa596fe6b7037964c7d7d154445bc",
+  "native_config": {
+    "responses": "/mnt/pikachu/rapidglm/validation/work/benchmark/thyroid128/counts.mtx",
+    "design": "/mnt/pikachu/rapidglm/validation/work/benchmark/thyroid128/x.tsv",
+    "coefficient": 11,
+    "legacy_cooks": false,
+    "threads": 1,
+    "output": "/mnt/pikachu/rapidglm/validation/work/review-r2/thyroid-precision/native"
+  },
+  "reference_command": "taskset -c 0-7 env OPENBLAS_NUM_THREADS=1 Rscript scripts/reference_bulk.R validation/work/benchmark/thyroid128 sex[T.female] WORK/deseq2 LIBS",
+  "relative_difference_definition": "abs(native-reference)/abs(reference), finite pairs with nonzero reference; no post-hoc removal of large errors",
+  "comparison": {
+    "size_factors": {
+      "compared": 128,
+      "excluded": 0,
+      "median_relative": 1.6882919756836067e-15,
+      "q95_relative": 5.130815916093435e-15,
+      "max_relative": 9.04333026385257e-15
+    },
+    "dispersions": {
+      "compared": 28769,
+      "excluded": 0,
+      "median_relative": 0.00014783568614228348,
+      "q95_relative": 0.00041050866594969135,
+      "max_relative": 0.68479317290747
+    },
+    "fold_changes": {
+      "compared": 28764,
+      "excluded": 5,
+      "median_relative": 6.11730742521403e-05,
+      "q95_relative": 0.0012985582656873096,
+      "max_relative": 17.05458418769387
+    },
+    "p_values": {
+      "compared": 27987,
+      "excluded": 782,
+      "median_relative": 0.00011569260334889811,
+      "q95_relative": 0.0007915780358703318,
+      "max_relative": 148.44557176224222
+    }
+  },
+  "all_four_medians_at_most_1e_4": false,
+  "cooks_inversion_formula": "alpha_rob=((y-mu)^2*H/(p*D*(1-H)^2)-mu)/mu^2; p is the number of design columns; public assays mu,H,cooks; genes marked by the public replace flag are excluded because cooks are retained from the original fit; that flag need not imply changed counts",
+  "replacement_flagged_genes_excluded": 283,
+  "genes_with_changed_replace_counts": 68,
+  "cooks_inversion": {
+    "genes_without_public_replace_flag": {
+      "genes": 28486,
+      "sample_values": 3646208,
+      "negative_inverted_values": 0,
+      "median_within_gene_relative_range": 1.1935679678215475e-12,
+      "q95_within_gene_relative_range": 1.5145194707864344e-11,
+      "max_within_gene_relative_range": 3.4092486299319845e-08,
+      "max_within_gene_absolute_range": 1.3355683226023984e-08,
+      "all_relative_ranges_at_most_1e_12": false
+    },
+    "no_replace_flag_and_all_means_at_least_0_5": {
+      "genes": 28212,
+      "sample_values": 3611136,
+      "negative_inverted_values": 0,
+      "median_within_gene_relative_range": 1.2058123485376774e-12,
+      "q95_within_gene_relative_range": 1.5209987524915844e-11,
+      "max_within_gene_relative_range": 6.603286912304581e-09,
+      "max_within_gene_absolute_range": 1.3355683226023984e-08,
+      "all_relative_ranges_at_most_1e_12": false
+    }
+  },
+  "scope": "Current dev.3 versus DESeq2 1.48.2. This does not recreate the unsaved 2026-10-01 analysis or establish a universal precision bound.",
+  "note": "Current dev.3 does not meet either universal precision claim. Cook inversion amplifies finite TSV export rounding; it is not evidence of a reference-tool error.",
+  "calculator_source": "#!/usr/bin/env python3\n\"\"\"Untimed precision checks against public DESeq2 exports from reference_bulk.R.\"\"\"\nimport argparse, hashlib, json, pathlib, subprocess\nimport numpy as np\nimport pandas as pd\nfrom scipy.io import mmread\np=argparse.ArgumentParser(description=__doc__)\np.add_argument('--work',type=pathlib.Path,required=True)\np.add_argument('--data',type=pathlib.Path,required=True)\np.add_argument('--output',type=pathlib.Path,required=True)\na=p.parse_args();w=a.work;r=w/'deseq2'\nx=pd.read_csv(w/'native.tsv',sep='\\t');y=pd.read_csv(r/'genes.tsv',sep='\\t')\nassert np.array_equal(x.gene,y.gene)\nref=json.loads((r/'reference.json').read_text())\nsf=np.asarray(json.loads((w/'native.run.json').read_text())['size_factors'])\nmetrics={}\nfor key,left,right in [('size_factors',sf,np.asarray(ref['size_factors'])),('dispersions',x.dispersion.to_numpy(),y.dispersion.to_numpy()),('fold_changes',x.log2FoldChange.to_numpy(),y.log2FoldChange.to_numpy()),('p_values',x.pvalue.to_numpy(),y.pvalue.to_numpy())]:\n good=np.isfinite(left)&np.isfinite(right)&(right!=0)\n err=np.abs(left[good]-right[good])/np.abs(right[good])\n metrics[key]={'compared':int(good.sum()),'excluded':int((~good).sum()),'median_relative':float(np.median(err)),'q95_relative':float(np.quantile(err,.95)),'max_relative':float(err.max())}\nY=mmread(a.data/'counts.mtx').toarray();mu=np.loadtxt(r/'mu.tsv');H=np.loadtxt(r/'H.tsv');D=np.loadtxt(r/'cooks.tsv')\nX=pd.read_csv(a.data/'design.tsv',sep='\\t').to_numpy(float);q=X.shape[1]\nreplaced=y['replace'].fillna(False).to_numpy(bool) if 'replace' in y else np.any(np.loadtxt(r/'replace_counts.tsv')!=Y,axis=1)\nwith np.errstate(all='ignore'): alpha=((Y-mu)**2*H/(q*D*(1-H)**2)-mu)/(mu**2)\neligible=np.isfinite(alpha)&np.isfinite(H)&np.isfinite(D)&(D>0)&(mu>0)&(H>0)&(H<1)&(~replaced[:,None])\ninversion={}\nfor name,mask in [('genes_without_public_replace_flag',eligible),('no_replace_flag_and_all_means_at_least_0_5',eligible&np.all(mu>=.5,axis=1)[:,None])]:\n ranges=[];absolute=[];observations=0;negative=0\n for i in np.flatnonzero(mask.sum(axis=1)>=2):\n  v=alpha[i,mask[i]];med=np.median(v);ranges.append(np.ptp(v)/max(abs(med),1e-300));absolute.append(np.ptp(v));observations+=len(v);negative+=int(np.sum(v<0))\n inversion[name]={'genes':len(ranges),'sample_values':observations,'negative_inverted_values':negative,'median_within_gene_relative_range':float(np.median(ranges)),'q95_within_gene_relative_range':float(np.quantile(ranges,.95)),'max_within_gene_relative_range':float(max(ranges)),'max_within_gene_absolute_range':float(max(absolute)),'all_relative_ranges_at_most_1e_12':bool(max(ranges)<=1e-12)}\nout={'version':subprocess.check_output(['build/rapidglm','--version'],text=True).strip(),'commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'reference_version':ref['version'],'untimed':True,'cpus':'0-7','timing_lock':False,'timing_usable':False,'dataset':'GTEx thyroid128','counts_sha256':hashlib.sha256((a.data/'counts.mtx').read_bytes()).hexdigest(),'native_config':json.loads((w/'native.json').read_text()),'reference_command':'taskset -c 0-7 env OPENBLAS_NUM_THREADS=1 Rscript scripts/reference_bulk.R validation/work/benchmark/thyroid128 sex[T.female] WORK/deseq2 LIBS','relative_difference_definition':'abs(native-reference)/abs(reference), finite pairs with nonzero reference; no post-hoc removal of large errors','comparison':metrics,'all_four_medians_at_most_1e_4':bool(all(v['median_relative']<=1e-4 for v in metrics.values())),'cooks_inversion_formula':'alpha_rob=((y-mu)^2*H/(p*D*(1-H)^2)-mu)/mu^2; p is the number of design columns; public assays mu,H,cooks; genes marked by the public replace flag are excluded because cooks are retained from the original fit; that flag need not imply changed counts','replacement_flagged_genes_excluded':int(replaced.sum()),'genes_with_changed_replace_counts':int(np.any(np.loadtxt(r/'replace_counts.tsv')!=Y,axis=1).sum()),'cooks_inversion':inversion,'scope':'Current dev.3 versus DESeq2 1.48.2. This does not recreate the unsaved 2026-10-01 analysis or establish a universal precision bound.'}\na.output.write_text(json.dumps(out,indent=2)+'\\n');print(json.dumps({'comparison':metrics,'cooks_inversion':inversion},indent=2))\n",
+  "reference_script_sha256": "5087e0fc17a1900f1862d91e546e31cea25c1cbf97ba627592bcdfc73c443cf7",
+  "cooks_inversion_authoritative_check": "COOKS_INVERSION.json uses the public live R assays without a decimal export round trip; the TSV inversion here is an export-conditioning diagnostic.",
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

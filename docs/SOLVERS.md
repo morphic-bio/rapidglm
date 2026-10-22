@@ -55,7 +55,7 @@ relative to the log likelihood.
 
 ## Results
 
-These runs are from version 1.3.0 (2026-10-09), each on one efficiency core of
+These final runs use version 1.4.0 (`v1.4.0-dev.4`), completed 2026-10-22, each on one efficiency core of
 an Intel Core i9-13900KF (see [BENCHMARK.md](BENCHMARK.md#host)). Times are
 wall seconds for all genes. Each cell gives the time and either the largest
 shortfall or the number of genes worse than the best answer.
@@ -64,47 +64,46 @@ shortfall or the number of genes worse than the best answer.
 
 | Data (samples × columns, genes) | RapidGLM | RapidGLM, plain `fit` | LM default | LM tight | Dogleg tight | L-BFGS default | L-BFGS tight |
 |---|---|---|---|---|---|---|---|
-| airway (8 × 5, 22,369) | 0.20 s; max 2e-9 | 0.22 s | 0.34 s; max 3e-6 | 0.46 s; max 1e-9 | 0.70 s | 0.45 s; 9,254 worse | 0.59 s |
-| simulation (5,000 × 5, 1,000) | 1.61 s; max 9e-11 | 1.66 s | 2.37 s; max 3e-3 | 4.28 s; max 3e-9 | 4.41 s | 4.06 s; 386 worse | 5.26 s |
-| GTEx thyroid (647 × 12, 28,769) | 7.26 s; max 8e-8 | 8.02 s | 10.3 s; max 7e-4 | 15.3 s; max 3e-8 | 15.8 s | 15.7 s; 23,162 worse | 31.9 s; 3 worse |
+| airway (8 × 5, 22,369) | 0.20 s; max 1e-9 | 0.21 s | 0.35 s; max 3e-6 | 0.47 s; max 2e-9 | 0.70 s | 0.44 s; 9,323 worse | 0.59 s |
+| simulation (5,000 × 5, 1,000) | 1.66 s; max 8e-11 | 1.72 s | 2.53 s; max 3e-3 | 4.60 s; max 3e-9 | 4.76 s | 4.01 s; 362 worse | 5.17 s |
+| GTEx thyroid (647 × 12, 28,769) | 7.07 s; max 8e-8 | 7.82 s | 10.3 s; max 7e-4 | 15.2 s; max 1e-8 | 15.8 s | 15.7 s; 23,163 worse | 32.0 s; 3 worse |
 
 **Maximum-likelihood dispersion:**
 
 | Data | RapidGLM joint Newton | RapidGLM, plain `fit` | BFGS default | BFGS tight | L-BFGS tight |
 |---|---|---|---|---|---|
-| airway | 1.12 s; 198 worse, max 6e-4 (θ at its 1e8 bound) | 1.22 s | 1.23 s; 17,804 worse, max 28 | 1.90 s; 6 worse, max 0.33 | 2.15 s; 8 worse |
-| simulation | 3.20 s; max 1e-5 | 3.33 s | 11.1 s; 120 worse, max 42 | 14.0 s; max 9e-6 | 14.2 s |
-| GTEx thyroid | 15.3 s; max 1e-5 | 16.8 s | 43.3 s; 21,364 worse, max 8.4e3 | 87.6 s; 2 worse, max 22 | 92.3 s; 3 worse |
+| airway | 1.12 s; 198 worse, max 6e-4 (θ at its 1e8 bound) | 1.22 s | 1.24 s; 17,804 worse, max 28 | 1.90 s; 6 worse, max 0.33 | 2.16 s; 8 worse |
+| simulation | 3.29 s; max 1e-5 | 3.46 s | 11.1 s; 120 worse, max 42 | 14.0 s; max 9e-6 | 14.3 s |
+| GTEx thyroid | 15.0 s; max 1e-5 | 16.5 s | 43.3 s; 21,364 worse, max 8.4e3 | 87.6 s; 2 worse, max 22 | 92.4 s; 3 worse |
 
-Summary:
-- **Fixed dispersion:** at equal accuracy, RapidGLM is 2.1–2.7× faster than
-  Levenberg–Marquardt and 2.2–3.5× faster than dogleg. It is also 1.4–1.7×
-  faster than Levenberg–Marquardt at Ceres's default tolerances, which stops
-  up to 3e-3 short of the optimum. Both take a median of 3 to 5 iterations;
-  RapidGLM's are cheaper.
-- **Maximum-likelihood dispersion:** RapidGLM is 4.4–6.1× faster than BFGS or
-  L-BFGS at tight tolerances on the simulation and thyroid, and 1.7–1.9× faster
-  on airway. On airway and thyroid it is also more accurate: tight BFGS still
-  misses on a few genes, by up to 22 in log likelihood.
-- **Default tolerances:** the quasi-Newton methods stop far from the optimum on
-  most genes, as much as 8,400 log-likelihood units short on thyroid.
-- **The θ bound:** RapidGLM keeps θ ≤ 1e8. For near-Poisson genes that costs
-  at most 6e-4 in log likelihood against an unbounded θ.
-- **Plain `fit`:** fitting each gene on its own takes 3–10% longer than sharing
-  the design-only work. Against plain `fit`, tight Levenberg–Marquardt takes
-  1.9–2.6× as long and tight BFGS 1.6–5.2×.
-- **Simplicity:** RapidGLM's methods reuse the factorizations the fitter
-  already needs for standard errors, and need no external optimizer.
-- **Core type:** three of the runs were repeated on a performance core
-  (`performance_core_control` in the receipt). RapidGLM took 0.11 s, 0.62 s
-  and 3.60 s (airway fixed, airway ML, thyroid fixed), 1.8–2.0× less than
-  above; the tight Ceres methods gained 1.7–2.0×. There RapidGLM is 2.1× and
-  2.4× faster than tight Levenberg–Marquardt (airway, thyroid) and 1.8×
-  faster than tight BFGS on airway.
-- **Before 1.2.0** a fixed-dispersion fit spent about two thirds of its time
-  outside the Newton iterations (response-only likelihood terms, a
-  confirming iteration and per-fit design work; [CHANGELOG.md](../CHANGELOG.md)).
-  RapidGLM then took as long as tight Levenberg–Marquardt on thyroid.
+The final fixed-dispersion speedups are
+2.15–2.77× over tight
+Levenberg–Marquardt and 2.23–3.52× over tight
+dogleg. With estimated dispersion, speedups over tight BFGS are
+1.71–5.85×. Accuracy and boundary shortfalls are
+reported in the same cells; a fast early stop is not treated as an equally
+accurate optimum.
+
+Plain `fit` repeats the design work for each gene. Its wall time divided by
+the shared-design path ranges from
+1.04–1.11×.
+Against plain `fit`, tight Levenberg–Marquardt takes
+1.95–2.67×
+as long, and tight BFGS takes
+1.56–5.30× as long.
+
+RapidGLM bounds θ at 1e8; its near-Poisson boundary shortfalls should be
+interpreted with that constraint. Quasi-Newton default tolerances can stop
+well short of the optimum, as the tables show. RapidGLM reuses factorizations
+already needed for standard errors and needs no external optimizer.
+
+Three control runs repeat on efficiency CPU 16, under the same quiet-start
+protocol: airway fixed, airway joint and thyroid fixed. Across all methods,
+first measurement / repeat ranges from 0.988 to
+1.035. Their per-method times are in
+`efficiency_core_control` in the receipt. All timings use the workstation's
+16 identical efficiency cores, one thread per core; they are final, not
+provisional. One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional.
 
 ## Defects the comparison found
 

@@ -1,0 +1,1396 @@
+{
+  "version": "1.4.0",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "measured_tag": "v1.4.0-dev.4",
+  "scope": "Geuvadis chromosome 22, 580 genes and 462 samples; 42 covariates plus intercept; 1 Mb cis window, seed 20261016. All final timing rows are fresh measurements from the eqtl stage.",
+  "host_note": "Final measurements on twelve of the workstation's 16 identical efficiency cores, CPUs 16-27, one thread per core. One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional.",
+  "repeats": 1,
+  "discovery_rule": "Storey q < 0.05",
+  "timings": [
+    {
+      "tool": "rapidglm_gaussian",
+      "model": "Gaussian",
+      "permutations": 1000,
+      "wall_seconds": 16.38,
+      "user_seconds": 187.09,
+      "system_seconds": 1.48,
+      "peak_rss_kbytes": 1196652,
+      "time_log_sha256": "f1e76c369e0b41fbffeb3946c4ac520935e86a43b7435d40955e51de6312ab89",
+      "time_log": "\tCommand being timed: \"taskset -c 16-27 build/rapidglm qtl validation/work/benchmark/runs-v1.4.0-final/eqtl/rapidglm_gaussian/config.json\"\n\tUser time (seconds): 187.09\n\tSystem time (seconds): 1.48\n\tPercent of CPU this job got: 1151%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:16.38\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 1196652\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 4\n\tMinor (reclaiming a frame) page faults: 868392\n\tVoluntary context switches: 105\n\tInvoluntary context switches: 1695\n\tSwaps: 0\n\tFile system inputs: 13936\n\tFile system outputs: 320\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+      "host": {
+        "command": [
+          "build/rapidglm",
+          "qtl",
+          "validation/work/benchmark/runs-v1.4.0-final/eqtl/rapidglm_gaussian/config.json"
+        ],
+        "cpus": "16-27",
+        "load_before": [
+          2.37890625,
+          7.58349609375,
+          14.96533203125
+        ],
+        "started_utc": "2026-10-22T18:33:24.349809+00:00",
+        "waited_for_idle_seconds": 0.0,
+        "waited_for_quiet_seconds": 20.09,
+        "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+        "exit": 0,
+        "cpus_busy_seconds": 189.14999999999418,
+        "outer_wall_seconds": 16.394397655996727,
+        "load_after": [
+          5.42138671875,
+          7.99755859375,
+          14.982421875
+        ],
+        "command_cpu_seconds": 188.57,
+        "others_cpu": 0.0029481615822079025,
+        "contended": false
+      },
+      "historical_dev3_seconds": 27.99,
+      "final_over_dev3": 0.5852090032154341,
+      "historical_timing_scope": "The final run uses turbo on under BIOS 1836, microcode 0x133, 253 W sustained and short-term limits, and 4 x 32 GiB at 4,200 MT/s. It pins every timed command to identical efficiency cores and audits the policy at every start and once per second. The dev.3 review used turbo on with the old BIOS. Power limits and memory speed can change absolute seconds, so historical absolute-time ratios do not isolate implementation changes; matched tool-to-tool speed-up ratios are the comparison of interest."
+    },
+    {
+      "tool": "rapidglm_nb",
+      "model": "NB score",
+      "permutations": 1000,
+      "wall_seconds": 1092.6,
+      "user_seconds": 13036.66,
+      "system_seconds": 3.81,
+      "peak_rss_kbytes": 918660,
+      "time_log_sha256": "357ec6a9144e6c23893b8fbf682cba533f8626d16f33602986610cc1d900a110",
+      "time_log": "\tCommand being timed: \"taskset -c 16-27 build/rapidglm qtl validation/work/benchmark/runs-v1.4.0-final/eqtl/rapidglm_nb/config.json\"\n\tUser time (seconds): 13036.66\n\tSystem time (seconds): 3.81\n\tPercent of CPU this job got: 1193%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 18:12.60\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 918660\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 502884\n\tVoluntary context switches: 110\n\tInvoluntary context switches: 52653\n\tSwaps: 0\n\tFile system inputs: 2088\n\tFile system outputs: 336\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+      "host": {
+        "command": [
+          "build/rapidglm",
+          "qtl",
+          "validation/work/benchmark/runs-v1.4.0-final/eqtl/rapidglm_nb/config.json"
+        ],
+        "cpus": "16-27",
+        "load_before": [
+          3.77734375,
+          6.04443359375,
+          12.6982421875
+        ],
+        "started_utc": "2026-10-22T18:37:24.719235+00:00",
+        "waited_for_idle_seconds": 0.0,
+        "waited_for_quiet_seconds": 220.9,
+        "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+        "exit": 0,
+        "cpus_busy_seconds": 13055.660000000003,
+        "outer_wall_seconds": 1092.6194960540015,
+        "load_after": [
+          12.6943359375,
+          13.9287109375,
+          14.40087890625
+        ],
+        "command_cpu_seconds": 13040.47,
+        "others_cpu": 0.0011585307949430151,
+        "contended": false
+      },
+      "historical_dev3_seconds": 1098.42,
+      "final_over_dev3": 0.9947014803080787,
+      "historical_timing_scope": "The final run uses turbo on under BIOS 1836, microcode 0x133, 253 W sustained and short-term limits, and 4 x 32 GiB at 4,200 MT/s. It pins every timed command to identical efficiency cores and audits the policy at every start and once per second. The dev.3 review used turbo on with the old BIOS. Power limits and memory speed can change absolute seconds, so historical absolute-time ratios do not isolate implementation changes; matched tool-to-tool speed-up ratios are the comparison of interest."
+    },
+    {
+      "tool": "rapidglm_gaussian10000",
+      "model": "Gaussian",
+      "permutations": 10000,
+      "wall_seconds": 117.19,
+      "user_seconds": 1390.13,
+      "system_seconds": 1.64,
+      "peak_rss_kbytes": 1201132,
+      "time_log_sha256": "6ac6d90563659780df15c396fdbbefe26c7513425aae06f42b830e2230d5ed28",
+      "time_log": "\tCommand being timed: \"taskset -c 16-27 build/rapidglm qtl validation/work/benchmark/runs-v1.4.0-final/eqtl/rapidglm_gaussian10000/config.json\"\n\tUser time (seconds): 1390.13\n\tSystem time (seconds): 1.64\n\tPercent of CPU this job got: 1187%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 1:57.19\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 1201132\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 890514\n\tVoluntary context switches: 52\n\tInvoluntary context switches: 2569\n\tSwaps: 0\n\tFile system inputs: 0\n\tFile system outputs: 320\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+      "host": {
+        "command": [
+          "build/rapidglm",
+          "qtl",
+          "validation/work/benchmark/runs-v1.4.0-final/eqtl/rapidglm_gaussian10000/config.json"
+        ],
+        "cpus": "16-27",
+        "load_before": [
+          3.32080078125,
+          9.99365234375,
+          12.90576171875
+        ],
+        "started_utc": "2026-10-22T18:57:30.894304+00:00",
+        "waited_for_idle_seconds": 0.0,
+        "waited_for_quiet_seconds": 110.47,
+        "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+        "exit": 0,
+        "cpus_busy_seconds": 1392.0400000000081,
+        "outer_wall_seconds": 117.2120881180017,
+        "load_after": [
+          12.3017578125,
+          11.2333984375,
+          13.021484375
+        ],
+        "command_cpu_seconds": 1391.7700000000002,
+        "others_cpu": 0.0001919597232839166,
+        "contended": false
+      },
+      "historical_dev3_seconds": 256.7,
+      "final_over_dev3": 0.4565251266069342,
+      "historical_timing_scope": "The final run uses turbo on under BIOS 1836, microcode 0x133, 253 W sustained and short-term limits, and 4 x 32 GiB at 4,200 MT/s. It pins every timed command to identical efficiency cores and audits the policy at every start and once per second. The dev.3 review used turbo on with the old BIOS. Power limits and memory speed can change absolute seconds, so historical absolute-time ratios do not isolate implementation changes; matched tool-to-tool speed-up ratios are the comparison of interest."
+    },
+    {
+      "tool": "fastqtl",
+      "model": "Gaussian",
+      "permutations": "adaptive 1000-10000",
+      "wall_seconds": 1004.62,
+      "user_seconds": 9747.03,
+      "system_seconds": 1.95,
+      "peak_rss_kbytes": 84376,
+      "time_log_sha256": "3d8dcb59b9634db26931bf5a5daf74c54c130aa74af278f83eb68c41f22b6722",
+      "time_log": "\tCommand being timed: \"taskset -c 16-27 sh -c seq 1 12 | xargs -P 12 -I K /mnt/pikachu/rapidglm/validation/work/eqtl/tools/fastQTL --vcf /mnt/pikachu/rapidglm/validation/work/eqtl/data/genotypes/chr22.vcf.gz         --bed /mnt/pikachu/rapidglm/validation/work/eqtl/data/expression/chr22.expr_int.bed.gz --cov /mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt.gz --window 1e6         --seed 20261016 --permute 1000 10000 --chunk K 12 --out validation/work/benchmark/runs-v1.4.0-final/eqtl/fastqtl/chunks/chunk_K.txt.gz --log validation/work/benchmark/runs-v1.4.0-final/eqtl/fastqtl/chunks/chunk_K.log\"\n\tUser time (seconds): 9747.03\n\tSystem time (seconds): 1.95\n\tPercent of CPU this job got: 970%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 16:44.62\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 84376\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 1\n\tMinor (reclaiming a frame) page faults: 149981\n\tVoluntary context switches: 223\n\tInvoluntary context switches: 14951\n\tSwaps: 0\n\tFile system inputs: 31032\n\tFile system outputs: 5744\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+      "host": {
+        "command": [
+          "sh",
+          "-c",
+          "seq 1 12 | xargs -P 12 -I K /mnt/pikachu/rapidglm/validation/work/eqtl/tools/fastQTL --vcf /mnt/pikachu/rapidglm/validation/work/eqtl/data/genotypes/chr22.vcf.gz         --bed /mnt/pikachu/rapidglm/validation/work/eqtl/data/expression/chr22.expr_int.bed.gz --cov /mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt.gz --window 1e6         --seed 20261016 --permute 1000 10000 --chunk K 12 --out validation/work/benchmark/runs-v1.4.0-final/eqtl/fastqtl/chunks/chunk_K.txt.gz --log validation/work/benchmark/runs-v1.4.0-final/eqtl/fastqtl/chunks/chunk_K.log"
+        ],
+        "cpus": "16-27",
+        "load_before": [
+          3.4052734375,
+          7.8974609375,
+          11.5029296875
+        ],
+        "started_utc": "2026-10-22T19:01:51.817945+00:00",
+        "waited_for_idle_seconds": 0.0,
+        "waited_for_quiet_seconds": 140.64,
+        "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+        "exit": 0,
+        "cpus_busy_seconds": 10195.47000000003,
+        "outer_wall_seconds": 1004.6378055399982,
+        "load_after": [
+          3.89453125,
+          8.5947265625,
+          11.02197265625
+        ],
+        "command_cpu_seconds": 9748.980000000001,
+        "others_cpu": 0.03703573546090392,
+        "contended": false
+      },
+      "historical_dev3_seconds": 1022.68,
+      "final_over_dev3": 0.9823405170727892,
+      "historical_timing_scope": "The final run uses turbo on under BIOS 1836, microcode 0x133, 253 W sustained and short-term limits, and 4 x 32 GiB at 4,200 MT/s. It pins every timed command to identical efficiency cores and audits the policy at every start and once per second. The dev.3 review used turbo on with the old BIOS. Power limits and memory speed can change absolute seconds, so historical absolute-time ratios do not isolate implementation changes; matched tool-to-tool speed-up ratios are the comparison of interest."
+    },
+    {
+      "tool": "tensorqtl",
+      "model": "Gaussian",
+      "permutations": 10000,
+      "wall_seconds": 151.53,
+      "user_seconds": 1164.15,
+      "system_seconds": 178.62,
+      "peak_rss_kbytes": 1469580,
+      "time_log_sha256": "e7a58b2d50075d93769359239b8f8fedec938f4db123be826843909841d22554",
+      "time_log": "\tCommand being timed: \"taskset -c 16-27 /mnt/pikachu/rapidglm/validation/work/eqtl/venv-tensorqtl/bin/python -I -m tensorqtl /mnt/pikachu/rapidglm/validation/work/eqtl/data/genotypes/chr22 /mnt/pikachu/rapidglm/validation/work/eqtl/data/expression/chr22.expr_int.bed.gz chr22 --covariates /mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt --mode cis --window 1000000 --seed 20261016 -o /mnt/pikachu/rapidglm/validation/work/benchmark/runs-v1.4.0-final/eqtl/tensorqtl\"\n\tUser time (seconds): 1164.15\n\tSystem time (seconds): 178.62\n\tPercent of CPU this job got: 886%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 2:31.53\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 1469580\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 1\n\tMinor (reclaiming a frame) page faults: 90883479\n\tVoluntary context switches: 27775\n\tInvoluntary context switches: 8333\n\tSwaps: 0\n\tFile system inputs: 149968\n\tFile system outputs: 328\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+      "host": {
+        "command": [
+          "/mnt/pikachu/rapidglm/validation/work/eqtl/venv-tensorqtl/bin/python",
+          "-I",
+          "-m",
+          "tensorqtl",
+          "/mnt/pikachu/rapidglm/validation/work/eqtl/data/genotypes/chr22",
+          "/mnt/pikachu/rapidglm/validation/work/eqtl/data/expression/chr22.expr_int.bed.gz",
+          "chr22",
+          "--covariates",
+          "/mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt",
+          "--mode",
+          "cis",
+          "--window",
+          "1000000",
+          "--seed",
+          "20261016",
+          "-o",
+          "/mnt/pikachu/rapidglm/validation/work/benchmark/runs-v1.4.0-final/eqtl/tensorqtl"
+        ],
+        "cpus": "16-27",
+        "load_before": [
+          3.390625,
+          8.09619140625,
+          10.79150390625
+        ],
+        "started_utc": "2026-10-22T19:18:59.598946+00:00",
+        "waited_for_idle_seconds": 0.0,
+        "waited_for_quiet_seconds": 20.09,
+        "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+        "exit": 0,
+        "cpus_busy_seconds": 1355.820000000007,
+        "outer_wall_seconds": 151.55280078599753,
+        "load_after": [
+          9.8857421875,
+          9.42626953125,
+          10.91552734375
+        ],
+        "command_cpu_seconds": 1342.77,
+        "others_cpu": 0.007175716940633811,
+        "contended": false
+      },
+      "historical_dev3_seconds": 144.99,
+      "final_over_dev3": 1.0451065590730395,
+      "historical_timing_scope": "The final run uses turbo on under BIOS 1836, microcode 0x133, 253 W sustained and short-term limits, and 4 x 32 GiB at 4,200 MT/s. It pins every timed command to identical efficiency cores and audits the policy at every start and once per second. The dev.3 review used turbo on with the old BIOS. Power limits and memory speed can change absolute seconds, so historical absolute-time ratios do not isolate implementation changes; matched tool-to-tool speed-up ratios are the comparison of interest."
+    },
+    {
+      "tool": "jaxqtl_nb_score_spa_acat",
+      "model": "NB SPA+ACAT",
+      "permutations": 0,
+      "wall_seconds": 52.74,
+      "user_seconds": 236.02,
+      "system_seconds": 8.4,
+      "peak_rss_kbytes": 892652,
+      "time_log_sha256": "277d578c6793f79ff49133e33aa69a5508cb2db872640d992e823138e9c6d8bc",
+      "time_log": "\tCommand being timed: \"taskset -c 16-27 bash validation/receipts/v1.4.0/jaxqtl_split.sh /mnt/pikachu/rapidglm/validation/work/benchmark/runs-v1.4.0-final/eqtl/jaxqtl_nb_score_spa_acat --test score --spa --acat\"\n\tUser time (seconds): 236.02\n\tSystem time (seconds): 8.40\n\tPercent of CPU this job got: 463%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:52.74\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 892652\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 135\n\tMinor (reclaiming a frame) page faults: 3474236\n\tVoluntary context switches: 611750\n\tInvoluntary context switches: 18517\n\tSwaps: 0\n\tFile system inputs: 31784\n\tFile system outputs: 288\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+      "host": {
+        "command": [
+          "bash",
+          "validation/receipts/v1.4.0/jaxqtl_split.sh",
+          "/mnt/pikachu/rapidglm/validation/work/benchmark/runs-v1.4.0-final/eqtl/jaxqtl_nb_score_spa_acat",
+          "--test",
+          "score",
+          "--spa",
+          "--acat"
+        ],
+        "cpus": "16-27",
+        "load_before": [
+          3.31640625,
+          7.0966796875,
+          9.8876953125
+        ],
+        "started_utc": "2026-10-22T19:23:24.726777+00:00",
+        "waited_for_idle_seconds": 0.0,
+        "waited_for_quiet_seconds": 110.51,
+        "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+        "exit": 0,
+        "cpus_busy_seconds": 268.9900000000489,
+        "outer_wall_seconds": 52.75909218400193,
+        "load_after": [
+          5.35546875,
+          7.10302734375,
+          9.74462890625
+        ],
+        "command_cpu_seconds": 244.42000000000002,
+        "others_cpu": 0.03880847670508125,
+        "contended": false
+      },
+      "historical_dev3_seconds": 58.11,
+      "final_over_dev3": 0.907589055240062,
+      "historical_timing_scope": "The final run uses turbo on under BIOS 1836, microcode 0x133, 253 W sustained and short-term limits, and 4 x 32 GiB at 4,200 MT/s. It pins every timed command to identical efficiency cores and audits the policy at every start and once per second. The dev.3 review used turbo on with the old BIOS. Power limits and memory speed can change absolute seconds, so historical absolute-time ratios do not isolate implementation changes; matched tool-to-tool speed-up ratios are the comparison of interest."
+    },
+    {
+      "tool": "jaxqtl_nb_score_perm1000",
+      "model": "NB score",
+      "permutations": 1000,
+      "wall_seconds": 3112.27,
+      "user_seconds": 26218.48,
+      "system_seconds": 151.83,
+      "peak_rss_kbytes": 1019732,
+      "time_log_sha256": "f5bae9a8b3500aeac5008e58ecba42f95227b608f1798823d552e43498963594",
+      "time_log": "\tCommand being timed: \"taskset -c 16-27 bash validation/receipts/v1.4.0/jaxqtl_split.sh /mnt/pikachu/rapidglm/validation/work/benchmark/runs-v1.4.0-final/eqtl/jaxqtl_nb_score_perm1000 --test score --nperm 1000\"\n\tUser time (seconds): 26218.48\n\tSystem time (seconds): 151.83\n\tPercent of CPU this job got: 847%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 51:52.27\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 1019732\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 45\n\tMinor (reclaiming a frame) page faults: 4716665\n\tVoluntary context switches: 57846736\n\tInvoluntary context switches: 344040\n\tSwaps: 0\n\tFile system inputs: 48\n\tFile system outputs: 320\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+      "host": {
+        "command": [
+          "bash",
+          "validation/receipts/v1.4.0/jaxqtl_split.sh",
+          "/mnt/pikachu/rapidglm/validation/work/benchmark/runs-v1.4.0-final/eqtl/jaxqtl_nb_score_perm1000",
+          "--test",
+          "score",
+          "--nperm",
+          "1000"
+        ],
+        "cpus": "16-27",
+        "load_before": [
+          3.310546875,
+          6.310546875,
+          9.349609375
+        ],
+        "started_utc": "2026-10-22T19:25:00.756989+00:00",
+        "waited_for_idle_seconds": 0.0,
+        "waited_for_quiet_seconds": 40.2,
+        "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+        "exit": 0,
+        "cpus_busy_seconds": 27531.01999999996,
+        "outer_wall_seconds": 3112.288985543011,
+        "load_after": [
+          7.54345703125,
+          10.97314453125,
+          11.458984375
+        ],
+        "command_cpu_seconds": 26370.31,
+        "others_cpu": 0.031078679962765043,
+        "contended": false
+      },
+      "historical_dev3_seconds": 3193.1,
+      "final_over_dev3": 0.9746860417775829,
+      "historical_timing_scope": "The final run uses turbo on under BIOS 1836, microcode 0x133, 253 W sustained and short-term limits, and 4 x 32 GiB at 4,200 MT/s. It pins every timed command to identical efficiency cores and audits the policy at every start and once per second. The dev.3 review used turbo on with the old BIOS. Power limits and memory speed can change absolute seconds, so historical absolute-time ratios do not isolate implementation changes; matched tool-to-tool speed-up ratios are the comparison of interest."
+    }
+  ],
+  "table_comparisons": {
+    "rapidglm_gaussian": {
+      "dev3": {
+        "rows": 580,
+        "old_sha256": "be868d52b27d9d26944930b93d425c990b6138261d98997f8dd0c1fceb3a5a5b",
+        "final_sha256": "b4f2be91b14a96afc213044a2c95814db849b4f3d69d4b25c77b661dc57da64c",
+        "columns": {
+          "phenotype_id": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "chrom": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "start": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "end": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "variants": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "status": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_variant": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_position": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele1": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele2": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "statistic": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "p_value": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "estimate": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "standard_error": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "theta": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "permutations": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutations_failed": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutation_p": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "beta_p": {
+            "mismatches": 577,
+            "max_absolute": 4.014566457044566e-13,
+            "max_relative": 1.0716192127687937e-10,
+            "largest_relative_gene": "ENSG00000244752.2"
+          },
+          "beta_k": {
+            "mismatches": 577,
+            "max_absolute": 2.0949908474676704e-12,
+            "max_relative": 2.0000217599171277e-12,
+            "largest_relative_gene": "ENSG00000182858.7"
+          },
+          "beta_n": {
+            "mismatches": 580,
+            "max_absolute": 4.424691724125296e-09,
+            "max_relative": 3.226994065232205e-12,
+            "largest_relative_gene": "ENSG00000182858.7"
+          },
+          "reference_ncp": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          }
+        },
+        "byte_identical": false
+      },
+      "optimized_code": {
+        "rows": 580,
+        "old_sha256": "b4f2be91b14a96afc213044a2c95814db849b4f3d69d4b25c77b661dc57da64c",
+        "final_sha256": "b4f2be91b14a96afc213044a2c95814db849b4f3d69d4b25c77b661dc57da64c",
+        "columns": {
+          "phenotype_id": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "chrom": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "start": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "end": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "variants": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "status": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_variant": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_position": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele1": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele2": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "statistic": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "p_value": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "estimate": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "standard_error": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "theta": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "permutations": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutations_failed": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutation_p": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "beta_p": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "beta_k": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "beta_n": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "reference_ncp": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          }
+        },
+        "byte_identical": true
+      }
+    },
+    "rapidglm_gaussian10000": {
+      "dev3": {
+        "rows": 580,
+        "old_sha256": "ad635860f59fd640b1abaf2f655019d07c908715d3bcf41bf67ac05cc993bf77",
+        "final_sha256": "7810433f3551e85a0a8e1647a2873a3b599c3e21d559b34ce58dc4b2e4de06c9",
+        "columns": {
+          "phenotype_id": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "chrom": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "start": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "end": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "variants": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "status": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_variant": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_position": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele1": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele2": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "statistic": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "p_value": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "estimate": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "standard_error": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "theta": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "permutations": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutations_failed": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutation_p": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "beta_p": {
+            "mismatches": 579,
+            "max_absolute": 3.1818991885756986e-13,
+            "max_relative": 1.9452410000072464e-10,
+            "largest_relative_gene": "ENSG00000260065.1"
+          },
+          "beta_k": {
+            "mismatches": 579,
+            "max_absolute": 1.758815315611173e-12,
+            "max_relative": 1.7045922120660452e-12,
+            "largest_relative_gene": "ENSG00000100347.10"
+          },
+          "beta_n": {
+            "mismatches": 580,
+            "max_absolute": 3.243258106522262e-09,
+            "max_relative": 2.767404874309281e-12,
+            "largest_relative_gene": "ENSG00000100347.10"
+          },
+          "reference_ncp": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          }
+        },
+        "byte_identical": false
+      },
+      "optimized_code": {
+        "rows": 580,
+        "old_sha256": "7810433f3551e85a0a8e1647a2873a3b599c3e21d559b34ce58dc4b2e4de06c9",
+        "final_sha256": "7810433f3551e85a0a8e1647a2873a3b599c3e21d559b34ce58dc4b2e4de06c9",
+        "columns": {
+          "phenotype_id": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "chrom": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "start": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "end": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "variants": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "status": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_variant": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_position": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele1": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele2": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "statistic": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "p_value": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "estimate": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "standard_error": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "theta": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "permutations": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutations_failed": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutation_p": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "beta_p": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "beta_k": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "beta_n": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "reference_ncp": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          }
+        },
+        "byte_identical": true
+      }
+    },
+    "rapidglm_nb": {
+      "dev3": {
+        "rows": 580,
+        "old_sha256": "7292b58d54d5f8e403fa47d6ee7ba3f98aebea216d72cf6e4f2a68d40a54df1b",
+        "final_sha256": "7292b58d54d5f8e403fa47d6ee7ba3f98aebea216d72cf6e4f2a68d40a54df1b",
+        "columns": {
+          "phenotype_id": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "chrom": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "start": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "end": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "variants": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "status": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_variant": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_position": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele1": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele2": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "statistic": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "p_value": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "estimate": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "standard_error": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "theta": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "permutations": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutations_failed": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutation_p": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "beta_p": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "beta_k": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "beta_n": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "reference_ncp": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          }
+        },
+        "byte_identical": true
+      },
+      "optimized_code": {
+        "rows": 580,
+        "old_sha256": "7292b58d54d5f8e403fa47d6ee7ba3f98aebea216d72cf6e4f2a68d40a54df1b",
+        "final_sha256": "7292b58d54d5f8e403fa47d6ee7ba3f98aebea216d72cf6e4f2a68d40a54df1b",
+        "columns": {
+          "phenotype_id": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "chrom": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "start": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "end": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "variants": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "status": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_variant": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "lead_position": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele1": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "allele2": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "statistic": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "p_value": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "estimate": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "standard_error": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "theta": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "permutations": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutations_failed": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "permutation_p": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null,
+            "changed_genes": []
+          },
+          "beta_p": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "beta_k": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "beta_n": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          },
+          "reference_ncp": {
+            "mismatches": 0,
+            "max_absolute": 0.0,
+            "max_relative": 0.0,
+            "largest_relative_gene": null
+          }
+        },
+        "byte_identical": true
+      }
+    }
+  },
+  "tensorqtl_table": {
+    "decompressed_byte_identical": true,
+    "old_sha256": "7b3f344e9fd5e0d524c737c0158fcb3c676045206a89b7a401311dda3881f2c0",
+    "final_sha256": "7b3f344e9fd5e0d524c737c0158fcb3c676045206a89b7a401311dda3881f2c0"
+  },
+  "additional_reference_tables": [
+    {
+      "table": "reference_gene_level.tsv.gz",
+      "old_sha256": "103c69d58d5d7078dfcdb23a8660cd9d1b0b7defa4cf4083f8ec56e4d60fb6f5",
+      "final_sha256": "aa77bb6b5dd3cc46ce90426be1f1e5c5dedf92579052a26574554dd98bf4bb0d",
+      "byte_identical": false,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "82612da6f864d360e6d6431973c438c1af7bd54a7b0e7d66e94ae1737fdbce18",
+      "final_decompressed_sha256": "82612da6f864d360e6d6431973c438c1af7bd54a7b0e7d66e94ae1737fdbce18"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_1.txt.gz",
+      "old_sha256": "7b0a4dcfd70c15fcb327acbd9949852cf6b19fb7169d24102bbc67c35077f3dd",
+      "final_sha256": "7b0a4dcfd70c15fcb327acbd9949852cf6b19fb7169d24102bbc67c35077f3dd",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "02a8199705d98165737573879a06e318899f7209781b811db06a4c4aa5d82638",
+      "final_decompressed_sha256": "02a8199705d98165737573879a06e318899f7209781b811db06a4c4aa5d82638"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_10.txt.gz",
+      "old_sha256": "61316a513093208bccb857e2099d006c62e20386684dc2a152424d8f3511c65e",
+      "final_sha256": "61316a513093208bccb857e2099d006c62e20386684dc2a152424d8f3511c65e",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "36301ba3cb9a528a901ac83fcdedaa43fd2b0943d0411572ed3ce13962411877",
+      "final_decompressed_sha256": "36301ba3cb9a528a901ac83fcdedaa43fd2b0943d0411572ed3ce13962411877"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_11.txt.gz",
+      "old_sha256": "e4c8c82d4e0f506f2b365003fafca7c65361ee627f4724c80b9b2071c14bb410",
+      "final_sha256": "e4c8c82d4e0f506f2b365003fafca7c65361ee627f4724c80b9b2071c14bb410",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "6641508d77980e0ea4f72f49222f61c7c5a3a0bbb6f7c2c5e8f7daa2c0759ce8",
+      "final_decompressed_sha256": "6641508d77980e0ea4f72f49222f61c7c5a3a0bbb6f7c2c5e8f7daa2c0759ce8"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_12.txt.gz",
+      "old_sha256": "7e68768110d90825e2c83da7c761487bc8ac3a790568b3ee710e264538e56004",
+      "final_sha256": "7e68768110d90825e2c83da7c761487bc8ac3a790568b3ee710e264538e56004",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "f958a1eda9ba09cc597ac27b1aa3856b0408ae7cab4869cc53f3042866c64ae9",
+      "final_decompressed_sha256": "f958a1eda9ba09cc597ac27b1aa3856b0408ae7cab4869cc53f3042866c64ae9"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_2.txt.gz",
+      "old_sha256": "b9b6c1d94eef7f9375f3cbd204e9c3e97d01fa0444848ae0494ee6ca5efafc2b",
+      "final_sha256": "b9b6c1d94eef7f9375f3cbd204e9c3e97d01fa0444848ae0494ee6ca5efafc2b",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "b0dcf53a09e6429b78fe1207e657e214e86f27a9d4775c9bbfea9dcf21ff9fb5",
+      "final_decompressed_sha256": "b0dcf53a09e6429b78fe1207e657e214e86f27a9d4775c9bbfea9dcf21ff9fb5"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_3.txt.gz",
+      "old_sha256": "9e42aef514dd5d2f0cb80d6a20a7516233e099d477ebb7186fc71d040b7f1e44",
+      "final_sha256": "9e42aef514dd5d2f0cb80d6a20a7516233e099d477ebb7186fc71d040b7f1e44",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "020ea7506d6ace518318401d18bcb4b98c2160a1e2470d1b39a0c0ba598b5eff",
+      "final_decompressed_sha256": "020ea7506d6ace518318401d18bcb4b98c2160a1e2470d1b39a0c0ba598b5eff"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_4.txt.gz",
+      "old_sha256": "1189b1df0053ae3f25968e4c6065a410618c592d1bcb7d9895048ce59093424a",
+      "final_sha256": "1189b1df0053ae3f25968e4c6065a410618c592d1bcb7d9895048ce59093424a",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "90f4de2242896cf12016ad5fd63661a13e8a5198d67b5ba716a1721a221f9148",
+      "final_decompressed_sha256": "90f4de2242896cf12016ad5fd63661a13e8a5198d67b5ba716a1721a221f9148"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_5.txt.gz",
+      "old_sha256": "6a94e7c9ee8d3fa78a2bb8bbccd14526694642b6974f615e6f82b4ecddad51d7",
+      "final_sha256": "6a94e7c9ee8d3fa78a2bb8bbccd14526694642b6974f615e6f82b4ecddad51d7",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "e89bc60abaad3bffdb44fb6a8dc3a91d85f3de3ad9f48de6da86d9b075362d4f",
+      "final_decompressed_sha256": "e89bc60abaad3bffdb44fb6a8dc3a91d85f3de3ad9f48de6da86d9b075362d4f"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_6.txt.gz",
+      "old_sha256": "9db088482b0615f6451e3ba6ac5de85874735a8cf7419dec447e355ea8e5b070",
+      "final_sha256": "9db088482b0615f6451e3ba6ac5de85874735a8cf7419dec447e355ea8e5b070",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "f51694c755e2e0b9d4aafe21a89a86264083e6657a7c70a3cd492c1ec7641a08",
+      "final_decompressed_sha256": "f51694c755e2e0b9d4aafe21a89a86264083e6657a7c70a3cd492c1ec7641a08"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_7.txt.gz",
+      "old_sha256": "a597302773fff6d51e6d3e989820ac2e73818714eb7d7e42a0d0b6d4f30c8e66",
+      "final_sha256": "a597302773fff6d51e6d3e989820ac2e73818714eb7d7e42a0d0b6d4f30c8e66",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "ed00175b2286c359c806aa9da344d2512e42ac1ab0309fcdbdfc3d02cd769a06",
+      "final_decompressed_sha256": "ed00175b2286c359c806aa9da344d2512e42ac1ab0309fcdbdfc3d02cd769a06"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_8.txt.gz",
+      "old_sha256": "50741d0a55ad05dce556169d231e90dda5e58c9d4303908f3fde4b9f67c984c6",
+      "final_sha256": "50741d0a55ad05dce556169d231e90dda5e58c9d4303908f3fde4b9f67c984c6",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "febd92a6ca0bc67b6aff37ed23239ca719e7dff2362fbd54544de9ea6651bb9b",
+      "final_decompressed_sha256": "febd92a6ca0bc67b6aff37ed23239ca719e7dff2362fbd54544de9ea6651bb9b"
+    },
+    {
+      "table": "fastqtl/chunks/chunk_9.txt.gz",
+      "old_sha256": "a9d291d0b0c04fc8e64350ad71558289ff5501f74e794cb3d5459aedb3424397",
+      "final_sha256": "a9d291d0b0c04fc8e64350ad71558289ff5501f74e794cb3d5459aedb3424397",
+      "byte_identical": true,
+      "decompressed_byte_identical": true,
+      "old_decompressed_sha256": "7cb5e101903b74e471afb0711b2ef11b21c12a4a4a5fcdc4c97e377528d0439e",
+      "final_decompressed_sha256": "7cb5e101903b74e471afb0711b2ef11b21c12a4a4a5fcdc4c97e377528d0439e"
+    },
+    {
+      "table": "jaxqtl_nb_score_spa_acat/part0/chr22.cis.score.spa.acat.parquet.gz",
+      "old_sha256": "a442c4a6ec6e6d095e1621dc63277b3e38d490671c45f1ab69663813fc02bc09",
+      "final_sha256": "a442c4a6ec6e6d095e1621dc63277b3e38d490671c45f1ab69663813fc02bc09",
+      "byte_identical": true,
+      "rows": 145,
+      "all_table_values_exactly_equal": true
+    },
+    {
+      "table": "jaxqtl_nb_score_spa_acat/part1/chr22.cis.score.spa.acat.parquet.gz",
+      "old_sha256": "b4ce8fd1f19b1c7b466cb8da3f9ef88eb33b5ce5a4efa60be363d936ed58cd15",
+      "final_sha256": "b4ce8fd1f19b1c7b466cb8da3f9ef88eb33b5ce5a4efa60be363d936ed58cd15",
+      "byte_identical": true,
+      "rows": 145,
+      "all_table_values_exactly_equal": true
+    },
+    {
+      "table": "jaxqtl_nb_score_spa_acat/part2/chr22.cis.score.spa.acat.parquet.gz",
+      "old_sha256": "45c56d18f234934cfe0a499076ef902786019958867aeb30f6ba93508e96c960",
+      "final_sha256": "45c56d18f234934cfe0a499076ef902786019958867aeb30f6ba93508e96c960",
+      "byte_identical": true,
+      "rows": 145,
+      "all_table_values_exactly_equal": true
+    },
+    {
+      "table": "jaxqtl_nb_score_spa_acat/part3/chr22.cis.score.spa.acat.parquet.gz",
+      "old_sha256": "d6c3261619c9b9bc93a8e2fd027abb6d131e7337fe4ea085e60a1bec68749d62",
+      "final_sha256": "d6c3261619c9b9bc93a8e2fd027abb6d131e7337fe4ea085e60a1bec68749d62",
+      "byte_identical": true,
+      "rows": 145,
+      "all_table_values_exactly_equal": true
+    },
+    {
+      "table": "jaxqtl_nb_score_perm1000/part0/chr22.cis.score.perm.parquet.gz",
+      "old_sha256": "687674d11a1d674da55ab6170af32ef6c01166ea43d9871449265f9634223baa",
+      "final_sha256": "687674d11a1d674da55ab6170af32ef6c01166ea43d9871449265f9634223baa",
+      "byte_identical": true,
+      "rows": 145,
+      "all_table_values_exactly_equal": true
+    },
+    {
+      "table": "jaxqtl_nb_score_perm1000/part1/chr22.cis.score.perm.parquet.gz",
+      "old_sha256": "9ed92fdbc55693cedc77501438efa5df35b70c7510b93abf0a9ced6fb3613775",
+      "final_sha256": "9ed92fdbc55693cedc77501438efa5df35b70c7510b93abf0a9ced6fb3613775",
+      "byte_identical": true,
+      "rows": 145,
+      "all_table_values_exactly_equal": true
+    },
+    {
+      "table": "jaxqtl_nb_score_perm1000/part2/chr22.cis.score.perm.parquet.gz",
+      "old_sha256": "08aade68b055c93cef4e891ac76a88f39debaa1f5b2d7a9c16b17c063f76476a",
+      "final_sha256": "08aade68b055c93cef4e891ac76a88f39debaa1f5b2d7a9c16b17c063f76476a",
+      "byte_identical": true,
+      "rows": 145,
+      "all_table_values_exactly_equal": true
+    },
+    {
+      "table": "jaxqtl_nb_score_perm1000/part3/chr22.cis.score.perm.parquet.gz",
+      "old_sha256": "33c4e40f10f63e8c0e90d6e548e549be4504659fed7455c38498be783ce21e47",
+      "final_sha256": "33c4e40f10f63e8c0e90d6e548e549be4504659fed7455c38498be783ce21e47",
+      "byte_identical": true,
+      "rows": 145,
+      "all_table_values_exactly_equal": true
+    }
+  ],
+  "matched_gaussian_speedup": 1.293028415393805,
+  "matched_nb_score_speedup": 2.8484989932271647,
+  "peak_rss_note": "GNU time reports a per-process maximum, not aggregate process-tree memory for multiprocess reference tools."
+}

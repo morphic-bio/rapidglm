@@ -39,6 +39,36 @@ def write_design(path, x):
 
 
 class CAPI(unittest.TestCase):
+    def test_floored_optimizer_fallback_metadata(self):
+        from rapidglm import capi
+        x = np.ones((20, 2)); x[:10, 1] = 0; x[10:, 1] = .01
+        y = np.r_[np.zeros(10), 10 + np.arange(10, 20) % 4][:, None]
+        *_, converged, optimized = capi.nb_floored_fits(
+            x, y, np.ones(20), np.array([.2]), max_iterations=1,
+            min_beta=-1, max_beta=1, return_optimizer=True)
+        self.assertTrue(converged[0])
+        self.assertTrue(optimized[0])
+
+    def test_old_api_checked_before_new_symbols(self):
+        from unittest.mock import patch
+        from rapidglm import capi
+        class Version:
+            def __call__(self): return 1
+        class Old:
+            rapidglm_c_api_version = Version()
+            def __getattr__(self, name):
+                raise AssertionError("looked up new symbol before version check: " + name)
+        with patch.object(capi, "_lib", None), patch.object(capi, "_load", return_value=Old()):
+            with self.assertRaisesRegex(OSError, "need 2"): capi._library()
+
+    def test_bad_hypothesis_dimensions(self):
+        x = np.ones((8, 2)); y = np.ones((8, 20))
+        for method in (rapidglm.bulk_de, rapidglm.edger_ql):
+            for options in ({"coefficient": -1}, {"coefficient": 2},
+                            {"coefficients": [-1]}, {"contrast": [1]}):
+                with self.assertRaises(ValueError): method(x, y, **options)
+        with self.assertRaises(ValueError): rapidglm.edger_ql(x, y, norm_factors=[1])
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = pathlib.Path(self.tmp.name)
@@ -108,6 +138,26 @@ class CAPI(unittest.TestCase):
         named = pd.DataFrame(counts, columns=[f"g{j}" for j in range(counts.shape[1])])
         frame = rapidglm.bulk_de(x, named)
         self.assertEqual(frame.index[5], "g5")
+
+    def test_edger_ql_matches_cli(self):
+        x, counts = self.bulk_data()
+        files = dict(design=write_design(self.root / "design.tsv", x),
+                     responses=write_market(self.root / "counts.mtx", counts))
+        cases = [
+            (dict(coefficient=2, threads=3), dict(coefficient=2, threads=3)),
+            (dict(contrast=[0, 1, -1]), dict(contrast=[0, 1, -1])),
+            (dict(coefficients=[1, 2]), dict(coefficients=[1, 2])),
+            (dict(filter=False, normalization="none", dispersion=0.1),
+             dict(filter=False, normalization="none", dispersion=0.1)),
+        ]
+        for config, arguments in cases:
+            with self.subTest(**{k: str(v) for k, v in arguments.items()}):
+                table, record = self.cli("edger-ql", **files, **config)
+                frame = rapidglm.edger_ql(x, sp.csr_matrix(counts), **arguments)
+                self.assert_same(table, frame, text=("status",))
+                self.assertEqual(frame.attrs["df_prior"], record["df_prior"])
+                self.assertEqual(frame.attrs["dispersion"], record["dispersion"])
+                self.assertEqual(frame.attrs["kept"], record["kept"])
 
     def test_fit_batch_and_scan_match_cli(self):
         x, counts = self.bulk_data()

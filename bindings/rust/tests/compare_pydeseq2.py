@@ -21,6 +21,7 @@ per gene, in the same gene order).
 
 import argparse
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -48,6 +49,13 @@ def pydeseq2(data, threads):
     design.index = index
     frame = pd.DataFrame(counts, index=index, columns=[f"g{j}" for j in range(counts.shape[1])])
     inference = RapidGLMInference(n_cpus=threads)
+    affinity = os.sched_getaffinity(0)
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from quiet_run import wait_quiet
+        cpus = set(range(16, 16 + threads))
+        wait_quiet(cpus, label=f"Rust comparison {data.name} PyDESeq2")
+        os.sched_setaffinity(0, cpus)
     start = time.perf_counter()
     dds = DeseqDataSet(counts=frame, metadata=pd.DataFrame(index=index), design=design,
                        inference=inference, quiet=True)
@@ -57,6 +65,7 @@ def pydeseq2(data, threads):
     stats = DeseqStats(dds, contrast=contrast, inference=inference, quiet=True)
     stats.summary()
     seconds = time.perf_counter() - start
+    os.sched_setaffinity(0, affinity)
     return stats.results_df.reset_index(drop=True), dds, seconds, contrast
 
 
@@ -64,9 +73,15 @@ def rust(data, contrast, workdir):
     path = pathlib.Path(workdir)
     (path / "contrast.txt").write_text(" ".join(str(c) for c in contrast))
     binary = ROOT / "bindings/rust/target/release/examples/deseq"
+    command = [str(binary), str(data / "counts.mtx"), str(data / "design.tsv"),
+               str(path / "contrast.txt"), str(path / "results.tsv")]
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from quiet_run import wait_quiet
+        wait_quiet("16-23", label=f"Rust comparison {data.name} native")
+        command = ["taskset", "-c", "16-23", *command]
     start = time.perf_counter()
-    run = subprocess.run([str(binary), str(data / "counts.mtx"), str(data / "design.tsv"),
-                          str(path / "contrast.txt"), str(path / "results.tsv")],
+    run = subprocess.run(command,
                          capture_output=True, text=True, check=True)
     seconds = time.perf_counter() - start
     return pd.read_csv(path / "results.tsv", sep="\t"), seconds, run.stderr.strip()
@@ -90,10 +105,10 @@ def cooks_outliers(ours, ref, dds, deseq2):
     differ = np.array(sorted(r ^ p), dtype=int)
     return {"deseq2": len(d), "rust": len(r), "pydeseq2_rapidglm": len(p),
             "jaccard_rust_deseq2": round(jaccard(r, d), 3), "jaccard_pydeseq2_deseq2": round(jaccard(p, d), 3),
-            "leverage_one_samples": int(single.sum()),
+            "singleton_design_cell_samples": int(single.sum()),
             "pydeseq2_infinite_distances": int(np.isinf(cooks).sum()),
             "mismatched_genes": {"total": len(differ), "rust_only": len(r - p), "pydeseq2_only": len(p - r),
-                                 "pydeseq2_max_at_leverage_one_sample": int(single[largest[differ]].sum())}}
+                                 "pydeseq2_max_at_singleton_design_cell_sample": int(single[largest[differ]].sum())}}
 
 
 def main():

@@ -1,0 +1,185 @@
+{
+  "dataset": "/data",
+  "mode": "joint",
+  "threads": 1,
+  "observations": 647,
+  "columns": 12,
+  "genes": 28769,
+  "boundary_genes": 1,
+  "setup_seconds": 34.1071,
+  "methods": [
+    {
+      "name": "rapidglm_newton",
+      "wall_seconds": 14.9844,
+      "finite": {
+        "genes": 28768,
+        "cpu_seconds": 13.6517,
+        "converged": 28768,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 1.919033821e-10,
+        "shortfall_max": 1.390165494e-05,
+        "iterations_median": 4,
+        "iterations_99": 7
+      },
+      "boundary": {
+        "genes": 1,
+        "cpu_seconds": 0.00113558,
+        "converged": 1,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 0,
+        "shortfall_max": 0,
+        "iterations_median": 4,
+        "iterations_99": 4
+      }
+    },
+    {
+      "name": "rapidglm_newton_plain",
+      "wall_seconds": 16.5441,
+      "finite": {
+        "genes": 28768,
+        "cpu_seconds": 15.2044,
+        "converged": 28768,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 1.919033821e-10,
+        "shortfall_max": 1.390165494e-05,
+        "iterations_median": 4,
+        "iterations_99": 7
+      },
+      "boundary": {
+        "genes": 1,
+        "cpu_seconds": 0.00118655,
+        "converged": 1,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 0,
+        "shortfall_max": 0,
+        "iterations_median": 4,
+        "iterations_99": 4
+      }
+    },
+    {
+      "name": "ceres_bfgs/ceres_default",
+      "wall_seconds": 43.2565,
+      "finite": {
+        "genes": 28768,
+        "cpu_seconds": 41.9217,
+        "converged": 28768,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 21363,
+        "shortfall_median": 3.759340359,
+        "shortfall_99": 160.0570081,
+        "shortfall_max": 8382.830378,
+        "iterations_median": 7,
+        "iterations_99": 28
+      },
+      "boundary": {
+        "genes": 1,
+        "cpu_seconds": 0.00407595,
+        "converged": 1,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 1,
+        "shortfall_median": 0.009122469521,
+        "shortfall_99": 0.009122469521,
+        "shortfall_max": 0.009122469521,
+        "iterations_median": 38,
+        "iterations_99": 38
+      }
+    },
+    {
+      "name": "ceres_lbfgs/ceres_default",
+      "wall_seconds": 43.2718,
+      "finite": {
+        "genes": 28768,
+        "cpu_seconds": 41.9298,
+        "converged": 28768,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 21474,
+        "shortfall_median": 3.783737463,
+        "shortfall_99": 163.9714485,
+        "shortfall_max": 8382.830378,
+        "iterations_median": 7,
+        "iterations_99": 30
+      },
+      "boundary": {
+        "genes": 1,
+        "cpu_seconds": 0.00532292,
+        "converged": 1,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 1,
+        "shortfall_median": 0.008368754593,
+        "shortfall_99": 0.008368754593,
+        "shortfall_max": 0.008368754593,
+        "iterations_median": 45,
+        "iterations_99": 45
+      }
+    },
+    {
+      "name": "ceres_bfgs/tight",
+      "wall_seconds": 87.639,
+      "finite": {
+        "genes": 28768,
+        "cpu_seconds": 86.298,
+        "converged": 28768,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 2,
+        "shortfall_median": 9.063114703e-10,
+        "shortfall_99": 2.147601663e-06,
+        "shortfall_max": 21.67237077,
+        "iterations_median": 22,
+        "iterations_99": 45
+      },
+      "boundary": {
+        "genes": 1,
+        "cpu_seconds": 0.00625404,
+        "converged": 1,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 1.42040335e-09,
+        "shortfall_99": 1.42040335e-09,
+        "shortfall_max": 1.42040335e-09,
+        "iterations_median": 64,
+        "iterations_99": 64
+      }
+    },
+    {
+      "name": "ceres_lbfgs/tight",
+      "wall_seconds": 92.3751,
+      "finite": {
+        "genes": 28768,
+        "cpu_seconds": 91.0268,
+        "converged": 28768,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 3,
+        "shortfall_median": 3.165951057e-09,
+        "shortfall_99": 8.449484585e-05,
+        "shortfall_max": 0.0320106717,
+        "iterations_median": 22,
+        "iterations_99": 45
+      },
+      "boundary": {
+        "genes": 1,
+        "cpu_seconds": 0.00948545,
+        "converged": 1,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 2.865731403e-07,
+        "shortfall_99": 2.865731403e-07,
+        "shortfall_max": 2.865731403e-07,
+        "iterations_median": 87,
+        "iterations_99": 87
+      }
+    }
+  ],
+  "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
+  }
+}

@@ -7,6 +7,7 @@
 #include <boost/math/distributions/gamma.hpp>
 #include <boost/math/distributions/normal.hpp>
 #include <boost/math/special_functions/trigamma.hpp>
+#include <optional>
 
 // Bulk RNA-seq differential expression following the procedure published for
 // DESeq2 (Love, Huber and Anders 2014, Genome Biology 15:550) and its
@@ -103,13 +104,15 @@ inline double mad(const Vector &v) {
         d[i] = std::abs(v[i] - m);
     return 1.4826 * median(d);
 }
-// R's default (type 7) quantile.
+// R's default (type 7) quantile, from the two order statistics it needs (by
+// selection, not a sort).
 inline double quantile7(Vector v, double p) {
-    std::sort(v.begin(), v.end());
     const double h = p * (v.size() - 1);
     const auto lo = static_cast<std::size_t>(std::floor(h));
-    const auto hi = std::min(lo + 1, v.size() - 1);
-    return v[lo] + (h - lo) * (v[hi] - v[lo]);
+    const auto at = v.begin() + static_cast<std::ptrdiff_t>(lo);
+    std::nth_element(v.begin(), at, v.end());
+    const double low = *at, high = lo + 1 < v.size() ? *std::min_element(at + 1, v.end()) : low;
+    return low + (h - lo) * (high - low);
 }
 // Cleveland's (1979) LOWESS: local linear fits with tricube weights over the
 // nearest ceil(f n) points, then `iterations` robustness passes with bisquare
@@ -396,6 +399,228 @@ inline MapFit nb_map_fit(const Matrix &x, const Vector &y, const Vector &offset,
     r.beta = std::move(beta);
     return r;
 }
+// NB GLM fit at a fixed dispersion with fitted counts floored at min_mu inside
+// the iterations, as DESeq2 fits (its documented minmu, 0.5), following
+// PyDESeq2's irls_solver (MIT; Muzellec et al. 2023): iteratively reweighted least
+// squares on mu_f = max(s exp(X b), min_mu) with a ridge of 1e-6, from `start`
+// (or the least-squares fit of log(y / s + 0.1)), until the deviance
+// -2 log L(mu_f) changes by at most 1e-8 of itself plus 0.1. Coefficients are
+// kept within [-30, 30], switching to bounded likelihood optimization when IRLS
+// leaves the bounds or reaches its iteration limit. Where no fitted count falls
+// below min_mu this is the maximum likelihood fit (tolerance, coefficient bounds
+// and the iteration limit as PyDESeq2's defaults). Returns the unfloored means
+// s exp(X b), as DESeq2 does, the floored ones, and the leverages from the
+// floored weights.
+struct FlooredFit {
+    Vector beta, mu, floored, hat;
+    // -2 log likelihood at the returned (unfloored) means, up to count-only terms.
+    double deviance = nan;
+    bool converged = false, used_optimizer = false;
+};
+inline FlooredFit floored_nb_fit(const Matrix &x, const Vector &y, const Vector &offset,
+                                 double dispersion, double min_mu, Vector start = {},
+                                 std::size_t max_iterations = 250, double tolerance = 1e-8,
+                                 double min_beta = -30, double max_beta = 30,
+                                 bool scale_columns = false) {
+    const std::size_t n = x.rows, p = x.cols;
+    // Bulk fits express bounds and ridge in units of each column's maximum
+    // magnitude. This makes changing a covariate's units leave the test unchanged.
+    if (scale_columns) {
+        Matrix z = x;
+        Vector scale(p, 0);
+        for (std::size_t j = 0; j < p; ++j) {
+            for (std::size_t i = 0; i < n; ++i)
+                scale[j] = std::max(scale[j], std::abs(x(i, j)));
+            if (!(scale[j] > 0))
+                return {};
+            for (std::size_t i = 0; i < n; ++i)
+                z(i, j) /= scale[j];
+            if (start.size() == p)
+                start[j] *= scale[j];
+        }
+        auto f = floored_nb_fit(z, y, offset, dispersion, min_mu, start, max_iterations, tolerance,
+                                min_beta, max_beta, false);
+        for (std::size_t j = 0; j < f.beta.size(); ++j)
+            f.beta[j] /= scale[j];
+        return f;
+    }
+    constexpr double ridge = 1e-6;
+    FlooredFit f;
+    if (start.size() != p || !std::all_of(start.begin(), start.end(), [&](double b) {
+            return std::isfinite(b) && b >= min_beta && b <= max_beta;
+        })) {
+        const Cholesky ls(crossprod(x, Vector(n, 1)), 1e-12, false);
+        if (!ls.ok)
+            return f;
+        Vector z(n);
+        for (std::size_t i = 0; i < n; ++i)
+            z[i] = std::log(y[i] / std::exp(offset[i]) + 0.1);
+        start = ls.solve(xtv(x, z));
+    }
+    for (auto &b : start)
+        b = std::clamp(b, min_beta, max_beta);
+    f.beta = std::move(start);
+    const Vector beta_initial = f.beta;
+    const double k = 1 / dispersion;
+    const auto floored_means = [&](const Vector &beta, Vector &mu) {
+        mu = matvec(x, beta);
+        for (std::size_t i = 0; i < n; ++i)
+            mu[i] = std::max(std::exp(mu[i] + offset[i]), min_mu);
+    };
+    // -2 times the NB log likelihood without its count-only terms.
+    const auto deviance = [&](const Vector &mu) {
+        double total = 0;
+        for (std::size_t i = 0; i < n; ++i)
+            total += (y[i] + k) * std::log1p(mu[i] / k) - (y[i] > 0 ? y[i] * std::log(mu[i]) : 0);
+        return 2 * total;
+    };
+    Vector mu, w(n), wz(n);
+    floored_means(f.beta, mu);
+    double dev = 1000;
+    for (std::size_t it = 0; it < max_iterations; ++it) {
+        for (std::size_t i = 0; i < n; ++i) {
+            w[i] = mu[i] / (1 + mu[i] / k);
+            wz[i] = w[i] * (std::log(mu[i]) - offset[i] + (y[i] - mu[i]) / mu[i]);
+        }
+        auto a = crossprod(x, w);
+        for (std::size_t j = 0; j < p; ++j)
+            a(j, j) += ridge;
+        const Cholesky ch(a, 1e-14, false);
+        if (!ch.ok)
+            return f;
+        auto beta = ch.solve(xtv(x, wz));
+        if (std::any_of(beta.begin(), beta.end(), [&](double b) {
+                return !std::isfinite(b) || b < min_beta || b > max_beta;
+            }))
+            break;
+        f.beta = std::move(beta);
+        floored_means(f.beta, mu);
+        const double old = dev;
+        dev = deviance(mu);
+        if (!std::isfinite(dev))
+            return f;
+        if (std::abs(dev - old) / (std::abs(dev) + 0.1) <= tolerance) {
+            f.converged = true;
+            break;
+        }
+    }
+    if (!f.converged) {
+        // As in PyDESeq2's irls_solver (MIT), switch to bounded likelihood
+        // optimization when IRLS leaves the bounds or exhausts its iterations.
+        // Independent implementation: projected BFGS with Armijo backtracking.
+        f.used_optimizer = true;
+        f.beta = beta_initial;
+        const auto objective = [&](const Vector &b, Vector &gradient) {
+            Vector means;
+            floored_means(b, means);
+            gradient.assign(p, 0);
+            double value = deviance(means) / 2;
+            for (std::size_t j = 0; j < p; ++j) {
+                value += ridge * b[j] * b[j] / 2;
+                gradient[j] = ridge * b[j];
+            }
+            const auto eta = matvec(x, b);
+            for (std::size_t i = 0; i < n; ++i) {
+                if (eta[i] + offset[i] <= std::log(min_mu))
+                    continue;
+                const double score = (means[i] - y[i]) / (1 + dispersion * means[i]);
+                for (std::size_t j = 0; j < p; ++j)
+                    gradient[j] += x(i, j) * score;
+            }
+            return value;
+        };
+        Vector grad;
+        double value = objective(f.beta, grad);
+        Matrix inverse(p, p);
+        for (std::size_t j = 0; j < p; ++j)
+            inverse(j, j) = 1;
+        for (std::size_t it = 0; it < std::max<std::size_t>(250, max_iterations); ++it) {
+            Vector projected = grad;
+            double norm = 0;
+            for (std::size_t j = 0; j < p; ++j) {
+                if ((f.beta[j] <= min_beta && grad[j] > 0) ||
+                    (f.beta[j] >= max_beta && grad[j] < 0))
+                    projected[j] = 0;
+                norm = std::max(norm, std::abs(projected[j]));
+            }
+            if (norm <= 1e-6) {
+                f.converged = true;
+                break;
+            }
+            Vector direction = matvec(inverse, projected);
+            for (auto &v : direction)
+                v = -v;
+            double slope = std::inner_product(grad.begin(), grad.end(), direction.begin(), 0.0);
+            if (!(slope < 0)) {
+                for (std::size_t j = 0; j < p; ++j)
+                    direction[j] = -projected[j];
+            }
+            Vector candidate(p), next_grad;
+            double next = value, step = 1;
+            bool accepted = false;
+            for (int back = 0; back < 60; ++back, step *= 0.5) {
+                double gain = 0;
+                for (std::size_t j = 0; j < p; ++j) {
+                    candidate[j] = std::clamp(f.beta[j] + step * direction[j], min_beta, max_beta);
+                    gain += grad[j] * (candidate[j] - f.beta[j]);
+                }
+                next = objective(candidate, next_grad);
+                if (gain < 0 && std::isfinite(next) && next <= value + 1e-4 * gain) {
+                    accepted = true;
+                    break;
+                }
+            }
+            if (!accepted)
+                break;
+            Vector delta(p), change(p);
+            for (std::size_t j = 0; j < p; ++j) {
+                delta[j] = candidate[j] - f.beta[j];
+                change[j] = next_grad[j] - grad[j];
+            }
+            const double sy = std::inner_product(delta.begin(), delta.end(), change.begin(), 0.0);
+            if (sy > 1e-12) {
+                const auto hy = matvec(inverse, change);
+                const double yhy =
+                    std::inner_product(change.begin(), change.end(), hy.begin(), 0.0);
+                for (std::size_t j = 0; j < p; ++j)
+                    for (std::size_t k = 0; k < p; ++k)
+                        inverse(j, k) += (1 + yhy / sy) * delta[j] * delta[k] / sy -
+                                         (hy[j] * delta[k] + delta[j] * hy[k]) / sy;
+            }
+            f.beta = std::move(candidate);
+            grad = std::move(next_grad);
+            value = next;
+        }
+        floored_means(f.beta, mu);
+        dev = deviance(mu);
+    }
+    f.floored = mu;
+    f.mu = matvec(x, f.beta);
+    for (std::size_t i = 0; i < n; ++i)
+        f.mu[i] = std::exp(f.mu[i] + offset[i]);
+    f.deviance = deviance(f.mu);
+    // Leverages diag(W^1/2 X (X'WX + ridge)^-1 X'W^1/2) at the floored weights.
+    for (std::size_t i = 0; i < n; ++i)
+        w[i] = mu[i] / (1 + mu[i] / k);
+    auto a = crossprod(x, w);
+    for (std::size_t j = 0; j < p; ++j)
+        a(j, j) += ridge;
+    const Cholesky ch(a, 1e-14, false);
+    if (!ch.ok) {
+        f.converged = false;
+        return f;
+    }
+    const auto inverse = ch.inverse();
+    f.hat.assign(n, 0);
+    for (std::size_t i = 0; i < n; ++i) {
+        double h = 0;
+        for (std::size_t r = 0; r < p; ++r)
+            for (std::size_t c = 0; c < p; ++c)
+                h += x(i, r) * inverse(r, c) * x(i, c);
+        f.hat[i] = w[i] * h;
+    }
+    return f;
+}
 } // namespace detail
 // Median-of-ratios size factors (Anders and Huber 2010). `ratio` uses genes with
 // no zero count; `poscounts` takes each gene's geometric mean as the n-th root of
@@ -479,16 +704,24 @@ inline FilterResult independent_filter(const Vector &p_all, const Vector &filter
         }
         // Span 0.2 with three robustness passes reproduces the curve DESeq2 records.
         out.fit = detail::lowess(theta, rejections, 0.2, 3);
-        double peak = *std::max_element(out.fit.begin(), out.fit.end()), sq = 0;
+        // PyDESeq2's calibrated rules: no filtering when at most ten
+        // discoveries are possible; residual RMS over positive-rejection bins.
+        const double peak = *std::max_element(out.fit.begin(), out.fit.end());
+        double sq = 0;
+        std::size_t positive = 0, chosen = 0;
         for (std::size_t k = 0; k < theta.size(); ++k)
-            sq += std::pow(rejections[k] - out.fit[k], 2);
-        const double sd = std::sqrt(sq / (theta.size() - 1));
-        std::size_t chosen = 0;
-        for (std::size_t k = 0; k < theta.size(); ++k)
-            if (rejections[k] > peak - sd) {
-                chosen = k;
-                break;
+            if (rejections[k] > 0) {
+                sq += std::pow(rejections[k] - out.fit[k], 2);
+                ++positive;
             }
+        if (*std::max_element(rejections.begin(), rejections.end()) > 10) {
+            const double sd = positive ? std::sqrt(sq / positive) : 0;
+            for (std::size_t k = 0; k < theta.size(); ++k)
+                if (rejections[k] > peak - sd) {
+                    chosen = k;
+                    break;
+                }
+        }
         out.theta = theta[chosen];
         out.threshold = detail::quantile7(filter, theta[chosen]);
         for (std::size_t j = 0; j < genes; ++j)
@@ -559,6 +792,8 @@ inline double legacy_cooks_dispersion(const Vector &normalized, const Matrix &de
 struct NbFixedFits {
     Matrix coefficients; // features x design columns, natural log scale
     Matrix fitted, hat;  // observations x features
+    // Nonzero means converged. Floored fits use 2 for bounded optimization,
+    // allowing inference adapters to delegate that path to their own optimizer.
     std::vector<unsigned char> converged;
 };
 // NB GLM fits at a fixed dispersion per feature with log size-factor offsets.
@@ -630,6 +865,52 @@ inline NbFixedFits nb_fixed_fits(const Matrix &design, const Matrix &counts,
         for (std::size_t k = 0; k < p; ++k)
             out.coefficients(j, k) = beta[k];
         out.converged[j] = 1;
+    });
+    return out;
+}
+// floored_nb_fit for every feature (counts observations x features, log
+// size-factor offsets): the fits of DESeq2 and PyDESeq2's irls, with fitted
+// counts floored at min_mu inside the iterations. Fitted values are the
+// unfloored means, hat values those of the floored weights.
+inline NbFixedFits nb_floored_fits(const Matrix &design, const Matrix &counts,
+                                   const Vector &size_factors, const Vector &dispersions,
+                                   double min_mu = 0.5, double tolerance = 1e-8,
+                                   std::size_t max_iterations = 250, double min_beta = -30,
+                                   double max_beta = 30, int threads = 1) {
+    design.validate();
+    const std::size_t m = design.rows, p = design.cols, genes = counts.cols;
+    require(counts.rows == m && size_factors.size() == m && dispersions.size() == genes,
+            "nb_floored_fits dimensions mismatch");
+    require(min_mu > 0 && std::isfinite(min_mu), "min_mu must be positive");
+    Vector offset(m);
+    for (std::size_t i = 0; i < m; ++i) {
+        require(size_factors[i] > 0 && std::isfinite(size_factors[i]),
+                "size factors must be positive");
+        offset[i] = std::log(size_factors[i]);
+    }
+    NbFixedFits out;
+    out.coefficients = Matrix(genes, p, nan);
+    out.fitted = Matrix(m, genes, nan);
+    out.hat = Matrix(m, genes, nan);
+    out.converged.assign(genes, 0);
+    parallel_for(genes, threads, [&](auto j) {
+        const double alpha = dispersions[j];
+        if (!(alpha > 0) || !std::isfinite(alpha))
+            return;
+        Vector y(m);
+        for (std::size_t i = 0; i < m; ++i)
+            y[i] = counts(i, j);
+        const auto f = detail::floored_nb_fit(design, y, offset, alpha, min_mu, {}, max_iterations,
+                                              tolerance, min_beta, max_beta);
+        if (f.beta.size() != p || f.hat.size() != m)
+            return;
+        for (std::size_t k = 0; k < p; ++k)
+            out.coefficients(j, k) = f.beta[k];
+        for (std::size_t i = 0; i < m; ++i) {
+            out.fitted(i, j) = f.mu[i];
+            out.hat(i, j) = f.hat[i];
+        }
+        out.converged[j] = f.converged ? (f.used_optimizer ? 2 : 1) : 0;
     });
     return out;
 }
@@ -738,22 +1019,44 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
     // rough moment dispersion; floored at min_mean.
     std::vector<Vector> mu0(genes), start0(genes);
     std::vector<unsigned char> usable(genes, 0);
-    // Rough moment dispersion from a least-squares fit of normalized counts on the
-    // design: the mean over samples of (r^2 - f) / f^2 on the residual df, with
-    // fitted values f (floored at 1e-3) and residuals r.
+    // Starting dispersion, as PyDESeq2 computes it (MIT; Muzellec et al. 2023;
+    // fit_rough_dispersions, fit_moments_dispersions), which reproduces DESeq2's
+    // starts: the smaller of a rough estimate from a least-squares fit of
+    // normalized counts on the design, the sum over samples of (r^2 - f) / f^2 on
+    // the residual df with fitted values f floored at 1 and residuals r (and at
+    // least 0), and the moments estimate (v - x m) / m^2 from the mean m and the
+    // variance v of the normalized counts and the mean x of the inverse size
+    // factors; clamped to the dispersion bounds. With size factors far apart (as in
+    // pseudobulk samples of very different numbers of cells) the moments estimate
+    // is often the smaller, and genes then start, and with keep_minimum_start stay,
+    // at the lower bound, as in DESeq2.
     detail::Cholesky least_squares(detail::crossprod(design, Vector(m, 1)));
     require(least_squares.ok, "singular bulk design");
+    double inverse_size = 0;
+    for (std::size_t i = 0; i < m; ++i)
+        inverse_size += 1 / sf[i];
+    inverse_size /= static_cast<double>(m);
     const auto moment_dispersion = [&](const Vector &y) {
         Vector nc(m);
-        for (std::size_t i = 0; i < m; ++i)
-            nc[i] = y[i] / sf[i];
-        const auto fitted = detail::matvec(design, least_squares.solve(detail::xtv(design, nc)));
-        double sum = 0;
+        double mean = 0;
         for (std::size_t i = 0; i < m; ++i) {
-            const double f = std::max(fitted[i], 1e-3), r = nc[i] - fitted[i];
-            sum += (r * r - f) / (f * f);
+            nc[i] = y[i] / sf[i];
+            mean += nc[i];
         }
-        return std::clamp(sum / (m - p), min_disp, max_disp);
+        mean /= static_cast<double>(m);
+        const auto fitted = detail::matvec(design, least_squares.solve(detail::xtv(design, nc)));
+        double rough = 0, variance = 0;
+        for (std::size_t i = 0; i < m; ++i) {
+            const double f = std::max(fitted[i], 1.0), r = nc[i] - f;
+            rough += (r * r - f) / (f * f);
+            variance += (nc[i] - mean) * (nc[i] - mean);
+        }
+        rough = std::max(0.0, rough / static_cast<double>(m - p));
+        variance /= static_cast<double>(m - 1);
+        double moments = (variance - inverse_size * mean) / (mean * mean);
+        if (std::isnan(moments))
+            moments = 0;
+        return std::clamp(std::min(rough, moments), min_disp, max_disp);
     };
     // Initial means for designs that are not group designs: an NB fit at the rough
     // dispersion, else a Poisson fit, else least-squares means of normalized counts.
@@ -803,10 +1106,25 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
             mu.assign(m, 0);
             for (std::size_t i = 0; i < m; ++i)
                 mu[i] = sf[i] * sum[groups.group[i]] / size[groups.group[i]];
-        } else
+            for (double &v : mu)
+                v = std::max(v, o.min_mean);
+        } else {
             mu = initial_means(y, rough, start);
-        for (double &v : mu)
-            v = std::max(v, o.min_mean);
+            // DESeq2 fits these means with fitted counts floored at min_mean and
+            // estimates the dispersion at the unfloored means of that fit (as
+            // PyDESeq2 does): where a fitted count falls below min_mean the fit is
+            // redone so.
+            if (std::any_of(mu.begin(), mu.end(), [&](double v) { return !(v >= o.min_mean); })) {
+                const auto f = detail::floored_nb_fit(design, y, offset, rough, o.min_mean, start,
+                                                      250, 1e-8, -30, 30, true);
+                if (f.converged) {
+                    mu = f.mu;
+                    start = f.beta;
+                } else
+                    for (double &v : mu)
+                        v = std::max(v, o.min_mean);
+            }
+        }
         if (o.keep_minimum_start && rough <= min_disp) {
             g.dispersion_gene = min_disp;
             return;
@@ -975,27 +1293,117 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
         full_options.design = tested_summary;
         fo.design = reduced_summary;
         auto full = fit(tested.x, y, full_options);
-        if (!full.ok()) {
-            g.status = std::string("fit_") + status_name(full.status);
-            return full;
-        }
         const double ln2 = std::log(2.0);
-        const bool boundary = hypothesis_boundary(full, target);
+        // DESeq2 fits with fitted counts floored at min_mean (minmu). Where a fitted
+        // count of the maximum likelihood fit falls below it, or a coefficient has
+        // no finite estimate, the fit is redone with the floor (floored_nb_fit), as
+        // PyDESeq2 does: the Wald test then uses the sandwich
+        // (H + 1e-6 I)^-1 H (H + 1e-6 I)^-1 with H = X'WX at the floored means, and
+        // Cook's distances the unfloored means and the leverages of that fit.
+        const auto below = [&](const FitResult &f) {
+            return f.has_boundary() || std::any_of(f.fitted.begin(), f.fitted.end(),
+                                                   [&](double v) { return !(v >= o.min_mean); });
+        };
+        Vector floor_ridge(p, 0);
+        for (std::size_t c = 0; c < p; ++c) {
+            double scale = 0;
+            for (std::size_t i = 0; i < m; ++i)
+                scale = std::max(scale, std::abs(tested.x(i, c)));
+            floor_ridge[c] = 1e-6 * scale * scale;
+        }
+        std::optional<detail::FlooredFit> floored;
+        double floored_se = nan;
+        if (!full.ok() || below(full)) {
+            auto refit = detail::floored_nb_fit(tested.x, y, offset, g.dispersion, o.min_mean,
+                                                full.coefficients, 250, 1e-8, -30, 30, true);
+            if (refit.converged) {
+                // The Wald variance at the floored means (DESeq2 documents minmu
+                // for its Wald test; PyDESeq2 uses the unfloored means here).
+                Vector w(m);
+                for (std::size_t i = 0; i < m; ++i)
+                    w[i] = refit.floored[i] / (1 + g.dispersion * refit.floored[i]);
+                const auto information = detail::crossprod(tested.x, w);
+                auto ridged = information;
+                for (std::size_t c = 0; c < p; ++c)
+                    ridged(c, c) += floor_ridge[c];
+                const detail::Cholesky ch(ridged, 1e-14, false);
+                if (ch.ok) {
+                    const auto inverse = ch.inverse();
+                    Vector hc(p);
+                    for (std::size_t r = 0; r < p; ++r)
+                        hc[r] = inverse(r, tested.column);
+                    double variance = 0;
+                    for (std::size_t r = 0; r < p; ++r)
+                        for (std::size_t c = 0; c < p; ++c)
+                            variance += hc[r] * information(r, c) * hc[c];
+                    floored_se = std::sqrt(variance);
+                }
+                // The fit Cook's distances read: unfloored means, floored weights and
+                // the inverse of the floored information, whose product gives the
+                // leverages.
+                for (std::size_t i = 0; i < m; ++i)
+                    w[i] = refit.floored[i] / (1 + g.dispersion * refit.floored[i]);
+                auto floored_information = detail::crossprod(tested.x, w);
+                for (std::size_t c = 0; c < p; ++c)
+                    floored_information(c, c) += floor_ridge[c];
+                const detail::Cholesky fh(floored_information, 1e-14, false);
+                if (fh.ok) {
+                    full.status = FitStatus::converged;
+                    full.coefficients = refit.beta;
+                    full.fitted = refit.mu;
+                    full.working_weights = w;
+                    full.covariance = fh.inverse();
+                    full.boundary_coefficients.assign(p, 0);
+                    floored = std::move(refit);
+                }
+            }
+            if (!floored) {
+                g.status = "floored_fit_failed";
+                full.status = FitStatus::iteration_limit;
+                return full;
+            }
+        }
+        const bool boundary = !floored && hypothesis_boundary(full, target);
         if (hypothesis.df() == 1 && !boundary) {
-            const auto [estimate, se] = hypothesis_estimate(full, target);
-            g.log2_fold_change = estimate / ln2;
-            g.lfc_se = se / ln2;
+            if (floored) {
+                g.log2_fold_change = full.coefficients[tested.column] / ln2;
+                g.lfc_se = floored_se / ln2;
+            } else {
+                const auto [estimate, se] = hypothesis_estimate(full, target);
+                g.log2_fold_change = estimate / ln2;
+                g.lfc_se = se / ln2;
+            }
         }
         if (o.lrt) {
             auto null = fit(reduced, y, fo);
-            if (!null.ok()) {
-                g.status = std::string("reduced_") + status_name(null.status);
-                return full;
-            }
-            g.statistic = std::max(0.0, 2 * (full.log_likelihood - null.log_likelihood));
+            if (floored || !null.ok() || below(null)) {
+                // Both coefficient fits use the floor; likelihoods are evaluated
+                // at their returned, unfloored means (DESeq2 black-box reference).
+                const auto full_floored =
+                    floored ? *floored
+                            : detail::floored_nb_fit(tested.x, y, offset, g.dispersion, o.min_mean,
+                                                     full.coefficients, 250, 1e-8, -30, 30, true);
+                const auto null_floored =
+                    detail::floored_nb_fit(reduced, y, offset, g.dispersion, o.min_mean,
+                                           null.coefficients, 250, 1e-8, -30, 30, true);
+                if (!full_floored.converged || !null_floored.converged) {
+                    g.status = "floored_fit_failed";
+                    return full;
+                }
+                g.statistic = std::max(0.0, null_floored.deviance - full_floored.deviance);
+            } else
+                g.statistic = std::max(0.0, 2 * (full.log_likelihood - null.log_likelihood));
             boost::math::chi_squared_distribution<double> chi(static_cast<double>(hypothesis.df()));
             g.p_value = boost::math::cdf(boost::math::complement(chi, g.statistic));
             g.status = full.has_boundary() ? "ok_boundary" : "ok";
+        } else if (floored) {
+            if (!(floored_se > 0) || !std::isfinite(floored_se)) {
+                g.status = "wald_floored";
+                return full;
+            }
+            g.statistic = full.coefficients[tested.column] / floored_se;
+            g.p_value = normal_tail(g.statistic, Side::both);
+            g.status = "ok";
         } else {
             const auto w = hypothesis_wald(full, target);
             if (!w.valid && boundary) {
@@ -1149,10 +1557,27 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
             auto &g = out.genes[j];
             const auto &y = replaced[j];
             g.replaced = true;
+            g.base_mean = 0;
+            for (std::size_t i = 0; i < m; ++i)
+                g.base_mean += y[i] / sf[i] / m;
+            // Discard every first-pass test before attempting the replacement fit.
+            g.log2_fold_change = g.lfc_se = g.statistic = g.p_value = nan;
+            mle[j].clear();
+            if (g.base_mean == 0) {
+                g.status = "replacement_all_zero";
+                g.log2_fold_change = g.lfc_se = g.statistic = 0;
+                g.p_value = 1;
+                cooks[j].assign(m, nan);
+                return;
+            }
             Vector mu;
             Vector start;
             gene_dispersion(y, g, mu, start);
             auto full = finish(j, y, mu, start);
+            if (g.status.rfind("ok", 0) != 0) {
+                g.log2_fold_change = g.lfc_se = g.statistic = nan;
+                g.p_value = 1;
+            }
             cooks[j] = cook_distances(j, y, full);
             keep_mle(j, full);
         });

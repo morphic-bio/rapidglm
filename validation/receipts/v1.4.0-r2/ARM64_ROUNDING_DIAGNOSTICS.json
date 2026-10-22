@@ -1,0 +1,55 @@
+{
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "untimed": true,
+  "cpus": "0-7",
+  "timing_usable": false,
+  "purpose": "Separate floating kernel-path differences from empirical resampling decisions on the same x86 host",
+  "cases": {
+    "sceptre-S1_public-strict": {
+      "p_mismatches": 0,
+      "p_mismatches_using_approximation": 0,
+      "max_absolute_p_difference": 0.0,
+      "max_absolute_statistic_difference": 0.0,
+      "empirical_p_exact": true,
+      "draws_exact": true,
+      "approximation_flags_exact": true,
+      "discoveries_equal": true
+    },
+    "sceptre-S1_public-ks": {
+      "p_mismatches": 0,
+      "p_mismatches_using_approximation": 0,
+      "max_absolute_p_difference": 0.0,
+      "max_absolute_statistic_difference": 0.0,
+      "empirical_p_exact": true,
+      "draws_exact": true,
+      "approximation_flags_exact": true,
+      "discoveries_equal": true
+    },
+    "sceptre-S2_public-strict": {
+      "p_mismatches": 0,
+      "p_mismatches_using_approximation": 0,
+      "max_absolute_p_difference": 0.0,
+      "max_absolute_statistic_difference": 0.0,
+      "empirical_p_exact": true,
+      "draws_exact": true,
+      "approximation_flags_exact": true,
+      "discoveries_equal": true
+    },
+    "sceptre-S2_public-ks": {
+      "p_mismatches": 0,
+      "p_mismatches_using_approximation": 0,
+      "max_absolute_p_difference": 0.0,
+      "max_absolute_statistic_difference": 0.0,
+      "empirical_p_exact": true,
+      "draws_exact": true,
+      "approximation_flags_exact": true,
+      "discoveries_equal": true
+    }
+  },
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

@@ -1,4 +1,4 @@
-//! Declarations from `include/rapidglm/rapidglm_c.h` (C API version 1). Only
+//! Declarations from `include/rapidglm/rapidglm_c.h` (legacy subset of C API version 2). Only
 //! the functions used by this crate are declared; the header is the reference.
 #![allow(non_camel_case_types)]
 

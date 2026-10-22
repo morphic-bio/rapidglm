@@ -1,0 +1,68 @@
+{"timed_command_ready_utc": "2026-10-22T07:20:27Z", "load_average": [1.89501953125, 2.73095703125, 3.0146484375], "cpus": "16-23", "waited_for_quiet_seconds": 20.1}
+{
+ "data": "validation/work/benchmark/thyroid32",
+ "samples": 32,
+ "genes": 28769,
+ "pydeseq2_rapidglm_seconds": 5.73,
+ "rust_seconds": 1.06,
+ "rust_log": "RapidGLM 1.4.0 (C API 2)\n28769 genes, 32 samples in 0.94 s; 1232 at padj < 0.05; 0 refitted, 110 Cook's outliers, 2 bounded fits",
+ "columns": {
+  "baseMean": {
+   "max_relative": 2.1023910697032952e-15,
+   "over_1e-6": 0,
+   "over_1e-3": 0,
+   "missing_mismatch": 0
+  },
+  "log2FoldChange": {
+   "max_relative": 6.2065948514740805,
+   "over_1e-6": 28667,
+   "over_1e-3": 8757,
+   "missing_mismatch": 0
+  },
+  "lfcSE": {
+   "max_relative": 217.06032731447823,
+   "over_1e-6": 28700,
+   "over_1e-3": 8266,
+   "missing_mismatch": 0
+  },
+  "stat": {
+   "max_relative": 6.063406637042226,
+   "over_1e-6": 28752,
+   "over_1e-3": 14135,
+   "missing_mismatch": 0
+  },
+  "pvalue": {
+   "max_relative": 3.4003635410763136e+21,
+   "over_1e-6": 28619,
+   "over_1e-3": 14199,
+   "missing_mismatch": 26
+  },
+  "padj": {
+   "max_relative": 2.7626605174564823e+18,
+   "over_1e-6": 28619,
+   "over_1e-3": 8974,
+   "missing_mismatch": 26
+  }
+ },
+ "calls": {
+  "rust": 1232,
+  "pydeseq2": 1250,
+  "both": 1224,
+  "jaccard": 0.972972972972973
+ },
+ "cooks_outliers": {
+  "deseq2": 128,
+  "rust": 110,
+  "pydeseq2_rapidglm": 90,
+  "jaccard_rust_deseq2": 0.845,
+  "jaccard_pydeseq2_deseq2": 0.703,
+  "singleton_design_cell_samples": 13,
+  "pydeseq2_infinite_distances": 0,
+  "mismatched_genes": {
+   "total": 26,
+   "rust_only": 23,
+   "pydeseq2_only": 3,
+   "pydeseq2_max_at_singleton_design_cell_sample": 24
+  }
+ }
+}

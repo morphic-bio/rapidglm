@@ -21,7 +21,7 @@ res, tally = rapidglm.sceptre_grid(design, responses, assignments, guides,
                                    discovery_targets, negative_targets, moi="high", threads=8)
 ```
 
-`bulk_de`, `sceptre`, `scan` and `fit_batch` call `librapidglm_c` through
+`bulk_de`, `edger_ql`, `sceptre`, `scan` and `fit_batch` call `librapidglm_c` through
 ctypes ([docs/C_API.md](../../docs/C_API.md)); nothing is compiled for Python.
 Arguments take the CLI configuration keys and values
 ([docs/CLI.md](../../docs/CLI.md)). Results are pandas DataFrames with the

@@ -45,12 +45,13 @@ def jaccard(a, b):
 def main(args):
     work = args.work.resolve()
     work.mkdir(parents=True, exist_ok=True)
-    base = json.loads((args.runs / "gasperini/rapidglm-cli-ks-t8/config.json").read_text())
-    reference = pd.read_csv(args.runs / "gasperini/sceptre-t8/discovery.tsv", sep="\t")
+    base = json.loads((args.runs / args.dataset / "rapidglm-cli-ks-t8/config.json").read_text())
+    base.update(args.option)
+    reference = pd.read_csv(args.runs / args.dataset / "sceptre-t8/discovery.tsv", sep="\t")
     reference = reference[reference.pass_qc.astype(str).str.upper() == "TRUE"]
     called = reference.significant.astype(str).str.upper() == "TRUE"
     reference_calls = set(zip(reference.response_id[called], reference.grna_target[called]))
-    responses = (ROOT / "validation/work/benchmark/gasperini/responses.txt").read_text().split()
+    responses = (ROOT / "validation/work/benchmark" / args.dataset / "responses.txt").read_text().split()
     seeds = [base["seed"]] + [s for s in args.seeds if s != base["seed"]]
     calls, rows = {}, []
     for seed in seeds:
@@ -74,7 +75,9 @@ def main(args):
     version = subprocess.run([str(args.binary), "--version"], capture_output=True, text=True).stdout.strip()
     receipt = {
         "purpose": "Agreement of the perturbation workflow with SCEPTRE 0.99.0 on the Gasperini benchmark "
-                   "(207,324 cells) under several seeds, and between the seeds",
+                   f"({args.dataset}) under several seeds, and between the seeds",
+        "dataset": args.dataset,
+        "options": args.option,
         "command": "python3 scripts/validate_perturbation_seeds.py --runs RUNS --work DIR --output OUT",
         "version": version,
         "commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
@@ -102,4 +105,7 @@ if __name__ == "__main__":
     ap.add_argument("--seeds", type=int, nargs="+", default=[1, 2, 3, 4, 5])
     ap.add_argument("--threads", type=int, default=8)
     ap.add_argument("--output", type=pathlib.Path, required=True)
+    ap.add_argument("--dataset", default="gasperini", help="benchmark dataset: gasperini or gasperini50k")
+    ap.add_argument("--option", default={}, metavar="JSON",
+                    type=json.loads, help='options added to the run\'s configuration, e.g. \'{"reuse_draws": true}\'')
     main(ap.parse_args())

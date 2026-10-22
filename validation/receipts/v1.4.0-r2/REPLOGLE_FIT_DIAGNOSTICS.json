@@ -1,0 +1,498 @@
+{
+  "purpose": "Summarize public edgeR fit diagnostics for the twenty-target pilot.",
+  "timed": false,
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "reference_api": "scripts/reference_edger_fits.R: glmFit and nbinomUnitDeviance through public functions",
+  "targets": {
+    "AARS2": {
+      "genes": 8563,
+      "sha256": "216106331936a0eafc4fcd7e3a60e92ee8257413800ddc7517677ca807b3a455",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1155,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 9.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1192,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "EIF6": {
+      "genes": 8563,
+      "sha256": "70725685e44fa0ce00a66141aec8278993735766ddb0de7f6728a3c4043638dc",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1088,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.1368683772161603e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 18.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1160,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "EXOC1": {
+      "genes": 8563,
+      "sha256": "531f99b471e770e7f218a0abaca36b877e9138eea362f8c7e51af7be153b0728",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1110,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 11.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1150,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "FAM136A": {
+      "genes": 8563,
+      "sha256": "01830629d8e4403a256b5fc1852be66ab983c40184a5a1681e66441e938f9e1c",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 585,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0658141036401503e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 18.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 735,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0089706847793423e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "GATA1": {
+      "genes": 8563,
+      "sha256": "d7f9b8ea5a8b8c13f3f4231ac7eebc3494413a74ad35d72ffd3f48f94690bc11",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 839,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.1368683772161603e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 19.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1013,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "HIST1H2AE": {
+      "genes": 8563,
+      "sha256": "2370e188fa9147db585f4fdef0fbc78fbb73bb91fb7810235cde406e82823913",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1011,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 11.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1120,
+        "maximum_absolute_reported_vs_at_fitted_difference": 9.947598300641403e-13,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "HNRNPR": {
+      "genes": 8563,
+      "sha256": "e91df1bd45e42efb18f0ab7a86c8e745e10200cf965657dc31e96c81e6e362af",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1153,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0089706847793423e-12,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 8.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1191,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "ISCA2": {
+      "genes": 8563,
+      "sha256": "9980d4c67c094bb86430e95f9d9a19d7d53f78a9dab0867843582ea1c74b9807",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1209,
+        "maximum_absolute_reported_vs_at_fitted_difference": 9.947598300641403e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 10.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1262,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "KANSL3": {
+      "genes": 8563,
+      "sha256": "d181236913ba11222d7164ac753aa874360198ed304da5a368e6f0dd4d8df48c",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1188,
+        "maximum_absolute_reported_vs_at_fitted_difference": 9.947598300641403e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 9.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1234,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0089706847793423e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "MRPL16": {
+      "genes": 8563,
+      "sha256": "8662cc40921465f4195d532db8b7feb244d09af90564af1887074c50e0543d5e",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 966,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.1368683772161603e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 9.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1076,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.1368683772161603e-13,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "MRPL27": {
+      "genes": 8563,
+      "sha256": "f0e66b9a9a466e061d2a0a0719e000deb3aacc248a88ed9371f1c57729ab4c76",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 988,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 16.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1050,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.1368683772161603e-13,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "MRPS31": {
+      "genes": 8563,
+      "sha256": "4295ba2564194d610b49b6bd9e4dd0a79187e1e5ff44f2c446db99614f2ded19",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1058,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.1368683772161603e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 8.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1087,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "NEPRO": {
+      "genes": 8563,
+      "sha256": "ffbadc5ab2c5d191f7698f17a9f779b885adecf6d3827e5498641ce7ba3de7c2",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 541,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 18.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 641,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "NUP98": {
+      "genes": 8563,
+      "sha256": "963238df84d60db90b1e93aea777b1fe78e1f18ee0a7db5215d1c78b85767224",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1171,
+        "maximum_absolute_reported_vs_at_fitted_difference": 9.947598300641403e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 8.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1256,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "RPS20": {
+      "genes": 8563,
+      "sha256": "eb1d8b12b9565a1e1fc0394c82271a8ca95094fa5650460dc04a0da4b8579994",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1157,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 9.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1218,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "RRN3": {
+      "genes": 8563,
+      "sha256": "5136328e1ff45bd1c55c82035296c8d640e4ef5a12cfe2a3ef8f8a356c77ddd5",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 492,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0658141036401503e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 18.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 566,
+        "maximum_absolute_reported_vs_at_fitted_difference": 9.947598300641403e-13,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "SAP18": {
+      "genes": 8563,
+      "sha256": "1b6c2f3a6f9e9d57c3adc4ff3817baa8718608c72a59c04ab1f76b95613a3cc1",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 724,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0658141036401503e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 17.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 819,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "TAF1B": {
+      "genes": 8563,
+      "sha256": "346552e26e9cb3311f089f335ce02c04b5e4ec9349fbe118133cb3cbb83bef82",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 934,
+        "maximum_absolute_reported_vs_at_fitted_difference": 9.947598300641403e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 10.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1107,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0089706847793423e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "TRNT1": {
+      "genes": 8563,
+      "sha256": "7633a740cc53ff647da996cfb8a4d153d69852d231977eec67c55275d8f94fa6",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1101,
+        "maximum_absolute_reported_vs_at_fitted_difference": 9.947598300641403e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 14.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 1137,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    },
+    "USP8": {
+      "genes": 8563,
+      "sha256": "7fedcafc59d8e9c30349ae05555873ea7dd0944dedef0caec02176b9764f5543",
+      "full": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 828,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.1368683772161603e-13,
+        "failure_metadata_present": true,
+        "known_failure_flags": 8563,
+        "failed": 0,
+        "iteration_metadata_present": true,
+        "maximum_iterations": 17.0
+      },
+      "reduced": {
+        "finite_deviance_pairs": 8563,
+        "exact_reported_vs_at_fitted_mismatches": 951,
+        "maximum_absolute_reported_vs_at_fitted_difference": 1.0231815394945443e-12,
+        "failure_metadata_present": false,
+        "known_failure_flags": 0,
+        "failed": null,
+        "iteration_metadata_present": false,
+        "maximum_iterations": null
+      }
+    }
+  },
+  "scope": "Exact numeric comparisons are descriptive. Missing public iteration/failure metadata stays missing; it is not converted to successful convergence. GATA1_FIT_DIAGNOSTIC.json separately checks the reduced objective.",
+  "recipe_sha256": "4e4795e3336503c562b077a2107e0d465b51129b14fc9e79ffe92e8128031e97",
+  "recipe_source": "#!/usr/bin/env python3\n\"\"\"Summarize public edgeR fit diagnostics for the twenty-target pilot.\"\"\"\nimport argparse\nimport csv\nimport hashlib\nimport json\nimport math\nfrom pathlib import Path\nimport subprocess\n\nROOT = next(p for p in Path(__file__).resolve().parents if (p / 'scripts/replogle_pilot.py').exists())\n\n\ndef number(value):\n    try:\n        x = float(value)\n        return x if math.isfinite(x) else None\n    except (ValueError, TypeError):\n        return None\n\n\ndef main():\n    parser = argparse.ArgumentParser(description=__doc__)\n    parser.add_argument('--pilot', type=Path, required=True)\n    parser.add_argument('--output', type=Path, required=True)\n    args = parser.parse_args()\n    source = json.loads((ROOT / 'validation/receipts/v1.4.0-r2/source.json').read_text())\n    targets = {}\n    for directory in sorted((args.pilot / 'pseudobulk/datasets').iterdir()):\n        if not directory.is_dir():\n            continue\n        path = directory / 'edger/fit_check.tsv'\n        with path.open() as stream:\n            reader = csv.DictReader(stream, delimiter='\\t')\n            columns = reader.fieldnames\n            rows = list(reader)\n        record = {'genes': len(rows), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}\n        for model in ['full', 'reduced']:\n            delta = [abs(number(r[model + '_reported']) - number(r[model + '_at_fitted']))\n                     for r in rows if number(r[model + '_reported']) is not None and number(r[model + '_at_fitted']) is not None]\n            flags = [r.get(model + '_failed') for r in rows]\n            iterations = [number(r.get(model + '_iter')) for r in rows]\n            known = [f for f in flags if f in ['TRUE', 'FALSE']]\n            record[model] = {\n                'finite_deviance_pairs': len(delta),\n                'exact_reported_vs_at_fitted_mismatches': sum(d != 0 for d in delta),\n                'maximum_absolute_reported_vs_at_fitted_difference': max(delta) if delta else None,\n                'failure_metadata_present': model + '_failed' in columns,\n                'known_failure_flags': len(known),\n                'failed': sum(f == 'TRUE' for f in known) if known else None,\n                'iteration_metadata_present': model + '_iter' in columns,\n                'maximum_iterations': max((x for x in iterations if x is not None), default=None)}\n        targets[directory.name] = record\n    if len(targets) != 20:\n        raise ValueError(f'Expected all twenty public target diagnostics; found {len(targets)}')\n    result = {'purpose': __doc__, 'timed': False, 'version': source['version'],\n              'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),\n              'reference_api': 'scripts/reference_edger_fits.R: glmFit and nbinomUnitDeviance through public functions',\n              'targets': targets,\n              'scope': 'Exact numeric comparisons are descriptive. Missing public iteration/failure metadata stays missing; it is not converted to successful convergence. GATA1_FIT_DIAGNOSTIC.json separately checks the reduced objective.',\n              'recipe_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),\n              'recipe_source': Path(__file__).read_text()}\n    args.output.write_text(json.dumps(result, indent=2) + '\\n')\n    print('targets', len(targets), 'genes', sum(t['genes'] for t in targets.values()))\n    print('maximum reported/at-fitted differences', {model: max(t[model]['maximum_absolute_reported_vs_at_fitted_difference'] or 0 for t in targets.values()) for model in ['full', 'reduced']})\n    print('public failure flags', {model: {n: t[model]['failed'] for n, t in targets.items()} for model in ['full', 'reduced']})\n\n\nif __name__ == '__main__':\n    main()\n",
+  "recipe_commit": "824c740f6dd64215d91b31f8e894a441638fa5e4",
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

@@ -1,0 +1,5 @@
+*
+!.gitignore
+!run.sh
+!cpu_guard.py
+!jaxqtl_split.sh

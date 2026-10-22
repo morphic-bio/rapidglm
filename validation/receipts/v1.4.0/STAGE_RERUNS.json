@@ -1,0 +1,51 @@
+{
+  "invalidated_attempts": [
+    {
+      "stage": "eqtl",
+      "invalidated_attempt": 1,
+      "reason": "Final jaxQTL 1000-permutation command exceeded the retained 5% selected-core contention threshold.",
+      "selected_core_other_cpu_fraction": 0.06508459911668629,
+      "threshold": 0.05,
+      "archive": "validation/work/release-1.4.0/contention-eqtl-20261022T183004Z",
+      "original_stage_exit": 0,
+      "rerun_scope": "All seven eQTL commands and the scientific comparison; other 17 stages retained.",
+      "measured_commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+      "invalidated_utc": "2026-10-22T18:33:00.917359+00:00",
+      "archived_command_timings": {
+        "fastqtl": {
+          "time.log": "2a9bba4c5756e70fff953adb61c209d510dc0ec3440136f7bff3a91e41def940",
+          "host.json": "2dda79634a33ee3b26458fc6f2b6c745ef08ad02ef3f0ae90b1bd958bdfce177"
+        },
+        "jaxqtl_nb_score_perm1000": {
+          "time.log": "9b254784070341fd9b8c54107cb6414f6814e0d93e6561a73acc2da5e35d3795",
+          "host.json": "4a9014ae0ae76dce0349c3f3bc5b0cb08f5cdf3ae4f3eceef0926c565f9b8485"
+        },
+        "jaxqtl_nb_score_spa_acat": {
+          "time.log": "0edca44e4b452c35cb9737b68221003c101efe359dcfdc27a981156aa25f0e51",
+          "host.json": "961a07fd200b592dfad3d7187f4e0bd478cc18ab489f9ef6988b2df7d5107806"
+        },
+        "rapidglm_gaussian": {
+          "time.log": "570532821c35a9f3358bc33f76ed7f4a3db5142d8696a851cc5e49bc88ddcd12",
+          "host.json": "9271e2b5ce06aa0bc3aa3f68ea06ff389d9f6d1085f1adf1dda7a6e7d20bf562"
+        },
+        "rapidglm_gaussian10000": {
+          "time.log": "3e6a7965497800091002e01e28621d1063d0bba91d663df689af846daecfe0d2",
+          "host.json": "50c4d330cb80e2f0ce15d40f231c1fff73484cac6cca1f6bfc9c6aefa5edfcb5"
+        },
+        "rapidglm_nb": {
+          "time.log": "31540cf1e9bcb528f0217258b16cf8e30670f0bd4dc14e879823c4574f286d79",
+          "host.json": "8bc2f76cd7497647da76eec33ac832568c4499c0d8415183927a616ee5f44e18"
+        },
+        "tensorqtl": {
+          "time.log": "ea539e9a2697d1f2776d612db20a3d23b7b2850f8acf6500a53d1d1da8a130e8",
+          "host.json": "d6abd0ce8b2085c8633729774e28166ac2e52925c917778c4da7768b296fc480"
+        }
+      }
+    }
+  ],
+  "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
+  }
+}

@@ -14,7 +14,6 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from scipy.special import gammaln
 
 try:
     from pydeseq2.dds import DeseqDataSet
@@ -97,26 +96,36 @@ class PyDESeq2Backend(unittest.TestCase):
                 for a, b in zip(mine, theirs):
                     np.testing.assert_allclose(a, b, rtol=1e-10)
             elif name == "irls":
-                # PyDESeq2's IRLS floors means at min_mu while fitting; RapidGLM returns
-                # the exact MLE. Where the floor is inactive the fits agree; elsewhere
-                # RapidGLM's likelihood is at least as high.
-                beta, theirs_beta = mine[0], theirs[0]
-                unfloored = (theirs[1] >= k["min_mu"]).all(axis=0) & (mine[1] >= k["min_mu"]).all(axis=0)
-                ok = unfloored & mine[3] & theirs[3]
+                # The same iterations as PyDESeq2's IRLS (means floored at min_mu, ridge
+                # 1e-6): coefficients, unfloored means and leverages agree to its
+                # deviance tolerance.
+                ok = mine[3] & theirs[3]
                 self.assertGreater(ok.mean(), 0.9)
-                np.testing.assert_allclose(beta[ok], theirs_beta[ok], atol=1e-3)  # their deviance tolerance
-                hat = mine[2][:, ok].sum(axis=0)
-                np.testing.assert_allclose(hat, k["design_matrix"].shape[1], rtol=1e-8)
-                y = np.asarray(k["counts"], float)
-                r = 1 / np.asarray(k["disp"])
-                loglik = lambda m: (gammaln(y + r) - gammaln(r) + r * np.log(r / (r + m))
-                                    + y * np.log(np.maximum(m, 1e-300) / (r + m))).sum(axis=0)
-                rest = ~ok & mine[3] & theirs[3]
-                self.assertTrue(np.all(loglik(mine[1])[rest] >= loglik(theirs[1])[rest] - 1e-6))
+                np.testing.assert_allclose(mine[0][ok], theirs[0][ok], atol=1e-3)
+                np.testing.assert_allclose(mine[1][:, ok], theirs[1][:, ok], rtol=1e-3)
+                np.testing.assert_allclose(mine[2][:, ok], theirs[2][:, ok], atol=1e-4)
             else:
                 ratio = np.abs(np.log(mine[0] / theirs[0]))
                 self.assertGreater(np.mean(ratio < 1e-3), 0.97, name)
         self.assertEqual(seen, {"irls", "alpha_mle", "wald_test"})
+
+    def test_bound_active_irls_uses_default_fallback(self):
+        from unittest.mock import patch
+        from rapidglm import capi
+        counts = np.ones((6, 1))
+        x = np.ones((6, 2)); x[3:, 1] = 0.01
+        expected = (np.array([[2., 3.]]), np.full((6, 1), 2.),
+                    np.full((6, 1), .2), np.array([True]))
+        for coefficient, optimized in ((30., False), (3., True)):
+            native = (np.array([[1., coefficient]]), np.ones((6, 1)),
+                      np.ones((6, 1)), np.array([True]), np.array([optimized]))
+            with patch.object(capi, "nb_floored_fits", return_value=native), \
+                 patch.object(DefaultInference, "irls", return_value=expected) as fallback:
+                inference = self.Inference(n_cpus=1)
+                got = inference.irls(counts, np.ones(6), x, np.ones(1), .5, 1e-8)
+                fallback.assert_called_once()
+                self.assertEqual(inference.fallbacks["irls"], 1)
+                for a, b in zip(got, expected): np.testing.assert_array_equal(a, b)
 
     def test_whole_analysis_agrees(self):
         inference = self.Inference(n_cpus=2)

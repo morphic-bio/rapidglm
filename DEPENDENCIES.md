@@ -14,9 +14,10 @@
 | R, MASS, Matrix, SCEPTRE, edgeR, DESeq2, Signac | black-box comparison, data export | separate GPL/LGPL environments; consult each package DESCRIPTION | never linked or shipped |
 | glmGamPoi 1.25.1 | quasi-likelihood recipe reference; black-box comparison | MIT (from 1.25; earlier releases GPL-3) | never linked or shipped; no code copied |
 | DESeq2 1.48.2 | bulk DE procedure from its paper and documentation; black-box comparison and calibration | LGPL (>= 3) | never linked or shipped; no source read |
-| PyDESeq2 0.5.2 | formula for the `legacy_cooks` robust dispersion (`robust_method_of_moments_disp`, `trimmed_cell_variance`); black-box comparison; RapidGLM inference back end target | MIT, Copyright (c) 2022 Owkin | never linked or shipped; formula reimplemented in C++ with attribution (notice below) |
+| PyDESeq2 0.5.2 | formula for the `legacy_cooks` robust dispersion (`robust_method_of_moments_disp`, `trimmed_cell_variance`); from 1.4.0 the starting dispersion (`fit_rough_dispersions`, `fit_moments_dispersions`) and the floored NB fits (`irls_solver`) of `bulk_de` and `nb_floored_fits`; black-box comparison; RapidGLM inference back end target | MIT, Copyright (c) 2022 Owkin | never linked or shipped; reimplemented in C++ with attribution (notice below) |
 | PyDESeq2 0.5.2 (Rust port) | workflow of `DeseqDataSet` and `DeseqStats` ported to Rust in `bindings/rust/src/deseq` | MIT, Copyright (c) 2022 Owkin | ported source in this repository with attribution (notice below) |
 | lowess by Alexandre Gramfort (via PyDESeq2) | independent-filtering smoother in `bindings/rust/src/deseq/util.rs` | BSD-3-Clause | ported with attribution |
+| jaxQTL 0.3.1 | design of the cis-QTL workflow (`cis_qtl`: score tests against a covariate-only null, permutations that refit the null, the Beta approximation with its chi-square(1, ncp) reference); black-box comparison | MIT, Copyright (c) 2026 Mancuso & Gazal Labs | never linked or shipped; method reimplemented in C++ with attribution (notice below) |
 | libm (Rust crate) | erfc and lgamma in the Rust binding | MIT or Apache-2.0 | Cargo dependency |
 | Bioconductor airway 1.28.0 | bulk DE validation data | LGPL | validation only; data not committed |
 
@@ -25,7 +26,15 @@ dispersion behind `legacy_cooks` (the default from 1.2.0) follows PyDESeq2's
 implementation (`pydeseq2/utils.py`, functions `robust_method_of_moments_disp`,
 `trimmed_cell_variance`, `trimmed_variance` and `trimmed_mean`; flagging rule in
 `DeseqDataSet.cooks_outlier`). It is reimplemented in C++ as
-`detail::legacy_cooks_dispersion` in `include/rapidglm/bulk.hpp`. Cite Muzellec
+`detail::legacy_cooks_dispersion` in `include/rapidglm/bulk.hpp`. With the
+author's approval (2026-10-17), 1.4.0 also follows PyDESeq2's `irls_solver`
+(fitted counts floored at `min_mu` inside the iterations, ridge 1e-6, bounded
+coefficients and the switch to bounded likelihood optimization;
+`detail::floored_nb_fit`, independently implemented projected BFGS) and its starting dispersion, the smaller
+of `fit_rough_dispersions` and `fit_moments_dispersions` (the `moment_dispersion`
+rule in `bulk_de`). The small-rejection rule and positive-rejection residual
+RMS in independent filtering and the replacement all-zero p-value rule also
+follow PyDESeq2. Cite Muzellec
 et al. (2023), Bioinformatics 39:btad547. PyDESeq2's licence:
 
 > MIT License
@@ -60,6 +69,39 @@ DESeq2's; they are ported as PyDESeq2 publishes them. Its lowess is marked
 "Authors: Alexandre Gramfort; License: BSD (3-clause); Adapted from
 https://gist.github.com/agramfort/850437".
 
+jaxQTL provenance: the cis-QTL workflow (`include/rapidglm/qtl.hpp`) follows the
+method of jaxQTL 0.3.1 (Zhang, Kim, Suboc, Mancuso and Gazal 2025), read from its
+source, which is MIT-licensed from its first commit: the score test of each
+variant against the covariate-only null, permutations of the response and
+offset with the null refitted, and the Beta approximation whose reference
+non-centrality is solved so that the moment estimate of the first Beta shape is
+1. It is reimplemented in C++, not translated. jaxQTL's licence:
+
+> The MIT License (MIT)
+>
+> Copyright (c) 2026 Mancuso & Gazal Labs
+>
+> Permission is hereby granted, free of charge, to any person obtaining a copy
+> of this software and associated documentation files (the "Software"), to deal
+> in the Software without restriction, including without limitation the rights
+> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> copies of the Software, and to permit persons to whom the Software is
+> furnished to do so, subject to the following conditions:
+>
+> The above copyright notice and this permission notice shall be included in all
+> copies or substantial portions of the Software.
+>
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+> SOFTWARE.
+
+edgeR and limma (GPL) were not read: `edger_ql` follows their papers, their
+documentation and black-box runs of edgeR 4.6.2 (METHODS.md).
+
 Boost licence: https://www.boost.org/LICENSE_1_0.txt
 GCC exception: https://www.gnu.org/licenses/gcc-exception-3.1.html
 LAPACK licence: https://github.com/Reference-LAPACK/lapack/blob/master/LICENSE
@@ -82,8 +124,9 @@ derivatives were derived here. glmGamPoi copyright: Constantin Ahlmann-Eltze
 
 DESeq2 provenance: `include/rapidglm/bulk.hpp` implements the procedure of Love,
 Huber and Anders (2014) from the paper, the manual pages and the vignette. No
-DESeq2 source was read; PyDESeq2 source was read only for `legacy_cooks` and the
-Rust port (above). DESeq2 ran only as a black box
+DESeq2 source was read. The permitted PyDESeq2 source informed `legacy_cooks`,
+the starting dispersion, floored fits and bounded fallback, independent
+filtering and the Rust port, as credited above. DESeq2 ran only as a black box
 (`scripts/reference_bulk.R`) through its public functions. Details that the
 documentation leaves open were calibrated from its outputs, as listed in
 [docs/BULK_DE.md](docs/BULK_DE.md#provenance).

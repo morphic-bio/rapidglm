@@ -1,0 +1,16 @@
+{"timed_command_ready_utc": "2026-10-22T03:02:58Z", "load_average": [1.22705078125, 1.33154296875, 1.35205078125], "cpus": "16-31", "waited_for_quiet_seconds": 20.1}
+{'tool': 'rapidglm fit_batch', 'family': 'poisson', 'load': 1.4462890625, 'seconds': 1.08656, 'threads': 1, 'failed': 0}
+{'tool': 'rapidglm fit_batch', 'family': 'poisson', 'load': 1.24462890625, 'seconds': 0.293035, 'threads': 4, 'failed': 0}
+{'tool': 'rapidglm fit_batch', 'family': 'poisson', 'load': 1.25244140625, 'seconds': 0.0772096, 'threads': 16, 'failed': 0}
+{'tool': 'R glm.fit', 'family': 'poisson', 'threads': 1, 'load': 1.07275390625, 'seconds': 5.548}
+{'tool': 'R rapidglm::glm_fit', 'family': 'poisson', 'threads': 1, 'load': 0.96875, 'seconds': 2.868}
+{'tool': 'Python statsmodels', 'family': 'poisson', 'threads': 1, 'load': 0.9765625, 'seconds': 4.937628496998514, 'responses_timed': 1000}
+{'tool': 'Python rapidglm.fit', 'family': 'poisson', 'threads': 1, 'load': 1.1318359375, 'seconds': 1.1596022240009916, 'responses_timed': 1000}
+{'tool': 'rapidglm fit_batch', 'family': 'nb', 'load': 0.94482421875, 'seconds': 3.01001, 'threads': 1, 'failed': 0}
+{'tool': 'rapidglm fit_batch', 'family': 'nb', 'load': 1.07421875, 'seconds': 0.787726, 'threads': 4, 'failed': 0}
+{'tool': 'rapidglm fit_batch', 'family': 'nb', 'load': 0.904296875, 'seconds': 0.208333, 'threads': 16, 'failed': 0}
+{'tool': 'R glm.nb', 'family': 'nb', 'threads': 1, 'load': 1.6328125, 'seconds': 142.566}
+{'tool': 'R rapidglm::glm_nb', 'family': 'nb', 'threads': 1, 'load': 1.6591796875, 'seconds': 10.079}
+{'tool': 'R glmGamPoi::glm_gp', 'family': 'nb', 'threads': 1, 'load': 1.52685546875, 'seconds': 5.831, 'glmgampoi_version': '1.25.1'}
+{'tool': 'Python statsmodels', 'family': 'nb', 'threads': 1, 'load': 1.26708984375, 'seconds': 23.302878630001942, 'responses_timed': 200}
+{'tool': 'Python rapidglm.fit', 'family': 'nb', 'threads': 1, 'load': 1.2568359375, 'seconds': 3.1662379800000053, 'responses_timed': 1000}

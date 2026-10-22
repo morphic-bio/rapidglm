@@ -1,0 +1,141 @@
+
+== C/C++ unit tests
+Internal ctest changing into directory: /opt/rapidglm/build
+Test project /opt/rapidglm/build
+    Start 1: engine
+1/2 Test #1: engine ...........................   Passed   86.27 sec
+    Start 2: c_api
+2/2 Test #2: c_api ............................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =  86.28 sec
+
+== CLI tests
+............................
+----------------------------------------------------------------------
+Ran 28 tests in 1.856s
+
+OK
+
+== Installed CMake package (C++ and C consumers)
+-- Install configuration: "Release"
+-- Installing: /opt/rapidglm/build/install/lib/librapidglm_c.so.1.4.0
+-- Installing: /opt/rapidglm/build/install/lib/librapidglm_c.so.1
+-- Installing: /opt/rapidglm/build/install/lib/librapidglm_c.so
+-- Installing: /opt/rapidglm/build/install/lib/librapidglm_c.a
+-- Installing: /opt/rapidglm/build/install/bin/rapidglm
+-- Installing: /opt/rapidglm/build/install/include
+-- Installing: /opt/rapidglm/build/install/include/rapidglm
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/qtl.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/edger.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/workflows.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/sparse.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/lapack.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/hypothesis.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/resampling.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/inference.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/rapidglm.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/rapidglm_c.h
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/scan.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/bulk.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/kernels.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/model.hpp
+-- Installing: /opt/rapidglm/build/install/include/rapidglm/shrinkage.hpp
+-- Installing: /opt/rapidglm/build/install/lib/cmake/rapidglm/rapidglmTargets.cmake
+-- Installing: /opt/rapidglm/build/install/lib/cmake/rapidglm/rapidglmTargets-release.cmake
+-- Installing: /opt/rapidglm/build/install/lib/cmake/rapidglm/rapidglmConfig.cmake
+-- Installing: /opt/rapidglm/build/install/lib/cmake/rapidglm/rapidglmConfigVersion.cmake
+-- Installing: /opt/rapidglm/build/install/lib/cmake/rapidglm/FindLAPACKE.cmake
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.83.0/BoostConfig.cmake (found suitable version "1.83.0", minimum required is "1.65")  
+-- Looking for sgemm_
+-- Looking for sgemm_ - not found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Looking for sgemm_
+-- Looking for sgemm_ - found
+-- Found BLAS: /usr/lib/x86_64-linux-gnu/libopenblas.so  
+-- Looking for cheev_
+-- Looking for cheev_ - found
+-- Found LAPACK: /usr/lib/x86_64-linux-gnu/libopenblas.so;-lm;-ldl  
+-- Found LAPACKE: /usr/lib/x86_64-linux-gnu/liblapacke.so  
+-- Found OpenMP_C: -fopenmp (found version "4.5") 
+-- Found OpenMP_CXX: -fopenmp (found version "4.5") 
+-- Found OpenMP: TRUE (found version "4.5")  
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /opt/rapidglm/build/external
+[ 25%] Building CXX object CMakeFiles/consumer.dir/main.cpp.o
+[ 50%] Building C object CMakeFiles/c_consumer.dir/main.c.o
+[ 75%] Linking C executable c_consumer
+[ 75%] Built target c_consumer
+[100%] Linking CXX executable consumer
+[100%] Built target consumer
+0.693147 
+RapidGLM 1.4.0 C API 2: beta1 = 1.223775
+
+== Python layer over the C interface
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 2.179s
+
+OK
+s...
+----------------------------------------------------------------------
+Ran 4 tests in 0.121s
+
+OK (skipped=1)
+
+== RapidGLM as a PyDESeq2 inference back end
+/opt/pydeseq2/lib/python3.12/site-packages/pydeseq2/dds.py:822: UserWarning: The dispersion trend curve fitting did not converge. Switching to a mean-based dispersion trend.
+  self._fit_parametric_dispersion_trend(vst)
+../opt/pydeseq2/lib/python3.12/site-packages/pydeseq2/dds.py:822: UserWarning: The dispersion trend curve fitting did not converge. Switching to a mean-based dispersion trend.
+  self._fit_parametric_dispersion_trend(vst)
+.
+----------------------------------------------------------------------
+Ran 3 tests in 1.684s
+
+OK
+
+== R package
+
+Attaching package: 'rapidglm'
+
+The following object is masked from 'package:stats':
+
+    glm
+
+poisson_offset ok
+poisson_weights ok
+poisson_zero_weights ok
+binomial ok
+binomial_factor ok
+binomial_cbind ok
+gaussian ok
+aliased ok
+quasi_fallback ok
+glm methods ok
+glm_nb ok
+
+Attaching package: 'rapidglm'
+
+The following object is masked from 'package:stats':
+
+    glm
+
+applications: ok
+
+== All test suites passed

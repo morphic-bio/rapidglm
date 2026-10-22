@@ -1,0 +1,18 @@
+{
+  "version": "1.4.0-dev.3",
+  "commit": "9e9a2ca44f4733141991010dc5f2f6639e7ee8e6",
+  "dataset": "gasperini50k",
+  "seed": 20260930,
+  "fit_check": "ks",
+  "untimed": true,
+  "cpus": "0-7",
+  "baseline": "validation/work/benchmark/runs-v1.3.0/gasperini50k/rapidglm-cli-ks-t8/rapid.tsv",
+  "byte_identical": true,
+  "baseline_sha256": "34ceeef29a2df3ddb5e2f478a6bb06ae1099a2c4787ab22d14f71789c691c78b",
+  "new_sha256": "34ceeef29a2df3ddb5e2f478a6bb06ae1099a2c4787ab22d14f71789c691c78b",
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "9e9a2ca44f4733141991010dc5f2f6639e7ee8e6",
+    "worktree_dirty": false
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "data": "validation/work/benchmark/thyroid128",
+  "samples": 128,
+  "genes": 28769,
+  "pydeseq2_rapidglm_seconds": 7.55,
+  "rust_seconds": 2.97,
+  "rust_log": "RapidGLM 1.4.0 (C API 2)\n28769 genes, 128 samples in 2.58 s; 458 at padj < 0.05; 282 refitted, 223 Cook's outliers, 0 bounded fits",
+  "columns": {
+    "baseMean": {
+      "max_relative": 0.024302172842802526,
+      "over_1e-6": 1,
+      "over_1e-3": 1,
+      "missing_mismatch": 0
+    },
+    "log2FoldChange": {
+      "max_relative": 52.16866172854465,
+      "over_1e-6": 28631,
+      "over_1e-3": 7825,
+      "missing_mismatch": 0
+    },
+    "lfcSE": {
+      "max_relative": 904.5329130897001,
+      "over_1e-6": 27089,
+      "over_1e-3": 134,
+      "missing_mismatch": 0
+    },
+    "stat": {
+      "max_relative": 52.16888828272514,
+      "over_1e-6": 28670,
+      "over_1e-3": 7829,
+      "missing_mismatch": 0
+    },
+    "pvalue": {
+      "max_relative": 1.1343825603218405e+56,
+      "over_1e-6": 28426,
+      "over_1e-3": 6906,
+      "missing_mismatch": 6
+    },
+    "padj": {
+      "max_relative": 1.03118462579602e+56,
+      "over_1e-6": 28471,
+      "over_1e-3": 3736,
+      "missing_mismatch": 6
+    }
+  },
+  "calls": {
+    "rust": 458,
+    "pydeseq2": 463,
+    "both": 458,
+    "jaccard": 0.9892008639308856
+  },
+  "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
+  }
+}

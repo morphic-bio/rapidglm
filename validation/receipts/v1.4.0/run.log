@@ -1,0 +1,4 @@
+Started complete final-policy release run: 2026-10-22T00:10:14.688212+00:00
+Release receipt runner completed: {'exit': 0, 'started_utc': '2026-10-22T00:10:14.688212+00:00', 'finished_utc': '2026-10-22T18:30:14.916860+00:00', 'cpu_policy_unchanged': True, 'cpu_policy_samples': 65573, 'cpu_policy_maximum_poll_gap_seconds': 3.608950663001451, 'cpu_policy_observed_quiet_starts': 843, 'error': None}
+Started eQTL-stage contention rerun: 2026-10-22T18:33:01.144985+00:00
+eQTL-stage contention rerun completed: {'exit': 0, 'started_utc': '2026-10-22T18:33:01.144985+00:00', 'finished_utc': '2026-10-22T20:16:57.223678+00:00', 'cpu_policy_unchanged': True, 'cpu_policy_samples': 6203, 'cpu_policy_maximum_poll_gap_seconds': 1.571989398013102, 'cpu_policy_observed_quiet_starts': 7, 'error': None}

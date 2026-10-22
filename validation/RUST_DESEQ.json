@@ -1,18 +1,19 @@
 {
  "description": "Rust port of PyDESeq2's workflow (bindings/rust, examples/deseq.rs) against PyDESeq2 0.5.2 run as a black box with RapidGLM's inference back end (rapidglm.pydeseq2.RapidGLMInference), contrast = last design column. Produced by bindings/rust/tests/compare_pydeseq2.py.",
- "date": "2026-10-10",
- "version": "1.3.0",
- "rapidglm_commit": "303cae1",
- "commit_note": "the source measured is this commit (v1.3.0-dev.1); it was made while the stages ran, and stages that started before it recorded 5a38191 with the same source uncommitted",
+ "date": "2026-10-22",
+ "version": "1.4.0",
+ "rapidglm_commit": "f0ecfbd",
+ "commit_note": "Library code of v1.4.0-dev.4; all final release measurements were run on this commit.",
  "command": "python3 bindings/rust/tests/compare_pydeseq2.py DATA --json OUT [--deseq2 TABLE]",
- "timing_note": "Indicative only: PyDESeq2 with 8 workers and Rust with 8 threads, both on CPUs 16-23. One workstation (Intel Core i9-13900KF, 125 GiB), 2026-10-09 and 2026-10-10. Four logical CPUs (8-11, on two performance cores) were offline after processor faults. Every timed run was confined to the 16 efficiency cores, one thread per core, because they are identical and the performance cores are not all available: one thread on CPU 16, four on 16-19, eight on 16-23, sixteen on 16-31. Timed runs held the shared timing lock, one at a time. Desktop services and a RAID consistency check kept every CPU about 7% busy. Another session ran untimed jobs on CPUs 20-31 at times; runs on those CPUs waited until other processes used less than a fifth of them, and the share others used during a run is recorded (others_cpu). Times on these cores are about 1.5 to 1.9 times those on the performance cores. Timings are provisional until the processor is repaired.",
- "differences_note": "Differences above 1e-6 come mainly from the dispersion trend, which PyDESeq2 fits by L-BFGS-B to a looser tolerance (trend coefficients differ by about 1e-5 relative); with PyDESeq2's trend coefficients injected (RAPIDGLM_TREND) airway agrees except genes with an all-zero design group (ill-posed fits). On thyroid32 the 42 genes with different missing p-values are Cook's outlier calls, from samples with leverage 1 (13 samples alone in their design cell).",
+ "timing_note": "PyDESeq2 with 8 workers and Rust with 8 threads, both on CPUs 16-23 after individual quiet starts. One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional. Final timings on the 16 identical efficiency cores (CPUs 16-31), one thread per core: one on 16, four on 16-19, eight on 16-23, twelve on 16-27, sixteen on 16-31. Each timed command holds the shared lock and starts after two consecutive ten-second quiet samples: one-minute load <=4 and every selected CPU <20% busy. Both samples are retained. Untimed work uses CPUs 0-7 under nice 10. These release timings are final, not provisional.",
+ "differences_note": "The Rust workflow uses unfloored NB fits; the Python inference backend uses floored fits from 1.4.0. Low-count and boundary-fit results therefore need not match. Dispersion-trend solvers and Cook's handling also differ; these are workflow comparisons, not timings of identical fit semantics.",
+ "discovery_threshold": 0.05,
  "runs": [
   {
    "data": "validation/work/bulk/airway",
    "samples": 8,
    "genes": 22369,
-   "pydeseq2_rapidglm_seconds": 3.32,
+   "pydeseq2_rapidglm_seconds": 2.57,
    "rust_seconds": 0.22,
    "columns": {
     "baseMean": {
@@ -22,41 +23,46 @@
      "missing_mismatch": 0
     },
     "log2FoldChange": {
-     "max_relative": 3.7524235035638136,
-     "over_1e-6": 14615,
-     "over_1e-3": 222,
+     "max_relative": 1704.3612758373922,
+     "over_1e-6": 21375,
+     "over_1e-3": 8017,
      "missing_mismatch": 0
     },
     "lfcSE": {
-     "max_relative": 0.05051765365605075,
-     "over_1e-6": 22049,
-     "over_1e-3": 1,
+     "max_relative": 9.508913245109861,
+     "over_1e-6": 22331,
+     "over_1e-3": 19302,
      "missing_mismatch": 0
     },
     "stat": {
-     "max_relative": 3.7520366738826274,
-     "over_1e-6": 22024,
-     "over_1e-3": 216,
+     "max_relative": 1675.252067094521,
+     "over_1e-6": 22368,
+     "over_1e-3": 19180,
      "missing_mismatch": 0
     },
     "pvalue": {
-     "max_relative": 0.05251106927564074,
-     "over_1e-6": 21823,
-     "over_1e-3": 1638,
+     "max_relative": 12104.752560220011,
+     "over_1e-6": 22359,
+     "over_1e-3": 18991,
      "missing_mismatch": 0
     },
     "padj": {
-     "max_relative": 0.02114205231284464,
-     "over_1e-6": 17703,
-     "over_1e-3": 1537,
+     "max_relative": 5484.760733310865,
+     "over_1e-6": 18031,
+     "over_1e-3": 16325,
      "missing_mismatch": 0
     }
    },
    "calls": {
     "rust": 3917,
-    "pydeseq2": 3917,
-    "both": 3917,
-    "jaccard": 1.0
+    "pydeseq2": 3882,
+    "both": 3882,
+    "jaccard": 0.9910645902476385
+   },
+   "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
    },
    "dataset": "airway"
   },
@@ -64,8 +70,8 @@
    "data": "validation/work/benchmark/thyroid32",
    "samples": 32,
    "genes": 28769,
-   "pydeseq2_rapidglm_seconds": 5.52,
-   "rust_seconds": 1.04,
+   "pydeseq2_rapidglm_seconds": 5.73,
+   "rust_seconds": 1.06,
    "columns": {
     "baseMean": {
      "max_relative": 2.1023910697032952e-15,
@@ -74,41 +80,46 @@
      "missing_mismatch": 0
     },
     "log2FoldChange": {
-     "max_relative": 1.2481243398387547,
-     "over_1e-6": 2763,
-     "over_1e-3": 3,
+     "max_relative": 6.2065948514740805,
+     "over_1e-6": 28667,
+     "over_1e-3": 8757,
      "missing_mismatch": 0
     },
     "lfcSE": {
-     "max_relative": 0.6184296725967339,
-     "over_1e-6": 9785,
-     "over_1e-3": 1,
+     "max_relative": 217.06032731447823,
+     "over_1e-6": 28700,
+     "over_1e-3": 8266,
      "missing_mismatch": 0
     },
     "stat": {
-     "max_relative": 1.65027158041176,
-     "over_1e-6": 9434,
-     "over_1e-3": 3,
+     "max_relative": 6.063406637042226,
+     "over_1e-6": 28752,
+     "over_1e-3": 14135,
      "missing_mismatch": 0
     },
     "pvalue": {
-     "max_relative": 0.13702037282445634,
-     "over_1e-6": 11985,
-     "over_1e-3": 2,
-     "missing_mismatch": 44
+     "max_relative": 3.4003635410763136e+21,
+     "over_1e-6": 28619,
+     "over_1e-3": 14199,
+     "missing_mismatch": 26
     },
     "padj": {
-     "max_relative": 0.027937974540888054,
-     "over_1e-6": 28637,
-     "over_1e-3": 14593,
-     "missing_mismatch": 44
+     "max_relative": 2.7626605174564823e+18,
+     "over_1e-6": 28619,
+     "over_1e-3": 8974,
+     "missing_mismatch": 26
     }
    },
    "calls": {
     "rust": 1232,
     "pydeseq2": 1250,
-    "both": 1232,
-    "jaccard": 0.9856
+    "both": 1224,
+    "jaccard": 0.972972972972973
+   },
+   "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
    },
    "dataset": "thyroid32"
   },
@@ -116,51 +127,56 @@
    "data": "validation/work/benchmark/thyroid128",
    "samples": 128,
    "genes": 28769,
-   "pydeseq2_rapidglm_seconds": 5.59,
-   "rust_seconds": 2.98,
+   "pydeseq2_rapidglm_seconds": 7.55,
+   "rust_seconds": 2.97,
    "columns": {
     "baseMean": {
-     "max_relative": 0.3135636630086298,
+     "max_relative": 0.024302172842802526,
      "over_1e-6": 1,
      "over_1e-3": 1,
      "missing_mismatch": 0
     },
     "log2FoldChange": {
-     "max_relative": 0.09279729690996957,
-     "over_1e-6": 292,
-     "over_1e-3": 1,
+     "max_relative": 52.16866172854465,
+     "over_1e-6": 28631,
+     "over_1e-3": 7825,
      "missing_mismatch": 0
     },
     "lfcSE": {
-     "max_relative": 0.048275446319865405,
-     "over_1e-6": 1,
-     "over_1e-3": 1,
+     "max_relative": 904.5329130897001,
+     "over_1e-6": 27089,
+     "over_1e-3": 134,
      "missing_mismatch": 0
     },
     "stat": {
-     "max_relative": 0.148228542265022,
-     "over_1e-6": 379,
-     "over_1e-3": 1,
+     "max_relative": 52.16888828272514,
+     "over_1e-6": 28670,
+     "over_1e-3": 7829,
      "missing_mismatch": 0
     },
     "pvalue": {
-     "max_relative": 0.00016247078281238271,
-     "over_1e-6": 1546,
-     "over_1e-3": 0,
-     "missing_mismatch": 0
+     "max_relative": 1.1343825603218405e+56,
+     "over_1e-6": 28426,
+     "over_1e-3": 6906,
+     "missing_mismatch": 6
     },
     "padj": {
-     "max_relative": 0.0001624707828124304,
-     "over_1e-6": 1572,
-     "over_1e-3": 0,
-     "missing_mismatch": 0
+     "max_relative": 1.03118462579602e+56,
+     "over_1e-6": 28471,
+     "over_1e-3": 3736,
+     "missing_mismatch": 6
     }
    },
    "calls": {
     "rust": 458,
-    "pydeseq2": 458,
+    "pydeseq2": 463,
     "both": 458,
-    "jaccard": 1.0
+    "jaccard": 0.9892008639308856
+   },
+   "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
    },
    "dataset": "thyroid128"
   },
@@ -168,69 +184,131 @@
    "data": "validation/work/benchmark/thyroid",
    "samples": 647,
    "genes": 28769,
-   "pydeseq2_rapidglm_seconds": 13.68,
-   "rust_seconds": 14.03,
+   "pydeseq2_rapidglm_seconds": 17.42,
+   "rust_seconds": 13.99,
    "columns": {
     "baseMean": {
-     "max_relative": 3.585340219372056e-15,
-     "over_1e-6": 0,
+     "max_relative": 0.00012388549839794277,
+     "over_1e-6": 1,
      "over_1e-3": 0,
      "missing_mismatch": 0
     },
     "log2FoldChange": {
-     "max_relative": 3.024427200149425e-06,
-     "over_1e-6": 2,
-     "over_1e-3": 0,
+     "max_relative": 4.8383464642695975,
+     "over_1e-6": 28232,
+     "over_1e-3": 3403,
      "missing_mismatch": 0
     },
     "lfcSE": {
-     "max_relative": 1.4847827209215081e-08,
-     "over_1e-6": 0,
-     "over_1e-3": 0,
+     "max_relative": 2960.6449900100015,
+     "over_1e-6": 2106,
+     "over_1e-3": 43,
      "missing_mismatch": 0
     },
     "stat": {
-     "max_relative": 3.011565547201721e-06,
-     "over_1e-6": 2,
-     "over_1e-3": 0,
+     "max_relative": 0.9980286811944162,
+     "over_1e-6": 28312,
+     "over_1e-3": 3402,
      "missing_mismatch": 0
     },
     "pvalue": {
-     "max_relative": 9.583152132175113e-07,
-     "over_1e-6": 0,
-     "over_1e-3": 0,
+     "max_relative": 3.603120409295156e+175,
+     "over_1e-6": 28480,
+     "over_1e-3": 5213,
      "missing_mismatch": 0
     },
     "padj": {
-     "max_relative": 9.583152131774513e-07,
-     "over_1e-6": 0,
-     "over_1e-3": 0,
+     "max_relative": 3.8386577249398194e+178,
+     "over_1e-6": 28631,
+     "over_1e-3": 4295,
      "missing_mismatch": 0
     }
    },
    "calls": {
     "rust": 5516,
-    "pydeseq2": 5516,
+    "pydeseq2": 5517,
     "both": 5516,
-    "jaccard": 1.0
+    "jaccard": 0.9998187420699656
+   },
+   "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
    },
    "dataset": "thyroid"
   }
  ],
- "cooks_leverage_one_thyroid32": {
-  "note": "Genes whose p-value is dropped as a Cook's outlier (missing p-value with baseMean > 0), against R DESeq2 1.48.2 run as a black box on the same design matrix. PyDESeq2 computes 0/0 at leverage-1 samples (infinite distances); the Rust port sets them to 0.",
+ "cooks_outliers_thyroid32": {
+  "note": "Genes whose p-value is dropped as a Cook's outlier (missing p-value with baseMean > 0), against R DESeq2 1.48.2 run as a black box on the same design matrix. The singleton-design-cell count is a descriptive covariate, not a measured leverage-one count; singleton cells do not imply leverage one in this additive design.",
   "deseq2": 128,
   "rust": 110,
-  "pydeseq2_rapidglm": 68,
+  "pydeseq2_rapidglm": 90,
   "jaccard_rust_deseq2": 0.845,
-  "jaccard_pydeseq2_deseq2": 0.531,
-  "leverage_one_samples": 13,
-  "pydeseq2_infinite_distances": 5769,
+  "jaccard_pydeseq2_deseq2": 0.703,
+  "singleton_design_cell_samples": 13,
+  "pydeseq2_infinite_distances": 0,
   "mismatched_genes": {
-   "total": 44,
-   "rust_only": 43,
-   "pydeseq2_only": 1,
-   "pydeseq2_max_at_leverage_one_sample": 40
+   "total": 26,
+   "rust_only": 23,
+   "pydeseq2_only": 3,
+   "pydeseq2_max_at_singleton_design_cell_sample": 24
   }
+ },
+ "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+ "measured_tag": "v1.4.0-dev.4",
+ "host_note": "One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional. Final timings on the 16 identical efficiency cores (CPUs 16-31), one thread per core: one on 16, four on 16-19, eight on 16-23, twelve on 16-27, sixteen on 16-31. Each timed command holds the shared lock and starts after two consecutive ten-second quiet samples: one-minute load <=4 and every selected CPU <20% busy. Both samples are retained. Untimed work uses CPUs 0-7 under nice 10. These release timings are final, not provisional.",
+ "_provenance": {
+  "version": "1.4.0",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "worktree_dirty": false
+ },
+ "_benchmark_host_configuration": {
+  "workstation": "Intel Core i9-13900KF",
+  "ram_gib": 125,
+  "bios_version": "1836",
+  "bios_date": "04/16/2026",
+  "microcode": "0x133",
+  "power_limits": {
+   "long_term": {
+    "power_limit_watts": 253.0,
+    "time_window_microseconds": 55967744
+   },
+   "short_term": {
+    "power_limit_watts": 253.0,
+    "time_window_microseconds": 2440
+   }
+  },
+  "memory": {
+   "modules": 4,
+   "module_gib": 32,
+   "configured_rate_mt_per_second": 4200,
+   "evidence": "Final host setting supplied by the user; BIOS/microcode and RAPL limits independently read at preflight."
+  },
+  "faulty_performance_cores": {
+   "physical_cores": 2,
+   "logical_cpus": [
+    8,
+    9,
+    10,
+    11
+   ],
+   "maximum_khz": 2200000,
+   "thread_siblings": {
+    "8": "8-9",
+    "9": "8-9",
+    "10": "10-11",
+    "11": "10-11"
+   },
+   "timed": false
+  },
+  "cap_faulty_cores_service": {
+   "enabled": true,
+   "executable": "/usr/local/sbin/cap-faulty-cores"
+  },
+  "fixed_cpu_clock_service": {
+   "enabled": false
+  },
+  "reproducibility": "Every timed run is pinned to identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Absolute seconds from other host settings are not directly comparable; matched tool speed-up ratios are the comparison of interest.",
+  "verified_utc": "2026-10-22T00:08:31.141014+00:00"
  }
 }

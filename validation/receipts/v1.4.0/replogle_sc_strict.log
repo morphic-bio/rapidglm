@@ -1,0 +1,2 @@
+{"timed_command_ready_utc": "2026-10-22T12:47:49Z", "load_average": [3.26123046875, 10.84912109375, 13.587890625], "cpus": "16-31", "waited_for_quiet_seconds": 120.51}
+{"load_before": 2.42, "wall_seconds": 1939.75, "cpu_seconds": 22021.7, "peak_rss_gb": 2.29, "load_average": 12.59, "workflow_wall_seconds": 1939.631457946, "null_fits": 174761}

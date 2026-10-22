@@ -95,8 +95,14 @@ def run_bulk(binary, d, coefficient, threads, prefix, **extra):
                   threads=threads, output=str(prefix), **extra)
     path = pathlib.Path(str(prefix) + ".json")
     path.write_text(json.dumps(config))
+    command = [str(binary), "bulk-de", str(path)]
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        from quiet_run import wait_quiet
+        cpus = "16" if threads == 1 else "16-23"
+        wait_quiet(cpus, label=f"bulk validation {prefix.name} threads={threads}")
+        command = ["taskset", "-c", cpus, *command]
     t0 = time.perf_counter()
-    subprocess.run([str(binary), "bulk-de", str(path)], check=True, env=ENV, stdout=subprocess.DEVNULL)
+    subprocess.run(command, check=True, env=ENV, stdout=subprocess.DEVNULL)
     return time.perf_counter() - t0
 
 
@@ -286,8 +292,13 @@ def main(args):
                 if args.compare_binary:
                     other[t].append(run_bulk(args.compare_binary, d, index, t, d / f"other.t{t}"))
             shrink_seconds.append(run_bulk(args.binary, d, index, 1, d / "rapid.shrink", lfc_shrink="normal"))
-            subprocess.run(["Rscript", str(ROOT / "scripts/reference_bulk.R"), str(d), coef, str(d / "deseq2_timing"),
-                            args.r_library], check=True, env=ENV, stdout=subprocess.DEVNULL)
+            command = ["Rscript", str(ROOT / "scripts/reference_bulk.R"), str(d), coef,
+                       str(d / "deseq2_timing"), args.r_library]
+            if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+                from quiet_run import wait_quiet
+                wait_quiet("16", label=f"bulk validation {name} DESeq2")
+                command = ["taskset", "-c", "16", *command]
+            subprocess.run(command, check=True, env=ENV, stdout=subprocess.DEVNULL)
             timing = json.loads((d / "deseq2_timing/reference.json").read_text())
             deseq2_seconds.append(timing["seconds"])
             deseq2_shrink_seconds.append(timing["shrink_seconds"])

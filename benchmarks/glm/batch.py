@@ -9,7 +9,7 @@ Single-thread timings are sequential; thread counts apply only to RapidGLM.
 --cpus THREADS:LIST confines the runs at a thread count to those CPUs.
 """
 
-import argparse, json, os, subprocess, time
+import argparse, json, os, subprocess, time, sys
 from pathlib import Path
 import numpy as np
 
@@ -66,7 +66,7 @@ def busy_seconds(cpus):
     return jiffies / os.sysconf("SC_CLK_TCK")
 
 
-def confine(threads, args):
+def confine(threads, args, label=None):
     """Child processes and the loops below inherit this process's CPU affinity.
     With --cpus, waits (up to 20 minutes) for other processes to leave those CPUs."""
     cpus = dict(args.cpus).get(threads)
@@ -77,6 +77,10 @@ def confine(threads, args):
         time.sleep(3)
         if (busy_seconds(cpus) - before) / (3 * len(cpus)) < 0.2 or time.time() - start > 1200:
             break
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from quiet_run import wait_quiet
+        wait_quiet(cpus or ALLOWED, label=label)
 
 
 def generate(d, n, m, seed=20260929):
@@ -138,7 +142,7 @@ def main(args):
     for family in ("poisson", "nb"):
         coefs = {}
         for threads in (1, 4, 16):
-            confine(threads, args)
+            confine(threads, args, f"batch {family} native threads={threads}")
             r = subprocess.run(
                 [
                     str(ROOT / "build/rapidglm_glm_batch"),
@@ -165,10 +169,10 @@ def main(args):
             )
             coefs["rapidglm"] = np.loadtxt(d / "coef.tsv")
             print(results[-1], flush=True)
-        confine(1, args)  # everything below runs on one thread
         for tool in (
             ["glm.fit", "rapidglm"] if family == "poisson" else ["glm.nb", "rapidglm"]
         ):
+            confine(1, args, f"batch {family} R {tool}")
             r = subprocess.run(
                 [
                     "Rscript",
@@ -206,6 +210,7 @@ def main(args):
         if family == "nb":
             script = d / "glmgampoi.R"
             script.write_text(GGP)
+            confine(1, args, "batch nb glmGamPoi")
             r = subprocess.run(["Rscript", str(script), str(d), GGP_LIBS], env=ENV, capture_output=True,
                                text=True, check=True)
             info = json.loads(r.stdout.strip().splitlines()[-1])
@@ -220,6 +225,7 @@ def main(args):
                 ]  # the discrete NB model is slow; timed on a subset and scaled
             else:
                 sub = Y
+            confine(1, args, f"batch {family} Python {tool}")
             seconds, c = python_loop(tool, family, X, sub)
             results.append(
                 dict(

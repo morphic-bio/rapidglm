@@ -1,0 +1,28 @@
+{
+  "invalidated_runs": [
+    {
+      "invalidated_utc": "2026-10-21T21:51:13.603765+00:00",
+      "reason": "User reported that turbo had accidentally been enabled and requested rerunning every timing. No timings from this attempt enter the final release collection.",
+      "measured_commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+      "archive": "validation/work/release-1.4.0/invalidated-turbo-20261021",
+      "additional_partial_bulk_archive": "validation/work/release-1.4.0/interruption-20261021",
+      "preserved_tests": "Functional test results and frozen artifact hashes remain valid; elapsed test diagnostics are not benchmark timings.",
+      "rerun_scope": "All 18 stages from glmacc, with turbo disabled and E-core maximum frequency fixed at 2200000 kHz."
+    },
+    {
+      "invalidated_utc": "2026-10-22T00:04:42.685896+00:00",
+      "reason": "host setting changed to the user's final choice: turbo on, CPUs 8-11 capped",
+      "measured_commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+      "archive": "validation/work/release-1.4.0/invalidated-fixed-clock-20261021",
+      "runner_exit": 125,
+      "scope": "Entire fixed-2.2-GHz attempt is void; glmacc completed and glmspeed was interrupted at 269 quiet starts. The signal-triggered shell exit 0 was not completion.",
+      "rerun_scope": "All 18 stages from glmacc under the final turbo-on policy. No timing from either earlier host setting enters the release."
+    }
+  ],
+  "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
+  },
+  "final_host_policy": "Turbo on; E CPUs 16-31 at stock 800000-4300000 kHz; faulty P CPUs 8-11 capped at 2200000 kHz and excluded from all timings."
+}

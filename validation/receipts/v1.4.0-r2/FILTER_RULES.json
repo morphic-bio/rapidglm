@@ -1,0 +1,60 @@
+{
+  "version": "1.4.0-dev.3",
+  "commit": "a979b964b20c1bdd1f23ba3378b1c1ecf4bf86d5",
+  "reference_rules": {
+    "airway": {
+      "reference_metadata": "validation/work/bulk/airway/deseq2/reference.json",
+      "maximum_rejections": 4860,
+      "positive_residual_rms": 16.176608047940807,
+      "theta_calculated": 0.193877551020408,
+      "theta_DESeq2": 0.193877551020408
+    },
+    "kang": {
+      "reference_metadata": "validation/work/bulk/kang/deseq2/reference.json",
+      "maximum_rejections": 635,
+      "positive_residual_rms": 1.7845905902446144,
+      "theta_calculated": 0.0,
+      "theta_DESeq2": 0
+    },
+    "sim3": {
+      "reference_metadata": "validation/work/bulk/sim3/deseq2/reference.json",
+      "maximum_rejections": 242,
+      "positive_residual_rms": 1.5560961198770464,
+      "theta_calculated": 0.0581632653061225,
+      "theta_DESeq2": 0.0581632653061225
+    },
+    "sim3b": {
+      "reference_metadata": "validation/work/bulk/sim3b/deseq2/reference.json",
+      "maximum_rejections": 205,
+      "positive_residual_rms": 1.9085317289270083,
+      "theta_calculated": 0.0387755102040816,
+      "theta_DESeq2": 0.0387755102040816
+    },
+    "sim8": {
+      "reference_metadata": "validation/work/bulk/sim8/deseq2/reference.json",
+      "maximum_rejections": 253,
+      "positive_residual_rms": 1.9992652662205934,
+      "theta_calculated": 0.0,
+      "theta_DESeq2": 0
+    }
+  },
+  "HNRNPR": {
+    "reference_version": "1.48.2",
+    "reference_theta": 0,
+    "rapidglm_theta": 0,
+    "reference_threshold": 0.843833543946049,
+    "rapidglm_threshold": 0.8438335439460494,
+    "discoveries": {
+      "old": 4,
+      "new": 2,
+      "reference": 2
+    },
+    "old_jaccard": 0.5,
+    "new_jaccard": 1.0
+  },
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "a979b964b20c1bdd1f23ba3378b1c1ecf4bf86d5",
+    "worktree_dirty": false
+  }
+}

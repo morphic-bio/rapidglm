@@ -1,0 +1,4738 @@
+{
+  "measured_commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "interpretation": "The final run uses turbo on under BIOS 1836, microcode 0x133, 253 W sustained and short-term limits, and 4 x 32 GiB at 4,200 MT/s. It pins every timed command to identical efficiency cores and audits the policy at every start and once per second. The dev.3 review used turbo on with the old BIOS. Power limits and memory speed can change absolute seconds, so historical absolute-time ratios do not isolate implementation changes; matched tool-to-tool speed-up ratios are the comparison of interest.",
+  "formula": "speedup = reference_seconds / rapidglm_seconds; ratio change = final_speedup / old_speedup",
+  "scope_note": "Every final value is from the complete final run. Historical values are explicitly labeled, including carried receipts. Acceptance modes, interfaces, threads and permutation budgets remain separate. High-MOI R/Python values time API calls after input loading; CLI values time the complete command. SCEPTRE high-MOI values sum its calibration, power and discovery calls, excluding setup. Low-MOI and QTL values are whole-command wall times.",
+  "summary": [
+    {
+      "scope": "GLM loaded fit, one thread",
+      "comparisons": 255,
+      "median_ratio_change": 0.9611955195079753,
+      "minimum": 0.4980277923369485,
+      "maximum": 1.2450694808423726,
+      "changes_over_five_percent": 120
+    },
+    {
+      "scope": "NB solver",
+      "comparisons": 6,
+      "median_ratio_change": 0.998005377830921,
+      "minimum": 0.9509693297108782,
+      "maximum": 1.0837395375582652,
+      "changes_over_five_percent": 1
+    },
+    {
+      "scope": "QTL whole command at matched permutation budgets",
+      "comparisons": 2,
+      "median_ratio_change": 1.634570995877502,
+      "minimum": 0.9798779443614615,
+      "maximum": 2.2892640473935426,
+      "changes_over_five_percent": 1
+    },
+    {
+      "scope": "bulk R interfaces",
+      "comparisons": 8,
+      "median_ratio_change": 0.9945486010242639,
+      "minimum": 0.9598567903982784,
+      "maximum": 1.0054934822861101,
+      "changes_over_five_percent": 0
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "comparisons": 18,
+      "median_ratio_change": 1.0130854110331597,
+      "minimum": 0.9774448472727223,
+      "maximum": 1.0855648481266298,
+      "changes_over_five_percent": 1
+    },
+    {
+      "scope": "low-MOI whole command",
+      "comparisons": 2,
+      "median_ratio_change": 0.9638088868890139,
+      "minimum": 0.9596550847029025,
+      "maximum": 0.9679626890751253,
+      "changes_over_five_percent": 0
+    }
+  ],
+  "comparisons": [
+    {
+      "scope": "bulk R interfaces",
+      "identity": {
+        "dataset": "airway",
+        "threads": 1
+      },
+      "baseline_scope": "dev.3 review bulk receipts",
+      "old_reference_seconds": 6.108,
+      "old_rapidglm_seconds": 0.956,
+      "final_reference_seconds": 6.069,
+      "final_rapidglm_seconds": 0.966,
+      "old_speedup": 6.389121338912134,
+      "final_speedup": 6.282608695652174,
+      "final_over_old_speedup": 0.9833290623843284,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "bulk R interfaces",
+      "identity": {
+        "dataset": "airway",
+        "threads": 8
+      },
+      "baseline_scope": "dev.3 review bulk receipts",
+      "old_reference_seconds": 2.718,
+      "old_rapidglm_seconds": 0.236,
+      "final_reference_seconds": 2.631,
+      "final_rapidglm_seconds": 0.238,
+      "old_speedup": 11.516949152542374,
+      "final_speedup": 11.054621848739496,
+      "final_over_old_speedup": 0.9598567903982784,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "bulk R interfaces",
+      "identity": {
+        "dataset": "thyroid",
+        "threads": 1
+      },
+      "baseline_scope": "dev.3 review bulk receipts",
+      "old_reference_seconds": 483.237,
+      "old_rapidglm_seconds": 35.241,
+      "final_reference_seconds": 483.469,
+      "final_rapidglm_seconds": 35.15,
+      "old_speedup": 13.712352089895294,
+      "final_speedup": 13.754452347083927,
+      "final_over_old_speedup": 1.0030702433041854,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "bulk R interfaces",
+      "identity": {
+        "dataset": "thyroid",
+        "threads": 8
+      },
+      "baseline_scope": "dev.3 review bulk receipts",
+      "old_reference_seconds": 83.935,
+      "old_rapidglm_seconds": 6.559,
+      "final_reference_seconds": 83.727,
+      "final_rapidglm_seconds": 6.507,
+      "old_speedup": 12.796920262235098,
+      "final_speedup": 12.867219917012449,
+      "final_over_old_speedup": 1.0054934822861101,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "bulk R interfaces",
+      "identity": {
+        "dataset": "thyroid128",
+        "threads": 1
+      },
+      "baseline_scope": "dev.3 review bulk receipts",
+      "old_reference_seconds": 119.666,
+      "old_rapidglm_seconds": 9.854,
+      "final_reference_seconds": 118.391,
+      "final_rapidglm_seconds": 9.869,
+      "old_speedup": 12.14390095392734,
+      "final_speedup": 11.996250886614654,
+      "final_over_old_speedup": 0.987841627836652,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "bulk R interfaces",
+      "identity": {
+        "dataset": "thyroid128",
+        "threads": 8
+      },
+      "baseline_scope": "dev.3 review bulk receipts",
+      "old_reference_seconds": 31.358,
+      "old_rapidglm_seconds": 1.754,
+      "final_reference_seconds": 31.275,
+      "final_rapidglm_seconds": 1.749,
+      "old_speedup": 17.87799315849487,
+      "final_speedup": 17.88164665523156,
+      "final_over_old_speedup": 1.0002043572063317,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "bulk R interfaces",
+      "identity": {
+        "dataset": "thyroid32",
+        "threads": 1
+      },
+      "baseline_scope": "dev.3 review bulk receipts",
+      "old_reference_seconds": 31.469,
+      "old_rapidglm_seconds": 4.895,
+      "final_reference_seconds": 31.461,
+      "final_rapidglm_seconds": 4.879,
+      "old_speedup": 6.428804902962207,
+      "final_speedup": 6.448247591719615,
+      "final_over_old_speedup": 1.003024308413598,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "bulk R interfaces",
+      "identity": {
+        "dataset": "thyroid32",
+        "threads": 8
+      },
+      "baseline_scope": "dev.3 review bulk receipts",
+      "old_reference_seconds": 7.466,
+      "old_rapidglm_seconds": 0.79,
+      "final_reference_seconds": 7.327,
+      "final_rapidglm_seconds": 0.784,
+      "old_speedup": 9.450632911392406,
+      "final_speedup": 9.345663265306122,
+      "final_over_old_speedup": 0.9888928448421961,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini",
+        "tool": "rapidglm-cli",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1472.89,
+      "old_rapidglm_seconds": 406.4761453429237,
+      "final_reference_seconds": 1472.492,
+      "final_rapidglm_seconds": 401.5350951279979,
+      "old_speedup": 3.6235582748832558,
+      "final_speedup": 3.6671564151338045,
+      "final_over_old_speedup": 1.0120318584505044,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini",
+        "tool": "rapidglm-cli-ks",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1472.89,
+      "old_rapidglm_seconds": 290.77648380957544,
+      "final_reference_seconds": 1472.492,
+      "final_rapidglm_seconds": 288.9241239719995,
+      "old_speedup": 5.065368356832359,
+      "final_speedup": 5.096466088593916,
+      "final_over_old_speedup": 1.0061392833789888,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini",
+        "tool": "rapidglm-python",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1472.89,
+      "old_rapidglm_seconds": 411.08631316106766,
+      "final_reference_seconds": 1472.492,
+      "final_rapidglm_seconds": 392.9796170940026,
+      "old_speedup": 3.582921524859689,
+      "final_speedup": 3.7469933196249534,
+      "final_over_old_speedup": 1.0457927402615077,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini",
+        "tool": "rapidglm-python-ks",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1472.89,
+      "old_rapidglm_seconds": 305.6635791892186,
+      "final_reference_seconds": 1472.492,
+      "final_rapidglm_seconds": 281.49491410300107,
+      "old_speedup": 4.818663721424984,
+      "final_speedup": 5.230971950922013,
+      "final_over_old_speedup": 1.0855648481266298,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini",
+        "tool": "rapidglm-r",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1472.89,
+      "old_rapidglm_seconds": 446.069,
+      "final_reference_seconds": 1472.492,
+      "final_rapidglm_seconds": 440.995,
+      "old_speedup": 3.3019331090033157,
+      "final_speedup": 3.33902198437624,
+      "final_over_old_speedup": 1.011232473265977,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini",
+        "tool": "rapidglm-r-ks",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1472.89,
+      "old_rapidglm_seconds": 335.23,
+      "final_reference_seconds": 1472.492,
+      "final_rapidglm_seconds": 323.211,
+      "old_speedup": 4.393670017599857,
+      "final_speedup": 4.5558226669265585,
+      "final_over_old_speedup": 1.036905968968348,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-cli",
+        "threads": 1
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1517.426,
+      "old_rapidglm_seconds": 436.12418066337705,
+      "final_reference_seconds": 1523.996,
+      "final_rapidglm_seconds": 429.98999656699743,
+      "old_speedup": 3.479343882496685,
+      "final_speedup": 3.5442591971149353,
+      "final_over_old_speedup": 1.0186573436862092,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-cli",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 250.713,
+      "old_rapidglm_seconds": 68.54208824504167,
+      "final_reference_seconds": 250.865,
+      "final_rapidglm_seconds": 68.6483078980018,
+      "old_speedup": 3.657796347022394,
+      "final_speedup": 3.654350816231876,
+      "final_over_old_speedup": 0.9990580309936273,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-cli-ks",
+        "threads": 1
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1517.426,
+      "old_rapidglm_seconds": 343.5905399834737,
+      "final_reference_seconds": 1523.996,
+      "final_rapidglm_seconds": 338.33556476599915,
+      "old_speedup": 4.416378867919315,
+      "final_speedup": 4.504391966756529,
+      "final_over_old_speedup": 1.0199287926759508,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-cli-ks",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 250.713,
+      "old_rapidglm_seconds": 52.75189081951976,
+      "final_reference_seconds": 250.865,
+      "final_rapidglm_seconds": 54.00189371700253,
+      "old_speedup": 4.752682721037722,
+      "final_speedup": 4.645485236400423,
+      "final_over_old_speedup": 0.9774448472727223,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-python",
+        "threads": 1
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1517.426,
+      "old_rapidglm_seconds": 427.61478709615767,
+      "final_reference_seconds": 1523.996,
+      "final_rapidglm_seconds": 423.7495684280002,
+      "old_speedup": 3.548581680966932,
+      "final_speedup": 3.596454400304467,
+      "final_over_old_speedup": 1.0134906629300104,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-python",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 250.713,
+      "old_rapidglm_seconds": 68.42271293140948,
+      "final_reference_seconds": 250.865,
+      "final_rapidglm_seconds": 66.60207245399943,
+      "old_speedup": 3.664178008424306,
+      "final_speedup": 3.76662453219105,
+      "final_over_old_speedup": 1.0279589374564253,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-python-ks",
+        "threads": 1
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1517.426,
+      "old_rapidglm_seconds": 337.28110162355006,
+      "final_reference_seconds": 1523.996,
+      "final_rapidglm_seconds": 331.0223599469973,
+      "old_speedup": 4.498995030245265,
+      "final_speedup": 4.603906516297024,
+      "final_over_old_speedup": 1.0233188712915826,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-python-ks",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 250.713,
+      "old_rapidglm_seconds": 52.06145218759775,
+      "final_reference_seconds": 250.865,
+      "final_rapidglm_seconds": 51.11267294600111,
+      "old_speedup": 4.815712767607463,
+      "final_speedup": 4.908078281584506,
+      "final_over_old_speedup": 1.0191800297140503,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-r",
+        "threads": 1
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1517.426,
+      "old_rapidglm_seconds": 430.959,
+      "final_reference_seconds": 1523.996,
+      "final_rapidglm_seconds": 428.36,
+      "old_speedup": 3.5210449253873337,
+      "final_speedup": 3.5577458212718276,
+      "final_over_old_speedup": 1.0104232966810147,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-r",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 250.713,
+      "old_rapidglm_seconds": 75.312,
+      "final_reference_seconds": 250.865,
+      "final_rapidglm_seconds": 75.252,
+      "old_speedup": 3.328991395793499,
+      "final_speedup": 3.333665550417265,
+      "final_over_old_speedup": 1.001404075309318,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-r-ks",
+        "threads": 1
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 1517.426,
+      "old_rapidglm_seconds": 335.682,
+      "final_reference_seconds": 1523.996,
+      "final_rapidglm_seconds": 332.914,
+      "old_speedup": 4.520427070858729,
+      "final_speedup": 4.577746805481296,
+      "final_over_old_speedup": 1.0126801591363088,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "high-MOI application workflow",
+      "identity": {
+        "dataset": "gasperini50k",
+        "tool": "rapidglm-r-ks",
+        "threads": 8
+      },
+      "baseline_scope": "published 1.3.0 receipts carried by the dev.3 review",
+      "old_reference_seconds": 250.713,
+      "old_rapidglm_seconds": 59.385,
+      "final_reference_seconds": 250.865,
+      "final_rapidglm_seconds": 59.562,
+      "old_speedup": 4.22182369285173,
+      "final_speedup": 4.211829690070851,
+      "final_over_old_speedup": 0.9976327759025558,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "low-MOI whole command",
+      "identity": {
+        "fit_check": "ks",
+        "threads": 16
+      },
+      "baseline_scope": "dev.3 review low-MOI receipts",
+      "old_reference_seconds": 3273.57,
+      "old_rapidglm_seconds": 722.72,
+      "final_reference_seconds": 3164.09,
+      "final_rapidglm_seconds": 721.67,
+      "old_speedup": 4.529513504538411,
+      "final_speedup": 4.384400072055095,
+      "final_over_old_speedup": 0.9679626890751253,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "low-MOI whole command",
+      "identity": {
+        "fit_check": "strict",
+        "threads": 16
+      },
+      "baseline_scope": "dev.3 review low-MOI receipts",
+      "old_reference_seconds": 3273.57,
+      "old_rapidglm_seconds": 1925.9,
+      "final_reference_seconds": 3164.09,
+      "final_rapidglm_seconds": 1939.75,
+      "old_speedup": 1.6997611506308739,
+      "final_speedup": 1.6311844309833743,
+      "final_over_old_speedup": 0.9596550847029025,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p20",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.011,
+      "old_rapidglm_seconds": 0.00509025,
+      "final_reference_seconds": 0.0109999999999999,
+      "final_rapidglm_seconds": 0.005096684,
+      "old_speedup": 2.1609940572663424,
+      "final_speedup": 2.1582660412142287,
+      "final_over_old_speedup": 0.9987376105718844,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p20",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.028,
+      "old_rapidglm_seconds": 0.00509025,
+      "final_reference_seconds": 0.028,
+      "final_rapidglm_seconds": 0.005096684,
+      "old_speedup": 5.500712145768872,
+      "final_speedup": 5.493768104908996,
+      "final_over_old_speedup": 0.9987376105718936,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p20",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.023,
+      "old_rapidglm_seconds": 0.00509025,
+      "final_reference_seconds": 0.022,
+      "final_rapidglm_seconds": 0.005096684,
+      "old_speedup": 4.518442119738716,
+      "final_speedup": 4.3165320824284965,
+      "final_over_old_speedup": 0.9553142361992024,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p20",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.007607702165842056,
+      "old_rapidglm_seconds": 0.00509025,
+      "final_reference_seconds": 0.00754882399996859,
+      "final_rapidglm_seconds": 0.005096684,
+      "old_speedup": 1.4945635608942696,
+      "final_speedup": 1.4811245900213925,
+      "final_over_old_speedup": 0.9910080967952706,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p20",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0089439507573843,
+      "old_rapidglm_seconds": 0.00509025,
+      "final_reference_seconds": 0.008899546999600716,
+      "final_rapidglm_seconds": 0.005096684,
+      "old_speedup": 1.7570749486536614,
+      "final_speedup": 1.7461445519480345,
+      "final_over_old_speedup": 0.9937792086137235,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p20",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.003542478196322918,
+      "old_rapidglm_seconds": 0.00509025,
+      "final_reference_seconds": 0.003548786000465043,
+      "final_rapidglm_seconds": 0.005096684,
+      "old_speedup": 0.6959340300226743,
+      "final_speedup": 0.6962931193036577,
+      "final_over_old_speedup": 1.0005159817820257,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p20",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.005069456063210964,
+      "old_rapidglm_seconds": 0.00509025,
+      "final_reference_seconds": 0.0048913179998635314,
+      "final_rapidglm_seconds": 0.005096684,
+      "old_speedup": 0.9959149478337929,
+      "final_speedup": 0.959705957807769,
+      "final_over_old_speedup": 0.9636424876393493,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p20",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.012,
+      "old_rapidglm_seconds": 0.00509025,
+      "final_reference_seconds": 0.012,
+      "final_rapidglm_seconds": 0.005096684,
+      "old_speedup": 2.3574480624723737,
+      "final_speedup": 2.3544720449609984,
+      "final_over_old_speedup": 0.9987376105718935,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p20",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.024434911087155342,
+      "old_rapidglm_seconds": 0.00509025,
+      "final_reference_seconds": 0.02388632200018037,
+      "final_rapidglm_seconds": 0.005096684,
+      "old_speedup": 4.800336149924924,
+      "final_speedup": 4.6866397838634635,
+      "final_over_old_speedup": 0.9763149157662139,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p5",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.005,
+      "old_rapidglm_seconds": 0.002573096,
+      "final_reference_seconds": 0.004,
+      "final_rapidglm_seconds": 0.00255022,
+      "old_speedup": 1.943184397317473,
+      "final_speedup": 1.5684921300907373,
+      "final_over_old_speedup": 0.8071761651935911,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p5",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.011,
+      "old_rapidglm_seconds": 0.002573096,
+      "final_reference_seconds": 0.011,
+      "final_rapidglm_seconds": 0.00255022,
+      "old_speedup": 4.27500567409844,
+      "final_speedup": 4.313353357749527,
+      "final_over_old_speedup": 1.0089702064919888,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p5",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.00799999999999998,
+      "old_rapidglm_seconds": 0.002573096,
+      "final_reference_seconds": 0.00800000000000001,
+      "final_rapidglm_seconds": 0.00255022,
+      "old_speedup": 3.1090950357079485,
+      "final_speedup": 3.1369842601814786,
+      "final_over_old_speedup": 1.0089702064919928,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p5",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0042885830625891685,
+      "old_rapidglm_seconds": 0.002573096,
+      "final_reference_seconds": 0.0042402879989822395,
+      "final_rapidglm_seconds": 0.00255022,
+      "old_speedup": 1.666701538764651,
+      "final_speedup": 1.6627145889304606,
+      "final_over_old_speedup": 0.9976078801504284,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p5",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.00497792474925518,
+      "old_rapidglm_seconds": 0.002573096,
+      "final_reference_seconds": 0.00500031300180126,
+      "final_rapidglm_seconds": 0.00255022,
+      "old_speedup": 1.9346051407546319,
+      "final_speedup": 1.9607378978289165,
+      "final_over_old_speedup": 1.013508057289712,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p5",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.002378457225859165,
+      "old_rapidglm_seconds": 0.002573096,
+      "final_reference_seconds": 0.002336326000659028,
+      "final_rapidglm_seconds": 0.00255022,
+      "old_speedup": 0.924356194195306,
+      "final_speedup": 0.916127236340013,
+      "final_over_old_speedup": 0.9910976332425006,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p5",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0031442800536751747,
+      "old_rapidglm_seconds": 0.002573096,
+      "final_reference_seconds": 0.003093057002843125,
+      "final_rapidglm_seconds": 0.00255022,
+      "old_speedup": 1.221983188219629,
+      "final_speedup": 1.212858891720371,
+      "final_over_old_speedup": 0.9925332061952902,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p5",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.004,
+      "old_rapidglm_seconds": 0.002573096,
+      "final_reference_seconds": 0.004,
+      "final_rapidglm_seconds": 0.00255022,
+      "old_speedup": 1.5545475178539783,
+      "final_speedup": 1.5684921300907373,
+      "final_over_old_speedup": 1.008970206491989,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p5",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.008542830124497414,
+      "old_rapidglm_seconds": 0.002573096,
+      "final_reference_seconds": 0.00840341100047226,
+      "final_rapidglm_seconds": 0.00255022,
+      "old_speedup": 3.3200588413714116,
+      "final_speedup": 3.295171005039667,
+      "final_over_old_speedup": 0.9925037966129949,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p50",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0369999999999999,
+      "old_rapidglm_seconds": 0.014479131,
+      "final_reference_seconds": 0.0359999999999999,
+      "final_rapidglm_seconds": 0.015276855,
+      "old_speedup": 2.555401978198823,
+      "final_speedup": 2.3565059693241768,
+      "final_over_old_speedup": 0.9221664495169413,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p50",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.092,
+      "old_rapidglm_seconds": 0.014479131,
+      "final_reference_seconds": 0.089,
+      "final_rapidglm_seconds": 0.015276855,
+      "old_speedup": 6.353972486332226,
+      "final_speedup": 5.825806424162565,
+      "final_over_old_speedup": 0.9168762434357753,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p50",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.082,
+      "old_rapidglm_seconds": 0.014479131,
+      "final_reference_seconds": 0.079,
+      "final_rapidglm_seconds": 0.015276855,
+      "old_speedup": 5.663323303035245,
+      "final_speedup": 5.171221432683625,
+      "final_over_old_speedup": 0.9131072262662668,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p50",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.019843006506562233,
+      "old_rapidglm_seconds": 0.014479131,
+      "final_reference_seconds": 0.01895050199891557,
+      "final_rapidglm_seconds": 0.015276855,
+      "old_speedup": 1.3704556237913887,
+      "final_speedup": 1.240471418948178,
+      "final_over_old_speedup": 0.9051525619752596,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p50",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.023136135190725327,
+      "old_rapidglm_seconds": 0.014479131,
+      "final_reference_seconds": 0.02248195200081682,
+      "final_rapidglm_seconds": 0.015276855,
+      "old_speedup": 1.597895287412299,
+      "final_speedup": 1.4716348358884612,
+      "final_over_old_speedup": 0.9209832756135671,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p50",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.008778498508036137,
+      "old_rapidglm_seconds": 0.014479131,
+      "final_reference_seconds": 0.00861169199924916,
+      "final_rapidglm_seconds": 0.015276855,
+      "old_speedup": 0.6062862825148925,
+      "final_speedup": 0.5637084333947766,
+      "final_over_old_speedup": 0.9297726992213946,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p50",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.012251983396708965,
+      "old_rapidglm_seconds": 0.014479131,
+      "final_reference_seconds": 0.012385391997668194,
+      "final_rapidglm_seconds": 0.015276855,
+      "old_speedup": 0.8461822326705218,
+      "final_speedup": 0.8107291715256965,
+      "final_over_old_speedup": 0.9581023333083505,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p50",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0499999999999998,
+      "old_rapidglm_seconds": 0.014479131,
+      "final_reference_seconds": 0.0489999999999999,
+      "final_rapidglm_seconds": 0.015276855,
+      "old_speedup": 3.4532459164848914,
+      "final_speedup": 3.2074664582467984,
+      "final_over_old_speedup": 0.9288265405412321,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n10000-p50",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.08494861796498299,
+      "old_rapidglm_seconds": 0.014479131,
+      "final_reference_seconds": 0.07998174200110952,
+      "final_rapidglm_seconds": 0.015276855,
+      "old_speedup": 5.866969361972275,
+      "final_speedup": 5.235484790626704,
+      "final_over_old_speedup": 0.8923661378839572,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p20",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.137,
+      "old_rapidglm_seconds": 0.055182535,
+      "final_reference_seconds": 0.139,
+      "final_rapidglm_seconds": 0.053453649,
+      "old_speedup": 2.482669562027189,
+      "final_speedup": 2.600383745551216,
+      "final_over_old_speedup": 1.0474143580460662,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p20",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.308,
+      "old_rapidglm_seconds": 0.055182535,
+      "final_reference_seconds": 0.306,
+      "final_rapidglm_seconds": 0.053453649,
+      "old_speedup": 5.5814760956523655,
+      "final_speedup": 5.724585799558792,
+      "final_over_old_speedup": 1.0256401176774546,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p20",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.244,
+      "old_rapidglm_seconds": 0.055182535,
+      "final_reference_seconds": 0.236,
+      "final_rapidglm_seconds": 0.053453649,
+      "old_speedup": 4.4216888549973286,
+      "final_speedup": 4.4150400284178914,
+      "final_over_old_speedup": 0.9984963151416856,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p20",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.06879115756601095,
+      "old_rapidglm_seconds": 0.055182535,
+      "final_reference_seconds": 0.06456478300242452,
+      "final_rapidglm_seconds": 0.053453649,
+      "old_speedup": 1.2466110439835894,
+      "final_speedup": 1.2078648363636413,
+      "final_over_old_speedup": 0.9689187675603024,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p20",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.08052476588636637,
+      "old_rapidglm_seconds": 0.055182535,
+      "final_reference_seconds": 0.0757312269997783,
+      "final_rapidglm_seconds": 0.053453649,
+      "old_speedup": 1.459243687995964,
+      "final_speedup": 1.416764400869589,
+      "final_over_old_speedup": 0.970889517990848,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p20",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.03500818554311991,
+      "old_rapidglm_seconds": 0.055182535,
+      "final_reference_seconds": 0.03297308199762483,
+      "final_rapidglm_seconds": 0.053453649,
+      "old_speedup": 0.6344069829905405,
+      "final_speedup": 0.6168537155924534,
+      "final_over_old_speedup": 0.9723312197552705,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p20",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.05176943447440863,
+      "old_rapidglm_seconds": 0.055182535,
+      "final_reference_seconds": 0.0464160070005164,
+      "final_rapidglm_seconds": 0.053453649,
+      "old_speedup": 0.9381488993647832,
+      "final_speedup": 0.8683412240110381,
+      "final_over_old_speedup": 0.925589983209476,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p20",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.144,
+      "old_rapidglm_seconds": 0.055182535,
+      "final_reference_seconds": 0.146,
+      "final_rapidglm_seconds": 0.053453649,
+      "old_speedup": 2.609521291473833,
+      "final_speedup": 2.7313383226653056,
+      "final_over_old_speedup": 1.0466817540786078,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p20",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.27952846325933933,
+      "old_rapidglm_seconds": 0.055182535,
+      "final_reference_seconds": 0.27546689700102434,
+      "final_rapidglm_seconds": 0.053453649,
+      "old_speedup": 5.065524142001438,
+      "final_speedup": 5.1533787150999615,
+      "final_over_old_speedup": 1.0173436293334517,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p5",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.044,
+      "old_rapidglm_seconds": 0.026527428,
+      "final_reference_seconds": 0.044,
+      "final_rapidglm_seconds": 0.0260687,
+      "old_speedup": 1.6586606134601516,
+      "final_speedup": 1.6878478788738984,
+      "final_over_old_speedup": 1.0175968882222741,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p5",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.151,
+      "old_rapidglm_seconds": 0.026527428,
+      "final_reference_seconds": 0.146,
+      "final_rapidglm_seconds": 0.0260687,
+      "old_speedup": 5.692221650738247,
+      "final_speedup": 5.600586143536118,
+      "final_over_old_speedup": 0.9839016270228611,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p5",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.105,
+      "old_rapidglm_seconds": 0.026527428,
+      "final_reference_seconds": 0.098,
+      "final_rapidglm_seconds": 0.0260687,
+      "old_speedup": 3.958167373029907,
+      "final_speedup": 3.759297548400956,
+      "final_over_old_speedup": 0.9497570956741226,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p5",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.026176251471042633,
+      "old_rapidglm_seconds": 0.026527428,
+      "final_reference_seconds": 0.02594494399818359,
+      "final_rapidglm_seconds": 0.0260687,
+      "old_speedup": 0.986761757341972,
+      "final_speedup": 0.995252697609915,
+      "final_over_old_speedup": 1.0086048534053598,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p5",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.03348247054964304,
+      "old_rapidglm_seconds": 0.026527428,
+      "final_reference_seconds": 0.032654499998898245,
+      "final_rapidglm_seconds": 0.0260687,
+      "old_speedup": 1.262183071409827,
+      "final_speedup": 1.2526324672460938,
+      "final_over_old_speedup": 0.9924332655221992,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p5",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.018293794244527817,
+      "old_rapidglm_seconds": 0.026527428,
+      "final_reference_seconds": 0.018079896002745954,
+      "final_rapidglm_seconds": 0.0260687,
+      "old_speedup": 0.6896180905486886,
+      "final_speedup": 0.6935480481476236,
+      "final_over_old_speedup": 1.0056987449325874,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p5",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.024646050296723843,
+      "old_rapidglm_seconds": 0.026527428,
+      "final_reference_seconds": 0.024388074001763016,
+      "final_rapidglm_seconds": 0.0260687,
+      "old_speedup": 0.9290780205575846,
+      "final_speedup": 0.935530885765804,
+      "final_over_old_speedup": 1.0069454502909743,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p5",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0470000000000002,
+      "old_rapidglm_seconds": 0.026527428,
+      "final_reference_seconds": 0.0449999999999999,
+      "final_rapidglm_seconds": 0.0260687,
+      "old_speedup": 1.7717511098324423,
+      "final_speedup": 1.7262080579392107,
+      "final_over_old_speedup": 0.9742948929787668,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p5",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.08640425000339746,
+      "old_rapidglm_seconds": 0.026527428,
+      "final_reference_seconds": 0.08186780300093233,
+      "final_rapidglm_seconds": 0.0260687,
+      "old_speedup": 3.257166507186353,
+      "final_speedup": 3.1404635827997684,
+      "final_over_old_speedup": 0.9641704149514307,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p50",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.695,
+      "old_rapidglm_seconds": 0.173122558,
+      "final_reference_seconds": 0.614,
+      "final_rapidglm_seconds": 0.172831302,
+      "old_speedup": 4.014497059360687,
+      "final_speedup": 3.5525972025599852,
+      "final_over_old_speedup": 0.8849420363321279,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p50",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.09,
+      "old_rapidglm_seconds": 0.173122558,
+      "final_reference_seconds": 1.056,
+      "final_rapidglm_seconds": 0.172831302,
+      "old_speedup": 6.296117690220358,
+      "final_speedup": 6.110004309288835,
+      "final_over_old_speedup": 0.9704399774450517,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p50",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.01,
+      "old_rapidglm_seconds": 0.173122558,
+      "final_reference_seconds": 0.972999999999999,
+      "final_rapidglm_seconds": 0.172831302,
+      "old_speedup": 5.834017309286754,
+      "final_speedup": 5.629767228161014,
+      "final_over_old_speedup": 0.9649898054295093,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p50",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.2638074466958642,
+      "old_rapidglm_seconds": 0.173122558,
+      "final_reference_seconds": 0.25120849900122266,
+      "final_rapidglm_seconds": 0.172831302,
+      "old_speedup": 1.5238190201410042,
+      "final_speedup": 1.4534895941547827,
+      "final_over_old_speedup": 0.9538466018230212,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p50",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.3054898465052247,
+      "old_rapidglm_seconds": 0.173122558,
+      "final_reference_seconds": 0.29385359899970354,
+      "final_rapidglm_seconds": 0.172831302,
+      "old_speedup": 1.7645871805176578,
+      "final_speedup": 1.7002336706327859,
+      "final_over_old_speedup": 0.9635305579710756,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p50",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.12730392068624496,
+      "old_rapidglm_seconds": 0.173122558,
+      "final_reference_seconds": 0.12560047800070606,
+      "final_rapidglm_seconds": 0.172831302,
+      "old_speedup": 0.7353398780431892,
+      "final_speedup": 0.7267229752206927,
+      "final_over_old_speedup": 0.9882817414371339,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p50",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.18051158636808395,
+      "old_rapidglm_seconds": 0.173122558,
+      "final_reference_seconds": 0.18040896499951486,
+      "final_rapidglm_seconds": 0.172831302,
+      "old_speedup": 1.0426809102952599,
+      "final_speedup": 1.0438442742247864,
+      "final_over_old_speedup": 1.0011157430025233,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p50",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.718,
+      "old_rapidglm_seconds": 0.173122558,
+      "final_reference_seconds": 0.692,
+      "final_rapidglm_seconds": 0.172831302,
+      "old_speedup": 4.147350918879098,
+      "final_speedup": 4.003904339041547,
+      "final_over_old_speedup": 0.9654124807272592,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n100000-p50",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.3398117292672396,
+      "old_rapidglm_seconds": 0.173122558,
+      "final_reference_seconds": 1.1746616799973708,
+      "final_rapidglm_seconds": 0.172831302,
+      "old_speedup": 7.73909388092128,
+      "final_speedup": 6.7965794760799225,
+      "final_over_old_speedup": 0.8782138556084865,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p20",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.858,
+      "old_rapidglm_seconds": 0.678652401,
+      "final_reference_seconds": 2.862,
+      "final_rapidglm_seconds": 0.671727098,
+      "old_speedup": 4.211286950121613,
+      "final_speedup": 4.260658842737352,
+      "final_over_old_speedup": 1.0117237066009748,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p20",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 4.017,
+      "old_rapidglm_seconds": 0.678652401,
+      "final_reference_seconds": 4.051,
+      "final_rapidglm_seconds": 0.671727098,
+      "old_speedup": 5.91908316257471,
+      "final_speedup": 6.030722911226071,
+      "final_over_old_speedup": 1.0188609866739564,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p20",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 3.437,
+      "old_rapidglm_seconds": 0.678652401,
+      "final_reference_seconds": 3.539,
+      "final_rapidglm_seconds": 0.671727098,
+      "old_speedup": 5.064448302158147,
+      "final_speedup": 5.268508610918061,
+      "final_over_old_speedup": 1.0402927024988993,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p20",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.988788646645844,
+      "old_rapidglm_seconds": 0.678652401,
+      "final_reference_seconds": 0.9895493110016105,
+      "final_rapidglm_seconds": 0.671727098,
+      "old_speedup": 1.456988356909746,
+      "final_speedup": 1.4731418666120426,
+      "final_over_old_speedup": 1.0110869174936703,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p20",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.7470781682059169,
+      "old_rapidglm_seconds": 0.678652401,
+      "final_reference_seconds": 1.7379875639999227,
+      "final_rapidglm_seconds": 0.671727098,
+      "old_speedup": 2.5743343214163574,
+      "final_speedup": 2.587341748121531,
+      "final_over_old_speedup": 1.005052734059039,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p20",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.47861924674361944,
+      "old_rapidglm_seconds": 0.678652401,
+      "final_reference_seconds": 0.48893673199927434,
+      "final_rapidglm_seconds": 0.671727098,
+      "old_speedup": 0.7052494709196784,
+      "final_speedup": 0.7278800177259998,
+      "final_over_old_speedup": 1.0320887114978052,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p20",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.9028812646865845,
+      "old_rapidglm_seconds": 0.678652401,
+      "final_reference_seconds": 0.9145562880003126,
+      "final_rapidglm_seconds": 0.671727098,
+      "old_speedup": 1.330403109686463,
+      "final_speedup": 1.361499767871971,
+      "final_over_old_speedup": 1.0233738616206605,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p20",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.133,
+      "old_rapidglm_seconds": 0.678652401,
+      "final_reference_seconds": 2.107,
+      "final_rapidglm_seconds": 0.671727098,
+      "old_speedup": 3.14299337460091,
+      "final_speedup": 3.1366904897440957,
+      "final_over_old_speedup": 0.9979946235624456,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p20",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 6.414355561137199,
+      "old_rapidglm_seconds": 0.678652401,
+      "final_reference_seconds": 6.031486537998717,
+      "final_rapidglm_seconds": 0.671727098,
+      "old_speedup": 9.451606671818434,
+      "final_speedup": 8.979072834722409,
+      "final_over_old_speedup": 0.9500049194276181,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p5",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.578,
+      "old_rapidglm_seconds": 0.315271962,
+      "final_reference_seconds": 0.526,
+      "final_rapidglm_seconds": 0.306736915,
+      "old_speedup": 1.8333377834594753,
+      "final_speedup": 1.7148245753205154,
+      "final_over_old_speedup": 0.9353565888358404,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p5",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.228,
+      "old_rapidglm_seconds": 0.315271962,
+      "final_reference_seconds": 1.185,
+      "final_rapidglm_seconds": 0.306736915,
+      "old_speedup": 3.895049823682069,
+      "final_speedup": 3.8632454786213133,
+      "final_over_old_speedup": 0.991834675677989,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p5",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.859,
+      "old_rapidglm_seconds": 0.315271962,
+      "final_reference_seconds": 0.816,
+      "final_rapidglm_seconds": 0.306736915,
+      "old_speedup": 2.724631757771089,
+      "final_speedup": 2.660260177683537,
+      "final_over_old_speedup": 0.9763742091370865,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p5",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.43080439884215593,
+      "old_rapidglm_seconds": 0.315271962,
+      "final_reference_seconds": 0.42523232299936353,
+      "final_rapidglm_seconds": 0.306736915,
+      "old_speedup": 1.3664532554980449,
+      "final_speedup": 1.3863095773763114,
+      "final_over_old_speedup": 1.0145312851342503,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p5",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.4962050272151828,
+      "old_rapidglm_seconds": 0.315271962,
+      "final_reference_seconds": 0.4909175309985585,
+      "final_rapidglm_seconds": 0.306736915,
+      "old_speedup": 1.5738951985054186,
+      "final_speedup": 1.6004514194144468,
+      "final_over_old_speedup": 1.0168729283463385,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p5",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.2676830757409334,
+      "old_rapidglm_seconds": 0.315271962,
+      "final_reference_seconds": 0.24543954800174106,
+      "final_rapidglm_seconds": 0.306736915,
+      "old_speedup": 0.8490544926444598,
+      "final_speedup": 0.8001630583059788,
+      "final_over_old_speedup": 0.9424166119347605,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p5",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.3776027327403426,
+      "old_rapidglm_seconds": 0.315271962,
+      "final_reference_seconds": 0.34818726100274944,
+      "final_rapidglm_seconds": 0.306736915,
+      "old_speedup": 1.1977047700180283,
+      "final_speedup": 1.1351332166940176,
+      "final_over_old_speedup": 0.9477571143654467,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p5",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.564,
+      "old_rapidglm_seconds": 0.315271962,
+      "final_reference_seconds": 0.536,
+      "final_rapidglm_seconds": 0.306736915,
+      "old_speedup": 1.7889316779777578,
+      "final_speedup": 1.7474258029882057,
+      "final_over_old_speedup": 0.9767985130452432,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p5",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.2608422692865133,
+      "old_rapidglm_seconds": 0.315271962,
+      "final_reference_seconds": 1.1951460939999379,
+      "final_rapidglm_seconds": 0.306736915,
+      "old_speedup": 3.999221057553203,
+      "final_speedup": 3.8963229906642893,
+      "final_over_old_speedup": 0.974270472822558,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p50",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 13.375,
+      "old_rapidglm_seconds": 1.791923477,
+      "final_reference_seconds": 12.516,
+      "final_rapidglm_seconds": 1.812199022,
+      "old_speedup": 7.464046412513183,
+      "final_speedup": 6.906526186172945,
+      "final_over_old_speedup": 0.9253059003752204,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p50",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 15.447,
+      "old_rapidglm_seconds": 1.791923477,
+      "final_reference_seconds": 14.207,
+      "final_rapidglm_seconds": 1.812199022,
+      "old_speedup": 8.620345789464757,
+      "final_speedup": 7.839646654439041,
+      "final_over_old_speedup": 0.9094352878535525,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p50",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 13.774,
+      "old_rapidglm_seconds": 1.791923477,
+      "final_reference_seconds": 13.023,
+      "final_rapidglm_seconds": 1.812199022,
+      "old_speedup": 7.686712170912641,
+      "final_speedup": 7.186296781921561,
+      "final_over_old_speedup": 0.9348986435468851,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p50",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.905971105210483,
+      "old_rapidglm_seconds": 1.791923477,
+      "final_reference_seconds": 2.750557317001949,
+      "final_rapidglm_seconds": 1.812199022,
+      "old_speedup": 1.6217049123523946,
+      "final_speedup": 1.5178009057561168,
+      "final_over_old_speedup": 0.9359291534453343,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p50",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 3.5974756255745888,
+      "old_rapidglm_seconds": 1.791923477,
+      "final_reference_seconds": 3.226199518001522,
+      "final_rapidglm_seconds": 1.812199022,
+      "old_speedup": 2.0076056102559723,
+      "final_speedup": 1.780267773481627,
+      "final_over_old_speedup": 0.8867617047825647,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p50",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.4408366503193974,
+      "old_rapidglm_seconds": 1.791923477,
+      "final_reference_seconds": 1.3046199109994632,
+      "final_rapidglm_seconds": 1.812199022,
+      "old_speedup": 0.8040726452960008,
+      "final_speedup": 0.7199098416682973,
+      "final_over_old_speedup": 0.8953293534855662,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p50",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.0388601841405034,
+      "old_rapidglm_seconds": 1.791923477,
+      "final_reference_seconds": 1.8988086270001077,
+      "final_rapidglm_seconds": 1.812199022,
+      "old_speedup": 1.1378053863962536,
+      "final_speedup": 1.0477925459337918,
+      "final_over_old_speedup": 0.9208890715946094,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p50",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 7.699,
+      "old_rapidglm_seconds": 1.791923477,
+      "final_reference_seconds": 8.169,
+      "final_rapidglm_seconds": 1.812199022,
+      "old_speedup": 4.2965004358832894,
+      "final_speedup": 4.507783030908181,
+      "final_over_old_speedup": 1.049175508807194,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-binomial-n1000000-p50",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 31.07062128279358,
+      "old_rapidglm_seconds": 1.791923477,
+      "final_reference_seconds": 23.495207359999768,
+      "final_rapidglm_seconds": 1.812199022,
+      "old_speedup": 17.339256771618032,
+      "final_speedup": 12.965025957286809,
+      "final_over_old_speedup": 0.7477267410047681,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p20",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.004,
+      "old_rapidglm_seconds": 0.002086465,
+      "final_reference_seconds": 0.004,
+      "final_rapidglm_seconds": 0.002104988,
+      "old_speedup": 1.9171181879398889,
+      "final_speedup": 1.9002483624609738,
+      "final_over_old_speedup": 0.9912004248955338,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p20",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.013,
+      "old_rapidglm_seconds": 0.002086465,
+      "final_reference_seconds": 0.012,
+      "final_rapidglm_seconds": 0.002104988,
+      "old_speedup": 6.230634110804638,
+      "final_speedup": 5.700745087382922,
+      "final_over_old_speedup": 0.9149542383651084,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p20",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.011,
+      "old_rapidglm_seconds": 0.002086465,
+      "final_reference_seconds": 0.01,
+      "final_rapidglm_seconds": 0.002104988,
+      "old_speedup": 5.272075016834694,
+      "final_speedup": 4.7506209061524345,
+      "final_over_old_speedup": 0.9010912953595763,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p20",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0056886011734604836,
+      "old_rapidglm_seconds": 0.002086465,
+      "final_reference_seconds": 0.005301706001773709,
+      "final_rapidglm_seconds": 0.002104988,
+      "old_speedup": 2.7264301933943216,
+      "final_speedup": 2.518639537030002,
+      "final_over_old_speedup": 0.9237865481141747,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p20",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0054931435734033585,
+      "old_rapidglm_seconds": 0.002086465,
+      "final_reference_seconds": 0.005323040000803303,
+      "final_rapidglm_seconds": 0.002104988,
+      "old_speedup": 2.632751363384173,
+      "final_speedup": 2.5287745112101843,
+      "final_over_old_speedup": 0.9605063912908451,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p20",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0027877353131771088,
+      "old_rapidglm_seconds": 0.002086465,
+      "final_reference_seconds": 0.002592298998933984,
+      "final_rapidglm_seconds": 0.002104988,
+      "old_speedup": 1.3361045180135342,
+      "final_speedup": 1.2315029819333811,
+      "final_over_old_speedup": 0.9217115617304622,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p20",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.002604333683848381,
+      "old_rapidglm_seconds": 0.002086465,
+      "final_reference_seconds": 0.0024174069985747337,
+      "final_rapidglm_seconds": 0.002104988,
+      "old_speedup": 1.2482038681925558,
+      "final_speedup": 1.1484184226108338,
+      "final_over_old_speedup": 0.9200567726759132,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p20",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.004,
+      "old_rapidglm_seconds": 0.002086465,
+      "final_reference_seconds": 0.003,
+      "final_rapidglm_seconds": 0.002104988,
+      "old_speedup": 1.9171181879398889,
+      "final_speedup": 1.4251862718457304,
+      "final_over_old_speedup": 0.7434003186716505,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p20",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.019239161163568497,
+      "old_rapidglm_seconds": 0.002086465,
+      "final_reference_seconds": 0.018558109000878176,
+      "final_rapidglm_seconds": 0.002104988,
+      "old_speedup": 9.220936446845979,
+      "final_speedup": 8.816254059822752,
+      "final_over_old_speedup": 0.9561126584749807,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p5",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.001,
+      "old_rapidglm_seconds": 0.000592924,
+      "final_reference_seconds": 0.001,
+      "final_rapidglm_seconds": 0.000595272,
+      "old_speedup": 1.6865567931134513,
+      "final_speedup": 1.6799043126503515,
+      "final_over_old_speedup": 0.996055584673897,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p5",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.005,
+      "old_rapidglm_seconds": 0.000592924,
+      "final_reference_seconds": 0.004,
+      "final_rapidglm_seconds": 0.000595272,
+      "old_speedup": 8.432783965567257,
+      "final_speedup": 6.719617250601406,
+      "final_over_old_speedup": 0.7968444677391175,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p5",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.00399999999999998,
+      "old_rapidglm_seconds": 0.000592924,
+      "final_reference_seconds": 0.00499999999999998,
+      "final_rapidglm_seconds": 0.000595272,
+      "old_speedup": 6.7462271724537715,
+      "final_speedup": 8.399521563251724,
+      "final_over_old_speedup": 1.2450694808423726,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p5",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0021765995770692825,
+      "old_rapidglm_seconds": 0.000592924,
+      "final_reference_seconds": 0.002012310000282014,
+      "final_rapidglm_seconds": 0.000595272,
+      "old_speedup": 3.670958802594064,
+      "final_speedup": 3.380488247863185,
+      "final_over_old_speedup": 0.920873382036971,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p5",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.00201279204338789,
+      "old_rapidglm_seconds": 0.000592924,
+      "final_reference_seconds": 0.002002574001380708,
+      "final_rapidglm_seconds": 0.000595272,
+      "old_speedup": 3.3946880939005504,
+      "final_speedup": 3.3641327013209223,
+      "final_over_old_speedup": 0.9909990574290083,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p5",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0008262880146503448,
+      "old_rapidglm_seconds": 0.000592924,
+      "final_reference_seconds": 0.000843892998091178,
+      "final_rapidglm_seconds": 0.000595272,
+      "old_speedup": 1.393581664176766,
+      "final_speedup": 1.4176594869088048,
+      "final_over_old_speedup": 1.017277654658482,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p5",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0007960088551044464,
+      "old_rapidglm_seconds": 0.000592924,
+      "final_reference_seconds": 0.0008380109975405503,
+      "final_rapidglm_seconds": 0.000595272,
+      "old_speedup": 1.3425141419548652,
+      "final_speedup": 1.4077782888167936,
+      "final_over_old_speedup": 1.0486133775595807,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p5",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.002,
+      "old_rapidglm_seconds": 0.000592924,
+      "final_reference_seconds": 0.001,
+      "final_rapidglm_seconds": 0.000595272,
+      "old_speedup": 3.3731135862269026,
+      "final_speedup": 1.6799043126503515,
+      "final_over_old_speedup": 0.4980277923369485,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p5",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.006193659268319607,
+      "old_rapidglm_seconds": 0.000592924,
+      "final_reference_seconds": 0.0056881480013544206,
+      "final_rapidglm_seconds": 0.000595272,
+      "old_speedup": 10.445958113214521,
+      "final_speedup": 9.555544358468769,
+      "final_over_old_speedup": 0.9147599726999339,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p50",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.017,
+      "old_rapidglm_seconds": 0.007408002,
+      "final_reference_seconds": 0.0169999999999999,
+      "final_rapidglm_seconds": 0.007925075,
+      "old_speedup": 2.2948157951361243,
+      "final_speedup": 2.14509010955731,
+      "final_over_old_speedup": 0.9347548130459278,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p50",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.046,
+      "old_rapidglm_seconds": 0.007408002,
+      "final_reference_seconds": 0.043,
+      "final_rapidglm_seconds": 0.007925075,
+      "old_speedup": 6.209501563309513,
+      "final_speedup": 5.425816159468522,
+      "final_over_old_speedup": 0.8737925426298941,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p50",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.041,
+      "old_rapidglm_seconds": 0.007408002,
+      "final_reference_seconds": 0.038,
+      "final_rapidglm_seconds": 0.007925075,
+      "old_speedup": 5.534555741210653,
+      "final_speedup": 4.794907303716369,
+      "final_over_old_speedup": 0.866358119408426,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p50",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.01641235686838627,
+      "old_rapidglm_seconds": 0.007408002,
+      "final_reference_seconds": 0.015052361999551067,
+      "final_rapidglm_seconds": 0.007925075,
+      "old_speedup": 2.2154903398225687,
+      "final_speedup": 1.899333697100793,
+      "final_over_old_speedup": 0.8572972145086872,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p50",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.01566037442535162,
+      "old_rapidglm_seconds": 0.007408002,
+      "final_reference_seconds": 0.015111177002836484,
+      "final_rapidglm_seconds": 0.007925075,
+      "old_speedup": 2.1139808581789827,
+      "final_speedup": 1.9067550783855653,
+      "final_over_old_speedup": 0.9019736725658315,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p50",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.010043366812169552,
+      "old_rapidglm_seconds": 0.007408002,
+      "final_reference_seconds": 0.0089270509997732,
+      "final_rapidglm_seconds": 0.007925075,
+      "old_speedup": 1.3557456939360373,
+      "final_speedup": 1.126431106301606,
+      "final_over_old_speedup": 0.8308572259088803,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p50",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.009692968800663948,
+      "old_rapidglm_seconds": 0.007408002,
+      "final_reference_seconds": 0.009144373998424271,
+      "final_rapidglm_seconds": 0.007925075,
+      "old_speedup": 1.308445759148546,
+      "final_speedup": 1.1538533071831207,
+      "final_over_old_speedup": 0.8818503167712322,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p50",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.013,
+      "old_rapidglm_seconds": 0.007408002,
+      "final_reference_seconds": 0.014,
+      "final_rapidglm_seconds": 0.007925075,
+      "old_speedup": 1.7548591374570361,
+      "final_speedup": 1.7665447961060305,
+      "final_over_old_speedup": 1.006659029434082,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n10000-p50",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.07200307864695787,
+      "old_rapidglm_seconds": 0.007408002,
+      "final_reference_seconds": 0.07003342900134157,
+      "final_rapidglm_seconds": 0.007925075,
+      "old_speedup": 9.719635422203972,
+      "final_speedup": 8.836942111127222,
+      "final_over_old_speedup": 0.9091845246519962,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p20",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.075,
+      "old_rapidglm_seconds": 0.023303603,
+      "final_reference_seconds": 0.0589999999999999,
+      "final_rapidglm_seconds": 0.02163169,
+      "old_speedup": 3.218386444362273,
+      "final_speedup": 2.727479914884131,
+      "final_over_old_speedup": 0.8474681216924478,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p20",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.179,
+      "old_rapidglm_seconds": 0.023303603,
+      "final_reference_seconds": 0.158,
+      "final_rapidglm_seconds": 0.02163169,
+      "old_speedup": 7.681215647211292,
+      "final_speedup": 7.304098755113448,
+      "final_over_old_speedup": 0.9509040092846817,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p20",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.13,
+      "old_rapidglm_seconds": 0.023303603,
+      "final_reference_seconds": 0.118,
+      "final_rapidglm_seconds": 0.02163169,
+      "old_speedup": 5.578536503561274,
+      "final_speedup": 5.454959829768271,
+      "final_over_old_speedup": 0.9778478327220564,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p20",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.05087355896830559,
+      "old_rapidglm_seconds": 0.023303603,
+      "final_reference_seconds": 0.04788851800185512,
+      "final_rapidglm_seconds": 0.02163169,
+      "old_speedup": 2.1830769674674593,
+      "final_speedup": 2.213813067858088,
+      "final_over_old_speedup": 1.0140792564113235,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p20",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.05484066717326641,
+      "old_rapidglm_seconds": 0.023303603,
+      "final_reference_seconds": 0.04764719500235515,
+      "final_rapidglm_seconds": 0.02163169,
+      "old_speedup": 2.3533127977363164,
+      "final_speedup": 2.2026570740591764,
+      "final_over_old_speedup": 0.935981428468813,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p20",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.029826371930539608,
+      "old_rapidglm_seconds": 0.023303603,
+      "final_reference_seconds": 0.029629759999806993,
+      "final_rapidglm_seconds": 0.02163169,
+      "old_speedup": 1.2799038814100812,
+      "final_speedup": 1.369738564106965,
+      "final_over_old_speedup": 1.0701886165060397,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p20",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.030182333663105965,
+      "old_rapidglm_seconds": 0.023303603,
+      "final_reference_seconds": 0.028496719998656772,
+      "final_rapidglm_seconds": 0.02163169,
+      "old_speedup": 1.2951788469407914,
+      "final_speedup": 1.3173598548544647,
+      "final_over_old_speedup": 1.0171258262641216,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p20",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0409999999999999,
+      "old_rapidglm_seconds": 0.023303603,
+      "final_reference_seconds": 0.0390000000000001,
+      "final_rapidglm_seconds": 0.02163169,
+      "old_speedup": 1.759384589584705,
+      "final_speedup": 1.8029104522115516,
+      "final_over_old_speedup": 1.0247392542167946,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p20",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.2578091025352478,
+      "old_rapidglm_seconds": 0.023303603,
+      "final_reference_seconds": 0.224003993000224,
+      "final_rapidglm_seconds": 0.02163169,
+      "old_speedup": 11.063057611101932,
+      "final_speedup": 10.355362572236567,
+      "final_over_old_speedup": 0.9360307915096471,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p5",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.014,
+      "old_rapidglm_seconds": 0.006223953,
+      "final_reference_seconds": 0.0139999999999999,
+      "final_rapidglm_seconds": 0.006219661,
+      "old_speedup": 2.2493743124345573,
+      "final_speedup": 2.2509265376360386,
+      "final_over_old_speedup": 1.0006900697642453,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p5",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0640000000000001,
+      "old_rapidglm_seconds": 0.006223953,
+      "final_reference_seconds": 0.051,
+      "final_rapidglm_seconds": 0.006219661,
+      "old_speedup": 10.28285399970085,
+      "final_speedup": 8.199803815674198,
+      "final_over_old_speedup": 0.7974248993433873,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p5",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.037,
+      "old_rapidglm_seconds": 0.006223953,
+      "final_reference_seconds": 0.033,
+      "final_rapidglm_seconds": 0.006219661,
+      "old_speedup": 5.944774968577044,
+      "final_speedup": 5.305755410142129,
+      "final_over_old_speedup": 0.8925073595194685,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p5",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.012690923176705837,
+      "old_rapidglm_seconds": 0.006223953,
+      "final_reference_seconds": 0.01124415899903397,
+      "final_rapidglm_seconds": 0.006219661,
+      "old_speedup": 2.0390454710544628,
+      "final_speedup": 1.8078411345946301,
+      "final_over_old_speedup": 0.8866114857456961,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p5",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.011764999479055405,
+      "old_rapidglm_seconds": 0.006223953,
+      "final_reference_seconds": 0.011573136001970852,
+      "final_rapidglm_seconds": 0.006219661,
+      "old_speedup": 1.8902776867137983,
+      "final_speedup": 1.86073421075053,
+      "final_over_old_speedup": 0.9843708275398263,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p5",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.006075570359826088,
+      "old_rapidglm_seconds": 0.006223953,
+      "final_reference_seconds": 0.005346362002455862,
+      "final_rapidglm_seconds": 0.006219661,
+      "old_speedup": 0.9761594214843987,
+      "final_speedup": 0.8595905793669241,
+      "final_over_old_speedup": 0.8805842165204798,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p5",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.005821176804602146,
+      "old_rapidglm_seconds": 0.006223953,
+      "final_reference_seconds": 0.0055475609988207,
+      "final_rapidglm_seconds": 0.006219661,
+      "old_speedup": 0.935286112315139,
+      "final_speedup": 0.8919394479571636,
+      "final_over_old_speedup": 0.9536541131240811,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p5",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.011,
+      "old_rapidglm_seconds": 0.006223953,
+      "final_reference_seconds": 0.0109999999999999,
+      "final_rapidglm_seconds": 0.006219661,
+      "old_speedup": 1.7673655311985805,
+      "final_speedup": 1.7685851367140268,
+      "final_over_old_speedup": 1.0006900697642436,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p5",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.06069518905133009,
+      "old_rapidglm_seconds": 0.006223953,
+      "final_reference_seconds": 0.057484813001792645,
+      "final_rapidglm_seconds": 0.006219661,
+      "old_speedup": 9.751871367172935,
+      "final_speedup": 9.242435078341511,
+      "final_over_old_speedup": 0.9477601508828034,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p50",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.425,
+      "old_rapidglm_seconds": 0.093274632,
+      "final_reference_seconds": 0.315,
+      "final_rapidglm_seconds": 0.087034076,
+      "old_speedup": 4.556437167181747,
+      "final_speedup": 3.6192720653459918,
+      "final_over_old_speedup": 0.7943206353012409,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p50",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.65,
+      "old_rapidglm_seconds": 0.093274632,
+      "final_reference_seconds": 0.517,
+      "final_rapidglm_seconds": 0.087034076,
+      "old_speedup": 6.968668608630909,
+      "final_speedup": 5.940202088202787,
+      "final_over_old_speedup": 0.8524156365888406,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p50",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.566,
+      "old_rapidglm_seconds": 0.093274632,
+      "final_reference_seconds": 0.452,
+      "final_rapidglm_seconds": 0.087034076,
+      "old_speedup": 6.068102203823221,
+      "final_speedup": 5.193368169956788,
+      "final_over_old_speedup": 0.8558471817901641,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p50",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.20562053751200438,
+      "old_rapidglm_seconds": 0.093274632,
+      "final_reference_seconds": 0.18694990800213418,
+      "final_rapidglm_seconds": 0.087034076,
+      "old_speedup": 2.2044636693072603,
+      "final_speedup": 2.148008189368658,
+      "final_over_old_speedup": 0.9743903786101664,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p50",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.2093305317685008,
+      "old_rapidglm_seconds": 0.093274632,
+      "final_reference_seconds": 0.1875041359999159,
+      "final_rapidglm_seconds": 0.087034076,
+      "old_speedup": 2.2442386239433336,
+      "final_speedup": 2.154376131940734,
+      "final_over_old_speedup": 0.9599585841523826,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p50",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.20061536133289337,
+      "old_rapidglm_seconds": 0.093274632,
+      "final_reference_seconds": 0.15921932799756178,
+      "final_rapidglm_seconds": 0.087034076,
+      "old_speedup": 2.150803032199509,
+      "final_speedup": 1.8293906859832898,
+      "final_over_old_speedup": 0.8505617011858457,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p50",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.2164281290024519,
+      "old_rapidglm_seconds": 0.093274632,
+      "final_reference_seconds": 0.15527477499927045,
+      "final_rapidglm_seconds": 0.087034076,
+      "old_speedup": 2.320332167083242,
+      "final_speedup": 1.784068747961091,
+      "final_over_old_speedup": 0.7688850645051147,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p50",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.227,
+      "old_rapidglm_seconds": 0.093274632,
+      "final_reference_seconds": 0.182,
+      "final_rapidglm_seconds": 0.087034076,
+      "old_speedup": 2.4336734987064865,
+      "final_speedup": 2.091134971088795,
+      "final_over_old_speedup": 0.8592504180204317,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n100000-p50",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.3495272397994995,
+      "old_rapidglm_seconds": 0.093274632,
+      "final_reference_seconds": 1.0295041870012938,
+      "final_rapidglm_seconds": 0.087034076,
+      "old_speedup": 14.468320173050905,
+      "final_speedup": 11.828748397366725,
+      "final_over_old_speedup": 0.8175619737389611,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p20",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.66,
+      "old_rapidglm_seconds": 0.319478414,
+      "final_reference_seconds": 1.394,
+      "final_rapidglm_seconds": 0.287051485,
+      "old_speedup": 5.195969202476384,
+      "final_speedup": 4.856271689380042,
+      "final_over_old_speedup": 0.934622877877251,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p20",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.266,
+      "old_rapidglm_seconds": 0.319478414,
+      "final_reference_seconds": 1.971,
+      "final_rapidglm_seconds": 0.287051485,
+      "old_speedup": 7.092810971573185,
+      "final_speedup": 6.866364060091868,
+      "final_over_old_speedup": 0.9680737422174539,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p20",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.896,
+      "old_rapidglm_seconds": 0.319478414,
+      "final_reference_seconds": 1.644,
+      "final_rapidglm_seconds": 0.287051485,
+      "old_speedup": 5.934673257768207,
+      "final_speedup": 5.727195593501284,
+      "final_over_old_speedup": 0.9650397494090606,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p20",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.7328185876831412,
+      "old_rapidglm_seconds": 0.319478414,
+      "final_reference_seconds": 0.6547508010007732,
+      "final_rapidglm_seconds": 0.287051485,
+      "old_speedup": 2.2937968750625553,
+      "final_speedup": 2.280952495336414,
+      "final_over_old_speedup": 0.9944003848528258,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p20",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.7188026383519173,
+      "old_rapidglm_seconds": 0.319478414,
+      "final_reference_seconds": 0.6539154929996585,
+      "final_rapidglm_seconds": 0.287051485,
+      "old_speedup": 2.2499255250212844,
+      "final_speedup": 2.2780425365145156,
+      "final_over_old_speedup": 1.0124968631986009,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p20",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.8644103733822703,
+      "old_rapidglm_seconds": 0.319478414,
+      "final_reference_seconds": 0.669291964997683,
+      "final_rapidglm_seconds": 0.287051485,
+      "old_speedup": 2.70569257734662,
+      "final_speedup": 2.3316094846110373,
+      "final_over_old_speedup": 0.8617422038750489,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p20",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.9221229180693626,
+      "old_rapidglm_seconds": 0.319478414,
+      "final_reference_seconds": 0.6672177270011161,
+      "final_rapidglm_seconds": 0.287051485,
+      "old_speedup": 2.886338724810881,
+      "final_speedup": 2.324383470794851,
+      "final_over_old_speedup": 0.8053051607611126,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p20",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.751,
+      "old_rapidglm_seconds": 0.319478414,
+      "final_reference_seconds": 0.651000000000001,
+      "final_rapidglm_seconds": 0.287051485,
+      "old_speedup": 2.3507065488311834,
+      "final_speedup": 2.2678858463317164,
+      "final_over_old_speedup": 0.9647677407711112,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p20",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 7.863709693774581,
+      "old_rapidglm_seconds": 0.319478414,
+      "final_reference_seconds": 4.344895894999354,
+      "final_rapidglm_seconds": 0.287051485,
+      "old_speedup": 24.614212883173327,
+      "final_speedup": 15.136294783492772,
+      "final_over_old_speedup": 0.6149412477796594,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p5",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.283,
+      "old_rapidglm_seconds": 0.097626679,
+      "final_reference_seconds": 0.229,
+      "final_rapidglm_seconds": 0.08671205,
+      "old_speedup": 2.8987977763742223,
+      "final_speedup": 2.640924761898721,
+      "final_over_old_speedup": 0.9110413922015473,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p5",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.544,
+      "old_rapidglm_seconds": 0.097626679,
+      "final_reference_seconds": 0.473,
+      "final_rapidglm_seconds": 0.08671205,
+      "old_speedup": 5.5722473157158205,
+      "final_speedup": 5.454835861913079,
+      "final_over_old_speedup": 0.9789292457512434,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p5",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.449,
+      "old_rapidglm_seconds": 0.097626679,
+      "final_reference_seconds": 0.395,
+      "final_rapidglm_seconds": 0.08671205,
+      "old_speedup": 4.599152655802212,
+      "final_speedup": 4.555306903711768,
+      "final_over_old_speedup": 0.9904665586529013,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p5",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.23267868347465992,
+      "old_rapidglm_seconds": 0.097626679,
+      "final_reference_seconds": 0.19352912300018943,
+      "final_rapidglm_seconds": 0.08671205,
+      "old_speedup": 2.3833514143675822,
+      "final_speedup": 2.2318596204355616,
+      "final_over_old_speedup": 0.9364374917526719,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p5",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.21587139833718538,
+      "old_rapidglm_seconds": 0.097626679,
+      "final_reference_seconds": 0.19238321900047595,
+      "final_rapidglm_seconds": 0.08671205,
+      "old_speedup": 2.2111926836841946,
+      "final_speedup": 2.218644571319395,
+      "final_over_old_speedup": 1.0033700761087834,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p5",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.12411546893417835,
+      "old_rapidglm_seconds": 0.097626679,
+      "final_reference_seconds": 0.1034520489993156,
+      "final_rapidglm_seconds": 0.08671205,
+      "old_speedup": 1.2713273687633926,
+      "final_speedup": 1.1930527417967352,
+      "final_over_old_speedup": 0.9384307858936488,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p5",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.11606503557413816,
+      "old_rapidglm_seconds": 0.097626679,
+      "final_reference_seconds": 0.10015497299900744,
+      "final_rapidglm_seconds": 0.08671205,
+      "old_speedup": 1.1888659612618613,
+      "final_speedup": 1.1550294682112514,
+      "final_over_old_speedup": 0.9715388494976374,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p5",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.261,
+      "old_rapidglm_seconds": 0.097626679,
+      "final_reference_seconds": 0.207,
+      "final_rapidglm_seconds": 0.08671205,
+      "old_speedup": 2.673449539341598,
+      "final_speedup": 2.387211465995787,
+      "final_over_old_speedup": 0.8929330555398087,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p5",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.2909445371478796,
+      "old_rapidglm_seconds": 0.097626679,
+      "final_reference_seconds": 0.858723949000705,
+      "final_rapidglm_seconds": 0.08671205,
+      "old_speedup": 13.223276161507856,
+      "final_speedup": 9.903167425988718,
+      "final_over_old_speedup": 0.7489193528920034,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p50",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 6.06,
+      "old_rapidglm_seconds": 0.956023642,
+      "final_reference_seconds": 6.275,
+      "final_rapidglm_seconds": 0.921773494,
+      "old_speedup": 6.338755375675113,
+      "final_speedup": 6.80752922582953,
+      "final_over_old_speedup": 1.073953611138447,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p50",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 7.436,
+      "old_rapidglm_seconds": 0.956023642,
+      "final_reference_seconds": 7.248,
+      "final_rapidglm_seconds": 0.921773494,
+      "old_speedup": 7.77805032566339,
+      "final_speedup": 7.863103080288833,
+      "final_over_old_speedup": 1.0109349709842856,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p50",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 7.594,
+      "old_rapidglm_seconds": 0.956023642,
+      "final_reference_seconds": 6.36,
+      "final_rapidglm_seconds": 0.921773494,
+      "old_speedup": 7.943318205095183,
+      "final_speedup": 6.899742769127619,
+      "final_over_old_speedup": 0.8686222295239072,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p50",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.0424799621105194,
+      "old_rapidglm_seconds": 0.956023642,
+      "final_reference_seconds": 2.0489897489969735,
+      "final_rapidglm_seconds": 0.921773494,
+      "old_speedup": 2.136432481771742,
+      "final_speedup": 2.2228777051349815,
+      "final_over_old_speedup": 1.0404624176522304,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p50",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.151882492005825,
+      "old_rapidglm_seconds": 0.956023642,
+      "final_reference_seconds": 2.0519969849992776,
+      "final_rapidglm_seconds": 0.921773494,
+      "old_speedup": 2.2508674445582644,
+      "final_speedup": 2.2261401508679937,
+      "final_over_old_speedup": 0.9890143270097704,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p50",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 3.92818998824805,
+      "old_rapidglm_seconds": 0.956023642,
+      "final_reference_seconds": 3.3033427519985707,
+      "final_rapidglm_seconds": 0.921773494,
+      "old_speedup": 4.108883730145295,
+      "final_speedup": 3.583681645762935,
+      "final_over_old_speedup": 0.8721788887504519,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p50",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 3.54143282584846,
+      "old_rapidglm_seconds": 0.956023642,
+      "final_reference_seconds": 3.302021301999048,
+      "final_rapidglm_seconds": 0.921773494,
+      "old_speedup": 3.704336033405814,
+      "final_speedup": 3.582248050624732,
+      "final_over_old_speedup": 0.9670418715580635,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p50",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.03,
+      "old_rapidglm_seconds": 0.956023642,
+      "final_reference_seconds": 2.207,
+      "final_rapidglm_seconds": 0.921773494,
+      "old_speedup": 2.1233784509274716,
+      "final_speedup": 2.394297530104505,
+      "final_over_old_speedup": 1.1275886920010414,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-gaussian-n1000000-p50",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 22.861908223479986,
+      "old_rapidglm_seconds": 0.956023642,
+      "final_reference_seconds": 19.897200903997145,
+      "final_rapidglm_seconds": 0.921773494,
+      "old_speedup": 23.913538556068456,
+      "final_speedup": 21.585781142017897,
+      "final_over_old_speedup": 0.9026594324970842,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n10000-p20",
+        "tool": "glm.nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.227,
+      "old_rapidglm_seconds": 0.012179835,
+      "final_reference_seconds": 0.218,
+      "final_rapidglm_seconds": 0.011466316,
+      "old_speedup": 18.63736249300586,
+      "final_speedup": 19.01220932686662,
+      "final_over_old_speedup": 1.0201126545669448,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n10000-p20",
+        "tool": "statsmodels-nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.05382889602333307,
+      "old_rapidglm_seconds": 0.012179835,
+      "final_reference_seconds": 0.052623588002461474,
+      "final_rapidglm_seconds": 0.011466316,
+      "old_speedup": 4.4195094616087225,
+      "final_speedup": 4.589406746025618,
+      "final_over_old_speedup": 1.038442566056879,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n10000-p5",
+        "tool": "glm.nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.123,
+      "old_rapidglm_seconds": 0.005655841,
+      "final_reference_seconds": 0.121,
+      "final_rapidglm_seconds": 0.005695216,
+      "old_speedup": 21.74742889695803,
+      "final_speedup": 21.2459018235656,
+      "final_over_old_speedup": 0.9769385578511958,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n10000-p5",
+        "tool": "statsmodels-nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.02512198593467474,
+      "old_rapidglm_seconds": 0.005655841,
+      "final_reference_seconds": 0.024785679001070093,
+      "final_rapidglm_seconds": 0.005695216,
+      "old_speedup": 4.441777259062753,
+      "final_speedup": 4.352017377579725,
+      "final_over_old_speedup": 0.979791899447482,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n10000-p50",
+        "tool": "glm.nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.318,
+      "old_rapidglm_seconds": 0.037316916,
+      "final_reference_seconds": 0.303,
+      "final_rapidglm_seconds": 0.039514568,
+      "old_speedup": 8.521604518444128,
+      "final_speedup": 7.668058018500924,
+      "final_over_old_speedup": 0.8998373489293252,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n10000-p50",
+        "tool": "statsmodels-nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.14001581724733114,
+      "old_rapidglm_seconds": 0.037316916,
+      "final_reference_seconds": 0.13027617700208793,
+      "final_rapidglm_seconds": 0.039514568,
+      "old_speedup": 3.7520736506556744,
+      "final_speedup": 3.2969151276584356,
+      "final_over_old_speedup": 0.8786914742684488,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n100000-p20",
+        "tool": "glm.nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.644,
+      "old_rapidglm_seconds": 0.121761236,
+      "final_reference_seconds": 1.568,
+      "final_rapidglm_seconds": 0.118431409,
+      "old_speedup": 13.501834031973853,
+      "final_speedup": 13.239731024394045,
+      "final_over_old_speedup": 0.980587599658008,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n100000-p20",
+        "tool": "statsmodels-nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.5779045317322016,
+      "old_rapidglm_seconds": 0.121761236,
+      "final_reference_seconds": 0.5203517949994421,
+      "final_rapidglm_seconds": 0.118431409,
+      "old_speedup": 4.746211115434157,
+      "final_speedup": 4.3936975789880375,
+      "final_over_old_speedup": 0.925727379614492,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n100000-p5",
+        "tool": "glm.nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.224,
+      "old_rapidglm_seconds": 0.058758625,
+      "final_reference_seconds": 1.215,
+      "final_rapidglm_seconds": 0.05687331,
+      "old_speedup": 20.830984387398445,
+      "final_speedup": 21.363272157010027,
+      "final_over_old_speedup": 1.0255526939923965,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n100000-p5",
+        "tool": "statsmodels-nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.2858165754005313,
+      "old_rapidglm_seconds": 0.058758625,
+      "final_reference_seconds": 0.25554731900047045,
+      "final_rapidglm_seconds": 0.05687331,
+      "old_speedup": 4.864248872408625,
+      "final_speedup": 4.493273189136881,
+      "final_over_old_speedup": 0.9237342305045242,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n100000-p50",
+        "tool": "glm.nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 3.77,
+      "old_rapidglm_seconds": 0.408395159,
+      "final_reference_seconds": 3.681,
+      "final_rapidglm_seconds": 0.418697772,
+      "old_speedup": 9.231255358734554,
+      "final_speedup": 8.791544274087993,
+      "final_over_old_speedup": 0.9523671410269775,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-nb-n100000-p50",
+        "tool": "statsmodels-nb"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.0295424070209265,
+      "old_rapidglm_seconds": 0.408395159,
+      "final_reference_seconds": 1.778574469000887,
+      "final_rapidglm_seconds": 0.418697772,
+      "old_speedup": 4.969555496177971,
+      "final_speedup": 4.247871825314816,
+      "final_over_old_speedup": 0.8547790297506098,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p20",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.014,
+      "old_rapidglm_seconds": 0.005570143,
+      "final_reference_seconds": 0.0129999999999999,
+      "final_rapidglm_seconds": 0.005633145,
+      "old_speedup": 2.5134004638660086,
+      "final_speedup": 2.3077694609316644,
+      "final_over_old_speedup": 0.9181861363158774,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p20",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.035,
+      "old_rapidglm_seconds": 0.005570143,
+      "final_reference_seconds": 0.032,
+      "final_rapidglm_seconds": 0.005633145,
+      "old_speedup": 6.283501159665022,
+      "final_speedup": 5.680663288447217,
+      "final_over_old_speedup": 0.9040601957571784,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p20",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.028,
+      "old_rapidglm_seconds": 0.005570143,
+      "final_reference_seconds": 0.028,
+      "final_rapidglm_seconds": 0.005633145,
+      "old_speedup": 5.026800927732017,
+      "final_speedup": 4.9705803773913155,
+      "final_over_old_speedup": 0.9888158391094141,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p20",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.010429742746055126,
+      "old_rapidglm_seconds": 0.005570143,
+      "final_reference_seconds": 0.010376082998845959,
+      "final_rapidglm_seconds": 0.005633145,
+      "old_speedup": 1.8724371611384352,
+      "final_speedup": 1.8419698052945483,
+      "final_over_old_speedup": 0.9837285028965337,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p20",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.011748542077839375,
+      "old_rapidglm_seconds": 0.005570143,
+      "final_reference_seconds": 0.011608411001361674,
+      "final_rapidglm_seconds": 0.005633145,
+      "old_speedup": 2.1091993648707716,
+      "final_speedup": 2.0607335691450643,
+      "final_over_old_speedup": 0.9770217095012843,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p20",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.004854981787502766,
+      "old_rapidglm_seconds": 0.005570143,
+      "final_reference_seconds": 0.004806939999980386,
+      "final_rapidglm_seconds": 0.005633145,
+      "old_speedup": 0.8716081054836053,
+      "final_speedup": 0.8533314871142827,
+      "final_over_old_speedup": 0.9790311514379711,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p20",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.007189230993390083,
+      "old_rapidglm_seconds": 0.005570143,
+      "final_reference_seconds": 0.006986616001086077,
+      "final_rapidglm_seconds": 0.005633145,
+      "old_speedup": 1.2906726081161801,
+      "final_speedup": 1.2402691571202369,
+      "final_over_old_speedup": 0.960947919186485,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p20",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.016,
+      "old_rapidglm_seconds": 0.005570143,
+      "final_reference_seconds": 0.015,
+      "final_rapidglm_seconds": 0.005633145,
+      "old_speedup": 2.872457672989724,
+      "final_speedup": 2.662810916459633,
+      "final_over_old_speedup": 0.9270148491650755,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p20",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.02765593584626913,
+      "old_rapidglm_seconds": 0.005570143,
+      "final_reference_seconds": 0.02666603499892517,
+      "final_rapidglm_seconds": 0.005633145,
+      "old_speedup": 4.9650315703329575,
+      "final_speedup": 4.733773939588839,
+      "final_over_old_speedup": 0.9534227270324063,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p5",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.00499999999999989,
+      "old_rapidglm_seconds": 0.002166496,
+      "final_reference_seconds": 0.005,
+      "final_rapidglm_seconds": 0.002141494,
+      "old_speedup": 2.3078740971596026,
+      "final_speedup": 2.3348185892652515,
+      "final_over_old_speedup": 1.0116750268737842,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p5",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.014,
+      "old_rapidglm_seconds": 0.002166496,
+      "final_reference_seconds": 0.014,
+      "final_rapidglm_seconds": 0.002141494,
+      "old_speedup": 6.462047472047029,
+      "final_speedup": 6.5374920499427045,
+      "final_over_old_speedup": 1.011675026873762,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p5",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.00999999999999998,
+      "old_rapidglm_seconds": 0.002166496,
+      "final_reference_seconds": 0.01,
+      "final_rapidglm_seconds": 0.002141494,
+      "old_speedup": 4.615748194319297,
+      "final_speedup": 4.669637178530503,
+      "final_over_old_speedup": 1.0116750268737642,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p5",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.004776020534336567,
+      "old_rapidglm_seconds": 0.002166496,
+      "final_reference_seconds": 0.004734889000246767,
+      "final_rapidglm_seconds": 0.002141494,
+      "old_speedup": 2.204490815739594,
+      "final_speedup": 2.211021371176743,
+      "final_over_old_speedup": 1.0029623872281626,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p5",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.00607201736420393,
+      "old_rapidglm_seconds": 0.002166496,
+      "final_reference_seconds": 0.005349793998902896,
+      "final_rapidglm_seconds": 0.002141494,
+      "old_speedup": 2.8026903184699763,
+      "final_speedup": 2.4981596954756338,
+      "final_over_old_speedup": 0.8913434634617108,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p5",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0027445154264569283,
+      "old_rapidglm_seconds": 0.002166496,
+      "final_reference_seconds": 0.002610147999803303,
+      "final_rapidglm_seconds": 0.002141494,
+      "old_speedup": 1.2667992123950047,
+      "final_speedup": 1.2188444141348531,
+      "final_over_old_speedup": 0.9621449099502608,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p5",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0032130293548107147,
+      "old_rapidglm_seconds": 0.002166496,
+      "final_reference_seconds": 0.0030725619981240015,
+      "final_rapidglm_seconds": 0.002141494,
+      "old_speedup": 1.4830534442762482,
+      "final_speedup": 1.4347749739779807,
+      "final_over_old_speedup": 0.9674465741712848,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p5",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.00600000000000001,
+      "old_rapidglm_seconds": 0.002166496,
+      "final_reference_seconds": 0.00600000000000001,
+      "final_rapidglm_seconds": 0.002141494,
+      "old_speedup": 2.7694489165915885,
+      "final_speedup": 2.801782307118306,
+      "final_over_old_speedup": 1.011675026873762,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p5",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.00960453599691391,
+      "old_rapidglm_seconds": 0.002166496,
+      "final_reference_seconds": 0.00938248499733163,
+      "final_rapidglm_seconds": 0.002141494,
+      "old_speedup": 4.433211968503016,
+      "final_speedup": 4.381280077054445,
+      "final_over_old_speedup": 0.9882857188382745,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p50",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0439999999999999,
+      "old_rapidglm_seconds": 0.01803509,
+      "final_reference_seconds": 0.0439999999999999,
+      "final_rapidglm_seconds": 0.019220882,
+      "old_speedup": 2.4396884074323943,
+      "final_speedup": 2.2891769482794753,
+      "final_over_old_speedup": 0.9383070974578586,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p50",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.105,
+      "old_rapidglm_seconds": 0.01803509,
+      "final_reference_seconds": 0.106,
+      "final_rapidglm_seconds": 0.019220882,
+      "old_speedup": 5.821983699554591,
+      "final_speedup": 5.514835375400566,
+      "final_over_old_speedup": 0.9472433555288857,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p50",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.099,
+      "old_rapidglm_seconds": 0.01803509,
+      "final_reference_seconds": 0.098,
+      "final_rapidglm_seconds": 0.019220882,
+      "old_speedup": 5.4892989167229,
+      "final_speedup": 5.098621384804297,
+      "final_over_old_speedup": 0.9288292479885871,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p50",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.025488825514912605,
+      "old_rapidglm_seconds": 0.01803509,
+      "final_reference_seconds": 0.024889455999073107,
+      "final_rapidglm_seconds": 0.019220882,
+      "old_speedup": 1.4132907301772604,
+      "final_speedup": 1.2949174756430586,
+      "final_over_old_speedup": 0.9162428140179233,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p50",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0286992359906435,
+      "old_rapidglm_seconds": 0.01803509,
+      "final_reference_seconds": 0.028999220001423964,
+      "final_rapidglm_seconds": 0.019220882,
+      "old_speedup": 1.5912998488304466,
+      "final_speedup": 1.5087351351214768,
+      "final_over_old_speedup": 0.9481149239286033,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p50",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.01485210657119751,
+      "old_rapidglm_seconds": 0.01803509,
+      "final_reference_seconds": 0.014803354002651758,
+      "final_rapidglm_seconds": 0.019220882,
+      "old_speedup": 0.8235116415386621,
+      "final_speedup": 0.7701703804566178,
+      "final_over_old_speedup": 0.9352270710073015,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p50",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.018317674286663532,
+      "old_rapidglm_seconds": 0.01803509,
+      "final_reference_seconds": 0.018506037999031832,
+      "final_rapidglm_seconds": 0.019220882,
+      "old_speedup": 1.0156685820067175,
+      "final_speedup": 0.9628089907129044,
+      "final_over_old_speedup": 0.9479558664802102,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p50",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0600000000000001,
+      "old_rapidglm_seconds": 0.01803509,
+      "final_reference_seconds": 0.0600000000000001,
+      "final_rapidglm_seconds": 0.019220882,
+      "old_speedup": 3.3268478283169145,
+      "final_speedup": 3.1216049294720243,
+      "final_over_old_speedup": 0.9383070974578586,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n10000-p50",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.09440753236413002,
+      "old_rapidglm_seconds": 0.01803509,
+      "final_reference_seconds": 0.09266697700149962,
+      "final_rapidglm_seconds": 0.019220882,
+      "old_speedup": 5.234658233706071,
+      "final_speedup": 4.821161536785857,
+      "final_over_old_speedup": 0.9210078903990903,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p20",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.157,
+      "old_rapidglm_seconds": 0.058333569,
+      "final_reference_seconds": 0.164,
+      "final_rapidglm_seconds": 0.05915343,
+      "old_speedup": 2.691417698101071,
+      "final_speedup": 2.772451234019735,
+      "final_over_old_speedup": 1.03010812330462,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p20",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.389,
+      "old_rapidglm_seconds": 0.058333569,
+      "final_reference_seconds": 0.376,
+      "final_rapidglm_seconds": 0.05915343,
+      "old_speedup": 6.668544487651698,
+      "final_speedup": 6.356351609703782,
+      "final_over_old_speedup": 0.9531842550460582,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p20",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.303,
+      "old_rapidglm_seconds": 0.058333569,
+      "final_reference_seconds": 0.293,
+      "final_rapidglm_seconds": 0.05915343,
+      "old_speedup": 5.194264729456207,
+      "final_speedup": 4.9532208022425745,
+      "final_over_old_speedup": 0.9535942159731109,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p20",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.08861854858696461,
+      "old_rapidglm_seconds": 0.058333569,
+      "final_reference_seconds": 0.07684841499940376,
+      "final_rapidglm_seconds": 0.05915343,
+      "old_speedup": 1.519168981190995,
+      "final_speedup": 1.2991370914485223,
+      "final_over_old_speedup": 0.8551629920919183,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p20",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.10111978743225336,
+      "old_rapidglm_seconds": 0.058333569,
+      "final_reference_seconds": 0.08748624299914809,
+      "final_rapidglm_seconds": 0.05915343,
+      "old_speedup": 1.7334750670279295,
+      "final_speedup": 1.4789715997727957,
+      "final_over_old_speedup": 0.8531830817206479,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p20",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.055640483275055885,
+      "old_rapidglm_seconds": 0.058333569,
+      "final_reference_seconds": 0.05109963299764786,
+      "final_rapidglm_seconds": 0.05915343,
+      "old_speedup": 0.9538330026584844,
+      "final_speedup": 0.8638490278188071,
+      "final_over_old_speedup": 0.905660661154649,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p20",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.08378449082374573,
+      "old_rapidglm_seconds": 0.058333569,
+      "final_reference_seconds": 0.061394105996441795,
+      "final_rapidglm_seconds": 0.05915343,
+      "old_speedup": 1.4362997543274907,
+      "final_speedup": 1.0378790544595942,
+      "final_over_old_speedup": 0.7226061630467615,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p20",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.175,
+      "old_rapidglm_seconds": 0.058333569,
+      "final_reference_seconds": 0.172,
+      "final_rapidglm_seconds": 0.05915343,
+      "old_speedup": 2.9999878800489643,
+      "final_speedup": 2.9076927576304534,
+      "final_over_old_speedup": 0.9692348349030648,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p20",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.31475262623280287,
+      "old_rapidglm_seconds": 0.058333569,
+      "final_reference_seconds": 0.3157931979985733,
+      "final_rapidglm_seconds": 0.05915343,
+      "old_speedup": 5.395737508068517,
+      "final_speedup": 5.338544155403555,
+      "final_over_old_speedup": 0.9894002714958914,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p5",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0529999999999999,
+      "old_rapidglm_seconds": 0.023018443,
+      "final_reference_seconds": 0.0479999999999999,
+      "final_rapidglm_seconds": 0.022082859,
+      "old_speedup": 2.302501520194042,
+      "final_speedup": 2.173631593626527,
+      "final_over_old_speedup": 0.9440304705828578,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p5",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.199,
+      "old_rapidglm_seconds": 0.023018443,
+      "final_reference_seconds": 0.172,
+      "final_rapidglm_seconds": 0.022082859,
+      "old_speedup": 8.645241556955003,
+      "final_speedup": 7.788846543828405,
+      "final_over_old_speedup": 0.9009403025369906,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p5",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.136,
+      "old_rapidglm_seconds": 0.023018443,
+      "final_reference_seconds": 0.121,
+      "final_rapidglm_seconds": 0.022082859,
+      "old_speedup": 5.908305787667741,
+      "final_speedup": 5.479362975600216,
+      "final_over_old_speedup": 0.9274000318394409,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p5",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.03392536472529173,
+      "old_rapidglm_seconds": 0.023018443,
+      "final_reference_seconds": 0.03137999500177102,
+      "final_rapidglm_seconds": 0.022082859,
+      "old_speedup": 1.47383403496456,
+      "final_speedup": 1.4210114279935864,
+      "final_over_old_speedup": 0.9641597318844358,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p5",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.03717857878655195,
+      "old_rapidglm_seconds": 0.023018443,
+      "final_reference_seconds": 0.034476458000426646,
+      "final_rapidglm_seconds": 0.022082859,
+      "old_speedup": 1.6151647957488677,
+      "final_speedup": 1.5612316322096993,
+      "final_over_old_speedup": 0.9666082596146715,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p5",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.018890656530857086,
+      "old_rapidglm_seconds": 0.023018443,
+      "final_reference_seconds": 0.01842265899904305,
+      "final_rapidglm_seconds": 0.022082859,
+      "old_speedup": 0.820674818486076,
+      "final_speedup": 0.8342515341443357,
+      "final_over_old_speedup": 1.0165433559705233,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p5",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.027216708287596703,
+      "old_rapidglm_seconds": 0.023018443,
+      "final_reference_seconds": 0.027016362000722438,
+      "final_rapidglm_seconds": 0.022082859,
+      "old_speedup": 1.1823870227711188,
+      "final_speedup": 1.2234087081171166,
+      "final_over_old_speedup": 1.0346939576940355,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p5",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.0800000000000001,
+      "old_rapidglm_seconds": 0.023018443,
+      "final_reference_seconds": 0.0620000000000001,
+      "final_rapidglm_seconds": 0.022082859,
+      "old_speedup": 3.4754739927457345,
+      "final_speedup": 2.807607475100941,
+      "final_over_old_speedup": 0.8078344078998106,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p5",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.11284235958009958,
+      "old_rapidglm_seconds": 0.023018443,
+      "final_reference_seconds": 0.09232640600021114,
+      "final_rapidglm_seconds": 0.022082859,
+      "old_speedup": 4.902258575008726,
+      "final_speedup": 4.18090818766769,
+      "final_over_old_speedup": 0.8528534600319911,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p50",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.846,
+      "old_rapidglm_seconds": 0.208133841,
+      "final_reference_seconds": 0.792000000000001,
+      "final_rapidglm_seconds": 0.216986355,
+      "old_speedup": 4.0646921996697305,
+      "final_speedup": 3.649999097869546,
+      "final_over_old_speedup": 0.8979767516384439,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p50",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.596,
+      "old_rapidglm_seconds": 0.208133841,
+      "final_reference_seconds": 1.271,
+      "final_rapidglm_seconds": 0.216986355,
+      "old_speedup": 7.668142731291833,
+      "final_speedup": 5.857511178525488,
+      "final_over_old_speedup": 0.7638761279993399,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p50",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.341,
+      "old_rapidglm_seconds": 0.208133841,
+      "final_reference_seconds": 1.197,
+      "final_rapidglm_seconds": 0.216986355,
+      "old_speedup": 6.442969550540317,
+      "final_speedup": 5.516475909280103,
+      "final_over_old_speedup": 0.8562008350353731,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p50",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.3985997214913368,
+      "old_rapidglm_seconds": 0.208133841,
+      "final_reference_seconds": 0.3747610550017271,
+      "final_rapidglm_seconds": 0.216986355,
+      "old_speedup": 1.9151125044165056,
+      "final_speedup": 1.7271180715567442,
+      "final_over_old_speedup": 0.9018363503834782,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p50",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.4503073450177908,
+      "old_rapidglm_seconds": 0.208133841,
+      "final_reference_seconds": 0.4129525630014541,
+      "final_rapidglm_seconds": 0.216986355,
+      "old_speedup": 2.163546989063594,
+      "final_speedup": 1.90312687174018,
+      "final_over_old_speedup": 0.8796327888232617,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p50",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.2363480944186449,
+      "old_rapidglm_seconds": 0.208133841,
+      "final_reference_seconds": 0.2267086149986426,
+      "final_rapidglm_seconds": 0.216986355,
+      "old_speedup": 1.1355582219743154,
+      "final_speedup": 1.0448058588690639,
+      "final_over_old_speedup": 0.9200812769005654,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p50",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.3409957019612193,
+      "old_rapidglm_seconds": 0.208133841,
+      "final_reference_seconds": 0.3364635569996608,
+      "final_rapidglm_seconds": 0.216986355,
+      "old_speedup": 1.6383481913506766,
+      "final_speedup": 1.5506208074681047,
+      "final_over_old_speedup": 0.9464537609613691,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p50",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.88,
+      "old_rapidglm_seconds": 0.208133841,
+      "final_reference_seconds": 0.843999999999999,
+      "final_rapidglm_seconds": 0.216986355,
+      "old_speedup": 4.228048623769933,
+      "final_speedup": 3.8896455032852133,
+      "final_over_old_speedup": 0.9199623394626472,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n100000-p50",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.4358008531853557,
+      "old_rapidglm_seconds": 0.208133841,
+      "final_reference_seconds": 1.4101450639973336,
+      "final_rapidglm_seconds": 0.216986355,
+      "old_speedup": 6.898449796952316,
+      "final_speedup": 6.498772994261937,
+      "final_over_old_speedup": 0.9420628091159041,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p20",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 3.558,
+      "old_rapidglm_seconds": 0.808866979,
+      "final_reference_seconds": 3.441,
+      "final_rapidglm_seconds": 0.782429644,
+      "old_speedup": 4.398745519811855,
+      "final_speedup": 4.397839507215807,
+      "final_over_old_speedup": 0.9997940293222314,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p20",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 5.326,
+      "old_rapidglm_seconds": 0.808866979,
+      "final_reference_seconds": 5.011,
+      "final_rapidglm_seconds": 0.782429644,
+      "old_speedup": 6.584519010263614,
+      "final_speedup": 6.404409697953622,
+      "final_over_old_speedup": 0.9726465498802196,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p20",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 4.466,
+      "old_rapidglm_seconds": 0.808866979,
+      "final_reference_seconds": 4.378,
+      "final_rapidglm_seconds": 0.782429644,
+      "old_speedup": 5.521303398392284,
+      "final_speedup": 5.59539127073258,
+      "final_over_old_speedup": 1.0134185475773472,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p20",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.1479970067739487,
+      "old_rapidglm_seconds": 0.808866979,
+      "final_reference_seconds": 1.1869849459981197,
+      "final_rapidglm_seconds": 0.782429644,
+      "old_speedup": 1.4192655116088608,
+      "final_speedup": 1.5170500697416311,
+      "final_over_old_speedup": 1.0688980020531345,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p20",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 6.214426659978926,
+      "old_rapidglm_seconds": 0.808866979,
+      "final_reference_seconds": 6.572927620996779,
+      "final_rapidglm_seconds": 0.782429644,
+      "old_speedup": 7.682878422929075,
+      "final_speedup": 8.40066282176392,
+      "final_over_old_speedup": 1.0934264945144336,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p20",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.7692516297101974,
+      "old_rapidglm_seconds": 0.808866979,
+      "final_reference_seconds": 0.8095246630000474,
+      "final_rapidglm_seconds": 0.782429644,
+      "old_speedup": 0.9510236536806349,
+      "final_speedup": 1.0346293359509362,
+      "final_over_old_speedup": 1.0879112543065907,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p20",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.0007530683651567,
+      "old_rapidglm_seconds": 0.808866979,
+      "final_reference_seconds": 1.0034064480023517,
+      "final_rapidglm_seconds": 0.782429644,
+      "old_speedup": 1.237228239434851,
+      "final_speedup": 1.282423864812504,
+      "final_over_old_speedup": 1.0365297395719788,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p20",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.93,
+      "old_rapidglm_seconds": 0.808866979,
+      "final_reference_seconds": 2.697,
+      "final_rapidglm_seconds": 0.782429644,
+      "old_speedup": 3.6223508637011625,
+      "final_speedup": 3.446955289439417,
+      "final_over_old_speedup": 0.9515796285723316,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p20",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 6.46061772480607,
+      "old_rapidglm_seconds": 0.808866979,
+      "final_reference_seconds": 5.975521567001124,
+      "final_rapidglm_seconds": 0.782429644,
+      "old_speedup": 7.987243752728432,
+      "final_speedup": 7.637135955704055,
+      "final_over_old_speedup": 0.9561666317113735,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p5",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.714,
+      "old_rapidglm_seconds": 0.306396616,
+      "final_reference_seconds": 0.727,
+      "final_rapidglm_seconds": 0.281782662,
+      "old_speedup": 2.330312943142949,
+      "final_speedup": 2.580002597888723,
+      "final_over_old_speedup": 1.1071485507903551,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p5",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.888,
+      "old_rapidglm_seconds": 0.306396616,
+      "final_reference_seconds": 1.724,
+      "final_rapidglm_seconds": 0.281782662,
+      "old_speedup": 6.161947950495641,
+      "final_speedup": 6.118190479725115,
+      "final_over_old_speedup": 0.9928987600800805,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p5",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.305,
+      "old_rapidglm_seconds": 0.306396616,
+      "final_reference_seconds": 1.253,
+      "final_rapidglm_seconds": 0.281782662,
+      "old_speedup": 4.259185421290684,
+      "final_speedup": 4.446689484394181,
+      "final_over_old_speedup": 1.0440234562614268,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p5",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.5336705865338445,
+      "old_rapidglm_seconds": 0.306396616,
+      "final_reference_seconds": 0.44611999900007504,
+      "final_rapidglm_seconds": 0.281782662,
+      "old_speedup": 1.741763970832643,
+      "final_speedup": 1.58320599228378,
+      "final_over_old_speedup": 0.9089670120613041,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p5",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 40.85967065766454,
+      "old_rapidglm_seconds": 0.306396616,
+      "final_reference_seconds": 40.50649026999963,
+      "final_rapidglm_seconds": 0.281782662,
+      "old_speedup": 133.35548933629389,
+      "final_speedup": 143.7508254854929,
+      "final_over_old_speedup": 1.0779520678221517,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p5",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.3523808252066374,
+      "old_rapidglm_seconds": 0.306396616,
+      "final_reference_seconds": 0.3377380120000453,
+      "final_rapidglm_seconds": 0.281782662,
+      "old_speedup": 1.1500806693199164,
+      "final_speedup": 1.1985762701043872,
+      "final_over_old_speedup": 1.042167129731124,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p5",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.457121673040092,
+      "old_rapidglm_seconds": 0.306396616,
+      "final_reference_seconds": 0.42388515999846277,
+      "final_rapidglm_seconds": 0.281782662,
+      "old_speedup": 1.4919279429642656,
+      "final_speedup": 1.5042982310901114,
+      "final_over_old_speedup": 1.0082914782742574,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p5",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 0.846,
+      "old_rapidglm_seconds": 0.306396616,
+      "final_reference_seconds": 0.819,
+      "final_rapidglm_seconds": 0.281782662,
+      "old_speedup": 2.761127100698788,
+      "final_speedup": 2.9064953613079285,
+      "final_over_old_speedup": 1.0526481597215682,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p5",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 1.4538110988214612,
+      "old_rapidglm_seconds": 0.306396616,
+      "final_reference_seconds": 1.3578034510028374,
+      "final_rapidglm_seconds": 0.281782662,
+      "old_speedup": 4.744866695334067,
+      "final_speedup": 4.8186195749788086,
+      "final_over_old_speedup": 1.0155437200622028,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p50",
+        "tool": "fastglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 16.572,
+      "old_rapidglm_seconds": 2.270448208,
+      "final_reference_seconds": 15.474,
+      "final_rapidglm_seconds": 2.322661569,
+      "old_speedup": 7.29899935246618,
+      "final_speedup": 6.662184541444918,
+      "final_over_old_speedup": 0.9127531350162272,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p50",
+        "tool": "glm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 18.372,
+      "old_rapidglm_seconds": 2.270448208,
+      "final_reference_seconds": 17.723,
+      "final_rapidglm_seconds": 2.322661569,
+      "old_speedup": 8.091794358164897,
+      "final_speedup": 7.630470248677025,
+      "final_over_old_speedup": 0.9429886513338811,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p50",
+        "tool": "glm.fit"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 17.108,
+      "old_rapidglm_seconds": 2.270448208,
+      "final_reference_seconds": 16.414,
+      "final_rapidglm_seconds": 2.322661569,
+      "old_speedup": 7.535076087496465,
+      "final_speedup": 7.066892662742465,
+      "final_over_old_speedup": 0.9378661317659561,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p50",
+        "tool": "glum"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 3.5961277838796377,
+      "old_rapidglm_seconds": 2.270448208,
+      "final_reference_seconds": 3.595949506998295,
+      "final_rapidglm_seconds": 2.322661569,
+      "old_speedup": 1.5838845260634273,
+      "final_speedup": 1.5482020949554425,
+      "final_over_old_speedup": 0.9774715703570451,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p50",
+        "tool": "glum-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 16.37027784343809,
+      "old_rapidglm_seconds": 2.270448208,
+      "final_reference_seconds": 16.09689543299828,
+      "final_rapidglm_seconds": 2.322661569,
+      "old_speedup": 7.210152508987815,
+      "final_speedup": 6.930366286608275,
+      "final_over_old_speedup": 0.9611955195079753,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p50",
+        "tool": "sklearn"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.4023361233994365,
+      "old_rapidglm_seconds": 2.270448208,
+      "final_reference_seconds": 2.3830645740017644,
+      "final_rapidglm_seconds": 2.322661569,
+      "old_speedup": 1.0580889336892711,
+      "final_speedup": 1.0260059432712663,
+      "final_over_old_speedup": 0.9696783612449852,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p50",
+        "tool": "sklearn-tight"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 2.9762644600123167,
+      "old_rapidglm_seconds": 2.270448208,
+      "final_reference_seconds": 2.9643114710015652,
+      "final_rapidglm_seconds": 2.322661569,
+      "old_speedup": 1.3108708886313063,
+      "final_speedup": 1.2762563046487316,
+      "final_over_old_speedup": 0.9735942080316422,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p50",
+        "tool": "speedglm"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 10.468,
+      "old_rapidglm_seconds": 2.270448208,
+      "final_reference_seconds": 10.023,
+      "final_rapidglm_seconds": 2.322661569,
+      "old_speedup": 4.6105433998078675,
+      "final_speedup": 4.315307978473725,
+      "final_over_old_speedup": 0.9359651573073912,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "GLM loaded fit, one thread",
+      "identity": {
+        "problem": "speed-poisson-n1000000-p50",
+        "tool": "statsmodels"
+      },
+      "baseline_scope": "dev.2 raw GLM measurements carried by the dev.3 review",
+      "old_reference_seconds": 27.726439577527344,
+      "old_rapidglm_seconds": 2.270448208,
+      "final_reference_seconds": 26.957987882000452,
+      "final_rapidglm_seconds": 2.322661569,
+      "old_speedup": 12.21187934603939,
+      "final_speedup": 11.60650705285788,
+      "final_over_old_speedup": 0.9504275897241118,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "NB solver",
+      "identity": {
+        "dataset": "airway",
+        "mode": "fixed",
+        "reference": "ceres_levenberg_marquardt/tight"
+      },
+      "baseline_scope": "dev.2 solver receipts carried by the dev.3 review",
+      "old_reference_seconds": 0.472889,
+      "old_rapidglm_seconds": 0.216837,
+      "final_reference_seconds": 0.468379,
+      "final_rapidglm_seconds": 0.198174,
+      "old_speedup": 2.1808501316657214,
+      "final_speedup": 2.3634735131752906,
+      "final_over_old_speedup": 1.0837395375582652,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "NB solver",
+      "identity": {
+        "dataset": "airway",
+        "mode": "joint",
+        "reference": "ceres_bfgs/tight"
+      },
+      "baseline_scope": "dev.2 solver receipts carried by the dev.3 review",
+      "old_reference_seconds": 1.9128,
+      "old_rapidglm_seconds": 1.06682,
+      "final_reference_seconds": 1.90287,
+      "final_rapidglm_seconds": 1.116,
+      "old_speedup": 1.792992257363004,
+      "final_speedup": 1.7050806451612903,
+      "final_over_old_speedup": 0.9509693297108782,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "NB solver",
+      "identity": {
+        "dataset": "sim5000",
+        "mode": "fixed",
+        "reference": "ceres_levenberg_marquardt/tight"
+      },
+      "baseline_scope": "dev.2 solver receipts carried by the dev.3 review",
+      "old_reference_seconds": 4.60124,
+      "old_rapidglm_seconds": 1.61247,
+      "final_reference_seconds": 4.59671,
+      "final_rapidglm_seconds": 1.65664,
+      "old_speedup": 2.8535352595707204,
+      "final_speedup": 2.774718707745799,
+      "final_over_old_speedup": 0.9723793313712975,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "NB solver",
+      "identity": {
+        "dataset": "sim5000",
+        "mode": "joint",
+        "reference": "ceres_bfgs/tight"
+      },
+      "baseline_scope": "dev.2 solver receipts carried by the dev.3 review",
+      "old_reference_seconds": 13.9622,
+      "old_rapidglm_seconds": 3.30031,
+      "final_reference_seconds": 13.9704,
+      "final_rapidglm_seconds": 3.29241,
+      "old_speedup": 4.230572279573737,
+      "final_speedup": 4.243213937510821,
+      "final_over_old_speedup": 1.0029881673451417,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "NB solver",
+      "identity": {
+        "dataset": "thyroid",
+        "mode": "fixed",
+        "reference": "ceres_levenberg_marquardt/tight"
+      },
+      "baseline_scope": "dev.2 solver receipts carried by the dev.3 review",
+      "old_reference_seconds": 15.3282,
+      "old_rapidglm_seconds": 7.0703,
+      "final_reference_seconds": 15.2138,
+      "final_rapidglm_seconds": 7.06684,
+      "old_speedup": 2.1679702417153446,
+      "final_speedup": 2.1528434208217537,
+      "final_over_old_speedup": 0.9930225883167002,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "NB solver",
+      "identity": {
+        "dataset": "thyroid",
+        "mode": "joint",
+        "reference": "ceres_bfgs/tight"
+      },
+      "baseline_scope": "dev.2 solver receipts carried by the dev.3 review",
+      "old_reference_seconds": 87.5796,
+      "old_rapidglm_seconds": 15.066,
+      "final_reference_seconds": 87.639,
+      "final_rapidglm_seconds": 14.9844,
+      "old_speedup": 5.813062524890482,
+      "final_speedup": 5.848682629935132,
+      "final_over_old_speedup": 1.0061275970957015,
+      "speedup_change_over_five_percent": false
+    },
+    {
+      "scope": "QTL whole command at matched permutation budgets",
+      "identity": {
+        "rapidglm": "rapidglm_gaussian10000",
+        "reference": "tensorqtl"
+      },
+      "baseline_scope": "dev.3 review; Gaussian implementation changed after that review",
+      "old_reference_seconds": 144.99,
+      "old_rapidglm_seconds": 256.7,
+      "final_reference_seconds": 151.53,
+      "final_rapidglm_seconds": 117.19,
+      "old_speedup": 0.5648227502921699,
+      "final_speedup": 1.293028415393805,
+      "final_over_old_speedup": 2.2892640473935426,
+      "speedup_change_over_five_percent": true
+    },
+    {
+      "scope": "QTL whole command at matched permutation budgets",
+      "identity": {
+        "rapidglm": "rapidglm_nb",
+        "reference": "jaxqtl_nb_score_perm1000"
+      },
+      "baseline_scope": "dev.3 review; Gaussian implementation changed after that review",
+      "old_reference_seconds": 3193.1,
+      "old_rapidglm_seconds": 1098.42,
+      "final_reference_seconds": 3112.27,
+      "final_rapidglm_seconds": 1092.6,
+      "old_speedup": 2.9069936818339066,
+      "final_speedup": 2.8484989932271647,
+      "final_over_old_speedup": 0.9798779443614615,
+      "speedup_change_over_five_percent": false
+    }
+  ]
+}

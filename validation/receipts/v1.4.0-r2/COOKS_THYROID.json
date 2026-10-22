@@ -1,0 +1,79 @@
+{
+  "purpose": "Bulk DE agreement with DESeq2 1.48.2 on GTEx thyroid with Cook's-distance filtering disabled in both tools (docs/BULK_DE.md, larger multi-factor designs): by default, and under own_estimator with legacy_cooks false. Outlying counts are still replaced in both tools.",
+  "commands": {
+    "rapidglm": "rapidglm bulk-de with cooks_filter=false, coefficient sex[T.female] (scripts/validate_cooks.py)",
+    "deseq2": "DESeq(full = design, betaPrior = FALSE) then results(name = 'sex.T.female.', cooksCutoff = FALSE) (scripts/reference_bulk_nocooks.R)"
+  },
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "datasets": {
+    "thyroid128": {
+      "discoveries": [
+        884,
+        884
+      ],
+      "jaccard": 1.0,
+      "pvalue_spearman": 0.9999593625775627,
+      "replaced_genes": 67,
+      "own_estimator": {
+        "discoveries": [
+          866,
+          884
+        ],
+        "jaccard": 0.9707207207207207,
+        "pvalue_spearman": 0.9932789276771836,
+        "replaced_genes": 284
+      }
+    },
+    "thyroid": {
+      "discoveries": [
+        7180,
+        7180
+      ],
+      "jaccard": 1.0,
+      "pvalue_spearman": 0.999998364262093,
+      "replaced_genes": 98,
+      "own_estimator": {
+        "discoveries": [
+          7050,
+          7180
+        ],
+        "jaccard": 0.9643843180563225,
+        "pvalue_spearman": 0.9819336311192225,
+        "replaced_genes": 1109
+      }
+    }
+  },
+  "alpha_rob_black_box": {
+    "method": "alpha_rob = ((y-mu)^2/R^2 - mu)/mu^2 with R^2 = D p (1-h)^2/h from DESeq2's cooks, mu and H assays",
+    "floor": 0.04,
+    "share_at_floor": {
+      "airway": 0.5560820778756315,
+      "thyroid128": 0.02613924710626021
+    },
+    "flags_thyroid128": {
+      "deseq2": 224,
+      "rapidglm_rule_with_deseq2_alpha_rob": 224,
+      "best_tested_candidate_jaccard": 0.477,
+      "rapidglm_default": 219,
+      "rapidglm_own_estimator": 753
+    },
+    "carried_over": "analysis of 2026-10-01, not recomputed",
+    "review_scope": {
+      "historical_analysis_date": "2026-10-01",
+      "native_alpha_equality_bounds_revalidated": false,
+      "current_reference_consistency_receipt": "COOKS_INVERSION.json",
+      "current_own_estimator_precision_receipt": "THYROID_PRECISION.json",
+      "note": "The new inversion receipt checks within-gene consistency of public reference dispersions, with a declared fitted-mean subset; it does not test equality to the native robust estimator. Historical equality values remain historical.",
+      "current_fields_updated": [
+        "flags_thyroid128.rapidglm_default",
+        "flags_thyroid128.rapidglm_own_estimator"
+      ]
+    }
+  },
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

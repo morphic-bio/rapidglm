@@ -1,0 +1,30 @@
+{
+  "purpose": "Validate cached public Cook references against the fresh public DESeq2 run used for the in-memory inversion receipt. The formal flag rerun reuses the cached reference and reruns RapidGLM.",
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "results": {
+    "fields": [
+      "baseMean",
+      "pvalue",
+      "maxCooks"
+    ],
+    "all_rows_exact": true,
+    "rows": 28769,
+    "cooks_assay_exact": true,
+    "cooks_shape": [
+      28769,
+      128
+    ]
+  },
+  "sha256": {
+    "validation/work/cooks_flags/deseq2/genes.tsv": "cd0f8f0a0adfc216ea62f52e94b07bd2d6c4686a3c511cf46c7d41a1967eb491",
+    "validation/work/review-r2/thyroid-precision-direct/deseq2/genes.tsv": "f1ecae7083fd9ea1c132a4b16aca1999b0754fc3f25360b7a622301bd96ef548",
+    "validation/work/cooks_flags/deseq2/cooks.tsv": "3bce4c1bc13abba1af992d3edfee7d88e43b0d5d493c8f751b80a9dbc00d8372",
+    "validation/work/review-r2/thyroid-precision-direct/deseq2/cooks.tsv": "3bce4c1bc13abba1af992d3edfee7d88e43b0d5d493c8f751b80a9dbc00d8372"
+  },
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

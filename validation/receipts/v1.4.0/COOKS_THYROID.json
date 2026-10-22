@@ -1,0 +1,52 @@
+{
+  "purpose": "Bulk DE agreement with DESeq2 1.48.2 on GTEx thyroid with Cook's-distance filtering disabled in both tools (docs/BULK_DE.md, larger multi-factor designs): by default, and under own_estimator with legacy_cooks false. Outlying counts are still replaced in both tools.",
+  "commands": {
+    "rapidglm": "rapidglm bulk-de with cooks_filter=false, coefficient sex[T.female] (scripts/validate_cooks.py)",
+    "deseq2": "DESeq(full = design, betaPrior = FALSE) then results(name = 'sex.T.female.', cooksCutoff = FALSE) (scripts/reference_bulk_nocooks.R)"
+  },
+  "version": "1.4.0",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "datasets": {
+    "thyroid128": {
+      "discoveries": [
+        884,
+        884
+      ],
+      "jaccard": 1.0,
+      "pvalue_spearman": 0.9999593625775627,
+      "replaced_genes": 67,
+      "own_estimator": {
+        "discoveries": [
+          866,
+          884
+        ],
+        "jaccard": 0.9707207207207207,
+        "pvalue_spearman": 0.9932789276771836,
+        "replaced_genes": 284
+      }
+    },
+    "thyroid": {
+      "discoveries": [
+        7180,
+        7180
+      ],
+      "jaccard": 1.0,
+      "pvalue_spearman": 0.999998364262093,
+      "replaced_genes": 98,
+      "own_estimator": {
+        "discoveries": [
+          7050,
+          7180
+        ],
+        "jaccard": 0.9643843180563225,
+        "pvalue_spearman": 0.9819336311192225,
+        "replaced_genes": 1109
+      }
+    }
+  },
+  "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
+  }
+}

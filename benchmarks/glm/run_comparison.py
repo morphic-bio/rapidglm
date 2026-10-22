@@ -6,7 +6,7 @@ problems run one process at a time with one BLAS/OpenMP thread per tool.
 Results are written beside each problem as result-<tool>.json.
 """
 
-import argparse, json, os, shutil, subprocess
+import argparse, json, os, shutil, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import numpy as np
@@ -44,6 +44,7 @@ ENV = {
 
 
 RAPIDGLM_BINARY = ROOT / "build/rapidglm_glm_compare"
+REFERENCE_BINARY = ROOT / "validation/work/glm-compare/bin/glm_reference"
 
 
 def reduced(problem, drop_rows, drop_last_column):
@@ -121,7 +122,7 @@ def run_reference(problem):
         target = reduced(problem, 40, True)
     subprocess.run(
         [
-            str(ROOT / "validation/work/glm-compare/bin/glm_reference"),
+            str(REFERENCE_BINARY),
             str(target),
             str(problem / "reference.json"),
         ],
@@ -154,6 +155,10 @@ def main(args):
         for p in speed:
             for t in tools:
                 if meta[p]["family"] in TOOLS[t][1]:
+                    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+                        sys.path.insert(0, str(ROOT / "scripts"))
+                        from quiet_run import wait_quiet
+                        wait_quiet(os.sched_getaffinity(0), label=f"GLM {p.name} {t}")
                     run_tool(t, p, args.budget, args.timeout, args.label)
                     print("speed", p.name, t, os.getloadavg()[0], flush=True)
 
@@ -169,8 +174,11 @@ if __name__ == "__main__":
     ap.add_argument("--budget", type=float, default=20.0)
     ap.add_argument("--timeout", type=int, default=1800)
     ap.add_argument("--rapidglm-binary", type=Path)
+    ap.add_argument("--reference-binary", type=Path)
     ap.add_argument("--label", default="", help="suffix for result files")
     args = ap.parse_args()
     if args.rapidglm_binary:
         RAPIDGLM_BINARY = args.rapidglm_binary.resolve()
+    if args.reference_binary:
+        REFERENCE_BINARY = args.reference_binary.resolve()
     main(args)

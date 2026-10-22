@@ -1,0 +1,56 @@
+{"timed_command_ready_utc": "2026-10-22T05:59:34Z", "load_average": [1.15771484375, 1.80224609375, 2.0009765625], "cpus": "16-31", "waited_for_quiet_seconds": 20.08}
+thyroid rapidglm-cli t1 repeat 0: 35.49 s {'load': 1.31103515625, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.09, 'others_cpu': 0.0006, 'contended': False}
+thyroid rapidglm-cli t8 repeat 0: 6.21 s {'load': 2.3251953125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.09, 'others_cpu': 0.0142, 'contended': False}
+thyroid rapidglm-python t1 repeat 0: 35.07 s {'load': 2.2763671875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.04, 'others_cpu': 0.0, 'contended': False}
+thyroid rapidglm-python t8 repeat 0: 5.77 s {'load': 1.57763671875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.08, 'others_cpu': 0.0157, 'contended': False}
+thyroid rapidglm-deseq t1 repeat 0: 35.87 s {'load': 1.439453125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0005, 'contended': False}
+thyroid rapidglm-deseq t8 repeat 0: 6.71 s {'load': 1.130859375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.07, 'others_cpu': 0.0071, 'contended': False}
+thyroid rapidglm-r t1 repeat 0: 35.15 s {'load': 1.3681640625, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.08, 'others_cpu': 0.0002, 'contended': False}
+thyroid rapidglm-r t8 repeat 0: 6.51 s {'load': 2.96435546875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0394, 'contended': False}
+thyroid pydeseq2 t1 repeat 0: 173.60 s {'load': 2.61376953125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.05, 'others_cpu': 0.0001, 'contended': False}
+thyroid pydeseq2 t8 repeat 0: 35.76 s {'load': 1.7216796875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.07, 'others_cpu': 0.0084, 'contended': False}
+thyroid pydeseq2-rapidglm t1 repeat 0: 61.56 s {'load': 2.935546875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.07, 'others_cpu': 0.0002, 'contended': False}
+thyroid pydeseq2-rapidglm t8 repeat 0: 17.40 s {'load': 1.75439453125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.04, 'others_cpu': 0.0141, 'contended': False}
+thyroid deseq2 t1 repeat 0: 484.09 s {'load': 2.12548828125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0001, 'contended': False}
+thyroid deseq2 t8 repeat 0: 83.73 s {'load': 3.1953125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0228, 'contended': False}
+thyroid deseq2-glmgampoi t1 repeat 0: 271.94 s {'load': 2.48876953125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 200.89, 'others_cpu': 0.0001, 'contended': False}
+thyroid rapidglm-edger-cli t1 repeat 0: 13.06 s {'load': 1.8505859375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.09, 'others_cpu': 0.0, 'contended': False}
+thyroid rapidglm-edger-cli t8 repeat 0: 4.08 s {'load': 1.4306640625, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.08, 'others_cpu': 0.0243, 'contended': False}
+thyroid edger t1 repeat 0: 91.02 s {'load': 1.482421875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0, 'contended': False}
+thyroid rapidglm-cli t1 repeat 1: 35.45 s {'load': 1.79345703125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.08, 'others_cpu': 0.0006, 'contended': False}
+thyroid rapidglm-cli t8 repeat 1: 6.23 s {'load': 1.685546875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.09, 'others_cpu': 0.0084, 'contended': False}
+thyroid rapidglm-python t1 repeat 1: 34.96 s {'load': 1.71484375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.07, 'others_cpu': 0.0, 'contended': False}
+thyroid rapidglm-python t8 repeat 1: 5.76 s {'load': 1.4326171875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0046, 'contended': False}
+thyroid rapidglm-deseq t1 repeat 1: 35.90 s {'load': 1.580078125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.09, 'others_cpu': 0.0, 'contended': False}
+thyroid rapidglm-deseq t8 repeat 1: 6.69 s {'load': 1.36962890625, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.07, 'others_cpu': 0.0107, 'contended': False}
+thyroid rapidglm-r t1 repeat 1: 35.16 s {'load': 1.75, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.09, 'others_cpu': 0.0005, 'contended': False}
+thyroid rapidglm-r t8 repeat 1: 6.51 s {'load': 2.234375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.05, 'others_cpu': 0.0256, 'contended': False}
+thyroid pydeseq2 t1 repeat 1: 174.67 s {'load': 2.29150390625, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.08, 'others_cpu': 0.0002, 'contended': False}
+thyroid pydeseq2 t8 repeat 1: 35.87 s {'load': 1.8505859375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0045, 'contended': False}
+thyroid pydeseq2-rapidglm t1 repeat 1: 62.06 s {'load': 3.02001953125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 30.15, 'others_cpu': 0.0, 'contended': False}
+thyroid pydeseq2-rapidglm t8 repeat 1: 17.88 s {'load': 2.5810546875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0101, 'contended': False}
+thyroid deseq2 t1 repeat 1: 483.47 s {'load': 2.51904296875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 572.4, 'others_cpu': 0.0001, 'contended': False}
+thyroid deseq2 t8 repeat 1: 84.36 s {'load': 3.4892578125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.07, 'others_cpu': 0.0096, 'contended': False}
+thyroid deseq2-glmgampoi t1 repeat 1: 272.16 s {'load': 3.6005859375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 40.1, 'others_cpu': 0.0001, 'contended': False}
+thyroid rapidglm-edger-cli t1 repeat 1: 13.10 s {'load': 1.48193359375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0, 'contended': False}
+thyroid rapidglm-edger-cli t8 repeat 1: 4.13 s {'load': 1.38037109375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0123, 'contended': False}
+thyroid edger t1 repeat 1: 91.00 s {'load': 2.13330078125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.07, 'others_cpu': 0.0, 'contended': False}
+dataset               tool  threads    seconds  contended
+thyroid       rapidglm-cli        1  35.448418      False
+thyroid       rapidglm-cli        8   6.208956      False
+thyroid    rapidglm-python        1  34.959959      False
+thyroid    rapidglm-python        8   5.762459      False
+thyroid     rapidglm-deseq        1  35.874008      False
+thyroid     rapidglm-deseq        8   6.685355      False
+thyroid         rapidglm-r        1  35.150000      False
+thyroid         rapidglm-r        8   6.507000      False
+thyroid           pydeseq2        1 173.598801      False
+thyroid           pydeseq2        8  35.764073      False
+thyroid  pydeseq2-rapidglm        1  61.562990      False
+thyroid  pydeseq2-rapidglm        8  17.399747      False
+thyroid             deseq2        1 483.469000      False
+thyroid             deseq2        8  83.727000      False
+thyroid   deseq2-glmgampoi        1 271.944000      False
+thyroid rapidglm-edger-cli        1  13.061127      False
+thyroid rapidglm-edger-cli        8   4.084602      False
+thyroid              edger        1  90.995000      False

@@ -48,7 +48,7 @@ pub fn version() -> String {
         .into_owned()
 }
 
-/// The C API version the library implements (this crate is written for 1).
+/// The C API version the library implements (this crate uses the legacy subset of version 2).
 pub fn c_api_version() -> i32 {
     unsafe { ffi::rapidglm_c_api_version() }
 }

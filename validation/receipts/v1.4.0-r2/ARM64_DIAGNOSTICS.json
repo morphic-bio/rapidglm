@@ -1,0 +1,89 @@
+{
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "untimed": true,
+  "cpus": "0-7",
+  "timing_usable": false,
+  "boundary_gene": {
+    "output_row": 5652,
+    "gene": 5652,
+    "counts": [
+      0,
+      15,
+      0,
+      7,
+      0,
+      6,
+      0,
+      13
+    ],
+    "x86_unshrunk_coefficient": 32.13775326408619,
+    "x86_deviance": 1.036483478043439e-12,
+    "design": "1\t0\t0\t1\t0\n1\t0\t0\t1\t1\n1\t0\t0\t0\t0\n1\t0\t0\t0\t1\n1\t0\t1\t0\t0\n1\t0\t1\t0\t1\n1\t1\t0\t0\t0\n1\t1\t0\t0\t1\n",
+    "arm64_unshrunk_coefficient": 32.132015009557655,
+    "arm64_deviance": 1.0424481811805465e-12,
+    "interpretation": "All four samples in design-column5 level0 have zero counts. The unshrunk coefficient has a boundary maximum rather than a unique finite estimate; tiny stopping differences give noticeably different coefficients with near-zero deviance. The1e-8 relative criterion is still recorded as failed."
+  },
+  "bulk_dispersion_floor": {
+    "max_abs": 5.886056730969709e-10,
+    "max_relative": 0.055234027412801256,
+    "nonfinite_mismatches": 0,
+    "worst_relative_row": 12848,
+    "x86_at_worst_relative": 1.0656577125870661e-08,
+    "arm64_at_worst_relative": 1.1245182798967632e-08
+  },
+  "sceptre_extreme_tail_examples": {
+    "sceptre-S1_public-strict": {
+      "max_abs": 4.6993658964211704e-15,
+      "max_relative": 1.0,
+      "nonfinite_mismatches": 0,
+      "worst_relative_row": 70,
+      "x86_at_worst_relative": 5.640866210001932e-133,
+      "arm64_at_worst_relative": 0.0
+    },
+    "sceptre-S1_public-ks": {
+      "max_abs": 4.6993658964211704e-15,
+      "max_relative": 0.835195530726257,
+      "nonfinite_mismatches": 0,
+      "worst_relative_row": 22,
+      "x86_at_worst_relative": 4.2309201218141356e-123,
+      "arm64_at_worst_relative": 6.972745452151788e-124
+    },
+    "sceptre-S2_public-strict": {
+      "max_abs": 7.979727989493313e-16,
+      "max_relative": 7.49714973604487e+164,
+      "nonfinite_mismatches": 0,
+      "worst_relative_row": 73,
+      "x86_at_worst_relative": 0.0,
+      "arm64_at_worst_relative": 7.497149736044871e-136
+    },
+    "sceptre-S2_public-ks": {
+      "max_abs": 7.979727989493313e-16,
+      "max_relative": 3.0458715596330275,
+      "nonfinite_mismatches": 0,
+      "worst_relative_row": 74,
+      "x86_at_worst_relative": 9.025659549753124e-169,
+      "arm64_at_worst_relative": 3.65166592792764e-168
+    }
+  },
+  "floating_tail_probe": "ARM64_TAIL_PROBE.json",
+  "same_host_portable_comparison": "ARM64_ROUNDING_DIAGNOSTICS.json",
+  "conclusion": "Application discoveries/statuses and empirical p-values match, but the stipulated relative criterion does not hold for every numeric column. Counts/near-zero scale explain some comparisons; fitted-tail arithmetic is independently reproduced with identical inputs. No tolerance was loosened.",
+  "toolchains": {
+    "x86": {
+      "gcc": "12.3.0",
+      "Boost": "1.74",
+      "long_double_mantissa_bits": 64
+    },
+    "arm64": {
+      "gcc": "13.3.0",
+      "Boost": "1.83",
+      "long_double_mantissa_bits": 113
+    }
+  },
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

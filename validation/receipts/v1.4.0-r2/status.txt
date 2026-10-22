@@ -1,0 +1,27 @@
+2026-10-19T06:40:10 load 13.92 11.62 8.90 bulkval start
+Queued timing wrapper stopped before its first command for the ARM64 KS verification; no timed result was produced.
+2026-10-19T07:50:43 load 8.61 5.82 5.34 bulkval queued (timed commands wait for quiet host and CPUs)
+Quiet wrapper stopped before its first command to reconcile two stale primary METHODS paragraphs with the reviewed rules; no timed result was produced.
+2026-10-19T07:52:25 load 7.20 6.06 5.47 bulkval queued (timed commands wait for quiet host and CPUs)
+2026-10-19T08:17:22 load 3.86 4.68 5.55 bulkval exit 0
+2026-10-19T08:17:22 load 3.86 4.68 5.55 edgerval queued (timed commands wait for quiet host and CPUs)
+2026-10-19T08:18:03 load 3.81 4.56 5.48 edgerval exit 0
+2026-10-19T08:18:03 load 3.81 4.56 5.48 bulk queued (timed commands wait for quiet host and CPUs)
+2026-10-19T10:44:19 load 3.19 3.50 3.89 bulk small exit 0
+2026-10-19T11:51:20 load 2.60 2.82 2.96 bulk exit 0
+2026-10-19T11:51:20 load 2.60 2.82 2.96 cooks queued (timed commands wait for quiet host and CPUs)
+2026-10-19T11:51:50 load 5.17 3.41 3.16 cooks exit 0
+2026-10-19T11:51:50 load 5.17 3.41 3.16 replogle queued (timed commands wait for quiet host and CPUs)
+2026-10-19T12:25:17 load 15.50 13.43 11.62 replogle sc strict exit 0
+2026-10-19T12:39:50 load 17.15 15.67 13.47 replogle sc ks exit 0
+2026-10-19T13:37:24 load 12.84 16.79 18.20 replogle sceptre exit 0
+2026-10-19T18:09:07 load 4.46 4.66 4.56 replogle pseudobulk exit 0
+2026-10-19T18:10:13 load 6.81 5.21 4.75 replogle exit 0
+2026-10-19T18:10:13 load 6.81 5.21 4.75 eqtl queued (timed commands wait for quiet host and CPUs)
+2026-10-19T18:19:35 load 8.42 6.30 5.52 eqtl rapidglm gaussian exit 0
+2026-10-19T18:42:27 load 12.77 13.39 11.43 eqtl rapidglm nb exit 0
+2026-10-19T19:08:33 load 4.91 9.32 10.95 eqtl fastqtl exit 0
+2026-10-19T19:12:01 load 11.75 9.84 10.73 eqtl tensorqtl exit 0
+2026-10-19T19:15:42 load 6.12 7.08 9.36 eqtl jaxqtl nb_score_spa_acat exit 0
+2026-10-19T20:10:08 load 7.16 11.74 13.51 eqtl jaxqtl nb_score_perm1000 exit 0
+2026-10-19T20:10:18 load 6.83 11.52 13.42 eqtl exit 0

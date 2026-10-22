@@ -1,0 +1,206 @@
+{
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "untimed": true,
+  "cpus": "0-7",
+  "timing_usable": false,
+  "purpose": "Test fitted skew-normal tails on identical inputs, independent of random draws or statistic accumulation",
+  "source": "#include <rapidglm/resampling.hpp>\n#include <iostream>\n#include <iomanip>\n#include <limits>\nint main(){std::cerr<<\"long_double_mantissa_bits=\"<<std::numeric_limits<long double>::digits<<\"\\n\";std::cout<<std::setprecision(17);for(double a:{-10.,-2.,-.3,0.,.3,2.,10.})for(int i=-40;i<=40;++i){rapidglm::SkewFit f;f.location=0;f.scale=1;f.shape=a;std::cout<<a<<\",\"<<i<<\",\"<<rapidglm::skew_normal_tail(f,i,rapidglm::Side::both)<<\"\\n\";}}\n",
+  "x86_command": "g++ -std=c++17 -O2 -Iinclude -Ivalidation/local-data/numerical-deps/root/usr/include build-arm64-r2/tail_probe.cpp -o build-arm64-r2/tail_probe_x86",
+  "arm64_command": "aarch64-linux-gnu-g++ -std=c++17 -O2 -I/src/include /out/tail_probe.cpp -o /out/tail_probe_arm64; qemu-aarch64 -cpu max -L /usr/aarch64-linux-gnu /out/tail_probe_arm64",
+  "long_double_mantissa_bits": {
+    "x86": 64,
+    "arm64": 113
+  },
+  "points": 567,
+  "exact_mismatches": 24,
+  "maximum_absolute_difference": 8.200532357869981e-143,
+  "zero_nonzero_mismatches": 0,
+  "differences": [
+    {
+      "shape": -10.0,
+      "statistic": -32.0,
+      "x86": 2.1808322414050576e-224,
+      "arm64": 2.1808322414050566e-224
+    },
+    {
+      "shape": -10.0,
+      "statistic": -24.0,
+      "x86": 5.561568474198955e-127,
+      "arm64": 5.561568474198954e-127
+    },
+    {
+      "shape": -10.0,
+      "statistic": 24.0,
+      "x86": 1.4186920979115068e-140,
+      "arm64": 1.4227923640904418e-140
+    },
+    {
+      "shape": -10.0,
+      "statistic": 32.0,
+      "x86": 9.8860013972e-238,
+      "arm64": 9.909996546222328e-238
+    },
+    {
+      "shape": -10.0,
+      "statistic": 35.0,
+      "x86": 2.937424568004003e-281,
+      "arm64": 2.9401145172421013e-281
+    },
+    {
+      "shape": -10.0,
+      "statistic": 36.0,
+      "x86": 2.042727408179845e-297,
+      "arm64": 2.0546731824966867e-297
+    },
+    {
+      "shape": -2.0,
+      "statistic": -32.0,
+      "x86": 2.1808322414050576e-224,
+      "arm64": 2.1808322414050566e-224
+    },
+    {
+      "shape": -2.0,
+      "statistic": -24.0,
+      "x86": 5.561568474198955e-127,
+      "arm64": 5.561568474198954e-127
+    },
+    {
+      "shape": -2.0,
+      "statistic": 24.0,
+      "x86": 1.4186920979115068e-140,
+      "arm64": 1.4227923640904418e-140
+    },
+    {
+      "shape": -2.0,
+      "statistic": 32.0,
+      "x86": 9.8860013972e-238,
+      "arm64": 9.909996546222328e-238
+    },
+    {
+      "shape": -2.0,
+      "statistic": 35.0,
+      "x86": 2.937424568004003e-281,
+      "arm64": 2.9401145172421013e-281
+    },
+    {
+      "shape": -2.0,
+      "statistic": 36.0,
+      "x86": 2.042727408179845e-297,
+      "arm64": 2.0546731824966867e-297
+    },
+    {
+      "shape": 2.0,
+      "statistic": -36.0,
+      "x86": 2.042727408179845e-297,
+      "arm64": 2.0546731824966867e-297
+    },
+    {
+      "shape": 2.0,
+      "statistic": -35.0,
+      "x86": 2.937424568004003e-281,
+      "arm64": 2.9401145172421013e-281
+    },
+    {
+      "shape": 2.0,
+      "statistic": -32.0,
+      "x86": 9.8860013972e-238,
+      "arm64": 9.909996546222328e-238
+    },
+    {
+      "shape": 2.0,
+      "statistic": -24.0,
+      "x86": 1.4186920979115068e-140,
+      "arm64": 1.4227923640904418e-140
+    },
+    {
+      "shape": 2.0,
+      "statistic": 24.0,
+      "x86": 5.561568474198955e-127,
+      "arm64": 5.561568474198954e-127
+    },
+    {
+      "shape": 2.0,
+      "statistic": 32.0,
+      "x86": 2.1808322414050576e-224,
+      "arm64": 2.1808322414050566e-224
+    },
+    {
+      "shape": 10.0,
+      "statistic": -36.0,
+      "x86": 2.042727408179845e-297,
+      "arm64": 2.0546731824966867e-297
+    },
+    {
+      "shape": 10.0,
+      "statistic": -35.0,
+      "x86": 2.937424568004003e-281,
+      "arm64": 2.9401145172421013e-281
+    },
+    {
+      "shape": 10.0,
+      "statistic": -32.0,
+      "x86": 9.8860013972e-238,
+      "arm64": 9.909996546222328e-238
+    },
+    {
+      "shape": 10.0,
+      "statistic": -24.0,
+      "x86": 1.4186920979115068e-140,
+      "arm64": 1.4227923640904418e-140
+    },
+    {
+      "shape": 10.0,
+      "statistic": 24.0,
+      "x86": 5.561568474198955e-127,
+      "arm64": 5.561568474198954e-127
+    },
+    {
+      "shape": 10.0,
+      "statistic": 32.0,
+      "x86": 2.1808322414050576e-224,
+      "arm64": 2.1808322414050566e-224
+    }
+  ],
+  "conclusion": "Identical fitted-tail inputs can differ across these architecture/toolchain environments, independently of streams or resampling. This probe does not isolate compiler, Boost version, libm and long-double precision from one another. The application comparison retains all original failed exact and relative criteria.",
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  },
+  "toolchains": {
+    "x86": {
+      "gcc": "12.3.0",
+      "Boost": "1.74",
+      "long_double_mantissa_bits": 64
+    },
+    "arm64": {
+      "gcc": "13.3.0",
+      "Boost": "1.83",
+      "long_double_mantissa_bits": 113
+    }
+  },
+  "same_Boost_version_control": {
+    "x86_boost174_vs_x86_boost183": {
+      "points": 567,
+      "exact_mismatches": 0,
+      "max_absolute": 0.0,
+      "zero_nonzero_mismatches": 0
+    },
+    "x86_boost183_vs_arm64_boost183": {
+      "points": 567,
+      "exact_mismatches": 24,
+      "max_absolute": 8.200532357869981e-143,
+      "zero_nonzero_mismatches": 0
+    }
+  },
+  "control_note": "Second x86 probe uses the ARM container Boost1.83 headers with the same host GCC12.3 and CPU; headers stay in ignored local development dependencies. The remaining matched-Boost comparison still varies architecture/compiler/libm/long-double precision.",
+  "distribution_policy_control": {
+    "points": 567,
+    "exact_mismatches": 24,
+    "max_absolute": 8.200532357869981e-143,
+    "zero_nonzero_mismatches": 0
+  },
+  "distribution_policy_control_source": "#include <boost/math/distributions/skew_normal.hpp>\n#include <boost/math/policies/policy.hpp>\n#include <algorithm>\n#include <iostream>\n#include <iomanip>\nint main(){using P=boost::math::policies::policy<boost::math::policies::promote_double<false>>;std::cout<<std::setprecision(17);for(double a:{-10.,-2.,-.3,0.,.3,2.,10.})for(int i=-40;i<=40;++i){boost::math::skew_normal_distribution<double,P> f(0,1,a);double l=std::clamp(boost::math::cdf(f,double(i)),0.,1.);double r=std::clamp(boost::math::cdf(boost::math::complement(f,double(i))),0.,1.);std::cout<<a<<\",\"<<i<<\",\"<<std::min(1.,2*std::min(l,r))<<\"\\n\";}}\n",
+  "distribution_policy_control_note": "Setting promote_double<false> on the public distribution policy did not change the cross-platform differences on this grid. This does not establish which inner precision or libm operation is responsible. Production inferential tails were not changed."
+}

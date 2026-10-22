@@ -1,0 +1,765 @@
+{
+  "started": "2026-10-22T05:59:34",
+  "finished": "2026-10-22T07:15:14",
+  "host": {
+    "cores": 32,
+    "cpus_allowed": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "cpus_by_threads": {
+      "1": [
+        16
+      ],
+      "8": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ]
+    },
+    "uname": "Linux pikachu 6.8.0-138-generic #138~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug  7 13:43:15 UTC  x86_64"
+  },
+  "binary": "/mnt/pikachu/rapidglm/build/rapidglm",
+  "version": "1.4.0",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "repeats": 2,
+  "bulk": [
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-cli",
+      "threads": 1,
+      "seconds": 35.448418061001576,
+      "all_seconds": [
+        35.49419429999398,
+        35.448418061001576
+      ],
+      "load": 1.79345703125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 35.49419429999398,
+          "load": 1.31103515625,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.09,
+          "others_cpu": 0.0006,
+          "contended": false
+        },
+        {
+          "seconds": 35.448418061001576,
+          "load": 1.79345703125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.08,
+          "others_cpu": 0.0006,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "agreement_with_edger": {
+        "discoveries": 7178,
+        "jaccard": 0.9169500392362019,
+        "spearman": 0.9869837966998974
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-cli",
+      "threads": 8,
+      "seconds": 6.208955629997945,
+      "all_seconds": [
+        6.208955629997945,
+        6.2292301549969125
+      ],
+      "load": 2.3251953125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 6.208955629997945,
+          "load": 2.3251953125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.09,
+          "others_cpu": 0.0142,
+          "contended": false
+        },
+        {
+          "seconds": 6.2292301549969125,
+          "load": 1.685546875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.09,
+          "others_cpu": 0.0084,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "agreement_with_edger": {
+        "discoveries": 7178,
+        "jaccard": 0.9169500392362019,
+        "spearman": 0.9869837966998974
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-python",
+      "threads": 1,
+      "seconds": 34.95995910000056,
+      "all_seconds": [
+        35.06610886999988,
+        34.95995910000056
+      ],
+      "load": 1.71484375,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 35.06610886999988,
+          "load": 2.2763671875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.04,
+          "others_cpu": 0.0,
+          "contended": false
+        },
+        {
+          "seconds": 34.95995910000056,
+          "load": 1.71484375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.07,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "agreement_with_edger": {
+        "discoveries": 7178,
+        "jaccard": 0.9169500392362019,
+        "spearman": 0.9869837966998974
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-python",
+      "threads": 8,
+      "seconds": 5.762459293000575,
+      "all_seconds": [
+        5.772334119996231,
+        5.762459293000575
+      ],
+      "load": 1.4326171875,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 5.772334119996231,
+          "load": 1.57763671875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.08,
+          "others_cpu": 0.0157,
+          "contended": false
+        },
+        {
+          "seconds": 5.762459293000575,
+          "load": 1.4326171875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0046,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "agreement_with_edger": {
+        "discoveries": 7178,
+        "jaccard": 0.9169500392362019,
+        "spearman": 0.9869837966998974
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-deseq",
+      "threads": 1,
+      "seconds": 35.87400800400064,
+      "all_seconds": [
+        35.87400800400064,
+        35.896756772002846
+      ],
+      "load": 1.439453125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 35.87400800400064,
+          "load": 1.439453125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0005,
+          "contended": false
+        },
+        {
+          "seconds": 35.896756772002846,
+          "load": 1.580078125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.09,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "agreement_with_edger": {
+        "discoveries": 7178,
+        "jaccard": 0.9169500392362019,
+        "spearman": 0.9869837966998974
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-deseq",
+      "threads": 8,
+      "seconds": 6.6853552460015635,
+      "all_seconds": [
+        6.709763023995038,
+        6.6853552460015635
+      ],
+      "load": 1.36962890625,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 6.709763023995038,
+          "load": 1.130859375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.07,
+          "others_cpu": 0.0071,
+          "contended": false
+        },
+        {
+          "seconds": 6.6853552460015635,
+          "load": 1.36962890625,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.07,
+          "others_cpu": 0.0107,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "agreement_with_edger": {
+        "discoveries": 7178,
+        "jaccard": 0.9169500392362019,
+        "spearman": 0.9869837966998974
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-r",
+      "threads": 1,
+      "seconds": 35.15,
+      "all_seconds": [
+        35.15,
+        35.163
+      ],
+      "load": 1.3681640625,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 35.15,
+          "load": 1.3681640625,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.08,
+          "others_cpu": 0.0002,
+          "contended": false
+        },
+        {
+          "seconds": 35.163,
+          "load": 1.75,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.09,
+          "others_cpu": 0.0005,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "agreement_with_edger": {
+        "discoveries": 7178,
+        "jaccard": 0.9169500392362019,
+        "spearman": 0.9869837966998974
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-r",
+      "threads": 8,
+      "seconds": 6.507,
+      "all_seconds": [
+        6.51,
+        6.507
+      ],
+      "load": 2.234375,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 6.51,
+          "load": 2.96435546875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0394,
+          "contended": false
+        },
+        {
+          "seconds": 6.507,
+          "load": 2.234375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.05,
+          "others_cpu": 0.0256,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "agreement_with_edger": {
+        "discoveries": 7178,
+        "jaccard": 0.9169500392362019,
+        "spearman": 0.9869837966998974
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "pydeseq2",
+      "threads": 1,
+      "seconds": 173.59880145900388,
+      "all_seconds": [
+        173.59880145900388,
+        174.67169566900702
+      ],
+      "load": 2.61376953125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 173.59880145900388,
+          "load": 2.61376953125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.05,
+          "others_cpu": 0.0001,
+          "contended": false
+        },
+        {
+          "seconds": 174.67169566900702,
+          "load": 2.29150390625,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.08,
+          "others_cpu": 0.0002,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7177,
+        "jaccard": 1.0,
+        "spearman": 0.9999983832597613
+      },
+      "agreement_with_edger": {
+        "discoveries": 7177,
+        "jaccard": 0.9168192518964164,
+        "spearman": 0.9869809827888567
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "pydeseq2",
+      "threads": 8,
+      "seconds": 35.76407329500216,
+      "all_seconds": [
+        35.76407329500216,
+        35.87487965999753
+      ],
+      "load": 1.7216796875,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 35.76407329500216,
+          "load": 1.7216796875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.07,
+          "others_cpu": 0.0084,
+          "contended": false
+        },
+        {
+          "seconds": 35.87487965999753,
+          "load": 1.8505859375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0045,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7177,
+        "jaccard": 1.0,
+        "spearman": 0.9999983832597613
+      },
+      "agreement_with_edger": {
+        "discoveries": 7177,
+        "jaccard": 0.9168192518964164,
+        "spearman": 0.9869809827888567
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "pydeseq2-rapidglm",
+      "threads": 1,
+      "seconds": 61.56299021599989,
+      "all_seconds": [
+        61.56299021599989,
+        62.059378028003266
+      ],
+      "load": 2.935546875,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 61.56299021599989,
+          "load": 2.935546875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.07,
+          "others_cpu": 0.0002,
+          "contended": false
+        },
+        {
+          "seconds": 62.059378028003266,
+          "load": 3.02001953125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 30.15,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7176,
+        "jaccard": 0.9998606660164414,
+        "spearman": 0.9999980963746495
+      },
+      "agreement_with_edger": {
+        "discoveries": 7176,
+        "jaccard": 0.9169391759319817,
+        "spearman": 0.9869751104475537
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "pydeseq2-rapidglm",
+      "threads": 8,
+      "seconds": 17.39974731700204,
+      "all_seconds": [
+        17.39974731700204,
+        17.880953275001957
+      ],
+      "load": 1.75439453125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 17.39974731700204,
+          "load": 1.75439453125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.04,
+          "others_cpu": 0.0141,
+          "contended": false
+        },
+        {
+          "seconds": 17.880953275001957,
+          "load": 2.5810546875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0101,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7176,
+        "jaccard": 0.9998606660164414,
+        "spearman": 0.9999980963746495
+      },
+      "agreement_with_edger": {
+        "discoveries": 7176,
+        "jaccard": 0.9169391759319817,
+        "spearman": 0.9869751104475537
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "deseq2",
+      "threads": 1,
+      "seconds": 483.469,
+      "all_seconds": [
+        484.09,
+        483.469
+      ],
+      "load": 2.51904296875,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 484.09,
+          "load": 2.12548828125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0001,
+          "contended": false
+        },
+        {
+          "seconds": 483.469,
+          "load": 2.51904296875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 572.4,
+          "others_cpu": 0.0001,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7177,
+        "jaccard": 1.0,
+        "spearman": 1.0
+      },
+      "agreement_with_edger": {
+        "discoveries": 7177,
+        "jaccard": 0.9168192518964164,
+        "spearman": 0.986980203266937
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "deseq2",
+      "threads": 8,
+      "seconds": 83.727,
+      "all_seconds": [
+        83.727,
+        84.364
+      ],
+      "load": 3.1953125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 83.727,
+          "load": 3.1953125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0228,
+          "contended": false
+        },
+        {
+          "seconds": 84.364,
+          "load": 3.4892578125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.07,
+          "others_cpu": 0.0096,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7177,
+        "jaccard": 1.0,
+        "spearman": 1.0
+      },
+      "agreement_with_edger": {
+        "discoveries": 7177,
+        "jaccard": 0.9168192518964164,
+        "spearman": 0.986980203266937
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "deseq2-glmgampoi",
+      "threads": 1,
+      "seconds": 271.944,
+      "all_seconds": [
+        271.944,
+        272.159
+      ],
+      "load": 2.48876953125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 271.944,
+          "load": 2.48876953125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 200.89,
+          "others_cpu": 0.0001,
+          "contended": false
+        },
+        {
+          "seconds": 272.159,
+          "load": 3.6005859375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 40.1,
+          "others_cpu": 0.0001,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7168,
+        "jaccard": 0.989321869366246,
+        "spearman": 0.9998103327966473
+      },
+      "agreement_with_edger": {
+        "discoveries": 7168,
+        "jaccard": 0.9161433804290947,
+        "spearman": 0.9904868033464453
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-edger-cli",
+      "threads": 1,
+      "seconds": 13.06112652799493,
+      "all_seconds": [
+        13.06112652799493,
+        13.095973823998065
+      ],
+      "load": 1.8505859375,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 13.06112652799493,
+          "load": 1.8505859375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.09,
+          "others_cpu": 0.0,
+          "contended": false
+        },
+        {
+          "seconds": 13.095973823998065,
+          "load": 1.48193359375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7481,
+        "jaccard": 0.9165794979079498,
+        "spearman": 0.9871003229149231
+      },
+      "agreement_with_edger": {
+        "discoveries": 7481,
+        "jaccard": 0.9994653835872761,
+        "spearman": 0.9998382529170946
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-edger-cli",
+      "threads": 8,
+      "seconds": 4.084601612004917,
+      "all_seconds": [
+        4.084601612004917,
+        4.126516315998742
+      ],
+      "load": 1.4306640625,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 4.084601612004917,
+          "load": 1.4306640625,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.08,
+          "others_cpu": 0.0243,
+          "contended": false
+        },
+        {
+          "seconds": 4.126516315998742,
+          "load": 1.38037109375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0123,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7481,
+        "jaccard": 0.9165794979079498,
+        "spearman": 0.9871003229149231
+      },
+      "agreement_with_edger": {
+        "discoveries": 7481,
+        "jaccard": 0.9994653835872761,
+        "spearman": 0.9998382529170946
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "edger",
+      "threads": 1,
+      "seconds": 90.995,
+      "all_seconds": [
+        91.016,
+        90.995
+      ],
+      "load": 2.13330078125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 91.016,
+          "load": 1.482421875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0,
+          "contended": false
+        },
+        {
+          "seconds": 90.995,
+          "load": 2.13330078125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.07,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_deseq2": {
+        "discoveries": 7479,
+        "jaccard": 0.9168192518964164,
+        "spearman": 0.986980203266937
+      },
+      "agreement_with_edger": {
+        "discoveries": 7479,
+        "jaccard": 1.0,
+        "spearman": 1.0
+      }
+    }
+  ],
+  "perturbation": [],
+  "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
+  }
+}

@@ -1,0 +1,7 @@
+{"timed_command_ready_utc": "2026-10-22T03:12:56Z", "load_average": [0.9677734375, 1.1904296875, 1.2587890625], "cpus": "16", "waited_for_quiet_seconds": 20.1}
+rapidglm_newton: 1.116 s
+rapidglm_newton_plain: 1.21601 s
+ceres_bfgs/ceres_default: 1.23756 s
+ceres_lbfgs/ceres_default: 1.23711 s
+ceres_bfgs/tight: 1.90287 s
+ceres_lbfgs/tight: 2.16436 s

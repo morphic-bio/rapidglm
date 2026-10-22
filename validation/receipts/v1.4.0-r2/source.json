@@ -1,0 +1,21 @@
+{
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "branch": "fix/review-1.4.0-r2",
+  "worktree_dirty": false,
+  "binaries_sha256": {
+    "build/rapidglm": "1a5dcc42aaefd336a1b9b8de82c6c363d34d458411ee92b3af3bde80fe2a32e2",
+    "build/librapidglm_c.so": "c7ad582b0145accbc0fafa9718580691e490bfc762392672c3f84ff23fa5e508"
+  },
+  "timed_cpus": "16-31 (one:16; eight:16-23; QTL twelve:16-27)",
+  "untimed_cpus": "0-7",
+  "timing_lock": "/mnt/pikachu/e2e_bench_20260926/pikachu_timed.lock",
+  "quiet_host_start": "two ten-second intervals: one-minute load <=4 before and after, every selected CPU busy fraction <0.2",
+  "historical_v1.4.0_worktree": {
+    "dirty": true,
+    "explanation": "Review and initial git status show documentation edits, the seed-script options and untracked paper receipts/scripts; no initial engine source edits."
+  },
+  "not_run": "Gasperini all-by-all, full Replogle screen, genome-wide QTL; perturbation timing decision pending user",
+  "tag": "not created; user review required before any tag or publication",
+  "engine_change_commit": "a979b964b20c1bdd1f23ba3378b1c1ecf4bf86d5"
+}

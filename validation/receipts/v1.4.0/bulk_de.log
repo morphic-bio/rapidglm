@@ -1,0 +1,9 @@
+{"timed_command_ready_utc": "2026-10-22T03:28:54Z", "load_average": [1.333984375, 1.5625, 1.470703125], "cpus": "16-23", "waited_for_quiet_seconds": 20.1}
+NULL
+airway {'jaccard': 0.9862338196013971, 'pvalue_spearman': 0.9998132796511495, 'discoveries': [4833, 4834], 'rapidglm_seconds': {1: 1.0253798560006544, 8: 0.27080935499907355}, 'deseq2_seconds': 5.988}
+kang {'jaccard': 1.0, 'pvalue_spearman': 0.999999291999292, 'discoveries': [635, 635], 'rapidglm_seconds': {1: 0.09018892500171205, 8: 0.02674349199878634}, 'deseq2_seconds': 1.132}
+sim3 {'jaccard': 0.983402489626556, 'pvalue_spearman': 0.9999989738927951, 'discoveries': [239, 239], 'rapidglm_seconds': {1: 0.10526250900147716, 8: 0.04025775000627618}, 'deseq2_seconds': 1.319}
+sim3b {'jaccard': 1.0, 'pvalue_spearman': 0.9999989596990232, 'discoveries': [201, 201], 'rapidglm_seconds': {1: 0.1116502400036552, 8: 0.033129469004052226}, 'deseq2_seconds': 1.313}
+sim8 {'jaccard': 1.0, 'pvalue_spearman': 0.9999486090592878, 'discoveries': [253, 253], 'rapidglm_seconds': {1: 0.15397375199972885, 8: 0.041510617003950756}, 'deseq2_seconds': 2.736}
+mock null {'rapidglm': {'tests': 70000, 'valid': 69995, 'rate_0_05': 0.023673119508536324, 'rate_0_01': 0.005357525537538396, 'rate_0_001': 0.0014572469462104437, 'bh_0_05_per_split': 0.4714285714285714}, 'deseq2': {'tests': 70000, 'valid': 69995, 'rate_0_05': 0.023915993999571398, 'rate_0_01': 0.005371812272305165, 'rate_0_001': 0.0014572469462104437, 'bh_0_05_per_split': 0.4714285714285714}}
+gates {'G1_agreement': True, 'G2_calibration': True, 'G3_threads': True, 'G4_shrinkage': True}

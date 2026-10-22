@@ -1,0 +1,131 @@
+{
+ "gaussian": {
+  "genes": 580,
+  "valid": 580,
+  "statuses": {
+   "ok": 580
+  },
+  "pi0": 0.380891,
+  "egenes": 270,
+  "beta_vs_permutation_spearman": 0.9874701339534268,
+  "wall_seconds": 16.245319894,
+  "threads": 12,
+  "permutations": 1000,
+  "references": {
+   "FastQTL_perm_beta": {
+    "egenes": 267,
+    "shared": 267,
+    "jaccard": 0.9889,
+    "spearman_p": 0.9996724333204074,
+    "same_lead": 1.0
+   },
+   "tensorQTL_perm10000_beta": {
+    "egenes": 266,
+    "shared": 266,
+    "jaccard": 0.9852,
+    "spearman_p": 0.9996826428714425,
+    "same_lead": 1.0
+   },
+   "jaxQTL_NB_score_perm1000": {
+    "egenes": 170,
+    "shared": 160,
+    "jaccard": 0.5714,
+    "spearman_p": 0.7348398776452963,
+    "same_lead": 0.41724137931034483
+   },
+   "jaxQTL_NB_score_SPA_ACAT": {
+    "egenes": 194,
+    "shared": 171,
+    "jaccard": 0.5836,
+    "spearman_p": 0.6091521859663571,
+    "same_lead": 0.41724137931034483
+   }
+  }
+ },
+ "gaussian10000": {
+  "genes": 580,
+  "valid": 580,
+  "statuses": {
+   "ok": 580
+  },
+  "pi0": 0.384681,
+  "egenes": 267,
+  "beta_vs_permutation_spearman": 0.9918737673274878,
+  "wall_seconds": 117.131989338,
+  "threads": 12,
+  "permutations": 10000,
+  "references": {
+   "FastQTL_perm_beta": {
+    "egenes": 267,
+    "shared": 267,
+    "jaccard": 1.0,
+    "spearman_p": 0.9999127882929661,
+    "same_lead": 1.0
+   },
+   "tensorQTL_perm10000_beta": {
+    "egenes": 266,
+    "shared": 266,
+    "jaccard": 0.9963,
+    "spearman_p": 0.9999285946460745,
+    "same_lead": 1.0
+   },
+   "jaxQTL_NB_score_perm1000": {
+    "egenes": 170,
+    "shared": 160,
+    "jaccard": 0.5776,
+    "spearman_p": 0.7352599453173987,
+    "same_lead": 0.41724137931034483
+   },
+   "jaxQTL_NB_score_SPA_ACAT": {
+    "egenes": 194,
+    "shared": 171,
+    "jaccard": 0.5897,
+    "spearman_p": 0.6089728422867303,
+    "same_lead": 0.41724137931034483
+   }
+  }
+ },
+ "nb": {
+  "genes": 580,
+  "valid": 580,
+  "statuses": {
+   "ok": 580
+  },
+  "pi0": 1.0,
+  "egenes": 168,
+  "beta_vs_permutation_spearman": 0.994627285929953,
+  "wall_seconds": 1092.557479349,
+  "threads": 12,
+  "permutations": 1000,
+  "references": {
+   "FastQTL_perm_beta": {
+    "egenes": 267,
+    "shared": 158,
+    "jaccard": 0.5704,
+    "spearman_p": 0.7360486023831923,
+    "same_lead": 0.4586206896551724
+   },
+   "tensorQTL_perm10000_beta": {
+    "egenes": 266,
+    "shared": 158,
+    "jaccard": 0.5725,
+    "spearman_p": 0.7355308674397429,
+    "same_lead": 0.4586206896551724
+   },
+   "jaxQTL_NB_score_perm1000": {
+    "egenes": 170,
+    "shared": 168,
+    "jaccard": 0.9882,
+    "spearman_p": 0.9995568685830898,
+    "same_lead": 0.95
+   },
+   "jaxQTL_NB_score_SPA_ACAT": {
+    "egenes": 194,
+    "shared": 157,
+    "jaccard": 0.7659,
+    "spearman_p": 0.8122645614490428,
+    "same_lead": 0.9017241379310345
+   }
+  }
+ }
+}

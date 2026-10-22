@@ -1,0 +1,1114 @@
+{
+  "purpose": "Final CLI row changes from the combined review fixes. IDs are zero-based feature indices. No per-fix causal ablation is claimed.",
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "datasets": {
+    "airway": {
+      "old_table_sha256": "ff00d43c43004456ae30b354caead92fa35589268d908e7e04eef6e1567312a8",
+      "new_table_sha256": "d49b13a12dbe2e45b5aed4afbec66341df595d62f55ff47b012651ee13e9838a",
+      "old_discoveries": 4833,
+      "new_discoveries": 4833,
+      "old_statuses": {
+        "ok": 22369
+      },
+      "new_statuses": {
+        "ok": 22369
+      },
+      "old_finite_p": 22369,
+      "new_finite_p": 22369,
+      "lost": [],
+      "gained": [],
+      "changed_cooks_flags": [],
+      "detail": []
+    },
+    "thyroid32": {
+      "old_table_sha256": "cce10b004d868776eb80c965410f00b3e64ec6099597a13e606ca956f8eb3048",
+      "new_table_sha256": "169cb98a575977fb470f279b7517009924c2c2dc85d9b00b8e6bad2bf0ae8c80",
+      "old_discoveries": 1636,
+      "new_discoveries": 1623,
+      "old_statuses": {
+        "ok": 28677,
+        "cooks_outlier": 91,
+        "fit_numerical_failure": 1
+      },
+      "new_statuses": {
+        "ok": 28648,
+        "cooks_outlier": 91,
+        "floored_fit_failed": 30
+      },
+      "old_finite_p": 28677,
+      "new_finite_p": 28648,
+      "lost": [
+        2630,
+        6522,
+        8436,
+        8465,
+        12768,
+        13200,
+        13458,
+        15900,
+        15903,
+        15926,
+        16656,
+        18331,
+        18346,
+        18368
+      ],
+      "gained": [
+        23378
+      ],
+      "changed_cooks_flags": [
+        5739,
+        8453,
+        11136,
+        14461,
+        16656,
+        16829,
+        19858,
+        20370,
+        20378,
+        23378
+      ],
+      "detail": [
+        {
+          "gene": 2630,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 270.96401240629325,
+            "pvalue": 0.0056974821813999,
+            "padj": 0.0999293727251597,
+            "maxCooks": 0.0270128578179231,
+            "replaced": 0,
+            "dispersion": 0.1235512726592962,
+            "log2FoldChange": 0.5931624934948789,
+            "lfcSE": 0.2145484385446774
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 270.96401240629325,
+            "pvalue": 0.0056974513721662,
+            "padj": 0.1003802060116122,
+            "maxCooks": 0.0270128576365899,
+            "replaced": 0,
+            "dispersion": 0.1235511093205895,
+            "log2FoldChange": 0.5931624906943754,
+            "lfcSE": 0.2145483006327147
+          }
+        },
+        {
+          "gene": 5739,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 370.6613865320078,
+            "pvalue": 0.0176656475471675,
+            "padj": 0.2077923604225279,
+            "maxCooks": 3.471408530135714,
+            "replaced": 0,
+            "dispersion": 0.3020161206084705,
+            "log2FoldChange": 0.7883260412909073,
+            "lfcSE": 0.3322691521793843
+          },
+          "new": {
+            "status": "cooks_outlier",
+            "baseMean": 370.6613865320078,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 3.471408533666256,
+            "replaced": 0,
+            "dispersion": 0.3020175331295776,
+            "log2FoldChange": 0.7883260418055533,
+            "lfcSE": 0.3322699222529563
+          }
+        },
+        {
+          "gene": 6522,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 24.461630375703116,
+            "pvalue": 0.0001748200880742,
+            "padj": 0.00664895976884,
+            "maxCooks": 0.094975100536072,
+            "replaced": 0,
+            "dispersion": 1.457752292128373,
+            "log2FoldChange": 3.547570202607475,
+            "lfcSE": 0.9452947355261714
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 24.461630375703116,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 1.457769086495761,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 8436,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 3.915573367842819,
+            "pvalue": 1.934190290188347e-05,
+            "padj": 0.0010666687490717,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 4.239733569086478,
+            "log2FoldChange": 6.785697604421928,
+            "lfcSE": 1.5882802489366024
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 3.915573367842819,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 4.239795223101112,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 8453,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 120.85219770207432,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 4.314063287828774,
+            "replaced": 0,
+            "dispersion": 3.735114780014756,
+            "log2FoldChange": 8.346510148139584,
+            "lfcSE": 1.222306264835075
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 120.85219770207432,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 3.735114780014756,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 8465,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 311.410918088331,
+            "pvalue": 1.2357453555236234e-09,
+            "padj": 2.0484086451069923e-07,
+            "maxCooks": 0.129558178149409,
+            "replaced": 0,
+            "dispersion": 2.918633703804306,
+            "log2FoldChange": 6.329380602851339,
+            "lfcSE": 1.0417814965739112
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 311.410918088331,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 2.918633703804306,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 11136,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 181.25274549418975,
+            "pvalue": 0.4747072166383512,
+            "padj": 0.8426335127386225,
+            "maxCooks": 4.848655412607725,
+            "replaced": 0,
+            "dispersion": 0.5046892264145103,
+            "log2FoldChange": -0.3080908668093033,
+            "lfcSE": 0.4309920814346813
+          },
+          "new": {
+            "status": "cooks_outlier",
+            "baseMean": 181.25274549418975,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 4.848655410052471,
+            "replaced": 0,
+            "dispersion": 0.5046924626867377,
+            "log2FoldChange": -0.3080908490660268,
+            "lfcSE": 0.4309934416904267
+          }
+        },
+        {
+          "gene": 12768,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 176.13729257038622,
+            "pvalue": 0.0057008397389845,
+            "padj": 0.0999293727251597,
+            "maxCooks": 0.182979287269146,
+            "replaced": 0,
+            "dispersion": 0.1954680966356627,
+            "log2FoldChange": -0.749620021181941,
+            "lfcSE": 0.2711583895803799
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 176.13729257038622,
+            "pvalue": 0.0057008724930498,
+            "padj": 0.1003802060116122,
+            "maxCooks": 0.1829792936478835,
+            "replaced": 0,
+            "dispersion": 0.1954683743385633,
+            "log2FoldChange": -0.749620025895621,
+            "lfcSE": 0.2711585751424369
+          }
+        },
+        {
+          "gene": 13200,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 78.61725001465425,
+            "pvalue": 0.005677005944907,
+            "padj": 0.0996935085622162,
+            "maxCooks": 0.1188724140096682,
+            "replaced": 0,
+            "dispersion": 0.089741191656541,
+            "log2FoldChange": -0.5403726298291831,
+            "lfcSE": 0.1953712188240344
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 78.61725001465425,
+            "pvalue": 0.0056768352940319,
+            "padj": 0.1001416117631941,
+            "maxCooks": 0.1188723360992227,
+            "replaced": 0,
+            "dispersion": 0.0897404231209376,
+            "log2FoldChange": -0.5403725692112796,
+            "lfcSE": 0.1953705044510435
+          }
+        },
+        {
+          "gene": 13458,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 379.6234443338576,
+            "pvalue": 0.0057008910896663,
+            "padj": 0.0999293727251597,
+            "maxCooks": 0.0722858502358636,
+            "replaced": 0,
+            "dispersion": 0.0831301844254478,
+            "log2FoldChange": -0.4888181554150663,
+            "lfcSE": 0.1768192964083849
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 379.6234443338576,
+            "pvalue": 0.0057007960948591,
+            "padj": 0.1003802060116122,
+            "maxCooks": 0.0722858564916515,
+            "replaced": 0,
+            "dispersion": 0.0831298424219356,
+            "log2FoldChange": -0.4888181479409323,
+            "lfcSE": 0.1768189459912645
+          }
+        },
+        {
+          "gene": 14461,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 18.237145282547356,
+            "pvalue": 0.4332734293556921,
+            "padj": 0.8190495803317854,
+            "maxCooks": 5.513623322865703,
+            "replaced": 0,
+            "dispersion": 1.2373117347929383,
+            "log2FoldChange": -0.5434640612674847,
+            "lfcSE": 0.693545655650541
+          },
+          "new": {
+            "status": "cooks_outlier",
+            "baseMean": 18.237145282547356,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 5.513623090330363,
+            "replaced": 0,
+            "dispersion": 1.2373177098483297,
+            "log2FoldChange": -0.5434642521914889,
+            "lfcSE": 0.6935472200353978
+          }
+        },
+        {
+          "gene": 15900,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 108.43107188159748,
+            "pvalue": 4.1467881376375965e-09,
+            "padj": 6.193616844949654e-07,
+            "maxCooks": 0.0320755695224847,
+            "replaced": 0,
+            "dispersion": 3.1988059310736747,
+            "log2FoldChange": 6.819960858450043,
+            "lfcSE": 1.1602067177350563
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 108.43107188159748,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 3.1988059310736747,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 15903,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 469.47149758287935,
+            "pvalue": 7.59526287492213e-13,
+            "padj": 2.3420360587542143e-10,
+            "maxCooks": 0.5382688077484825,
+            "replaced": 0,
+            "dispersion": 3.0345140654493505,
+            "log2FoldChange": 7.631928121270999,
+            "lfcSE": 1.0646823403458003
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 469.47149758287935,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 3.0345140654493505,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 15926,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 13.726664778561467,
+            "pvalue": 3.8866601326953614e-05,
+            "padj": 0.001913241831238,
+            "maxCooks": 0.2244177243754944,
+            "replaced": 0,
+            "dispersion": 3.2501787598781227,
+            "log2FoldChange": 5.076772866720833,
+            "lfcSE": 1.2339887603457675
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 13.726664778561467,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 3.2501787598781227,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 16656,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 526.4903521916815,
+            "pvalue": 0.0009829983486835,
+            "padj": 0.0271052342742284,
+            "maxCooks": 3.4819377143861634,
+            "replaced": 0,
+            "dispersion": 0.2913735844671125,
+            "log2FoldChange": 1.0740113860795577,
+            "lfcSE": 0.3259174318654012
+          },
+          "new": {
+            "status": "cooks_outlier",
+            "baseMean": 526.4903521916815,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 3.4819377047749094,
+            "replaced": 0,
+            "dispersion": 0.2913749602999909,
+            "log2FoldChange": 1.074011386586828,
+            "lfcSE": 0.3259181965526165
+          }
+        },
+        {
+          "gene": 16829,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 76.75218047264664,
+            "pvalue": 0.2008728097860988,
+            "padj": 0.6604482419440447,
+            "maxCooks": 3.334963615876751,
+            "replaced": 0,
+            "dispersion": 0.4213456901765752,
+            "log2FoldChange": 0.5109659906306073,
+            "lfcSE": 0.399482786547661
+          },
+          "new": {
+            "status": "cooks_outlier",
+            "baseMean": 76.75218047264664,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 3.334963651008327,
+            "replaced": 0,
+            "dispersion": 0.4213475164933538,
+            "log2FoldChange": 0.5109659412817418,
+            "lfcSE": 0.3994836150152307
+          }
+        },
+        {
+          "gene": 18331,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 239.33704426462927,
+            "pvalue": 1.9864130942523146e-06,
+            "padj": 0.0001519049821436,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 3.9689903987302295,
+            "log2FoldChange": 5.7534096335925975,
+            "lfcSE": 1.210020945989429
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 239.33704426462927,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 3.9689903987302295,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 18346,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 69.226783603015,
+            "pvalue": 1.1526720788699949e-07,
+            "padj": 1.2912178595997984e-05,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 6.8199394761547225,
+            "log2FoldChange": 9.142462705859122,
+            "lfcSE": 1.7247176171901424
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 69.226783603015,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 6.8199394761547225,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 18368,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 65.73026498992967,
+            "pvalue": 2.893429837868796e-07,
+            "padj": 2.871103372337836e-05,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 4.667625418590881,
+            "log2FoldChange": 7.33257260076671,
+            "lfcSE": 1.4292790779209394
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 65.73026498992967,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 4.667625418590881,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 19858,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 124.55819765731324,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 6.383601235866788,
+            "replaced": 0,
+            "dispersion": 3.3627979973036517,
+            "log2FoldChange": -1.3842208095434858,
+            "lfcSE": 1.1433110211913495
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 124.55819765731324,
+            "pvalue": 0.1088731758346462,
+            "padj": 0.530712734611357,
+            "maxCooks": 6.978779672725327,
+            "replaced": 0,
+            "dispersion": 3.3627979973036517,
+            "log2FoldChange": -1.839992203476112,
+            "lfcSE": 1.1476435169725263
+          }
+        },
+        {
+          "gene": 20370,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 30.30980918707764,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 17.603618684906746,
+            "replaced": 0,
+            "dispersion": 3.694965261874219,
+            "log2FoldChange": -2.818450071302587,
+            "lfcSE": 1.3019780250774196
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 30.30980918707764,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 3.694965261874219,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 20378,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 61.11664988900608,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 5.277864197745388,
+            "replaced": 0,
+            "dispersion": 0.682579919212625,
+            "log2FoldChange": 0.8174992772945285,
+            "lfcSE": 0.50502618939724
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 61.11664988900608,
+            "pvalue": 0.1055071437630918,
+            "padj": 0.5232978972515678,
+            "maxCooks": 5.277863922009272,
+            "replaced": 0,
+            "dispersion": 0.6825839248346292,
+            "log2FoldChange": 0.817499206019575,
+            "lfcSE": 0.5050276264041551
+          }
+        },
+        {
+          "gene": 23378,
+          "lost_discovery": false,
+          "gained_discovery": true,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 775.5284550351107,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 3.4391161848923346,
+            "replaced": 0,
+            "dispersion": 0.3125986498796843,
+            "log2FoldChange": 1.1672318350775308,
+            "lfcSE": 0.3371933843248202
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 775.5284550351107,
+            "pvalue": 0.0005369734848261,
+            "padj": 0.0167939043594976,
+            "maxCooks": 3.4391161885727275,
+            "replaced": 0,
+            "dispersion": 0.3126002795320903,
+            "log2FoldChange": 1.1672318363552536,
+            "lfcSE": 0.3371942597945425
+          }
+        }
+      ]
+    },
+    "thyroid128": {
+      "old_table_sha256": "575f7b9078e69d25b17ac44b73aefebccba3a9b7ade08c3de6ff03ac7535c2e4",
+      "new_table_sha256": "20a91698eb6c23b78871dfb23e555698e309776904b53bb8fe55c1fb3e4a9064",
+      "old_discoveries": 792,
+      "new_discoveries": 790,
+      "old_statuses": {
+        "ok": 28541,
+        "cooks_outlier": 228
+      },
+      "new_statuses": {
+        "ok": 28545,
+        "cooks_outlier": 219,
+        "floored_fit_failed": 5
+      },
+      "old_finite_p": 28541,
+      "new_finite_p": 28545,
+      "lost": [
+        13956,
+        23179
+      ],
+      "gained": [],
+      "changed_cooks_flags": [
+        4120,
+        8499,
+        9930,
+        9931,
+        12204,
+        15927,
+        19303,
+        23521,
+        25911
+      ],
+      "detail": [
+        {
+          "gene": 4120,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 7.82056020674288,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 2.70164747119412,
+            "replaced": 1,
+            "dispersion": 24.83537181896666,
+            "log2FoldChange": -0.6593939712385766,
+            "lfcSE": 1.4108318459829787
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 7.82056020674288,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 36.28009766463504,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 8499,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 5.59625081630884,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 5.142944219427184,
+            "replaced": 1,
+            "dispersion": 110.61363561432822,
+            "log2FoldChange": -0.6900750070965749,
+            "lfcSE": 2.902900814845705
+          },
+          "new": {
+            "status": "floored_fit_failed",
+            "baseMean": 5.59625081630884,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": null,
+            "replaced": 0,
+            "dispersion": 103.63070883287882,
+            "log2FoldChange": null,
+            "lfcSE": null
+          }
+        },
+        {
+          "gene": 9930,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 54.434225922405005,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 4.848904205222207,
+            "replaced": 1,
+            "dispersion": 3.2803698108750843,
+            "log2FoldChange": -0.7819664193326096,
+            "lfcSE": 0.505273668390616
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 27.948319399265493,
+            "pvalue": 0.1217162998515848,
+            "padj": 0.5833320632141775,
+            "maxCooks": 1.2480100506391727,
+            "replaced": 1,
+            "dispersion": 3.2803698108750843,
+            "log2FoldChange": -0.7819664193326096,
+            "lfcSE": 0.505273668390616
+          }
+        },
+        {
+          "gene": 9931,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 30.24952838476303,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 3.0508835398198078,
+            "replaced": 1,
+            "dispersion": 2.550613819709976,
+            "log2FoldChange": -0.7529058875068378,
+            "lfcSE": 0.4540335537492361
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 15.782585115367176,
+            "pvalue": 0.0972649070998711,
+            "padj": 0.5376085273643306,
+            "maxCooks": 0.806179269554612,
+            "replaced": 1,
+            "dispersion": 2.550613819709976,
+            "log2FoldChange": -0.7529058875068378,
+            "lfcSE": 0.4540335537492361
+          }
+        },
+        {
+          "gene": 12204,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 130.25709798552316,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 9.375341694525293,
+            "replaced": 1,
+            "dispersion": 1.4392980006564922,
+            "log2FoldChange": 0.0393602201122773,
+            "lfcSE": 0.3366562915534089
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 39.248968252616606,
+            "pvalue": 0.9069272942052427,
+            "padj": 0.9863125055238974,
+            "maxCooks": 0.9307699394419576,
+            "replaced": 1,
+            "dispersion": 1.4392980006564922,
+            "log2FoldChange": 0.0393602201122773,
+            "lfcSE": 0.3366562915534089
+          }
+        },
+        {
+          "gene": 13956,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 609.1754914574585,
+            "pvalue": 0.0027731419585084,
+            "padj": 0.0999879294770992,
+            "maxCooks": 0.5605460426334267,
+            "replaced": 0,
+            "dispersion": 1.4245328529462484,
+            "log2FoldChange": 0.9801315406213068,
+            "lfcSE": 0.3276031134584205
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 609.1754914574585,
+            "pvalue": 0.0027731419585084,
+            "padj": 0.1000019427113242,
+            "maxCooks": 0.5605460426334267,
+            "replaced": 0,
+            "dispersion": 1.4245328529462484,
+            "log2FoldChange": 0.9801315406213068,
+            "lfcSE": 0.3276031134584205
+          }
+        },
+        {
+          "gene": 15927,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 10.25349418457184,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 3.7257189394147185,
+            "replaced": 1,
+            "dispersion": 10.646207093051324,
+            "log2FoldChange": -0.4396771935282272,
+            "lfcSE": 0.908014375644374
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 7.562562411380084,
+            "pvalue": 0.6282309381479525,
+            "padj": 0.9219119336061756,
+            "maxCooks": 2.1182764083515435,
+            "replaced": 1,
+            "dispersion": 10.646207093051324,
+            "log2FoldChange": -0.4396771935282272,
+            "lfcSE": 0.908014375644374
+          }
+        },
+        {
+          "gene": 19303,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 39.562283968433725,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 2.9380224367456447,
+            "replaced": 1,
+            "dispersion": 0.5792234444663898,
+            "log2FoldChange": 0.0889630724874828,
+            "lfcSE": 0.215175177065032
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 33.83391820670499,
+            "pvalue": 0.679280708106649,
+            "padj": 0.9368405473891722,
+            "maxCooks": 2.1478433198784894,
+            "replaced": 1,
+            "dispersion": 0.579223444466396,
+            "log2FoldChange": 0.0889630724874831,
+            "lfcSE": 0.2151751770650331
+          }
+        },
+        {
+          "gene": 23179,
+          "lost_discovery": true,
+          "gained_discovery": false,
+          "old": {
+            "status": "ok",
+            "baseMean": 10.774619387579277,
+            "pvalue": 0.0027746203758054,
+            "padj": 0.0999879294770992,
+            "maxCooks": 0.2335354267507041,
+            "replaced": 0,
+            "dispersion": 1.0856780705730051,
+            "log2FoldChange": 0.9018810279264547,
+            "lfcSE": 0.3014647430880509
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 10.774619387579277,
+            "pvalue": 0.0027746203758055,
+            "padj": 0.1000019427113242,
+            "maxCooks": 0.2335354267507042,
+            "replaced": 0,
+            "dispersion": 1.0856780705730151,
+            "log2FoldChange": 0.9018810279264552,
+            "lfcSE": 0.3014647430880522
+          }
+        },
+        {
+          "gene": 23521,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 8.708567964396277,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 2.523892223494709,
+            "replaced": 1,
+            "dispersion": 1.0481424718071393,
+            "log2FoldChange": -0.608032591776615,
+            "lfcSE": 0.3176773251687491
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 5.97778881336188,
+            "pvalue": 0.0556208831984516,
+            "padj": 0.4346285548589661,
+            "maxCooks": 1.1338600068189908,
+            "replaced": 1,
+            "dispersion": 1.048142471807147,
+            "log2FoldChange": -0.608032591776615,
+            "lfcSE": 0.3176773251687501
+          }
+        },
+        {
+          "gene": 25911,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 58.380498157984256,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 2.8627992594333698,
+            "replaced": 1,
+            "dispersion": 1.214691387003768,
+            "log2FoldChange": -0.6309712521268005,
+            "lfcSE": 0.309781532468629
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 46.923322250221766,
+            "pvalue": 0.0416674260223106,
+            "padj": 0.3851251125823305,
+            "maxCooks": 1.8356061417248375,
+            "replaced": 1,
+            "dispersion": 1.214691387003768,
+            "log2FoldChange": -0.6309712521268005,
+            "lfcSE": 0.309781532468629
+          }
+        }
+      ]
+    },
+    "thyroid": {
+      "old_table_sha256": "48f94760e03cfd7587019c1415d518626c784a000787996160f6f37da094af33",
+      "new_table_sha256": "484746246b1ea05239b35e7ae9119977d49073204a3af44709375217e6cfbe80",
+      "old_discoveries": 7177,
+      "new_discoveries": 7178,
+      "old_statuses": {
+        "ok": 28764,
+        "cooks_outlier": 5
+      },
+      "new_statuses": {
+        "ok": 28766,
+        "cooks_outlier": 3
+      },
+      "old_finite_p": 28764,
+      "new_finite_p": 28766,
+      "lost": [],
+      "gained": [
+        6028
+      ],
+      "changed_cooks_flags": [
+        6028,
+        22952
+      ],
+      "detail": [
+        {
+          "gene": 6028,
+          "lost_discovery": false,
+          "gained_discovery": true,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 10.414686902069755,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 2.392475759299916,
+            "replaced": 1,
+            "dispersion": 2.0297454568580084,
+            "log2FoldChange": 0.8414183495657354,
+            "lfcSE": 0.1801841709663541
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 9.526008741909791,
+            "pvalue": 3.015394798482893e-06,
+            "padj": 7.1450450389752e-05,
+            "maxCooks": 2.0130647805637936,
+            "replaced": 1,
+            "dispersion": 2.0297454568580084,
+            "log2FoldChange": 0.8414183495657354,
+            "lfcSE": 0.1801841709663541
+          }
+        },
+        {
+          "gene": 22952,
+          "lost_discovery": false,
+          "gained_discovery": false,
+          "old": {
+            "status": "cooks_outlier",
+            "baseMean": 442.03379329244416,
+            "pvalue": null,
+            "padj": null,
+            "maxCooks": 2.5841725013150527,
+            "replaced": 1,
+            "dispersion": 3.211358422181284,
+            "log2FoldChange": -0.150209076130601,
+            "lfcSE": 0.2205994226258246
+          },
+          "new": {
+            "status": "ok",
+            "baseMean": 49.55717638027959,
+            "pvalue": 0.495926365420379,
+            "padj": 0.6922099550633398,
+            "maxCooks": 0.0434352803211249,
+            "replaced": 1,
+            "dispersion": 3.211358422181284,
+            "log2FoldChange": -0.150209076130601,
+            "lfcSE": 0.2205994226258246
+          }
+        }
+      ]
+    }
+  },
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}

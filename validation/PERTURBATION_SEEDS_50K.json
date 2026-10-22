@@ -1,0 +1,66 @@
+{
+  "purpose": "Agreement of the perturbation workflow with SCEPTRE 0.99.0 on the Gasperini benchmark (gasperini50k) under several seeds, and between the seeds",
+  "dataset": "gasperini50k",
+  "options": {},
+  "command": "python3 scripts/validate_perturbation_seeds.py --runs RUNS --work DIR --output OUT",
+  "version": "1.3.0",
+  "commit": "06afa910bf32525145eefddf5337b321abaef84d",
+  "configuration": "the benchmark's run with fit_check ks (scripts/benchmark_applications.py, tool rapidglm-cli-ks), with its seed and with the others; discoveries are BH at 0.1 over the discovery pairs both tools tested",
+  "sceptre_discoveries": 24,
+  "runs": [
+    {
+      "seed": 20260930,
+      "pairs_tested_by_both": 8546,
+      "discoveries": 28,
+      "jaccard_with_sceptre": 0.7931034482758621
+    },
+    {
+      "seed": 1,
+      "pairs_tested_by_both": 8546,
+      "discoveries": 29,
+      "jaccard_with_sceptre": 0.8275862068965517
+    },
+    {
+      "seed": 2,
+      "pairs_tested_by_both": 8546,
+      "discoveries": 25,
+      "jaccard_with_sceptre": 0.8846153846153846
+    },
+    {
+      "seed": 3,
+      "pairs_tested_by_both": 8546,
+      "discoveries": 25,
+      "jaccard_with_sceptre": 0.8148148148148148
+    },
+    {
+      "seed": 4,
+      "pairs_tested_by_both": 8546,
+      "discoveries": 27,
+      "jaccard_with_sceptre": 0.8214285714285714
+    },
+    {
+      "seed": 5,
+      "pairs_tested_by_both": 8546,
+      "discoveries": 25,
+      "jaccard_with_sceptre": 0.8846153846153846
+    }
+  ],
+  "jaccard_with_sceptre": {
+    "min": 0.7931034482758621,
+    "mean": 0.8376939684410948,
+    "max": 0.8846153846153846
+  },
+  "jaccard_between_seeds": {
+    "min": 0.8,
+    "mean": 0.8802161312506142,
+    "max": 0.9310344827586207,
+    "pairs_of_seeds": 15
+  },
+  "validated_for": {
+    "version": "1.4.0-dev.3",
+    "commit": "9e9a2ca44f4733141991010dc5f2f6639e7ee8e6",
+    "check": "benchmark seed, ks, eight threads on CPUs 0-7, untimed; gene table byte-identical to v1.3.0",
+    "gene_table_sha256": "34ceeef29a2df3ddb5e2f478a6bb06ae1099a2c4787ab22d14f71789c691c78b",
+    "receipt": "receipts/v1.4.0-r2/PERTURBATION_IDENTITY.json"
+  }
+}

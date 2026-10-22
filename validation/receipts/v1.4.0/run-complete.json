@@ -1,0 +1,14 @@
+{
+  "exit": 0,
+  "started_utc": "2026-10-22T00:10:14.688212+00:00",
+  "finished_utc": "2026-10-22T20:16:57.223678+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 71776,
+  "cpu_policy_maximum_poll_gap_seconds": 3.608950663001451,
+  "cpu_policy_observed_quiet_starts": 850,
+  "error": null,
+  "stage_reruns": [
+    "eqtl"
+  ],
+  "initial_attempt_exit": 0
+}

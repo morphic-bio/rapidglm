@@ -1,5 +1,52 @@
 # Changelog
 
+## 1.4.0 (2026-10-22)
+
+The library is the code of `v1.4.0-dev.4`; this release adds the receipts and
+documentation measured with it. Every stage in the complete 18-stage release
+run was measured afresh. One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional.
+
+- **Bulk and pseudobulk DE:** fitted-count flooring (default `min_mean: 0.5`),
+  rough/moments starting dispersions, bounded fallback with covariate-unit
+  invariance, and independent filtering following the documented and
+  black-box-validated rules. Replaced-count base means and failed-refit
+  p-values are corrected. Low-count and boundary genes can change results
+  relative to 1.3.0; shared trends and priors can also move other genes.
+- **Floored-fit interfaces:** C `rapidglm_nb_floored_fits` and Python
+  `capi.nb_floored_fits`; the PyDESeq2 inference backend uses native fits and
+  delegates unsupported/fallback cases to DefaultInference. MIT PyDESeq2
+  ports carry attribution in DEPENDENCIES.md.
+- **Quasi-likelihood DE:** `edger-ql` / C++ `edger_ql` implements filtering,
+  TMM, common Cox-Reid dispersion, adjusted deviances, moderation and QL
+  testing following edgeR 4's publications, documentation and public API
+  outputs. Near-Poisson deviances and fit failure handling are stable.
+  Inputs must be nonnegative integer counts. Known reference-fit differences
+  and small-panel moderation limits are documented in METHODS.md.
+- **Cis-QTL mapping:** Gaussian, Poisson and NB score tests, empirical
+  permutation calibration and Beta approximation, with PLINK/BED input,
+  checked outputs, stable ties, per-gene singular statuses and failed-draw
+  accounting. Only phenotype chromosomes are decoded; MAF filtering is
+  in-place. Validation covers chromosome 22, not a genome-wide run.
+- **Faster Gaussian permutations:** project genotypes once per gene and
+  score batches of 512 responses with packed AVX2/FMA or portable kernels.
+  On the final matched 10,000-permutation panel, RapidGLM takes
+  117.19 s versus tensorQTL's 151.53 s
+  (1.29×), with unchanged empirical p-values
+  and lead variants relative to dev.3. See
+  [QTL_GAUSSIAN_SPEED.md](docs/QTL_GAUSSIAN_SPEED.md).
+- **Numerical and input handling:** tiled weighted cross products and
+  leverages, vectorized predictor/mean updates, quicker MatrixMarket input
+  and SHA-accelerated fingerprints where available; binding, matrix input
+  and QTL file validation fixes. Perturbation streams and acceptance-rule
+  definitions are unchanged from 1.3.0.
+- **ARM64:** cross-build support, selected QEMU checks, and double-precision
+  KS CDF checks with unchanged integer streams. Floating-point results can
+  differ by architecture; numerical limits are retained explicitly.
+- **Validation:** native and portable C++ (172 cases each), C99, CLI (28
+  cases on each build), Python/R, Rust, selected ARM64 and container suites
+  pass. Final agreements and timing scopes are in the
+  [release collection](validation/receipts/v1.4.0/README.md).
+
 ## 1.3.0 (2026-10-10)
 
 The perturbation workflow (`sceptre`). Bulk DE, single fits, batch fits and

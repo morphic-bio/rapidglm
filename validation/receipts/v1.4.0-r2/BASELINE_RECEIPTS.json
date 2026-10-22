@@ -1,0 +1,39 @@
+{
+  "version": "1.4.0-dev.3",
+  "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+  "baseline_directory": "validation/work/benchmark/receipts/v1.4.0",
+  "note": "Read-only baseline receipt hashes; no baseline receipt was modified by this review run.",
+  "sha256": {
+    "BULK_DE.json": "130a04f3228a8fe5f256fcf8061b7be08784e6b87e95c4fd27f973aba71e458f",
+    "COOKS_LEGACY.json": "6a2a63fb974026bc985cca2c0d7beae738426d752b01aa4b51c50d1411a256e4",
+    "COOKS_THYROID.json": "fe987a3332a51123323ca457dba78e181fc2c58062a3bc113893d55fd1ac7782",
+    "EDGER_QL.json": "bc826f9a3c2de03f9f34ebf0d08e189376a5992ebdea76b907bf44b240317224",
+    "SCEPTRE_STAGING.all.json": "845e062422bfff321541109a8caeb39b95615823f03bbfe9a1938d3e6a6f38f6",
+    "UNTESTABLE_PAIRS.json": "1c27072e3789fdf53ae8da6fc4d4f973b1467d4434a00ba5f0f918aeee104a87",
+    "applications_bulk_large.json": "40f8b1e2ebb8941b501ae28e5f29c3ef7d53ca918a0625ecae21055ff5444e8f",
+    "applications_bulk_small.json": "24984216ff142d40ec9112ac7a4a49d73f47f7b64d8fee39f9e3baf25e335846",
+    "engine_batch.json": "760cfb702687b3e9f984e774ab9e2c5be94335767a5c2a38b578eec75490c75f",
+    "pcore-control/solv_airway_fixed.json": "ba10bf1c825fd7e2a09be89fc5e7fd7bf07ad562e1063b4d9f73d2d964b66cc3",
+    "pcore-control/solv_airway_joint.json": "dfa056ad976f4f13aab2a1bc270733f3000fda106c39bc85f0eb804384c23c6a",
+    "pcore-control/solv_thyroid_fixed.json": "d2ded7deab551995d5cefdb9c1f92c121b848d5fd65c0d663cf24c7c508ac5d5",
+    "perturbation_50k.json": "9fb4bdb5c928473ef4cd1c98caecde56e48b0a37043fc5022f51be6594f74590",
+    "replogle_pseudobulk.json": "50446fa4700931f469a5c59406446782b2ecb426329a460c9bc927912cfbbc19",
+    "replogle_sc_ks.json": "9e94e5971450e5b8ffec236507d9613569174fceba18fc3454d364b8a91a018b",
+    "replogle_sc_strict.json": "295952ef8828b2cd5e42ba09a692d68f8444af5ecfafed6be3074bade3a361fe",
+    "rust_airway.json": "3c92dc81046e36d40b7585a81cd4d9617f08b50a63620da8e7d332544a001ddb",
+    "rust_thyroid.json": "711125120fdfdb93d85c09e8c436b099add4091d187a81239ed8a56dc0fe1ced",
+    "rust_thyroid128.json": "cd45e566bc7fbf75b8ab1719723725ae55a2cd94c9dde7a0badf462995cf3d2d",
+    "rust_thyroid32.json": "2be4ac5af23e8970cd7f3793126c10ae6e0e7cb6a4f28d649fcb1be0fb287442",
+    "solv_airway_fixed.json": "087db57d6492dc86f2ee8f4633b89366d6af20722a42a883d166896cde08bcc6",
+    "solv_airway_joint.json": "5653350cc57299b8c48831d1939a17013a565c60f0f7538e41fa21108f07577c",
+    "solv_sim5000_fixed.json": "bf6c82d8e9a5106cc508fc98d0d1bea2bb7bc2e467739f2e369f79d67971428c",
+    "solv_sim5000_joint.json": "6bb13def3fcc135718eb159b03b0b1703729f200809386deb9f16c503da78460",
+    "solv_thyroid_fixed.json": "691ae065d886c1782493ad020908ae82787bf799af8b560c2e59c39020da4e44",
+    "solv_thyroid_joint.json": "65344b270a6b585269833a3e5393f01089d4687bde72941af5c903150f55a26b"
+  },
+  "_provenance": {
+    "version": "1.4.0-dev.3",
+    "commit": "b27e684a13e5dedbcf5ed4b9b416061a2077a59d",
+    "worktree_dirty": false
+  }
+}
