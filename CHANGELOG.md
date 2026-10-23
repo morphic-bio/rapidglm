@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.4.1 (2026-10-22)
+
+- Return an empty weighted cross-product matrix immediately when the design
+  has zero columns. This avoids undefined behavior from forming row pointers
+  into empty storage, including in a Cook's replacement refit when every
+  coefficient is at a boundary. Add a regression covering six row counts.
+- The focused solver and bulk suites pass ASan/UBSan with OpenMP (29 cases,
+  4,553 assertions). All 28 checked nonempty-design cross-products are
+  bit-identical to 1.4.0; this patch changes no fitting or resampling rule.
+- Benchmark tables and raw receipts remain the completed **1.4.0** run on
+  `f0ecfbd` (`v1.4.0-dev.4`). They have not been remeasured for 1.4.1.
+  See the [patch validation](validation/receipts/v1.4.1/README.md) and
+  [benchmark provenance](validation/receipts/v1.4.0/README.md).
+
 ## 1.4.0 (2026-10-22)
 
 The library is the code of `v1.4.0-dev.4`; this release adds the receipts and

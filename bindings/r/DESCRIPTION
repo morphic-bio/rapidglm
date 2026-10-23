@@ -1,6 +1,6 @@
 Package: rapidglm
 Title: Fast and Numerically Stable Generalized Linear Model Fitting
-Version: 1.4.0
+Version: 1.4.1
 Authors@R: person("Ling-Hong", "Hung", email = "lhhunghimself@gmail.com",
     role = c("aut", "cre"))
 Description: A fitting method for stats::glm() and a negative binomial fit

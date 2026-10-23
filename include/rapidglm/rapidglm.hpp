@@ -1,6 +1,6 @@
 #pragma once
 namespace rapidglm {
-inline constexpr const char *version = "1.4.0";
+inline constexpr const char *version = "1.4.1";
 }
 #include "bulk.hpp"
 #include "edger.hpp"

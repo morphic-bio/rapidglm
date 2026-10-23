@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(rapidglm VERSION 1.4.0 LANGUAGES C CXX)
+project(rapidglm VERSION 1.4.1 LANGUAGES C CXX)
 option(RAPIDGLM_OPENMP "Enable OpenMP" ON)
 option(RAPIDGLM_FORCE_PORTABLE "Force portable kernels and integer/SHA paths on x86" OFF)
 option(RAPIDGLM_TESTS "Build tests" ON)

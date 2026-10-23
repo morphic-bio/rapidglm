@@ -13,7 +13,7 @@ import numpy as np
 from .capi import bulk_de, edger_ql, fit_batch, library_version, scan, sceptre, sceptre_grid
 
 __all__ = ["bulk_de", "edger_ql", "sceptre", "sceptre_grid", "scan", "fit_batch", "fit", "library_version"]
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 
 
 def fit(

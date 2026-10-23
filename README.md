@@ -25,6 +25,11 @@ One library serves several interfaces:
 
 ## Benchmarks
 
+The current release is **1.4.1**, which fixes undefined behavior for a
+zero-column weighted cross-product. The benchmark tables and receipts below
+remain **1.4.0 measurements** on `f0ecfbd` (`v1.4.0-dev.4`); they have not been
+remeasured for 1.4.1. [Patch validation](validation/receipts/v1.4.1/README.md).
+
 Version 1.4.0 uses the library code of `v1.4.0-dev.4`. All figures below come
 from the complete final release run, completed 2026-10-22; the
 [release receipts](validation/receipts/v1.4.0/README.md) retain source hashes,

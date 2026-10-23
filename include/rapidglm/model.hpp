@@ -472,6 +472,8 @@ struct WeightedQR {
 inline Matrix crossprod(const Matrix &x, const Vector &w) {
     const std::size_t n = x.rows, p = x.cols;
     Matrix a(p, p);
+    if (p == 0)
+        return a;
     double v_small[64];
     Vector v_large;
     double *v = 4 * p <= 64 ? v_small : (v_large.resize(4 * p), v_large.data());
