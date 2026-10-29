@@ -4,6 +4,8 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 0"
 
 permissions:
   contents: read
@@ -27,6 +29,8 @@ jobs:
           - name: Release, OpenMP
             cmake: -DCMAKE_BUILD_TYPE=Release
             external: true
+          - name: Release, portable kernels
+            cmake: -DCMAKE_BUILD_TYPE=Release -DRAPIDGLM_FORCE_PORTABLE=ON
           - name: Release, no OpenMP
             cmake: -DCMAKE_BUILD_TYPE=Release -DRAPIDGLM_OPENMP=OFF
           - name: Release, OpenMP, LAPACK solves
@@ -50,8 +54,10 @@ jobs:
         run: cmake --build build -j "$(nproc)"
       - name: Unit tests
         run: ctest --test-dir build --output-on-failure
-      - name: CLI tests
-        run: python3 tests/test_cli.py build/rapidglm
+      - name: CLI and timing-guard tests
+        run: |
+          python3 tests/test_cli.py build/rapidglm
+          python3 tests/test_quiet_run.py
       - name: Installed CMake package
         if: matrix.external
         run: scripts/check_external.sh
@@ -62,6 +68,9 @@ jobs:
           export RAPIDGLM_C_LIBRARY="$PWD/build/librapidglm_c.so" PYTHONPATH="$PWD/bindings/python"
           python3 bindings/python/tests/test_capi.py build/rapidglm
           python3 bindings/python/tests/test_deseq.py build/rapidglm
+          python3 bindings/python/tests/test_special.py
+          python3 tests/test_replogle.py
+          python3 tests/test_qtl_recipe.py
       - name: RapidGLM as a PyDESeq2 inference back end
         if: matrix.external
         run: |
@@ -84,8 +93,14 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
+      # Native ARM64 runners can replace QEMU once this repository is public.
       - name: Build for arm64 and run the tests under QEMU
-        run: docker run --rm -v "$PWD":/src:ro ubuntu:24.04 bash /src/scripts/test_arm64.sh
+        env:
+          FULL: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          filter=""
+          if [ "$FULL" = true ]; then filter=all; fi
+          docker run --rm -v "$PWD":/src:ro ubuntu:24.04 bash /src/scripts/test_arm64.sh $filter
 
   container:
     name: Container (every test suite)

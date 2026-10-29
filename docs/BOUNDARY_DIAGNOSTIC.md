@@ -177,11 +177,11 @@ Tracked receipts:
 - [BOUNDARY_DIAGNOSTIC.json](../validation/BOUNDARY_DIAGNOSTIC.json): paired
   results before the stopping-rule fix, oracle, exact-input checks, seeds,
   versions, hashes and commands.
-- [BLAS_THREAD_SAFETY.json](../validation/BLAS_THREAD_SAFETY.json): failing and
+- BLAS_THREAD_SAFETY.json: failing and
   corrected backend configurations, regression logs and revalidation.
 - [BOUNDARY_FIX.json](../validation/BOUNDARY_FIX.json): current paired results,
   finite-treatment oracle errors and explicit boundary-inference checks.
-- [BOUNDARY_FIX_CHECKS.json](../validation/BOUNDARY_FIX_CHECKS.json): unit, CLI,
+- BOUNDARY_FIX_CHECKS.json: unit, CLI,
   sanitizer, external-consumer, pseudobulk, ordinary-fit and calibration replays.
 
 Historical G3/G5 calibration failures are retained. This diagnosis does not

@@ -15,6 +15,7 @@ to the C++ calls (`tests/test_c_api.cpp`).
 | `rapidglm_sceptre` | `sceptre` | `sceptre` |
 | `rapidglm_sceptre_grid` | `sceptre_grid` | `sceptre` with `targets` |
 | `rapidglm_scan` | `score_scan` | `scan` |
+| `rapidglm_log_array`, `rapidglm_log1p_array`, `rapidglm_exp_array`, `rapidglm_lgamma_array`, `rapidglm_digamma_array`, `rapidglm_trigamma_array` | `vmath::log_array`, ... (`include/rapidglm/vmath.hpp`) | |
 
 ## Building and linking
 
@@ -83,9 +84,17 @@ From 1.3.0 `rapidglm_sceptre_options` ends with `stream_keys`, `response_ids`,
 `family` and `family_size` ([CLI.md](CLI.md#perturbation-workflow), stream keys
 and adjustment family). A caller built against an earlier header passes a
 shorter struct and gets their defaults: streams keyed by identity and the
-family of the tested pairs. `rapidglm_sceptre_grid` takes target names and
+family of the tested pairs. 1.6.0 appends `null_start`
+(`RAPIDGLM_NULL_START_REFINE`, the default, or `RAPIDGLM_NULL_START_COLD`;
+[CLI.md](CLI.md#perturbation-workflow), null start), and the `rapidglm_sceptre`
+table gains the scalars `null_start_used`, `null_refined` and
+`null_cold_refits`. `rapidglm_sceptre_grid` takes target names and
 response columns instead of a list of pairs and returns a second table, the
 tally of the pairs that fail pair QC by target and kind.
+
+1.6.0 then appends `batch_scoring` (default 1): CRT with complement controls
+scores each response's pairs together, with the records of scoring them one by
+one (0). A caller built against an earlier header gets the defaults of both.
 
 ## Language bindings
 
@@ -110,3 +119,41 @@ tally of the pairs that fail pair QC by target and kind.
   bit for bit: `fit_batch`; `bulk_de` with shrinkage and a contrast; `score_scan`;
   `sceptre` with each stream key and adjustment family; and `sceptre_grid`.
 - Both run under ctest, with and without the sanitizers.
+- `vmath_*` Boost cases check the special functions: every path against the
+  others bit for bit, known-answer digests, mpmath references and special
+  values. The Python (`bindings/python/tests/test_special.py`) and R
+  (`bindings/r/tests/special.R`) layers reproduce the C++ values of RapidGLM's
+  functions in `tests/fixtures/vmath_known_values.tsv` bit for bit.
+
+C API feature version 2 adds the 1.4.0 entry points, version 4 (1.6.0) the
+`null_start` and `batch_scoring` fields of `rapidglm_sceptre_options` and the
+`null_start_used`, `null_refined` and `null_cold_refits` scalars of the
+`rapidglm_sceptre` table, and version 3 (1.5.0) the
+`crt_draw_used` scalar of the `rapidglm_sceptre` and `rapidglm_scan` tables
+(the `RAPIDGLM_CRT_*` sampler that drew the CRT labels) and the special
+functions: `rapidglm_<f>_array(x, out, n)` sets `out[i] = f(x[i])` for
+`log`, `log1p`, `exp`, `digamma` and `trigamma` (RapidGLM's; digamma and
+trigamma for x >= 0) and `lgamma` (the C library's `lgamma_r` in slow mode,
+and RapidGLM's positive-argument kernel in fast mode, with libm for negative
+arguments); `out` may be
+`x`, and `rapidglm_special_path()` names the path RapidGLM's functions take
+(`avx2`, `neon` or `portable`). RapidGLM's results are the same bits on every
+processor (METHODS.md, Numerical backend). Python checks this version
+before resolving symbols; rebuild bindings and libraries together. Existing
+legacy entry points remain available.
+
+For `rapidglm_nb_floored_fits`, a nonzero convergence code indicates success:
+1 means IRLS convergence, 2 means native bounded-optimizer convergence.
+The Python wrapper returns booleans by default; `return_optimizer=True` also
+returns the optimizer mask so `RapidGLMInference.irls` can delegate every such
+fallback to PyDESeq2's default inference.
+
+`rapidglm_set_division(RAPIDGLM_DIVISION_FAST, &previous)` selects the calling
+thread's numerical policy. Restore it with `rapidglm_set_division(previous, NULL)`.
+The other choices are `RAPIDGLM_DIVISION_SLOW` and `RAPIDGLM_DIVISION_INHERIT`
+(environment/build default). Worker threads inherit the resolved policy.
+`rapidglm_division_mode()` returns the resolved 0 (slow) or 1 (fast), or -2 on an
+invalid environment setting. Result tables include scalar `division_mode`.
+This thread-local option leaves the layout of all existing C option structures
+unchanged. Python and R use a scoped `division="slow"`/`"fast"` parameter;
+Rust provides `DivisionMode`, `with_division`, and `BulkOptions.division`.

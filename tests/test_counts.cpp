@@ -242,3 +242,13 @@ BOOST_AUTO_TEST_CASE(count_loader_names_tables_that_are_not_counts) {
                               return dynamic_cast<const io::NotCountTable *>(&e) == nullptr;
                           });
 }
+
+BOOST_AUTO_TEST_CASE(market_dimensions_reject_negative_and_overflowing_sizes) {
+    for (const auto &sizes : {"-1 4 0", "4 -1 0", "4 4 -1", "18446744073709551615 4 0",
+                              "4 4 18446744073709551616", "4 4 0 extra"}) {
+        TemporaryFile file(std::string("%%MatrixMarket matrix coordinate integer general\n") +
+                           sizes + "\n");
+        BOOST_CHECK_THROW(io::read_market(file.path), std::invalid_argument);
+        BOOST_CHECK_THROW(io::read_market_counts(file.path), std::invalid_argument);
+    }
+}

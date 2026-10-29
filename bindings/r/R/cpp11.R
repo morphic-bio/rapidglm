@@ -19,3 +19,15 @@ rapidglm_sceptre_grid_ <- function(design, yp, yi, yx, genes, gp, gi, gx, n_guid
 rapidglm_fit_ <- function(x, y, weights, offset, start, family, theta, estimate_theta, tolerance, max_iterations, singular_ok, alias_tolerance) {
   .Call(`_rapidglm_rapidglm_fit_`, x, y, weights, offset, start, family, theta, estimate_theta, tolerance, max_iterations, singular_ok, alias_tolerance)
 }
+
+rapidglm_special_ <- function(x, name) {
+  .Call(`_rapidglm_rapidglm_special_`, x, name)
+}
+
+rapidglm_division_set_ <- function(mode) {
+  .Call(`_rapidglm_rapidglm_division_set_`, mode)
+}
+
+rapidglm_special_path_ <- function() {
+  .Call(`_rapidglm_rapidglm_special_path_`)
+}

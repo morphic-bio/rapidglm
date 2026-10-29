@@ -40,14 +40,38 @@ extern "C" SEXP _rapidglm_rapidglm_fit_(SEXP x, SEXP y, SEXP weights, SEXP offse
     return cpp11::as_sexp(rapidglm_fit_(cpp11::as_cpp<cpp11::decay_t<cpp11::doubles_matrix<>>>(x), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(y), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(weights), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(offset), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(start), cpp11::as_cpp<cpp11::decay_t<std::string>>(family), cpp11::as_cpp<cpp11::decay_t<double>>(theta), cpp11::as_cpp<cpp11::decay_t<bool>>(estimate_theta), cpp11::as_cpp<cpp11::decay_t<double>>(tolerance), cpp11::as_cpp<cpp11::decay_t<int>>(max_iterations), cpp11::as_cpp<cpp11::decay_t<bool>>(singular_ok), cpp11::as_cpp<cpp11::decay_t<double>>(alias_tolerance)));
   END_CPP11
 }
+// special.cpp
+SEXP rapidglm_special_(SEXP x, std::string name);
+extern "C" SEXP _rapidglm_rapidglm_special_(SEXP x, SEXP name) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(rapidglm_special_(cpp11::as_cpp<cpp11::decay_t<SEXP>>(x), cpp11::as_cpp<cpp11::decay_t<std::string>>(name)));
+  END_CPP11
+}
+// special.cpp
+int rapidglm_division_set_(int mode);
+extern "C" SEXP _rapidglm_rapidglm_division_set_(SEXP mode) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(rapidglm_division_set_(cpp11::as_cpp<cpp11::decay_t<int>>(mode)));
+  END_CPP11
+}
+// special.cpp
+std::string rapidglm_special_path_();
+extern "C" SEXP _rapidglm_rapidglm_special_path_() {
+  BEGIN_CPP11
+    return cpp11::as_sexp(rapidglm_special_path_());
+  END_CPP11
+}
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
     {"_rapidglm_rapidglm_bulk_de_",      (DL_FUNC) &_rapidglm_rapidglm_bulk_de_,       7},
+    {"_rapidglm_rapidglm_division_set_", (DL_FUNC) &_rapidglm_rapidglm_division_set_,  1},
     {"_rapidglm_rapidglm_edger_ql_",     (DL_FUNC) &_rapidglm_rapidglm_edger_ql_,      7},
     {"_rapidglm_rapidglm_fit_",          (DL_FUNC) &_rapidglm_rapidglm_fit_,          12},
     {"_rapidglm_rapidglm_sceptre_",      (DL_FUNC) &_rapidglm_rapidglm_sceptre_,      16},
     {"_rapidglm_rapidglm_sceptre_grid_", (DL_FUNC) &_rapidglm_rapidglm_sceptre_grid_, 19},
+    {"_rapidglm_rapidglm_special_",      (DL_FUNC) &_rapidglm_rapidglm_special_,       2},
+    {"_rapidglm_rapidglm_special_path_", (DL_FUNC) &_rapidglm_rapidglm_special_path_,  0},
     {NULL, NULL, 0}
 };
 }

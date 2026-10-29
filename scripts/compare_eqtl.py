@@ -16,6 +16,7 @@ genes with the same lead variant.
 
 import argparse
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -26,7 +27,7 @@ import pandas as pd
 from scipy.stats import spearmanr
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-EQTL = ROOT / "validation/work/eqtl"
+EQTL = pathlib.Path(os.environ.get("EQTL_WORK", ROOT / "validation/work/eqtl"))
 REFERENCES = ["FastQTL_perm_beta", "tensorQTL_perm10000_beta", "jaxQTL_NB_score_perm1000",
               "jaxQTL_NB_score_SPA_ACAT", "jaxQTL_Gauss_score_perm1000_ncx2", "jaxQTL_Gauss_score_ACAT"]
 
@@ -36,7 +37,7 @@ def qvalues(p):
     with tempfile.TemporaryDirectory() as tmp:
         source, target = pathlib.Path(tmp) / "p.tsv", pathlib.Path(tmp) / "q.tsv"
         pd.DataFrame({"id": p.index, "p": p.to_numpy()}).to_csv(source, sep="\t", index=False)
-        r = subprocess.run(["Rscript", str(EQTL / "scripts/qvalue.R"), str(source), str(target),
+        r = subprocess.run(["Rscript", str(ROOT / "scripts/eqtl_qvalue.R"), str(source), str(target),
                             str(EQTL / "tools/Rlib")], capture_output=True, text=True, check=True)
         q = pd.read_csv(target, sep="\t", dtype={"id": str})
         pi0 = float(re.search(r"pi0 ([\d.]+)", r.stdout).group(1))
@@ -47,8 +48,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--run", nargs=2, action="append", metavar=("LABEL", "PREFIX"), required=True)
     parser.add_argument("--output", type=pathlib.Path)
+    parser.add_argument("--reference", type=pathlib.Path,
+                        default=EQTL / "runs/summary/gene_level_chr22.tsv.gz")
     args = parser.parse_args()
-    reference = pd.read_csv(EQTL / "runs/summary/gene_level_chr22.tsv.gz", sep="\t").set_index("phenotype_id")
+    reference = pd.read_csv(args.reference, sep="\t").set_index("phenotype_id")
     summary = {}
     for label, prefix in args.run:
         ours = pd.read_csv(prefix + ".cis.tsv", sep="\t", na_values="NA", keep_default_na=False)
@@ -62,7 +65,9 @@ def main():
                  "beta_vs_permutation_spearman": float(spearmanr(ours.beta_p[valid],
                                                                  ours.permutation_p[valid]).statistic),
                  "wall_seconds": record.get("wall_seconds"), "threads": record.get("threads"),
-                 "permutations": record.get("permutations"), "references": {}}
+                 "permutations": record.get("permutations"),
+                 "permutation_precision": record.get("permutation_precision", "double"),
+                 "references": {}}
         for name in REFERENCES:
             if f"{name}.p" not in reference:
                 continue

@@ -1,10 +1,137 @@
 #pragma once
 #include "resampling.hpp"
+#include "vmath.hpp"
 
 // Dense cross products shared by the workflows: c = A'G with u = G'r and
 // v = diag(G'WG), in register tiles, with AVX2 fused multiply-adds where the
 // processor has them.
 namespace rapidglm::detail {
+// C = A'B for row-major A (n x p), B (n x m), C (p x m). Pack
+// sample panels into six-by-eight register tiles: each B panel is reused by
+// every row of C before advancing through B. The 128 x 128 B panel fits in
+// L2; the two micro-panels (128 x 6 and 128 x 8) together fit in L1. Each
+// accumulator visits the samples in order, including across panel boundaries.
+inline void product_tile_generic(const double *a, const double *b, std::size_t n, double *c,
+                                 std::size_t stride) {
+    double acc[6][8];
+    for (std::size_t r = 0; r < 6; ++r)
+        std::copy_n(c + r * stride, 8, acc[r]);
+    for (std::size_t i = 0; i < n; ++i)
+        for (std::size_t r = 0; r < 6; ++r)
+            for (std::size_t q = 0; q < 8; ++q)
+                acc[r][q] += a[i * 6 + r] * b[i * 8 + q];
+    for (std::size_t r = 0; r < 6; ++r)
+        std::copy_n(acc[r], 8, c + r * stride);
+}
+#ifdef RAPIDGLM_PHILOX_AVX2
+__attribute__((target("avx2,fma"))) inline void
+product_tile_avx2(const double *a, const double *b, std::size_t n, double *c, std::size_t stride) {
+    // Named accumulators keep GCC from materializing a vector array on the
+    // stack inside the sample loop. Twelve sums fit in the sixteen YMM registers.
+    __m256d c00 = _mm256_loadu_pd(c + 0 * stride + 0);
+    __m256d c01 = _mm256_loadu_pd(c + 0 * stride + 4);
+    __m256d c10 = _mm256_loadu_pd(c + 1 * stride + 0);
+    __m256d c11 = _mm256_loadu_pd(c + 1 * stride + 4);
+    __m256d c20 = _mm256_loadu_pd(c + 2 * stride + 0);
+    __m256d c21 = _mm256_loadu_pd(c + 2 * stride + 4);
+    __m256d c30 = _mm256_loadu_pd(c + 3 * stride + 0);
+    __m256d c31 = _mm256_loadu_pd(c + 3 * stride + 4);
+    __m256d c40 = _mm256_loadu_pd(c + 4 * stride + 0);
+    __m256d c41 = _mm256_loadu_pd(c + 4 * stride + 4);
+    __m256d c50 = _mm256_loadu_pd(c + 5 * stride + 0);
+    __m256d c51 = _mm256_loadu_pd(c + 5 * stride + 4);
+    for (std::size_t i = 0; i < n; ++i) {
+        const __m256d b0 = _mm256_loadu_pd(b + i * 8), b1 = _mm256_loadu_pd(b + i * 8 + 4);
+        const __m256d a0 = _mm256_broadcast_sd(a + i * 6 + 0);
+        c00 = _mm256_fmadd_pd(a0, b0, c00);
+        c01 = _mm256_fmadd_pd(a0, b1, c01);
+        const __m256d a1 = _mm256_broadcast_sd(a + i * 6 + 1);
+        c10 = _mm256_fmadd_pd(a1, b0, c10);
+        c11 = _mm256_fmadd_pd(a1, b1, c11);
+        const __m256d a2 = _mm256_broadcast_sd(a + i * 6 + 2);
+        c20 = _mm256_fmadd_pd(a2, b0, c20);
+        c21 = _mm256_fmadd_pd(a2, b1, c21);
+        const __m256d a3 = _mm256_broadcast_sd(a + i * 6 + 3);
+        c30 = _mm256_fmadd_pd(a3, b0, c30);
+        c31 = _mm256_fmadd_pd(a3, b1, c31);
+        const __m256d a4 = _mm256_broadcast_sd(a + i * 6 + 4);
+        c40 = _mm256_fmadd_pd(a4, b0, c40);
+        c41 = _mm256_fmadd_pd(a4, b1, c41);
+        const __m256d a5 = _mm256_broadcast_sd(a + i * 6 + 5);
+        c50 = _mm256_fmadd_pd(a5, b0, c50);
+        c51 = _mm256_fmadd_pd(a5, b1, c51);
+    }
+    _mm256_storeu_pd(c + 0 * stride + 0, c00);
+    _mm256_storeu_pd(c + 0 * stride + 4, c01);
+    _mm256_storeu_pd(c + 1 * stride + 0, c10);
+    _mm256_storeu_pd(c + 1 * stride + 4, c11);
+    _mm256_storeu_pd(c + 2 * stride + 0, c20);
+    _mm256_storeu_pd(c + 2 * stride + 4, c21);
+    _mm256_storeu_pd(c + 3 * stride + 0, c30);
+    _mm256_storeu_pd(c + 3 * stride + 4, c31);
+    _mm256_storeu_pd(c + 4 * stride + 0, c40);
+    _mm256_storeu_pd(c + 4 * stride + 4, c41);
+    _mm256_storeu_pd(c + 5 * stride + 0, c50);
+    _mm256_storeu_pd(c + 5 * stride + 4, c51);
+}
+#endif
+// Storage belongs to the call, so concurrent gene workers share no packing
+// buffer or BLAS lock. Partial tiles are padded, never read past an input.
+template <class Tile>
+inline void blocked_product_impl(const double *a, const double *b, std::size_t n, std::size_t p,
+                                 std::size_t m, double *c, Tile tile) {
+    if (p == 0 || m == 0)
+        return;
+    std::fill_n(c, p * m, 0.0);
+    constexpr std::size_t samples = 128, columns = 128;
+    const std::size_t row_tiles = (p + 5) / 6;
+    std::vector<double> packed_a(row_tiles * samples * 6), packed_b(samples * columns);
+    for (std::size_t i0 = 0; i0 < n; i0 += samples) {
+        const std::size_t count = std::min(samples, n - i0);
+        for (std::size_t r0 = 0; r0 < p; r0 += 6) {
+            double *ar = packed_a.data() + (r0 / 6) * count * 6;
+            const std::size_t rows = std::min<std::size_t>(6, p - r0);
+            for (std::size_t i = 0; i < count; ++i) {
+                std::copy_n(a + (i0 + i) * p + r0, rows, ar + i * 6);
+                std::fill(ar + i * 6 + rows, ar + (i + 1) * 6, 0.0);
+            }
+        }
+        for (std::size_t q0 = 0; q0 < m; q0 += columns) {
+            const std::size_t width = std::min(columns, m - q0);
+            for (std::size_t q = 0; q < width; q += 8) {
+                double *bq = packed_b.data() + (q / 8) * count * 8;
+                const std::size_t lanes = std::min<std::size_t>(8, width - q);
+                for (std::size_t i = 0; i < count; ++i) {
+                    std::copy_n(b + (i0 + i) * m + q0 + q, lanes, bq + i * 8);
+                    std::fill(bq + i * 8 + lanes, bq + (i + 1) * 8, 0.0);
+                }
+            }
+            for (std::size_t r0 = 0; r0 < p; r0 += 6) {
+                const double *ar = packed_a.data() + (r0 / 6) * count * 6;
+                const std::size_t rows = std::min<std::size_t>(6, p - r0);
+                for (std::size_t q = 0; q < width; q += 8) {
+                    const double *bq = packed_b.data() + (q / 8) * count * 8;
+                    const std::size_t lanes = std::min<std::size_t>(8, width - q);
+                    double *out = c + r0 * m + q0 + q;
+                    if (rows == 6 && lanes == 8) {
+                        tile(ar, bq, count, out, m);
+                    } else {
+                        double edge[6 * 8] = {};
+                        for (std::size_t r = 0; r < rows; ++r)
+                            std::copy_n(out + r * m, lanes, edge + r * 8);
+                        tile(ar, bq, count, edge, 8);
+                        for (std::size_t r = 0; r < rows; ++r)
+                            std::copy_n(edge + r * 8, lanes, out + r * m);
+                    }
+                }
+            }
+        }
+    }
+}
+inline void blocked_product_generic(const double *a, const double *b, std::size_t n, std::size_t p,
+                                    std::size_t m, double *c) {
+    blocked_product_impl(a, b, n, p, m, c, product_tile_generic);
+}
 // c = A'G (p x m, row k at c + k m), u = G'r and v[q] = sum_i w_i G(i, q)^2 for A
 // (n x p) and G (n x m), both row-major. Each sum runs over the samples in
 // order from zero; tiles of four rows of c by eight variants are held in
@@ -157,6 +284,295 @@ inline bool fma_available() {
     return available;
 }
 #endif
+inline void blocked_product(const double *a, const double *b, std::size_t n, std::size_t p,
+                            std::size_t m, double *c) {
+#ifdef RAPIDGLM_PHILOX_AVX2
+    if (fma_available())
+        return blocked_product_impl(a, b, n, p, m, c, product_tile_avx2);
+#endif
+    blocked_product_generic(a, b, n, p, m, c);
+}
+// C = A'B as blocked_product, for float A and B and a double C, in
+// six-by-sixteen register tiles of float sums. Each tile starts from zero in
+// every 128-sample panel, visits that panel's samples in order and then adds
+// its sums to C in double, so C holds the double sum of the panels' float sums,
+// panel by panel in sample order (four float sums per element for 462
+// samples). The AVX2 tile rounds each product with its sum (fused
+// multiply-add) and the portable tile may not, so the two can differ in the
+// last bits of each float sum.
+// Not inlined: GCC 12 vectorizes it worse inside fused_maxima_impl (4.7
+// rather than 6.6 GFMA/s).
+__attribute__((noinline)) inline void product_tile_float_generic(const float *a, const float *b,
+                                                                 std::size_t n, double *c,
+                                                                 std::size_t stride) {
+    // One row at a time: compilers keep its sixteen sums in vector registers
+    // (given the whole six-by-sixteen tile, GCC 12 vectorizes across rows and
+    // runs ten times slower). Each sum still visits the samples in order.
+    for (std::size_t r = 0; r < 6; ++r) {
+        float acc[16] = {};
+        for (std::size_t i = 0; i < n; ++i) {
+            const float ar = a[i * 6 + r];
+            for (std::size_t q = 0; q < 16; ++q)
+                acc[q] += ar * b[i * 16 + q];
+        }
+        for (std::size_t q = 0; q < 16; ++q)
+            c[r * stride + q] += static_cast<double>(acc[q]);
+    }
+}
+// The float driver packs every sample panel of A once, then completes C one
+// block of 128 columns at a time, adding each panel's sums in sample order:
+// the block (p x 128 doubles) stays in cache through the panels, where panels
+// outermost would carry all of C through memory once per panel. Partial tiles
+// are padded as in blocked_product_impl.
+template <class Tile>
+inline void blocked_product_float_impl(const float *a, const float *b, std::size_t n, std::size_t p,
+                                       std::size_t m, double *c, Tile tile) {
+    if (p == 0 || m == 0)
+        return;
+    std::fill_n(c, p * m, 0.0);
+    constexpr std::size_t samples = 128, columns = 128, lanes = 16;
+    const std::size_t row_tiles = (p + 5) / 6;
+    // Panel i0 starts at packed_a + i0 row_tiles 6, its row tiles count x 6 each.
+    std::vector<float> packed_a(row_tiles * 6 * n), packed_b(samples * columns);
+    for (std::size_t i0 = 0; i0 < n; i0 += samples) {
+        const std::size_t count = std::min(samples, n - i0);
+        for (std::size_t r0 = 0; r0 < p; r0 += 6) {
+            float *ar = packed_a.data() + i0 * row_tiles * 6 + (r0 / 6) * count * 6;
+            const std::size_t rows = std::min<std::size_t>(6, p - r0);
+            for (std::size_t i = 0; i < count; ++i) {
+                std::copy_n(a + (i0 + i) * p + r0, rows, ar + i * 6);
+                std::fill(ar + i * 6 + rows, ar + (i + 1) * 6, 0.0f);
+            }
+        }
+    }
+    for (std::size_t q0 = 0; q0 < m; q0 += columns) {
+        const std::size_t width = std::min(columns, m - q0);
+        for (std::size_t i0 = 0; i0 < n; i0 += samples) {
+            const std::size_t count = std::min(samples, n - i0);
+            for (std::size_t q = 0; q < width; q += lanes) {
+                float *bq = packed_b.data() + (q / lanes) * count * lanes;
+                const std::size_t used = std::min(lanes, width - q);
+                for (std::size_t i = 0; i < count; ++i) {
+                    std::copy_n(b + (i0 + i) * m + q0 + q, used, bq + i * lanes);
+                    std::fill(bq + i * lanes + used, bq + (i + 1) * lanes, 0.0f);
+                }
+            }
+            for (std::size_t r0 = 0; r0 < p; r0 += 6) {
+                const float *ar = packed_a.data() + i0 * row_tiles * 6 + (r0 / 6) * count * 6;
+                const std::size_t rows = std::min<std::size_t>(6, p - r0);
+                for (std::size_t q = 0; q < width; q += lanes) {
+                    const float *bq = packed_b.data() + (q / lanes) * count * lanes;
+                    const std::size_t used = std::min(lanes, width - q);
+                    double *out = c + r0 * m + q0 + q;
+                    if (rows == 6 && used == lanes) {
+                        tile(ar, bq, count, out, m);
+                    } else {
+                        double edge[6 * lanes] = {};
+                        for (std::size_t r = 0; r < rows; ++r)
+                            std::copy_n(out + r * m, used, edge + r * lanes);
+                        tile(ar, bq, count, edge, lanes);
+                        for (std::size_t r = 0; r < rows; ++r)
+                            std::copy_n(edge + r * lanes, used, out + r * m);
+                    }
+                }
+            }
+        }
+    }
+}
+inline void blocked_product_float_generic(const float *a, const float *b, std::size_t n,
+                                          std::size_t p, std::size_t m, double *c) {
+    blocked_product_float_impl(a, b, n, p, m, c, product_tile_float_generic);
+}
+#ifdef RAPIDGLM_PHILOX_AVX2
+// c[0 .. 7] += the eight float sums of `sum`, converted to double.
+__attribute__((target("avx2,fma"))) inline void add_float_sums(double *c, __m256 sum) {
+    _mm256_storeu_pd(
+        c, _mm256_add_pd(_mm256_loadu_pd(c), _mm256_cvtps_pd(_mm256_castps256_ps128(sum))));
+    _mm256_storeu_pd(c + 4, _mm256_add_pd(_mm256_loadu_pd(c + 4),
+                                          _mm256_cvtps_pd(_mm256_extractf128_ps(sum, 1))));
+}
+__attribute__((target("avx2,fma"))) inline void product_tile_float_avx2(const float *a,
+                                                                        const float *b,
+                                                                        std::size_t n, double *c,
+                                                                        std::size_t stride) {
+    // Twelve named accumulators of eight floats, as in product_tile_avx2.
+    __m256 c00 = _mm256_setzero_ps(), c01 = _mm256_setzero_ps(), c10 = _mm256_setzero_ps(),
+           c11 = _mm256_setzero_ps(), c20 = _mm256_setzero_ps(), c21 = _mm256_setzero_ps(),
+           c30 = _mm256_setzero_ps(), c31 = _mm256_setzero_ps(), c40 = _mm256_setzero_ps(),
+           c41 = _mm256_setzero_ps(), c50 = _mm256_setzero_ps(), c51 = _mm256_setzero_ps();
+    for (std::size_t i = 0; i < n; ++i) {
+        const __m256 b0 = _mm256_loadu_ps(b + i * 16), b1 = _mm256_loadu_ps(b + i * 16 + 8);
+        const __m256 a0 = _mm256_broadcast_ss(a + i * 6 + 0);
+        c00 = _mm256_fmadd_ps(a0, b0, c00);
+        c01 = _mm256_fmadd_ps(a0, b1, c01);
+        const __m256 a1 = _mm256_broadcast_ss(a + i * 6 + 1);
+        c10 = _mm256_fmadd_ps(a1, b0, c10);
+        c11 = _mm256_fmadd_ps(a1, b1, c11);
+        const __m256 a2 = _mm256_broadcast_ss(a + i * 6 + 2);
+        c20 = _mm256_fmadd_ps(a2, b0, c20);
+        c21 = _mm256_fmadd_ps(a2, b1, c21);
+        const __m256 a3 = _mm256_broadcast_ss(a + i * 6 + 3);
+        c30 = _mm256_fmadd_ps(a3, b0, c30);
+        c31 = _mm256_fmadd_ps(a3, b1, c31);
+        const __m256 a4 = _mm256_broadcast_ss(a + i * 6 + 4);
+        c40 = _mm256_fmadd_ps(a4, b0, c40);
+        c41 = _mm256_fmadd_ps(a4, b1, c41);
+        const __m256 a5 = _mm256_broadcast_ss(a + i * 6 + 5);
+        c50 = _mm256_fmadd_ps(a5, b0, c50);
+        c51 = _mm256_fmadd_ps(a5, b1, c51);
+    }
+    add_float_sums(c + 0 * stride + 0, c00);
+    add_float_sums(c + 0 * stride + 8, c01);
+    add_float_sums(c + 1 * stride + 0, c10);
+    add_float_sums(c + 1 * stride + 8, c11);
+    add_float_sums(c + 2 * stride + 0, c20);
+    add_float_sums(c + 2 * stride + 8, c21);
+    add_float_sums(c + 3 * stride + 0, c30);
+    add_float_sums(c + 3 * stride + 8, c31);
+    add_float_sums(c + 4 * stride + 0, c40);
+    add_float_sums(c + 4 * stride + 8, c41);
+    add_float_sums(c + 5 * stride + 0, c50);
+    add_float_sums(c + 5 * stride + 8, c51);
+}
+inline void blocked_product_float_avx2(const float *a, const float *b, std::size_t n, std::size_t p,
+                                       std::size_t m, double *c) {
+    blocked_product_float_impl(a, b, n, p, m, c, product_tile_float_avx2);
+}
+#endif
+inline void blocked_product_float(const float *a, const float *b, std::size_t n, std::size_t p,
+                                  std::size_t m, double *c) {
+#ifdef RAPIDGLM_PHILOX_AVX2
+    if (fma_available())
+        return blocked_product_float_avx2(a, b, n, p, m, c);
+#endif
+    blocked_product_float_generic(a, b, n, p, m, c);
+}
+// The row maxima of |C| D for C = A'B as blocked_product_float computes it and
+// D = diag(inverse_info), without storing C. A holds the p rows of C in tiles
+// of six, each tile's n samples in order (row r of tile t, sample i at
+// a + t n 6 + i 6 + r); B holds the m columns in groups of sixteen, each
+// group's n samples in order (column q of group g at b + g n 16 + i 16 + q).
+// Rows and columns past the last are zeros, and inverse_info has an entry for
+// every column of the last group (NaN past the last column). Each
+// six-by-sixteen register tile sums every 128-sample panel from zero in float
+// and adds the panel's sums to its double partials in sample order, with the
+// tile of blocked_product_float, so the partials are C's elements bit for bit.
+// After the last panel, |c| inverse_info of each column is folded into its
+// row's running maximum as qtl_finite_maximum does, skipping NaN and infinity.
+// maxima[j] is the largest finite value of row j, or NaN when it has none.
+//
+// The twelve float sums fill twelve of the sixteen YMM registers, so the
+// partials (6 x 16 doubles) live in a 768-byte scratch in L1, read and written
+// once per panel (tiles small enough to keep double partials in registers,
+// two by sixteen or four by eight, reuse each load too little and ran four
+// times slower). Variants are taken 128 at a time (eight groups): each row
+// tile's six-by-128 partials (6 kB) stay in L1 while it passes over the
+// block's packed columns (n x 128 floats, 236 kB at 462 samples), which stay
+// in L2 for every row tile; each panel of the row tile (128 x 6 floats) is
+// reused from L1 by the eight groups.
+inline void pack_rows_float(const float *a, std::size_t n, std::size_t p, float *out) {
+    for (std::size_t r0 = 0; r0 < p; r0 += 6) {
+        float *tile = out + r0 * n;
+        const std::size_t rows = std::min<std::size_t>(6, p - r0);
+        for (std::size_t i = 0; i < n; ++i) {
+            std::copy_n(a + i * p + r0, rows, tile + i * 6);
+            std::fill(tile + i * 6 + rows, tile + (i + 1) * 6, 0.0f);
+        }
+    }
+}
+inline void pack_columns_float(const float *b, std::size_t n, std::size_t m, float *out) {
+    for (std::size_t q0 = 0; q0 < m; q0 += 16) {
+        float *group = out + q0 * n;
+        const std::size_t used = std::min<std::size_t>(16, m - q0);
+        for (std::size_t i = 0; i < n; ++i) {
+            std::copy_n(b + i * m + q0, used, group + i * 16);
+            std::fill(group + i * 16 + used, group + (i + 1) * 16, 0.0f);
+        }
+    }
+}
+// maxima[0 .. 5] folded with the finite |partial| inverse_info of a tile's rows.
+inline void fold_maxima_generic(const double *partial, const double *inverse_info, double *maxima) {
+    constexpr double largest = std::numeric_limits<double>::max();
+    for (std::size_t r = 0; r < 6; ++r)
+        for (std::size_t q = 0; q < 16; ++q) {
+            const double value = std::abs(partial[r * 16 + q]) * inverse_info[q];
+            // NaN and infinity fail the second comparison.
+            maxima[r] = value > maxima[r] && value <= largest ? value : maxima[r];
+        }
+}
+template <class Tile, class Fold>
+inline void fused_maxima_impl(const float *a, const float *b, std::size_t n, std::size_t p,
+                              std::size_t m, const double *inverse_info, double *maxima, Tile tile,
+                              Fold fold) {
+    constexpr std::size_t samples = 128, block = 8;
+    const std::size_t tiles = (p + 5) / 6, full = p / 6, groups = (m + 15) / 16;
+    // Running maxima from -1 (below any value); the last tile's in `tail`.
+    double tail[6];
+    std::fill_n(maxima, p, -1.0);
+    std::fill_n(tail, 6, -1.0);
+    alignas(32) double partial[block][6 * 16];
+    for (std::size_t g0 = 0; g0 < groups; g0 += block) {
+        const std::size_t width = std::min(block, groups - g0);
+        for (std::size_t t = 0; t < tiles; ++t) {
+            const float *at = a + t * n * 6;
+            double *running = t < full ? maxima + t * 6 : tail;
+            for (std::size_t k = 0; k < width; ++k)
+                std::fill_n(partial[k], 6 * 16, 0.0);
+            for (std::size_t i0 = 0; i0 < n; i0 += samples)
+                for (std::size_t k = 0; k < width; ++k)
+                    tile(at + i0 * 6, b + (g0 + k) * n * 16 + i0 * 16, std::min(samples, n - i0),
+                         partial[k], 16);
+            for (std::size_t k = 0; k < width; ++k)
+                fold(partial[k], inverse_info + (g0 + k) * 16, running);
+        }
+    }
+    std::copy_n(tail, p - full * 6, maxima + full * 6);
+    for (std::size_t j = 0; j < p; ++j)
+        maxima[j] = maxima[j] >= 0 ? maxima[j] : nan;
+}
+inline void fused_maxima_generic(const float *a, const float *b, std::size_t n, std::size_t p,
+                                 std::size_t m, const double *inverse_info, double *maxima) {
+    fused_maxima_impl(a, b, n, p, m, inverse_info, maxima, product_tile_float_generic,
+                      fold_maxima_generic);
+}
+#ifdef RAPIDGLM_PHILOX_AVX2
+__attribute__((target("avx2,fma"))) inline void
+fold_maxima_avx2(const double *partial, const double *inverse_info, double *maxima) {
+    const __m256d sign = _mm256_set1_pd(-0.0), none = _mm256_set1_pd(-1),
+                  largest = _mm256_set1_pd(std::numeric_limits<double>::max());
+    const __m256d i0 = _mm256_loadu_pd(inverse_info), i1 = _mm256_loadu_pd(inverse_info + 4),
+                  i2 = _mm256_loadu_pd(inverse_info + 8), i3 = _mm256_loadu_pd(inverse_info + 12);
+    for (std::size_t r = 0; r < 6; ++r) {
+        const double *c = partial + r * 16;
+        __m256d v0 = _mm256_mul_pd(_mm256_andnot_pd(sign, _mm256_loadu_pd(c)), i0);
+        __m256d v1 = _mm256_mul_pd(_mm256_andnot_pd(sign, _mm256_loadu_pd(c + 4)), i1);
+        __m256d v2 = _mm256_mul_pd(_mm256_andnot_pd(sign, _mm256_loadu_pd(c + 8)), i2);
+        __m256d v3 = _mm256_mul_pd(_mm256_andnot_pd(sign, _mm256_loadu_pd(c + 12)), i3);
+        v0 = _mm256_blendv_pd(none, v0, _mm256_cmp_pd(v0, largest, _CMP_LE_OQ));
+        v1 = _mm256_blendv_pd(none, v1, _mm256_cmp_pd(v1, largest, _CMP_LE_OQ));
+        v2 = _mm256_blendv_pd(none, v2, _mm256_cmp_pd(v2, largest, _CMP_LE_OQ));
+        v3 = _mm256_blendv_pd(none, v3, _mm256_cmp_pd(v3, largest, _CMP_LE_OQ));
+        // Finite values and -1 only: the maximum does not depend on the order.
+        __m256d v = _mm256_max_pd(_mm256_max_pd(v0, v1), _mm256_max_pd(v2, v3));
+        v = _mm256_max_pd(v, _mm256_permute2f128_pd(v, v, 1));
+        v = _mm256_max_pd(v, _mm256_permute_pd(v, 5));
+        maxima[r] = std::max(maxima[r], _mm256_cvtsd_f64(v));
+    }
+}
+inline void fused_maxima_avx2(const float *a, const float *b, std::size_t n, std::size_t p,
+                              std::size_t m, const double *inverse_info, double *maxima) {
+    fused_maxima_impl(a, b, n, p, m, inverse_info, maxima, product_tile_float_avx2,
+                      fold_maxima_avx2);
+}
+#endif
+inline void fused_maxima(const float *a, const float *b, std::size_t n, std::size_t p,
+                         std::size_t m, const double *inverse_info, double *maxima) {
+#ifdef RAPIDGLM_PHILOX_AVX2
+    if (fma_available())
+        return fused_maxima_avx2(a, b, n, p, m, inverse_info, maxima);
+#endif
+    fused_maxima_generic(a, b, n, p, m, inverse_info, maxima);
+}
 inline void cross_products(const double *a, const double *w, const double *r, const double *g,
                            std::size_t n, std::size_t p, std::size_t m, double *c, double *u,
                            double *v) {
@@ -210,11 +626,6 @@ inline void weighted_gram_generic(const double *a, const double *w, const double
     for (std::size_t i = 0; i < n; ++i)
         for (std::size_t k = 0; k < p; ++k)
             u[k] += a[i * p + k] * r[i];
-}
-// out_i = exp(x_i) for x_i in [-700, 700] (or NaN).
-inline void exp_array_generic(const double *x, double *out, std::size_t n) {
-    for (std::size_t i = 0; i < n; ++i)
-        out[i] = std::exp(x[i]);
 }
 // out = A x for A (n x p, row-major).
 inline void matrix_vector_generic(const double *a, const double *x, std::size_t n, std::size_t p,
@@ -473,51 +884,6 @@ transposed_product_avx2(const double *a, const double *r, std::size_t n, std::si
             _mm256_maskstore_pd(u + k0 + 4 * v, mask[v], _mm256_add_pd(even[v], odd[v]));
     }
 }
-// exp four at a time: exp(x) = 2^k exp(r) with k = round(x / log 2) and
-// r = x - k log 2 (log 2 in two parts, |r| <= 0.35), exp(r) from its Taylor
-// polynomial of degree 13 (truncation below 1e-17 relative) and 2^k added to the
-// exponent bits. Within about one unit in the last place of std::exp for the
-// arguments the fits pass ([-700, 700]; NaN stays NaN).
-__attribute__((target("avx2,fma"))) inline __m256d exp_lanes(__m256d x) {
-    const __m256d log2e = _mm256_set1_pd(1.4426950408889634),
-                  ln2_hi = _mm256_set1_pd(6.93147180559945286227e-01),
-                  ln2_lo = _mm256_set1_pd(2.31904681384629955842e-17),
-                  shift = _mm256_set1_pd(6755399441055744.0); // 1.5 x 2^52
-    const __m256d k =
-        _mm256_round_pd(_mm256_mul_pd(x, log2e), _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
-    __m256d r = _mm256_fnmadd_pd(k, ln2_hi, x);
-    r = _mm256_fnmadd_pd(k, ln2_lo, r);
-    static constexpr double c[14] = {1.0,
-                                     1.0,
-                                     1.0 / 2,
-                                     1.0 / 6,
-                                     1.0 / 24,
-                                     1.0 / 120,
-                                     1.0 / 720,
-                                     1.0 / 5040,
-                                     1.0 / 40320,
-                                     1.0 / 362880,
-                                     1.0 / 3628800,
-                                     1.0 / 39916800,
-                                     1.0 / 479001600,
-                                     1.0 / 6227020800};
-    __m256d poly = _mm256_set1_pd(c[13]);
-    for (int j = 12; j >= 0; --j)
-        poly = _mm256_fmadd_pd(poly, r, _mm256_set1_pd(c[j]));
-    const __m256i power = _mm256_slli_epi64(_mm256_castpd_si256(_mm256_add_pd(k, shift)), 52);
-    const __m256d value = _mm256_castsi256_pd(_mm256_add_epi64(_mm256_castpd_si256(poly), power));
-    return _mm256_blendv_pd(value, x, _mm256_cmp_pd(x, x, _CMP_UNORD_Q));
-}
-__attribute__((target("avx2,fma"))) inline void exp_array_avx2(const double *x, double *out,
-                                                               std::size_t n) {
-    std::size_t i = 0;
-    for (; i + 4 <= n; i += 4)
-        _mm256_storeu_pd(out + i, exp_lanes(_mm256_loadu_pd(x + i)));
-    if (i < n) {
-        const __m256i mask = lane_mask(n - i);
-        _mm256_maskstore_pd(out + i, mask, exp_lanes(_mm256_maskload_pd(x + i, mask)));
-    }
-}
 // out = A x four rows at a time: each row's products summed in four lanes
 // (columns four at a time, the last ones masked), then the lanes added.
 __attribute__((target("avx2,fma"))) inline void
@@ -556,12 +922,9 @@ matrix_vector_avx2(const double *a, const double *x, std::size_t n, std::size_t 
     }
 }
 #endif
+// out_i = exp(x_i) (vmath::exp_array: the same bits on every processor).
 inline void exp_array(const double *x, double *out, std::size_t n) {
-#ifdef RAPIDGLM_PHILOX_AVX2
-    if (fma_available())
-        return exp_array_avx2(x, out, n);
-#endif
-    exp_array_generic(x, out, n);
+    vmath::exp_array(x, out, n);
 }
 inline void matrix_vector(const double *a, const double *x, std::size_t n, std::size_t p,
                           double *out) {

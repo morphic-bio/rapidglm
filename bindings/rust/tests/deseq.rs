@@ -169,7 +169,7 @@ fn outliers_are_replaced_and_refitted() {
 
 #[test]
 fn rapidglm_procedure_through_the_c_layer() {
-    assert_eq!(rapidglm::c_api_version(), 1);
+    assert_eq!(rapidglm::c_api_version(), 4);
     assert!(!rapidglm::version().is_empty());
     let (counts, design) = simulate(12, 1000, 1);
     let table = bulk_de(
@@ -212,4 +212,36 @@ fn rapidglm_procedure_through_the_c_layer() {
     // Errors from the C layer arrive as Err.
     let bad = Matrix::filled(12, 2, f64::NAN);
     assert!(bulk_de(&bad, &Matrix::filled(12, 3, 1.0), &BulkOptions::default()).is_err());
+}
+
+#[test]
+fn division_scopes_restore_on_success_error_and_panic() {
+    use rapidglm::{division_mode, with_division, DivisionMode, Error};
+    let original = division_mode().unwrap();
+    for mode in [DivisionMode::Slow, DivisionMode::Fast] {
+        with_division(mode, || {
+            assert_eq!(division_mode()?, mode);
+            let (counts, design) = simulate(12, 30, 151);
+            let result = bulk_de(
+                &design,
+                &counts,
+                &BulkOptions {
+                    division: mode,
+                    ..Default::default()
+                },
+            )?;
+            assert_eq!(result.scalar("division_mode"), mode as i32 as f64);
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(division_mode().unwrap(), original);
+        let failed: rapidglm::Result<()> = with_division(mode, || Err(Error("expected".into())));
+        assert!(failed.is_err());
+        assert_eq!(division_mode().unwrap(), original);
+        let panic = std::panic::catch_unwind(|| {
+            with_division(mode, || -> rapidglm::Result<()> { panic!("expected") })
+        });
+        assert!(panic.is_err());
+        assert_eq!(division_mode().unwrap(), original);
+    }
 }

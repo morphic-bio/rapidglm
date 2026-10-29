@@ -18,7 +18,7 @@ struct ScanOptions {
     FitMethod null_model = FitMethod::direct;
     Calibration calibration = Calibration::permutation;
     ResampleOptions resampling;
-    CrtDraw crt_draw = CrtDraw::thinned;
+    CrtDraw crt_draw = CrtDraw::hazard; // thinned without AES instructions
     // Permutation strata, one integer per observation (empty: one stratum).
     std::vector<std::size_t> strata;
     EffectFits effect_fits = EffectFits::significant;
@@ -59,6 +59,7 @@ inline std::vector<ScanResult> score_scan(const Matrix &design, const SparseCSC 
                                           const SparseCSC &predictors,
                                           std::vector<ScanPair> pairs = {},
                                           const ScanOptions &o = {}) {
+    const vmath::DivisionScope division(o.model.division);
     design.validate();
     responses.validate();
     predictors.validate();

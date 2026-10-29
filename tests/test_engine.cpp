@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(thinned_crt_draws_match_bernoulli_law) {
     for (std::size_t i = 0; i < 300; ++i)
         p.push_back(0.004 + 0.02 * (i % 17) / 17);
     const std::size_t n = p.size(), draws = 40000;
-    auto thinned = crt_sampler(p), direct = crt_sampler(p, CrtDraw::direct);
+    auto thinned = crt_sampler(p, CrtDraw::thinned), direct = crt_sampler(p, CrtDraw::direct);
     Vector hits(n), direct_hits(n), sizes;
     double joint = 0; // cells 4 and 7 (different levels)
     std::vector<std::size_t> selected;
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(thinned_crt_draws_match_bernoulli_law) {
     // Mean probability >= 1/16 uses the direct stream, where thinning has no gain.
     Vector dense(64, 0.07);
     CounterRng r3(5, 6, 8), r4(5, 6, 8);
-    crt_sampler(dense)(r3, a);
+    crt_sampler(dense, CrtDraw::thinned)(r3, a);
     crt_sampler(dense, CrtDraw::direct)(r4, b);
     BOOST_TEST(a == b);
 }
@@ -600,19 +600,22 @@ BOOST_AUTO_TEST_CASE(hazard_crt_draws_match_bernoulli_law) {
     crt_sampler(Vector(100, 0), CrtDraw::hazard, true)(r5, a);
     BOOST_TEST(a.empty());
     // Without AES instructions hazard is the thinned sampler, stream and all;
-    // by default the processor decides.
-    const auto fallback = crt_sampler(p, CrtDraw::hazard, false), thinned = crt_sampler(p),
-               chosen = crt_sampler(p, CrtDraw::hazard);
+    // by default the processor decides. hazard is the default method.
+    const auto fallback = crt_sampler(p, CrtDraw::hazard, false),
+               thinned = crt_sampler(p, CrtDraw::thinned), chosen = crt_sampler(p, CrtDraw::hazard),
+               default_method = crt_sampler(p);
     std::size_t differ = 0;
     for (std::size_t d = 0; d < 20; ++d) {
-        CounterRng r6(8, 9, d), r7(8, 9, d), r8(8, 9, d), r9(8, 9, d);
-        std::vector<std::size_t> with_aes, by_default;
+        CounterRng r6(8, 9, d), r7(8, 9, d), r8(8, 9, d), r9(8, 9, d), r10(8, 9, d);
+        std::vector<std::size_t> with_aes, by_default, unnamed;
         fallback(r6, a);
         thinned(r7, b);
         hazard(r8, with_aes);
         chosen(r9, by_default);
+        default_method(r10, unnamed);
         BOOST_REQUIRE(a == b);
         BOOST_REQUIRE(by_default == (aes_instructions() ? with_aes : b));
+        BOOST_REQUIRE(unnamed == by_default);
         differ += with_aes != b;
     }
     BOOST_TEST(differ > 0u);
@@ -1002,4 +1005,15 @@ BOOST_AUTO_TEST_CASE(nb_ml_keeps_the_poisson_limit_when_it_beats_an_interior_max
     interior.dispersion = Dispersion::fixed;
     interior.theta = 43.57;
     BOOST_TEST(f.log_likelihood > fit(x, y, interior).log_likelihood + 4);
+}
+
+BOOST_AUTO_TEST_CASE(double_precision_ks_cdf_matches_promoted_reference) {
+    for (double shape : {-20., -5., -2., 0., 2., 5., 20.}) {
+        boost::math::skew_normal_distribution<double> reference(0, 1, shape);
+        for (int i = -100; i <= 100; ++i) {
+            const double z = i / 10.;
+            BOOST_TEST(std::abs(detail::skew_normal_ks_cdf(z, shape) -
+                                boost::math::cdf(reference, z)) < 2e-14);
+        }
+    }
 }

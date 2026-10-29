@@ -15,12 +15,14 @@ genes at once; every other step is PyDESeq2's own. Genes RapidGLM does not conve
     dds.deseq2()
     DeseqStats(dds, contrast=["condition", "B", "A"], inference=inference).summary()
 
-Written against PyDESeq2's published interface only. Differences from the
+Uses PyDESeq2's published inference interface; the floored iterations follow
+its MIT implementation (credited in DEPENDENCIES.md). Differences from the
 default inference, all confined to a few genes per dataset:
 - coefficients come from the same iterations as PyDESeq2's IRLS (means floored
   at ``min_mu``, ridge 1e-6, bounded coefficients); where PyDESeq2 switches to
-  L-BFGS-B after its coefficients leave the bounds, RapidGLM continues the
-  iterations on the bounded coefficients;
+  L-BFGS-B after its coefficients leave the bounds, RapidGLM uses a bounded
+  optimizer; every optimizer fallback, failed fit and bound-active fit is
+  handed back to DefaultInference;
 - dispersions are maximized by Newton steps in log dispersion rather than
   L-BFGS-B and reach at least as high a Cox-Reid adjusted likelihood where they
   differ; genes whose rough starting value is at the dispersion floor keep it
@@ -54,11 +56,12 @@ class RapidGLMInference(DefaultInference):
              max_beta=30, optimizer="L-BFGS-B", maxiter=250):
         counts = np.asarray(counts, dtype=float)
         design = np.asarray(design_matrix, dtype=float)
-        beta, mu, hat, converged = capi.nb_floored_fits(
+        beta, mu, hat, converged, optimized = capi.nb_floored_fits(
             design, counts, np.asarray(size_factors, float), np.asarray(disp, float), min_mu=min_mu,
             tolerance=beta_tol, max_iterations=int(maxiter), min_beta=min_beta, max_beta=max_beta,
-            threads=self.threads)
-        bad = np.flatnonzero(~converged)
+            threads=self.threads, return_optimizer=True)
+        bad = np.flatnonzero(~converged | optimized | np.any((beta <= min_beta + 1e-7) |
+                                                  (beta >= max_beta - 1e-7), axis=1))
         if bad.size:
             self.fallbacks["irls"] += bad.size
             b, m, h, c = super().irls(counts[:, bad], size_factors, design_matrix, np.asarray(disp)[bad],

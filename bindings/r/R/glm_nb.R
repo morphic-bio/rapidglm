@@ -4,10 +4,13 @@
 # engine; stats::glm() then assembles the model object at that theta.
 glm_nb <- function(formula, data, weights, subset, na.action, start = NULL, etastart, mustart,
                    control = glm.control(...), method = "glm.fit", model = TRUE, x = FALSE,
-                   y = TRUE, contrasts = NULL, ..., init.theta, link = log) {
+                   y = TRUE, contrasts = NULL, ..., init.theta, link = log, division = NULL) {
+  .division_previous <- .division_set(division)
+  on.exit(.division_restore(.division_previous), add = TRUE)
   call <- match.call()
   link_name <- deparse(substitute(link))
   if (!identical(link_name, "log") || !missing(etastart) || !missing(mustart)) {
+    call$division <- NULL
     call[[1L]] <- quote(MASS::glm.nb)
     return(eval(call, parent.frame()))
   }
@@ -32,6 +35,7 @@ glm_nb <- function(formula, data, weights, subset, na.action, start = NULL, etas
   beta <- f$coefficients
   beta[f$aliased] <- 0
   fit_call <- call
+  fit_call$division <- NULL
   fit_call[[1L]] <- quote(stats::glm)
   fit_call$family <- MASS::negative.binomial(theta)
   fit_call$method <- quote(rapidglm::glm_fit)

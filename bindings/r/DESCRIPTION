@@ -1,6 +1,6 @@
 Package: rapidglm
 Title: Fast and Numerically Stable Generalized Linear Model Fitting
-Version: 1.4.0
+Version: 1.6.0
 Authors@R: person("Ling-Hong", "Hung", email = "lhhunghimself@gmail.com",
     role = c("aut", "cre"))
 Description: A fitting method for stats::glm() and a negative binomial fit
@@ -9,7 +9,8 @@ Description: A fitting method for stats::glm() and a negative binomial fit
     are fitted natively; Gaussian and other families use stats::glm.fit().
     Bulk differential expression by the DESeq2 procedure (bulk_de()) and
     perturbation screen analysis by the SCEPTRE method (sceptre()) run through
-    the RapidGLM C interface.
+    the RapidGLM C interface, as do vectorized special functions (special_lgamma()
+    and others).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports: stats, methods, MASS, Matrix

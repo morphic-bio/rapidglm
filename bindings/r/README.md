@@ -39,8 +39,20 @@ attr(grid_res, "tally")   # the pairs that failed pair QC, by target and kind
   - `sceptre()` to 1e-10, because R's BLAS can round differently from the
     CLI's OpenBLAS. Approximation-tail p-values below 1e-12 only need to be
     small on both sides.
-- On airway, `bulk_de()` took 1.6 s against DESeq2's 9.5 s in the same R
-  session (one thread, shared host).
+
+The native application and GLM entry points accept `division = "slow"` or
+`"fast"`; `NULL` inherits `RAPIDGLM_DIVISION`, read on first native use.
+The build default is `slow`. Explicit choices are scoped to the call and
+restored on return or error.
+
+## Special functions
+
+`special_log()`, `special_log1p()`, `special_exp()`, `special_digamma()` and
+`special_trigamma()` (RapidGLM's; digamma and trigamma for x >= 0) and
+`special_lgamma()` (libm in slow mode; the own positive kernel in fast mode) evaluate the engine's special functions on
+double vectors, with the same `division` argument, keeping attributes and treating NA and NaN as base R does
+([man/special.Rd](man/special.Rd)). `tests/special.R` checks RapidGLM's against
+the C++ values bit for bit and all of them against base R.
 
 ## glm drop-ins
 

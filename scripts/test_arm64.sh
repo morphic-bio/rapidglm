@@ -10,7 +10,7 @@
 # emulation). The script installs packages and edits the APT sources, so it
 # refuses to run outside a container.
 set -euo pipefail
-filter="${1:-ars_*,philox_*,exponential_ziggurat*,thinned_*,hazard_*,batched_*}"
+filter="${1:-ars_*,philox_*,exponential_ziggurat*,thinned_*,hazard_*,batched_*,crt_draw_*,vmath_*}"
 [ -f /.dockerenv ] || { echo "run this in a container (see the header)" >&2; exit 2; }
 export DEBIAN_FRONTEND=noninteractive
 dpkg --add-architecture arm64

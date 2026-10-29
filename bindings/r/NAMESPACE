@@ -1,4 +1,6 @@
 useDynLib(rapidglm, .registration = TRUE)
 export(glm_fit, glm, glm_nb, bulk_de, edger_ql, sceptre, sceptre_grid)
+export(special_log, special_log1p, special_exp, special_lgamma, special_digamma, special_trigamma,
+       special_path)
 importFrom(stats, gaussian, glm.control, model.frame, model.response, model.weights,
            model.offset, model.matrix, terms, delete.response, na.omit)

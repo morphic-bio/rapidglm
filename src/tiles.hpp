@@ -27,6 +27,10 @@ struct TileRun {
     // targets (summed over those tiles) that rebuilt their sampler per pair,
     // and the null models this process fitted (response nulls and the tiles').
     std::size_t tiles = 0, computed = 0, samplers_rebuilt = 0, null_fits = 0;
+    // The null start used by this process's tiles, the pairs they refined and
+    // those they fitted cold after refining failed (SceptreOptions::null_start).
+    bool null_refine = false;
+    std::size_t null_refined = 0, null_cold_refits = 0;
     double computed_seconds = 0;
 };
 namespace tiles {
@@ -370,6 +374,9 @@ sceptre_tiled(TileRun &t, const Matrix &design, const Responses &responses,
             records = std::move(part.tests);
             t.samplers_rebuilt += part.samplers_rebuilt;
             t.null_fits += part.null_fits;
+            t.null_refine = part.null_start_used == NullStart::refine;
+            t.null_refined += part.null_refined;
+            t.null_cold_refits += part.null_cold_refits;
         }
         const double seconds =
             std::chrono::duration<double>(std::chrono::steady_clock::now() - begin).count();

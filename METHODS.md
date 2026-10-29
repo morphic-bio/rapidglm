@@ -232,6 +232,206 @@ Sparse input is CSC with observations in rows and features in columns (transpose
 of the biological feature-by-cell convention). Only one response per worker is
 dense. Compact batch outputs omit observation-sized fit state.
 
+## Numerical backend: special functions
+
+`include/rapidglm/vmath.hpp` (1.5.0) gives log, log1p, exp, lgamma, digamma
+and trigamma of double, over arrays and one value at a time. It needs only
+the C++17 standard library and can be copied into other projects on its own.
+The default slow policy uses RapidGLM's log, log1p, exp, digamma and
+trigamma kernels; lgamma uses the C library's `lgamma_r`. The fast policy
+selects different log1p, positive-argument lgamma and array digamma kernels,
+as described under Division policy. Negative-argument lgamma always uses
+`lgamma_r` (`std::lgamma` writes the global `signgam`, which threaded
+callers must not do).
+
+The following algorithms describe the slow policy. Its own functions use no
+division except in digamma and trigamma:
+
+- **log.** x = 2^k m with m in [sqrt(2)/2, sqrt(2)), taken from the bits, and
+  g = m - 1 (exact). Then log x = k log 2 + g - g^2/2 + g^3 R(g), where:
+  - log 2 is split in two parts, so that k log2_hi is exact;
+  - k log2_hi + g, and that sum plus -g^2/2, are split exactly (Fast2Sum);
+  - the rounding error of g^2 is kept;
+  - R has degree 19 and is evaluated by Estrin's scheme;
+  - everything but the leading part is added before the last rounding.
+
+  Subnormal x are scaled by 2^54 first.
+- **log1p.** u = 1 + x is rounded, and c = x - (u - 1), its rounding error, is
+  computed exactly (with the larger of x and 1 first). Then
+  log1p(x) = log u + c/u, evaluated as for log with:
+  - g + r = (m - 1) + c 2^-k split exactly (g = x when k = 0);
+  - r/u formed as r 2^-k (1 - g + g^2), with no division.
+
+  For |x| < 2^-60 the result is x, which is correctly rounded there.
+- **exp.** exp(x) = 2^k exp(r), with k = round(x / log 2) and r = x - k log 2
+  (log 2 in two parts). exp(r) is the Taylor polynomial of degree 13, and 2^k
+  is added to the exponent bits. For |x| > 708 the scaling takes two steps,
+  for overflow and gradual underflow. This is the exp of `kernels.hpp`, moved
+  here: `detail::exp_array` now calls `vmath::exp_array`, with the same bits
+  on [-700, 700].
+- **digamma.**
+  - On z in [0.5, 2.5): psi(z) = (z - x0) P(v)/D(v), with v = z - 0.5, x0 the
+    positive root in two parts, P of degree 16 and D(v) = z (z + 1)(z + 2).
+  - Below 0.5: psi(x) = psi(x + 1) - 1/x. From 2.5 to 5: psi(x - n) plus the
+    sum of 1/(x - j). Both are free of cancellation.
+  - From 5: log x - 1/(2x) + G(1/x^2)/x^2, with G of degree 9 and RapidGLM's
+    log.
+- **trigamma.** psi'(x) = sum over j < m of 1/(x + j)^2 + psi'(x + m), with
+  m = ceil(6 - x) and at most 6. Then psi'(y) = 1/y + 1/(2y^2) + H(1/y^2)/y^3,
+  with H of degree 8.
+- **Polynomials.** They are Chebyshev interpolants computed with mpmath at 60
+  digits, converted to monomials and rounded to double
+  (`scripts/fit_vmath_polynomials.py`, which reproduces them).
+- **Subnormal intermediates.** For 1/x above 2^500, digamma and trigamma clamp
+  or drop their 1/x^2 terms, far below half an ulp, because subnormal
+  arithmetic costs over 100 ns an element.
+- **Domains.** digamma and trigamma are defined for x >= 0; negative x gives
+  NaN.
+- **NaN.** RapidGLM's functions return a NaN argument unchanged, keeping R's
+  NA.
+
+**Bit identity.** RapidGLM's functions give the same bits on every processor
+and path:
+- AVX2 with FMA on x86-64 (dispatched at run time);
+- Advanced SIMD on AArch64;
+- the portable path (scalar, `std::fma`);
+- the one-value forms (the scalar code compiled for FMA on AVX2 hosts).
+
+They use only IEEE operations, fused multiply-adds and integer operations on
+the bits, in one order. A rounded product never feeds an addition, so
+floating-point contraction cannot change the result. Vector lanes outside a
+function's main domain take the scalar code. `tests/test_vmath.cpp` checks:
+- the portable and dispatched paths and the one-value form against each
+  other, on 256,000 arguments;
+- digests of all outputs recorded on x86-64 AVX2, which the portable build
+  and AArch64 under QEMU reproduce;
+- 1,350 mpmath reference values;
+- special values.
+
+Slow-mode lgamma and negative-argument fast-mode lgamma follow the platform's
+libm. Positive-argument fast-mode lgamma has its own cross-path digest. Fast
+log1p, lgamma and digamma use AVX2 where available and the portable scalar
+kernels on AArch64; unchanged functions retain their Advanced SIMD paths.
+On an x86-64 processor without FMA, the
+portable path calls the C library's `fma`, which is correctly rounded but
+slow (`RAPIDGLM_FORCE_PORTABLE` builds take this path only).
+
+**Accuracy of the slow policy.** Largest error in ulps of the correctly rounded value, for 10^6
+random arguments per range, against long double references (glibc's `logl`,
+`log1pl`, `expl`, `lgammal`; Boost's long double digamma and trigamma):
+
+| Function | (1e-300, 1e-5) | (1e-5, 3) | (3, 100) | (100, 1e300) | NB | Other |
+|---|---|---|---|---|---|---|
+| log | 0.06 | 0.66 | 0.53 | 0.12 | 0.61 | |
+| log1p | 0.50 | 0.68 | 0.52 | 0.50 | | (-1, 0): 0.65 |
+| exp | | | | | | (-1, 1) and (-700, 700): 0.85 |
+| lgamma (glibc) | 0.55 | 1.78 | 2.22 | 1.07 | 2.25 | |
+| digamma | 0.99 | 3.74 | 2.28 | 0.61 | 3.15 | |
+| trigamma | 1.90 | 2.48 | 2.24 | 0.99 | 2.40 | |
+
+For comparison:
+- glibc: log 0.52, log1p 0.81, exp 0.51.
+- Boost's double-precision digamma and trigamma: up to 3.25 and 4.21.
+- Boost with promotion to long double: up to 0.70, at 2 to 20 times the cost.
+
+`tests/test_vmath.cpp` also checks 1,350 points against mpmath, including the
+neighbourhoods of lgamma's zeros and digamma's root. Largest errors there:
+log 0.51, log1p 0.49, exp 0.62, digamma 1.9, trigamma 1.3 ulp.
+
+The NB arguments are y + 1/alpha, with y geometric (mean 20) and alpha
+log-uniform from 1e-8 to 1e3.
+
+### Division policy
+
+`RAPIDGLM_DIVISION=slow|fast` selects the special-function policy, with `slow`
+as the default. The environment is read once on first use. CMake can set a build
+fallback with `-DRAPIDGLM_DIVISION_DEFAULT=fast`. Explicit call options override
+the environment and restore the previous policy on return or exception. Worker
+threads inherit the calling thread's resolved policy. There is no CPU-model
+autodetection; callers select the policy suited to their processor.
+
+The fast policy is measured on one Zen 3 core of the Threadripper PRO 5965WX,
+under an exclusive Slurm allocation with the core's SMT sibling idle. Log and
+exp retain the division-free array kernels. Log1p uses the earlier atanh-series
+kernel with division; positive lgamma uses the earlier polynomial kernel; array
+digamma uses the Boost-derived rational algorithm with one division per recurrence
+step. The combined recurrence was measured and rejected for its error. Array
+trigamma retains the existing kernel: the faster Boost-derived array candidate
+exceeded its accuracy bound. Negative lgamma arguments use the platform's libm.
+Within each policy, the own kernels use the same operation order on AVX2,
+portable and AArch64 paths; separate known-answer fingerprints test both modes.
+The old slow-policy fingerprints remain unchanged.
+
+For individual engine calls, the fast policy keeps glibc log, log1p, exp and
+lgamma_r, and Boost's double-policy digamma and trigamma. The Boost-derived FMA
+trigamma candidate has lower dependent-call latency, but made edgeR QL 1.5%
+slower in the paired end-to-end check and gave no bulk-DE improvement. The
+engine therefore retains Boost double. The rejected candidate and its
+accuracy and timing measurements are retained in DIVISION_CHOICES.json.
+
+### Choice of backends
+
+The slow-division choices below were made on a Gracemont efficiency core
+(CPU 16) on pikachu. These are historical development
+measurements; the 1.5.0 receipts run re-measures this stage on Zen 3. Gracemont
+cores issue about one 256-bit
+division per 32 cycles. Times are ns per element on 4,096 arguments in
+cache, for the NB arguments unless stated (`validation/VMATH.json`, "choices";
+`validation/SPECIAL_FUNCTIONS.json`).
+
+| Function | Engine, one value at a time | Engine, arrays | vmath arrays (C, Python, R) | Measured and not chosen |
+|---|---|---|---|---|
+| log | glibc, 4.7 | RapidGLM in edgeR-QL's unit deviances; elsewhere not batched | RapidGLM, 3.3; 0.67 ulp | SLEEF 6.8 (divides); RapidGLM one at a time 9.6; arrays in the NB likelihood, deviance and theta score (slower end to end) |
+| log1p | glibc, 10.1-11.6 (and 1.4.1's log plus a division) | RapidGLM in edgeR-QL's unit deviances | RapidGLM, 4.6; 0.68 ulp | SLEEF 7.9; RapidGLM one at a time 12.7 |
+| exp | glibc, 4.9-7.9 | RapidGLM: log-link means, floored NB fits, edgeR fixed-dispersion fits | RapidGLM, 2.6; 0.86 ulp | SLEEF 4.4; glibc one at a time 7.9 |
+| lgamma | glibc `lgamma_r`, 11.5 | none | glibc `lgamma_r`, 11.5; 2.25 ulp | SLEEF 41.4; Boost double 32.9; Boost promoted 230 |
+| digamma | Boost double policy, 5.6-10.0 per call | none | RapidGLM, 10.0; 3.7 ulp | Boost double as an array 11.2; Boost's algorithm in AVX2 13.3; first RapidGLM version 12.3; RapidGLM one at a time 11.9-13.8 per call |
+| trigamma | Boost double policy, 5.2-7.2 per call | none | RapidGLM, 6.6; 2.7 ulp | Boost double as an array 7.5; Boost's algorithm in AVX2 7.6; first version 8.4; RapidGLM one at a time 6.6-11.7 per call |
+
+Times are ns per element (per call where stated). Notes:
+- On arguments below 3, Boost's scalar digamma and trigamma are faster: 7.3
+  and 6.8 ns against RapidGLM's 10.7 and 14.0.
+- On a performance core (2.2 GHz, untimed), RapidGLM's arrays take 2.6 (log),
+  3.2 (log1p) and 1.5 ns (exp) against glibc's 5.2, 11.4 and 9.5. There,
+  Boost's trigamma algorithm in AVX2 is faster than RapidGLM's (3.1 against
+  3.6 ns).
+- RapidGLM's portable path, without FMA instructions, takes 32-75 ns.
+
+SLEEF 3.9.0 (u10, AVX2), the first backend tried, made the count paths slower
+on these cores because its double-double log divides. Ratios against 1.4.1,
+one thread:
+
+| workload | ratio |
+|---|---|
+| bulk DE, GTEx thyroid | 0.883 |
+| NB batch fit | 0.882 |
+| edgeR-QL, thyroid | 0.978 |
+| bulk DE, Replogle AAAS | 1.000 |
+
+On a performance core (capped at 2.2 GHz, untimed) the same build was faster,
+by 2-7% on the NB batch, bulk DE and edgeR-QL. It was removed.
+
+**Call sites.**
+- One value at a time, the engine keeps glibc's log, log1p and exp, as 1.4.1
+  did. RapidGLM's are faster only as arrays.
+- The log-link means, the floored NB fits of bulk DE and edgeR's
+  fixed-dispersion fits take their exponentials as one array.
+- edgeR's unit deviances take their logarithms as arrays (two gathers).
+- The other count paths take their logarithms one at a time again, because
+  the arrays did not pay there:
+  - NB likelihood, count deviance and theta score: 2.991 against 2.893 s on
+    the NB batch fit;
+  - bulk DE's floored deviance: 34.89 against 34.66 s on thyroid, 35.69
+    against 35.85 s on Replogle AAAS. This is within the noise below.
+- digamma and trigamma at the engine's call sites (theta Newton steps,
+  edgeR-QL's squeezed variances, bulk DE's prior variance) are boost::math's
+  double-precision algorithms, without promotion to long double. Per call
+  they are faster: 5.2-9.9 against 12.7-14.2 ns for digamma with one argument
+  repeated. In the workloads the two choices differed by -1.7% to +0.4%.
+- Rebuilding with a change in code layout only moved bulk DE on thyroid by
+  1.5% on these cores, so differences of that size are not attributed to the
+  functions.
+
 ## Tests and effects
 
 For an added covariate g, let c=X'Wg and H=X'WX. The efficient score is
@@ -316,7 +516,9 @@ guides or adjusting p-values. Neither change modifies the resampling test.
 
 Permutation uniformly shuffles labels within each supplied stratum, preserving
 its treatment count. CRT draws independent Bernoulli(p_i) labels using a fitted
-logistic propensity or caller-supplied probabilities. The default `thinned`
+logistic propensity or caller-supplied probabilities. Three samplers draw
+this law, each from its own random stream: `hazard` (the default, below),
+`thinned` (the default of releases before 1.5.0) and `direct`. The `thinned`
 draw groups observations by q=2^-b with q/2<p_i<=q, visits Bernoulli(q)
 candidates through geometric gaps and accepts each with probability p_i/q;
 levels with q>=1/4 use one uniform per observation. The law is unchanged and
@@ -326,10 +528,11 @@ observation order, reproducing earlier streams. Thinning by acceptance is the
 standard construction of [Lewis & Shedler 1979](https://doi.org/10.1002/nav.3800260304). A sampler callback permits
 other documented conditional laws; no lineage sampler is copied or qualified.
 
-`crt_draw=hazard` draws the same law without rejection. Observation i is given
-an interval of length -log(1 - p_i) on a line, the intervals laid end to end in
-observation order. The points of a unit-rate Poisson process on the line are
-generated by adding standard exponential gaps, and an observation is selected
+`crt_draw=hazard`, the default, draws the same law without rejection.
+Observation i is given an interval of length -log(1 - p_i) on a line, the
+intervals laid end to end in observation order. The points of a unit-rate
+Poisson process on the line are generated by adding standard exponential gaps,
+and an observation is selected
 when at least one point falls in its interval. An interval of length L holds
 no point with probability exp(-L) = 1 - p_i, and disjoint intervals are
 independent, so the labels are independent Bernoulli(p_i). The expected number
@@ -351,8 +554,11 @@ third of a Philox word; AES is exact integer arithmetic, so both give the
 words of the table-lookup implementation the tests compare them with
 (`scripts/test_arm64.sh` runs those tests for arm64 under QEMU). A processor
 without the instructions would spend more on the lookups than the method
-saves, so `hazard` then draws with the thinned sampler, from thinned's stream;
-the run record's `crt_draw_used` tells which. A point's observation is found from a table with
+saves, so `hazard` then draws with the thinned sampler, from thinned's stream.
+CRT p-values therefore depend on the kind of processor; the run record and the
+C, Python and R results state the sampler used (`crt_draw_used`). Builds with
+`RAPIDGLM_FORCE_PORTABLE` have no AES path and take the fallback too, so the
+tests cover both paths on x86. A point's observation is found from a table with
 one entry per observation over equal stretches of the line, then by stepping
 along the intervals' ends (8 + 4 bytes per observation, as for `thinned`).
 Lengths are added in double precision, so each probability is exact to within
@@ -381,6 +587,36 @@ target's CRT sampler depends only on the target and is built once for all its
 pairs, within `sampler_cache_mb`. Philox blocks are computed eight at a time,
 with AVX2 when available. Draw k of a pair always uses its own key and is
 written to slot k, so none of this changes any result.
+
+**Batch scoring** (`batch_scoring`, the default from 1.6.0 for CRT with
+complement controls). Instead of the ring of active pairs, each thread takes
+one response and scores all its pairs together, stage by stage. In each round
+every active pair contributes its next draws: a target's stored stage with
+`reuse_draws`, otherwise up to 8,192 draws from the pair's own stream,
+generated in batches of 256 as above. All of them are scored in one pass over
+the response's score records, a sparse × dense product S = D R with D the
+draws' treated cells and R the records (residual, weight, weighted design
+row). The pass visits the cells in blocks of 32,768, 2 MB of records with six
+design columns, so that a block's records stay in cache while every draw adds
+those of its cells in the block, two draws at a time with AVX2 vectors where
+available. A draw's sums are thus added in the order of pair-by-pair scoring,
+and statistics, p-values and draws are bit for bit those of the pair pipeline
+on every processor path and at any thread count. D is too sparse (about 0.4%
+of the cells per draw on the Gasperini screen) for dense matrix products.
+Before the responses, every listed target's propensity model and sampler are
+prepared in parallel, and with `reuse_draws` its first-stage draws are
+stored; a stage that another thread is storing is waited for, and stored or
+generated draws are checked once (ascending, unique, in range) instead of at
+every cell. On 100 targets × 7,418 genes of the Gasperini screen (8 threads,
+Xeon E5-2640 v4) scoring took 2.3 to 3.0 times less thread time; a run with
+`reuse_draws` and `confirm_draws: 0` took 1.92 times less wall time and a
+default run, where drawing the labels takes most of the time, 1.22 times less
+([BATCH_SCORING.json](validation/BATCH_SCORING.json)). The alternatives
+measured there (block sizes, one, two or four draws at a time, prefetching, a
+cell-major layout of stored draws, and response nulls and propensity models
+fitted in lockstep as matrix products) and the reasons for the choice are
+recorded with it. Shared screens, sequential screens and early stopping keep
+the pair pipeline.
 
 Optionally (`reuse_draws`, high MOI only), the CRT draws of a target are shared
 by all its tests: the random streams are keyed by the target instead of the
@@ -626,6 +862,90 @@ still use direct GLM fitting. Tail approximation, staging, RNG and draw budgets
 are unchanged by this model flag. Until 2026-09-29 the default was
 `null_model=direct`; its earlier receipts remain valid for that setting.
 
+### Mergeable null start
+
+With NT controls, each pair's null is fitted on its own cells: the NT cells and
+the target's treated cells (above). From 1.6.0 that fit starts by default from
+the response's **reference** (`null_start=refine`), not from scratch
+(`null_start=cold`, the behaviour of earlier releases).
+
+1. **Reference.** The response's null is fitted once on all retained cells:
+   Poisson coefficients beta_ref, then theta_ref by conditional ML, exactly as
+   for complement controls. Every per-cell term below is evaluated at
+   (beta_ref, theta_ref) and the fitted means mu_i of that fit.
+2. **Totals.** For a set of cells the totals are the Poisson score
+   sum a_i (y_i - mu_i) x_i, the Poisson information sum a_i mu_i x_i x_i', the
+   conditional theta score and curvature terms of `estimate_theta` at theta_ref,
+   their derivative in beta, sum a_i t mu_i (y_i - mu_i)/(t + mu_i)^2 x_i with
+   t = theta_ref, and sum a_i y_i log y_i. The NT cells' totals are summed once
+   per response. A pair adds the totals of its cells outside the NT cells. The
+   order is fixed: the NT totals, then the target's cells in ascending order.
+   A pair's totals therefore depend only on its set of cells and not on which
+   of them carry the target's label. Permuting the labels within the pair, as
+   the resampling does, leaves the null unchanged, as it does for the cold fit.
+3. **One-step start.** One Fisher-scoring step, beta_1 = beta_ref + I^-1 s, and
+   one Newton step in u = log theta, linearized in beta with the cross term,
+   from the pair's totals. This is the one-step estimator
+   ([Le Cam 1956](https://projecteuclid.org/euclid.bsmsp/1200501652);
+   [Bickel 1975](https://doi.org/10.1080/01621459.1975.10479884)). The start
+   differs from the pair's fit by the share of the other targets' cells in the
+   reference, about a fifth of the cells on the Replogle pilot. The step
+   corrects that to first order only, so it is used as a warm start
+   ([Friedman, Hastie and Tibshirani 2010](https://doi.org/10.18637/jss.v033.i01)),
+   not as the null.
+4. **Refinement.** Newton passes over the pair's cells compute, in one pass
+   each, the exact gradient, the Poisson deviance and, while the relative
+   coefficient step exceeds 1e-6, the information. A step that raises the
+   deviance by more than the cold fit's step acceptance allows (1e-12 of the
+   log likelihood) is halved, up to 30 times. The fit has converged when the
+   predicted gain of the next step relative to (0.1 + deviance), and its
+   largest relative coefficient change, are below the tolerance (the floor
+   100 eps/sqrt(rcond) applies as in `fit()`). These are the chord criteria of
+   the cold IRLS. That last step is then taken, as the cold fit takes its
+   chord refinement.
+5. **Theta.** Newton in log theta at the converged means, from the start's
+   theta, with the score and curvature of `estimate_theta`. It stops when the
+   log-scale step is below a tenth of the tolerance or the score is below
+   1e-10. A non-concave or large (|step| > 1) iteration hands over to today's
+   procedure: the moment start followed by `estimate_theta`.
+6. **Fallback.** The cold fit is used for every pair of a response whose
+   reference did not converge or has a boundary. It is also used for a pair
+   whose refinement does not converge within 30 passes or meets a singular
+   information. Boundaries and rank deficiency thus keep the cold fit's statuses.
+7. **Score.** The score records and the covariate-adjusted information are
+   computed in one pass from the pair's means and theta. The information is
+   summed over the rows' nonzero entries rather than as a dense product.
+
+The refined null agrees with the cold fit to the convergence tolerance.
+Empirical p-values are the same unless a draw lies within rounding of the
+observed statistic. Skew-normal tail p-values are continuous in all the draws'
+statistics and can differ in the last digits, and by more far in a tail.
+
+On the Replogle K562 pilot (20 targets, 8,563 genes, 174,761 tested pairs,
+8 threads), refine and cold were compared on the same binary:
+- Agreement: coefficients within 1.2e-11 and theta within 6e-10 at the 99th
+  percentile (6.4e-4 at most, on flat high-theta likelihoods). Statistics are
+  within a relative 4.8e-8. All 158,699 empirical p-values are identical, as
+  are the statuses and the discoveries of every family. 77 of 16,062
+  tail-approximated p-values differ by more than 1e-4, all of them below 3e-17.
+- Work per pair: 9 exact passes at the median (99th percentile 16), against
+  about 55 for the cold fit (4.6 IRLS iterations, two theta rounds and a dense
+  51 x 51 information). 7.4% of pairs hand theta over, and no pair fell back
+  to the cold fit.
+- Time: null work fell from 20.9 to 5.1 thread-ms per pair. The `ks` run's
+  wall time fell from 1,262 s to 592 s. The `strict` run fell from 3,666 s to
+  3,028 s: its draws take most of its time and are the same work under both
+  starts.
+
+[MERGEABLE_NULL.json](validation/MERGEABLE_NULL.json) records the measured
+alternatives, their numbers and the reasons for this choice:
+- the one-step null without refinement, from all-cells or NT-only references;
+- an NT-only base with a quadratic model;
+- a lockstep batched cold fit;
+- an index-mapped score kernel.
+SCEPTRE's per-pair refit is described from its documentation and black-box
+outputs only.
+
 ## Bulk differential expression
 
 `bulk_de` (CLI `bulk-de`) follows the procedure published for DESeq2
@@ -688,15 +1008,33 @@ which PyDESeq2 states follows DESeq2's code. Counts are samples × genes
    1e-8 of itself plus 0.1). Its Wald SE is the sandwich
    (H + 10⁻⁶ I)⁻¹ H (H + 10⁻⁶ I)⁻¹ with H = X'WX at the floored means
    (*calibrated*: DESeq2's SEs; PyDESeq2 uses the unfloored means here), its LR
-   statistic the difference of the two floored deviances, and its Cook's
+   statistic the difference of the two likelihood deviances at the returned,
+   unfloored means (calibrated by public `nbinomLRT` runs), and its Cook's
    distances use the unfloored means and the leverages of the floored weights.
-   A group of zeros then has a finite fold change, as in DESeq2 (−9.35, SE 1.10
-   in tests/test_bulk.cpp's example, equal to DESeq2's). Before 1.4.0 such genes
-   were reported by the LR test as `boundary_lrt`; that status remains only if
-   the floored fit fails.
+   A group of zeros then has a finite fold change. The C++ test example gives
+   about −9.390, SE 1.055; the separate R-simulated calibration gave −9.35,
+   SE 1.10 in both tools. Failed floored fits report `floored_fit_failed`.
+   Bulk bounds and ridge scale with the design columns' maximum magnitudes;
+   the sandwich expression above uses normalized columns and is transformed
+   back to input units. Crossing a bound or reaching the IRLS limit triggers bounded optimization.
+   The Python inference interface retains PyDESeq2's coefficient units and
+   hands every native optimizer fallback, failed fit and bound-active fit back
+   to its default inference. Boundary warm starts outside the bounds restart
+   from the least-squares initialization instead of clipping a coefficient
+   vector whose linear predictors are valid only before clipping.
 9. **Cook's distance** ([Cook 1977](https://doi.org/10.2307/1268249)):
    D_i = R_i² / p × h_i / (1 − h_i)², with R_i = (y_i − μ_i) / √(μ_i + α_rob μ_i²)
-   and h_i the hat values of the final fit. The cutoff is the 0.99 quantile
+   and h_i the hat values of the final fit. Before computing a distance,
+   leverage within 4 × double-precision machine epsilon of 1 is treated as
+   exactly 1. Its distance is undefined (NaN), so it is excluded from finite
+   maxima and from replacement. This applies to both robust-dispersion modes
+   and to refits after replacement. If any observation is saturated, the
+   largest distance across all samples is undefined, so the legacy count-rank
+   exemption below is not applied: an above-cutoff finite distance in an
+   eligible replicated cell flags the gene. Saturation alone does not flag
+   a gene. This avoids last-bit weight changes granting or removing the
+   exemption.
+   The cutoff is the 0.99 quantile
    of F(p, m − p). DESeq2 uses a robust dispersion α_rob here that its paper
    and documentation do not specify in reproducible detail.
    - By default (`legacy_cooks`, from 1.2.0), α_rob is DESeq2's robust
@@ -712,9 +1050,15 @@ which PyDESeq2 states follows DESeq2's code. Counts are samples × genes
      - **Flagging.** A gene is not flagged when three or more samples have
        larger counts than the sample with the largest distance.
 
-     These values equal those recovered from DESeq2's outputs to 1e-12, and
-     they reproduce DESeq2's discoveries
-     ([BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01)).
+     These rules follow the public PyDESeq2 implementation. The historical
+     claim of equality to inverted DESeq2 dispersions is not established by
+     the current receipts. The public-assay inversion check supports per-gene
+     consistency within 1e-12 on a declared subset with all fitted means at
+     least 0.5; its maximum relative range is 4.684e-15 there and 3.027e-9 over
+     all eligible genes, including low means. This is a check of the reference
+     inversion, rather than of equality to the native estimator. See
+     [COOKS_INVERSION.json](validation/receipts/v1.4.0-r2/COOKS_INVERSION.json)
+     and [BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01).
    - With `legacy_cooks: false`, α_rob is RapidGLM's own estimator, the default
      before 1.2.0. It pools the squared scaled MADs of the normalized counts
      within design cells of at least three samples (the ordinary variance if
@@ -733,8 +1077,11 @@ which PyDESeq2 states follows DESeq2's code. Counts are samples × genes
     rule is *calibrated*), and the BH rejections at α are counted. A LOWESS
     ([Cleveland 1979](https://doi.org/10.1080/01621459.1979.10481038); span
     0.2, *calibrated*, with three robustness passes) is fitted to rejections
-    over θ. The chosen θ is the lowest whose rejections exceed the curve's
-    maximum minus the residual SD, √(Σ residual² / 49). BH adjustment then runs
+    over θ. If the maximum rejection count is at most ten, choose the first θ.
+    Otherwise choose the lowest θ whose rejections exceed the curve's maximum
+    minus the residual RMS, calculated over quantiles with positive rejections.
+    These are calibrated rules following PyDESeq2, checked against black-box
+    DESeq2 results. BH adjustment then runs
     over the passing genes with p-values; the others get `NA`.
 11. **Fold-change shrinkage** (optional, `lfc_shrink=normal`): the paper's
     empirical normal prior, as DESeq2's `lfcShrink(type = "normal")` computes it
@@ -759,6 +1106,16 @@ which PyDESeq2 states follows DESeq2's code. Counts are samples × genes
       consistent with the test (a RapidGLM choice). DESeq2's `lfcShrink` uses the
       original counts (black-box observation).
 
+**Final 1.4.0 agreement with DESeq2 1.48.2.** On the five validation
+datasets, discovery Jaccard ranges from 0.9834
+to 1.0000; p-value Spearman is at least
+0.999813. The one- and eight-thread
+tables are byte-identical on every dataset. Size factors differ by at most
+4.108e-15 relative.
+These are final-code measurements from [BULK_DE.json](validation/BULK_DE.json);
+[the bulk report](docs/BULK_DE.md) gives the simulations, null checks,
+shrinkage, Cook's-distance and pseudobulk comparisons.
+
 ## Quasi-likelihood differential expression
 
 `edger_ql` (CLI `edger-ql`) follows the default quasi-likelihood workflow of
@@ -767,7 +1124,7 @@ Lun, Baldoni and Smyth 2025, NAR 53:gkaf018; Lund et al. 2012). It was written
 from the papers, the documentation of edgeR and limma and black-box runs of
 edgeR 4.6.2; no edgeR or limma source was read. Rules the documentation leaves
 open were settled by the black-box runs, recorded with the evidence for each in
-the specification the implementation follows (`validation/work/edger/EDGER_QL_SPEC.md`).
+the specification the implementation follows (`docs/EDGER_QL_SPEC.md`).
 
 1. **Filtering.** A gene is kept when its count per million of library, at
    least `min_count` reads per median library (10), holds in at least m
@@ -811,6 +1168,11 @@ the specification the implementation follows (`validation/work/edger/EDGER_QL_SP
    likelihood keeps increasing. s²_post = (d0 s²_prior + d s²)/(d0 + d).
 7. **Tests.** F = (D_reduced − D_full)/(q s²_post) on q and d0 + d df, with
    deviances at φ/a; Benjamini-Hochberg over the kept genes.
+   The total denominator df is uncapped in RapidGLM. On the 12-gene/8-sample
+   CLI fixture, public edgeR reports df.total=72 versus about 8140.82 here;
+   gene 0 has p=.24615077 versus .24226256. The fixture's absolute .005
+   p-value tolerance does not establish identical tails for small panels.
+   See [EDGER_SMALL_PANEL_LIMITATION.json](validation/receipts/v1.4.0-r2/EDGER_SMALL_PANEL_LIMITATION.json).
 8. **Fold changes.** From fits at φ/a of the counts plus 0.125 × library /
    mean library with offsets log(library + 0.25 × library / mean library).
 
@@ -822,23 +1184,36 @@ count). After a whole step, convergence is confirmed without a new
 factorization when the decrement computed with the previous information, times
 exp of the largest change in a linear predictor (which bounds the change of
 every weight), is below that threshold; otherwise the next step computes the
-decrement. A fit that does not converge in 60 steps is refitted by `fit`.
+decrement. The bound assumes well-conditioned information. Near a group of
+zeros and fitted means around 1e-12, rounding can make the shortcut stop before
+the full test; observed differences in statistics are negligible. A fit that
+does not converge in 60 steps is refitted by `fit`.
 Leverages come from the Cholesky factor of X'WX, or from a Householder QR of
 W^(1/2)X when fitted means near zero make that factor ill-conditioned.
 
-**Agreement with edgeR 4.6.2** (`scripts/validate_edger.py`; eight datasets).
-The kept genes, TMM factors (to 5e-15), average log CPM (to 1e-11) and φ (to
-4e-5 relative, within the tolerance of the search) agree. On airway, kang and three simulated sets the discoveries at FDR
-0.1 are identical and p-values agree to within 0.007 in log10. On the GTEx
-thyroid sets, for 22, 7 and 9 genes edgeR's `glmFit` reports a deviance that is
-not the deviance of its own fitted values, or flags the fit as failed, for the
-full or the reduced design (black-box check, `scripts/reference_edger_fits.R`);
-its F statistics for those genes use the reported deviance. Over the other
-genes p-values agree to within 0.1 in log10 (0.005 for 32 samples), and with
-Benjamini-Hochberg over those genes the discoveries differ by at most 7 (1,370
-against 1,363 for 32 samples, 822 against 821 for 128, 7,480 against 7,477 for
-647). Without edgeR's implementation the reason for those deviances cannot be
-checked.
+**Final 1.4.0 agreement with edgeR 4.6.2** (eight datasets).
+The kept-gene sets are identical. Maximum discrepancies are
+5.107e-15 relative for TMM
+factors, 6.509e-12 absolute
+for average log CPM and
+3.398e-05
+relative for the common dispersion. At FDR 0.1, discoveries are identical on
+airway, kang, sim3, sim3b, sim8. On the thyroid subsets, black-box checks of edgeR's
+public fitted values identify inconsistent reported deviances or failed fits
+in 22,
+7 and
+9 genes (32, 128 and 647 samples).
+Without reading edgeR's implementation, the reason for those reported
+deviances cannot be established. Over the other genes, with BH recalculated
+on that subset, discovery counts are:
+
+| Samples | RapidGLM | edgeR | Shared |
+|---|---:|---:|---:|
+| 32 | 1,370 | 1,363 | 1,363 |
+| 128 | 822 | 821 | 821 |
+| 647 | 7,480 | 7,477 | 7,477 |
+
+Source: [EDGER_QL.json](validation/EDGER_QL.json), from the complete final release run.
 
 ## Other applications
 
@@ -851,3 +1226,259 @@ direction of [Signac](https://stuartlab.org/signac/reference/findmarkers).
 Dose trend tests a supplied numeric dose column using the selected GLM family.
 Count-model assumptions for RNA, peaks and antibodies are identical NB2 working
 assumptions, not assertions that each modality follows an NB sampling law.
+
+`edger-ql` accepts nonnegative integer counts only; fractional counts are
+rejected before normalization or likelihood evaluation. This is a RapidGLM
+input restriction; edgeR also supports workflows using fractional counts.
+
+Additional edgeR workflow choices: dispersion genes must have row sums at
+least 5. Every trial dispersion uses this same set; if any gene fails, that
+objective value is invalid. The likelihood-ratio statistic is clamped at zero,
+and BH adjustment includes only finite p-values. RapidGLM currently uses all
+selected dispersion genes, including when there are more than 10,000; edgeR's
+systematic 10,000-row subset is not implemented. The moderation LOWESS anchor
+spacing is range/200, including at most 200 distinct abundances; this is a
+RapidGLM choice, differing from the black-box specification's zero spacing
+for small sets. The prior-df search is bounded by 8134.84478 but returns its
+numerical interior optimum (about 8134.8433 at the upper boundary), rather than
+that exact endpoint. Counts occupy the sparse input and a dense kept-gene
+matrix; TMM temporarily transposes the dense matrix. These memory costs remain.
+
+## Cis-QTL mapping
+
+`cis_qtl` and `rapidglm qtl` test each dosage by its efficient score against a
+covariate-only Gaussian, Poisson or NB null. With working weights W and score
+residual r, U = g'r − g'WX(X'WX)⁻¹X'r and I = g'Wg − g'WX(X'WX)⁻¹X'Wg.
+The reported z is U / sqrt(I × scale); the one-step estimate is U/I and its
+SE sqrt(scale/I). Gaussian scale is the residual variance, count-model scale
+is one. Missing dosages are imputed to each variant's observed mean.
+
+Each phenotype's inclusive cis window is [start−window, end+window]. CLI
+BED intervals are zero-based half-open and convert to the 1-based inclusive
+[start+1,end]; point records with start=end anchor at that supplied coordinate.
+PLINK allele A1 (ALT in plink2-generated files) is counted. Genotypes and
+covariates are matched to BED sample IDs. Tied positions retain input order;
+exact score ties select the first variant in that order.
+
+Each permutation shuffles the response and log-library offset together and
+refits the null. For unweighted Gaussian fits without offsets, ridge or robust
+covariance, the permutation scores instead use a projection computed once per
+gene. The observed information basis supplies S = Q'G and I = diag(G'G) −
+diag(S'S), where Q = X D⁻¹L⁻ᵀ and LL' = D⁻¹(X'X)D⁻¹. Thus Q has orthonormal
+columns, G_res = G − QS, and G_res'(I−QQ')y_perm = G_res'y_perm.
+
+Batches of 512 responses retain the existing CounterRng streams and shuffle
+order. Each shuffle's generator values are computed in bulk, eight Philox
+blocks at a time with the vectorized Philox, before its Fisher–Yates swaps
+run over them; each range r takes its rejection threshold 2⁶⁴ mod r from a
+table and its remainder without a division, as the integer part of
+((⌈2¹²⁸/r⌉x) mod 2¹²⁸)·r/2¹²⁸, which equals x mod r for every 64-bit x
+(Lemire, Kaser and Kurz 2019). A shuffle that rejects a value (each value with
+probability below n/2⁶⁴) continues with the following blocks, so every shuffle
+is that of the generator drawn value by value. On an efficiency core the
+shuffles of 10,000 permutations of 462 samples take 32 ms instead of 59 ms,
+two 64-bit divisions per swap having taken most of the time. Packed
+matrix products give Y_perm'G_res and Y_perm'Q; each scale is
+(|y|² − |Q'y_perm|²)/(n−p). If the residual squared norm is at most 1e-6 of
+|y|², explicit least-squares residuals supply both the scale and the score
+input to avoid cancellation. The observed statistics and information are
+unchanged. Double-precision products use 128-sample by 128-column cache panels
+and six-by-eight register tiles, with runtime-dispatched AVX2/FMA and a portable
+path. Every sum visits samples in order across panels; packing buffers belong
+to the calling gene worker. No external BLAS matrix product is used, preserving
+independence from its build and avoiding shared packing-buffer contention.
+
+**Single-precision permutation scores.** The score product Y_perm'G_res takes
+about 97% of the Gaussian permutation time. By default
+(`permutation_precision: single`) it is computed in single precision, in three
+steps:
+
+1. Before its conversion to float, each permuted response is centred or
+   residualized in double precision. G_res is orthogonal to the covariates, so
+   in exact arithmetic y_b minus any vector in their span has the scores of
+   the residual r_b = y_b − Q t_b; for the float product what matters is that
+   no large component that the covariates explain remains. A permutation
+   leaves the covariates little to explain, so by default its centred response
+   y_b − ȳ1 stands for r_b (ȳ is the phenotype mean when the design has a
+   constant column, and 0 otherwise). Its sum of squares SS_c is the same for
+   every permutation. A permutation with SS_c > 2·rss_b, which the covariates
+   happen to fit well, keeps r_b, using the t_b = Q'y_b already computed for
+   its scale, and Q T' is formed for those permutations alone, with the sums
+   used before. Columns that took the explicit least-squares fallback already
+   hold residuals. With SS_c ≤ 2·rss_b the bounds on the float rounding of the
+   response and of every float sum (γ|g_res||response| by Cauchy–Schwarz) are
+   at most √2 times those for r_b, and the part of y_b − ȳ1 in the covariate
+   span, of norm √(SS_c − rss_b) ≤ √rss_b, adds at most the float rounding of
+   G_res times that norm. Either way no large shared component, such as the
+   phenotype mean, cancels in single precision. At the Geuvadis dimensions
+   (462 samples, 43 covariates) a permutation's R² against the covariates is
+   about 0.09 (SS_c/rss_b ≈ 1.1), so every permutation is centred, which
+   saves the product Q T' and its subtraction. Each response is divided by its
+   residual standard deviation before the conversion, so the float entries are
+   O(1) whatever the phenotype's units: like the double path, the single path
+   does not depend on the scale of the phenotype, which can lie far outside the
+   float range.
+2. G_res is converted to float once per gene, by the packed double product
+   Q S, and stored in groups of sixteen variants, each sample's sixteen in one
+   64-byte cache line.
+3. Six-by-sixteen float register tiles (AVX2/FMA, or a portable tile on other
+   processors, including ARM64) sum each 128-sample panel from zero. Each
+   panel's sums are then added to double partials, in sample order, so 462
+   samples need four float partial sums per element. The scores are never
+   stored: after the last panel, each tile multiplies its partials by the
+   variants' inverse information, takes |z| and folds it into its six
+   permutations' running maxima, skipping NaN and infinity as before. The
+   twelve float sums occupy twelve of the sixteen YMM registers (the compiled
+   sample loop keeps them there without spills), so the double partials
+   (768 bytes per tile) live in an L1 scratch, read and written once per
+   panel; tiles small enough to keep double partials in registers (2 × 16,
+   4 × 8) ran four times slower. Variants are taken 128 at a time: each row
+   tile's partials for the block (6 kB) stay in L1 while it passes over the
+   block's packed genotypes (236 kB at 462 samples), which stay in L2 for
+   every row tile. Before this, each 512-permutation batch wrote a 512 × m
+   double score matrix (18 MB at 4,500 variants) and read it back for the
+   maxima; with twelve threads that traffic left the caches, and each core ran
+   at 83% of its single-thread rate, against 94% now (48 synthetic genes of
+   4,500 variants on twelve efficiency cores, `benchmarks/qtl_precision.cpp`).
+
+Each panel sum is within γ₁₂₉ = 129u/(1−129u) ≈ 7.7e-6 (u = 2⁻²⁴) of the
+panel's sum of |terms|. Scales and their fallback, information, the maxima,
+observed statistics, nominal output, refitted permutations and the Beta
+calibration stay in double precision.
+
+Single and double results were compared on test shapes covering 37–462
+samples, 1–4,500 variants, 1–43 covariates, a phenotype mean of 10⁶,
+phenotypes scaled by 10³⁸ and 10⁻⁴², nearly collinear covariates and
+one-carrier variants. Permutation maxima agree to within 1.03e-6 of
+max(1, |z|): relative for maxima of at least 1 and absolute below, because a
+small score can lose more of its relative accuracy to cancellation. The
+largest difference is 9.7e-7 with centred responses (step 1), and was 1.03e-6
+with every permutation residualized; on the Geuvadis-sized shape it is 3.9e-7
+(2.9e-7 residualized). Simulated gene-level beta_p agrees to within 3.3e-7
+relative. On Geuvadis chromosome 22 (580 genes), statuses, leads and observed
+statistics are identical for every gene. With 1,000 permutations, empirical
+p-values are identical except in 12 genes, all with |z| < 4: in each, one
+permutation maximum lies within the single-precision tie tolerance below the
+observed statistic (see below) and counts as extreme, which raises p by
+1/1001. beta_p agrees to within 3.8e-5 relative, at beta_p ≈ 2 × 10⁻⁴⁹, and
+to within 5.0e-6 wherever beta_p > 10⁻¹⁰; beta_k and beta_n agree to within
+2.9e-6 relative. With 10,000 permutations, 76 empirical p-values (|z| ≤ 4.2)
+rise by 1 to 3 counts out of 10,001 through the tie tolerance, beta_p agrees
+to within 2.3e-5 relative (4.1e-6 wherever beta_p > 10⁻¹⁰), and both
+precisions find the same 267 eGenes at Storey q < 0.05. Residualizing every
+permutation gave 12 and 77 such genes, and beta_p within 2.5e-5 relative at
+both budgets.
+
+Maxima that are equal in exact arithmetic are spread by float rounding: their
+relative variance is about 3e-14 at 462 samples, above the double threshold
+of 64ε. For single-precision maxima, the Beta calibration's constant-maxima
+test therefore uses a relative variance of 1e-8 (a relative SD of 1e-4), six
+orders of magnitude above that spread. Maxima with a relative SD of 1e-3 are
+still fitted, as in double precision.
+
+Results do not depend on the thread count, the batch boundaries or the order
+in which genes reach a worker. The AVX2 and portable float tiles
+round differently (fused or separate multiply-add), and other architectures
+can differ too, so single-precision results can differ in the last bits
+between them. `permutation_precision: double` keeps the 1.4.1 products. It
+reproduces 1.4.1 output except where a permutation maximum lies within 1e-9
+relative below the observed statistic (see below). Geuvadis chromosome 22
+(1,000 permutations), a 60-gene subset with 10,000 permutations and nominal
+output, and an NB subset are byte-identical to 1.4.1.
+
+Successful maxima give the empirical p=(1+extreme)/(1+successful). A maximum
+counts as extreme when it is at least |z|(1 − τ), with τ = 1e-5 for
+single-precision scores and 1e-9 otherwise. The observed statistic and the
+permutation maxima are rounded along different paths, and some designs make
+them equal in exact arithmetic. With an intercept only and a private variant
+in every sample, for example, every permutation has the observed largest |z|
+among those variants, so the exact permutation p-value is 1. Without τ,
+rounding decides on which side each such tie falls; in tests of this design
+permutation_p then ranged from about 0.2 to 0.9 in either precision. In single
+precision, τ is ten times the largest measured spread of such ties (1e-6
+relative). Projected double-precision scores spread them mainly through the
+rounding of their scales (|y|² − |Q'y_perm|²). That spread grows with the
+squared ratio of the phenotype mean to its residual SD, from about 1e-15 at
+mean zero to 1e-10 at 300 SDs, so τ covers means up to several hundred
+residual SDs. Counting
+near-ties as extreme is conservative: it raises the empirical p-value by the
+share of maxima within τ below |z|.
+
+Fewer than ten usable permutations gives `permutations_failed`. Singular null
+information becomes a per-gene status; singular permutation information is
+counted as a failed draw.
+The Beta calibration follows jaxQTL's noncentral chi-square reference and
+maximum-likelihood Beta shapes (credited in DEPENDENCIES.md). Nearly constant
+maxima fail calibration using a relative variance test; failed shapes and
+noncentrality are NaN, with `ok_beta_failed` retaining nominal results.
+
+**Genotype storage and memory.** `Genotypes` holds either dosages, eight bytes
+per call with NaN for a missing call, or hard calls: the two-bit codes of a
+variant-major PLINK 1 .bed (00 two copies of A1, 01 missing, 10 one copy, 11
+none), a quarter of a byte per call. `rapidglm qtl` loads only chromosomes
+present in the phenotype BED and keeps their codes as read; it repacks them
+only when the BED's samples are not the .fam's samples in .fam order. Each
+gene worker decodes its cis variants into its double-precision genotype block
+as it tests the gene, and computes each variant's mean dosage from the codes,
+four calls at a time through a 256-entry table of byte sums. Sums of whole
+dosages are exact, so the decoded values, the means and every result are bit
+for bit those of the same calls stored as dosages. For the
+genome-wide Geuvadis panel (6,317,351 variants, 462 samples) the calls take
+0.68 GiB instead of 21.7 GiB. For each variant the CLI also keeps the chromosome
+name and position, and packs the ID and alleles into one string (31 bytes
+rather than 128 for three strings). MAF filtering compacts the codes and these
+vectors in place and then releases their spare capacity.
+
+Each gene worker keeps its buffers from gene to gene in a workspace that grows
+to the largest gene the worker has met and is never shrunk, so later genes
+allocate, fault in and clear no memory. In single precision it holds the
+genotype block in double precision (3.7 kB per cis variant at 462 samples),
+the packed float projection (1.8 kB), the projection's 64-sample block
+(0.5 kB) and the basis (0.3 kB): about 6.5 kB per cis variant of its largest
+gene, with no score matrix, plus about 5 MB of batch buffers. In double
+precision the scores of a 512-permutation batch (4.1 kB per cis variant) take
+the place of the float projection and its block: about 8.2 kB. glibc keeps a
+freed block below its mmap threshold (which rises to 32 MB as large blocks
+are freed) resident in the arena of the thread that freed it; as workers met
+ever larger genes, the blocks they outgrew raised the genome-wide peak by
+0.8 GiB, so once a worker's buffers have grown by a megabyte or more it returns
+the free pages (`malloc_trim`). Windows are largest in the HLA region: 143
+chromosome 6 genes have more than 15,000 cis variants (up to 26,032), so with
+12 threads every worker then holds buffers of that size, and they set the
+genome-wide peak. Measured untimed with 12 threads and 10 permutations, which
+allocate the same per-gene buffers as 10,000, the genome-wide scan peaks at
+3.35 GiB of resident memory (3.52 GiB for the previous build measured the same
+way; 25.8 GiB when calls were stored as dosages, close to the 25.9 GiB of the
+1.4.1 run with 10,000 permutations). Chromosome 22 peaks at 0.65 GiB in single
+precision, with 1,000 or 10,000 permutations (0.90 and 0.94 GiB before), and
+at 0.88 GiB in double precision with 10,000 (0.84 GiB before).
+
+Nominal output keeps every cis pair in memory (48 bytes each). Flattening
+allocates the full table while every gene's rows are still held, so it
+briefly needs twice that. For very large nominal scans, partition phenotypes
+by chromosome.
+
+**Final 1.4.0 QTL agreement.** On Geuvadis chromosome 22 (580 genes,
+462 samples), Gaussian 10,000-permutation calibration finds
+267 eGenes at Storey q < 0.05. Discovery Jaccard is
+1.0000 with
+FastQTL's adaptive 1,000–10,000 run and
+0.9963
+with tensorQTL at 10,000 permutations. NB at 1,000 permutations finds
+168 eGenes, with Jaccard
+0.9882 against
+jaxQTL NB at the same budget. Full metrics and limitations are in
+[EQTL_COMPARE.json](validation/EQTL_COMPARE.json) and
+[the QTL report](docs/QTL_GAUSSIAN_SPEED.md). This panel does not establish
+genome-wide performance or agreement.
+
+On ARM64, the KS discrepancy of the skew-normal fit uses the double-precision
+CDF identity Phi(z) − 2 T(z, shape), with promotion disabled for Owen's T.
+Its absolute error is checked against the promoted Boost distribution CDF on
+a grid of shapes and statistics. The inferential tail and strict tail-soundness
+checks retain their distribution CDF and quantiles. Integer generator streams
+are unchanged; floating-point statistics and fitted-tail p-values can round
+differently across architectures. Exact empirical-p comparisons are recorded
+in the historical [dev.3 ARM64 study](validation/ARM64_DEV3.json), without
+relaxing its comparison criteria. The final selected test suite has its own
+[ARM64 receipt](validation/ARM64.json).

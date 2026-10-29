@@ -18,6 +18,14 @@ std::pair<Matrix, Vector> collinear(double delta, std::size_t n = 600) {
     return {x, y};
 }
 } // namespace
+BOOST_AUTO_TEST_CASE(crossproduct_handles_zero_columns) {
+    for (std::size_t n : {0u, 1u, 3u, 4u, 5u, 11u}) {
+        const auto a = detail::crossprod(Matrix(n, 0), Vector(n, 1));
+        BOOST_TEST(a.rows == 0u);
+        BOOST_TEST(a.cols == 0u);
+        BOOST_TEST(a.values.empty());
+    }
+}
 BOOST_AUTO_TEST_CASE(crossproduct_matches_direct_sums_for_any_row_count) {
     std::mt19937_64 rng(7);
     std::normal_distribution<double> normal;

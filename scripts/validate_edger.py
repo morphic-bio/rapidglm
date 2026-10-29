@@ -125,8 +125,14 @@ def main():
         seconds = run(args.binary, WORK / DATASETS[name], out, args.threads, args.cpus)
         results[name] = compare(name, out)
         results[name]["seconds"] = round(seconds, 3)
+        assert results[name]["filter_mismatches"] == 0, (name, results[name])
+        assert results[name]["norm_factor_max_rel"] < 1e-10, (name, results[name])
+        assert results[name]["log10_p_max_abs"] < .15, (name, results[name])
         print(name, json.dumps(results[name]), flush=True)
     if args.output:
+        results["_provenance"] = {
+            "version": subprocess.check_output([str(args.binary), "--version"],text=True).strip(),
+            "commit": subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip()}
         args.output.write_text(json.dumps(results, indent=1) + "\n")
 
 

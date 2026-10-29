@@ -1,6 +1,6 @@
-# SCEPTRE concordance and staging — 2026-09-30
+# SCEPTRE concordance and staging
 
-On public S2 the perturbation workflow's discoveries overlapped SCEPTRE 0.99.0's
+The historical investigation began on 2026-09-30. On public S2 the perturbation workflow's discoveries overlapped SCEPTRE 0.99.0's
 with a Jaccard index of only 0.846 (13 against 11). This report finds the cause
 clean-room: from SCEPTRE's documentation and black-box outputs, without reading
 its source. The receipt is
@@ -43,46 +43,33 @@ and the run record stores it. Scans keep 0 by default. A scan configured like
 
 ## Concordance at the Monte Carlo floor
 
-RapidGLM's draws differ from SCEPTRE's, so borderline pairs can go either way.
-SCEPTRE's results do not change with R's seed, so its own Monte Carlo spread
-cannot be measured by reseeding it. The floor is therefore the agreement between
-RapidGLM runs with different seeds. Over seeds 1–10 with version 1.3.0 (BH 0.1
-over the pairs matched with SCEPTRE):
+These measurements were repeated in the complete final 1.4.0 run on
+`v1.4.0-dev.4`. RapidGLM and SCEPTRE use different random draws, so marginal
+discoveries can differ. The between-seed agreement of RapidGLM gives the
+comparison floor used here. Ten seeds, BH 0.1 over matched tested pairs:
 
-| Panel (SCEPTRE discoveries) | Screen | RapidGLM discoveries | Jaccard with SCEPTRE, mean (min) | Jaccard between seeds, mean (min) | Stage agreement |
+| Panel (SCEPTRE discoveries) | Screen | RapidGLM discoveries | Jaccard with SCEPTRE, mean (min) | Between-seed Jaccard, mean (min) | Stage agreement |
 |---|---|---|---|---|---|
-| public S1, low MOI (32) | 0.02 | 30–32 | 0.963 (0.909) | 0.948 (0.879) | 0.97 |
-| | 0 | 31–32 | 0.975 (0.969) | 0.972 (0.938) | 0.55 |
-| public S2, high MOI (11) | 0.02 | 11–16 | 0.834 (0.688) | 0.811 (0.647) | 0.95 |
-| | 0 | 13–18 | 0.702 (0.611) | 0.895 (0.722) | 0.83 |
+| Public S1, low MOI (32) | 0.02 | 30–32 | 0.963 (0.909) | 0.948 (0.879) | 0.968 |
+| Public S1, low MOI (32) | 0 | 31–32 | 0.975 (0.969) | 0.972 (0.938) | 0.545 |
+| Public S2, high MOI (11) | 0.02 | 11–16 | 0.834 (0.688) | 0.811 (0.647) | 0.955 |
+| Public S2, high MOI (11) | 0 | 13–18 | 0.702 (0.611) | 0.895 (0.722) | 0.833 |
 
-With the screen, agreement with SCEPTRE equals or exceeds the agreement between
-two RapidGLM seeds on every panel. Without it, S2 falls well below that floor
-and averages 15.8 discoveries against SCEPTRE's 11.
+Over 200 seeds, Public S1, low MOI averages 31.095 discoveries (SE 0.077; range 29–34), with mean Jaccard 0.9632 against SCEPTRE.
 
-Ten seeds are few for S2. From 1.3.0 a pair's draws are keyed by the pair
-itself, so the same ten seeds give other draws than before: with the screen
-they average 13.2 discoveries on S2, where the draws of 1.2.0 gave 12.4. Over
-200 seeds the two sets of draws agree: 12.3 discoveries (standard error 0.11;
-9 to 17 in single runs) and a mean Jaccard index with SCEPTRE of 0.883 with
-either. On S1, 200 seeds average 31.1 discoveries (29 to 34) and 0.963. Stage agreement is the fraction of pairs that both tools
-take to a second stage, or both do not. The S2 value that prompted this, 0.846
-at seed 20260926 without the screen, is one draw from such a distribution. With
-the screen, that seed gives 0.769.
 
-Gates, set after exploring S1 and S2; all pass:
-- **G1 floor:** with the screen, the mean Jaccard with SCEPTRE is at least the
-  mean between-seed Jaccard minus 0.02.
-- **G2 counts:** the mean discovery count is within max(1, 15%) of SCEPTRE's.
-  From 1.3.0 the mean is taken over 200 seeds. Over ten seeds its standard
-  error on S2, about 0.5, is a third of the margin there (1.65), so the outcome
-  turns on the seeds: the ten above average 13.2, outside the margin (the
-  receipt records this as `G2_counts_ten_seeds`), and the same seeds with the
-  draws of 1.2.0 averaged 12.4, inside it. Over 200 seeds the mean is 12.3.
-- **G3 null calibration:** screened resampling meets the scan's null bounds on
-  six configurations (Poisson and NB responses; binary and continuous
-  predictors; permutation and CRT). Rejections at 0.05 run from 98 to 130 of
-  2,400; KS statistics are at most 0.027, against a critical value of 0.040.
+Over 200 seeds, Public S2, high MOI averages 12.315 discoveries (SE 0.113; range 9–17), with mean Jaccard 0.8826 against SCEPTRE.
+
+All final staging gates pass. G1 requires mean reference Jaccard to be
+at least mean between-seed Jaccard minus 0.02. G2 uses the 200-seed mean count,
+within max(1, 15%) of the reference count; its ten-seed counterpart is retained
+separately because it is sensitive to those few draws. G3 reruns screened
+resampling on the six scan-null configurations and checks their declared
+binomial and KS bounds. These thresholds were chosen after development
+exploration; they are descriptive validation gates.
+
+The original changes to frozen panels below are historical development
+observations; they are separate from the fresh staging table above.
 
 ## Effect on the frozen panels
 

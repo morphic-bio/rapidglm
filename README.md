@@ -7,13 +7,15 @@ Wald, likelihood ratio, score and quasi-likelihood tests and deterministic
 permutation or conditional-randomization calibration. Results are identical at
 any thread count.
 
-Two widely used methods are built on it, written from their publications and
-documentation (the reference implementations were run only as black boxes):
+Applications are built from published methods and documentation; GPL reference
+implementations are run only through their public interfaces:
 - **bulk differential expression** following the DESeq2 procedure (`bulk_de`);
 - **perturbation-screen analysis** following the SCEPTRE method (`sceptre`), for
   a list of pairs or for every pair of named targets and responses
   (`sceptre_grid`). A pair's result depends only on the seed, its response and
-  its target, not on what else is tested or in what order.
+  its target, not on what else is tested or in what order;
+- **quasi-likelihood differential expression** following edgeR 4 (`edger_ql`);
+- **cis-QTL mapping** with Gaussian, Poisson and NB score tests (`cis_qtl`).
 
 One library serves several interfaces:
 - a C++ header library and a CLI;
@@ -23,54 +25,58 @@ One library serves several interfaces:
 
 ## Benchmarks
 
-Measured on 2026-10-10 with version 1.3.0 on one workstation (wall-clock
-seconds; one / eight threads, each thread on its own efficiency core of an
-Intel Core i9-13900KF; [docs/BENCHMARK.md](docs/BENCHMARK.md#host)). Jaccard is
-the overlap of discoveries with the reference tool at a false-discovery rate of
-0.1. RapidGLM times are for its R package; the CLI and Python package take
-similar times. The SCEPTRE rows accept the skew-normal fit as SCEPTRE does
-(`fit_check: "ks"`); RapidGLM's default is a stricter check with confirmation
-draws, which takes 27–40% longer on these panels
-([docs/CLI.md](docs/CLI.md#perturbation-workflow)).
+The current release is **1.4.1**, which fixes undefined behavior for a
+zero-column weighted cross-product. The benchmark tables and receipts below
+remain **1.4.0 measurements** on `f0ecfbd` (`v1.4.0-dev.4`); they have not been
+remeasured for 1.4.1. [Patch validation](validation/receipts/v1.4.1/README.md).
 
-| Analysis | Reference (1 / 8) | RapidGLM (1 / 8) | Speed-up (1 thread) | Jaccard |
-|---|---|---|---:|---:|
-| DESeq2 1.48.2, airway (8 samples) | 6.09 / 2.75 | 1.02 / 0.28 | 6.0× | 0.932 |
-| DESeq2, GTEx thyroid (128 samples) | 119 / 31.3 | 9.56 / 1.74 | 12.4× | 0.997 |
-| DESeq2, GTEx thyroid (647 samples) | 481 / 83.8 | 35.1 / 6.55 | 13.7× | 1.000 |
-| SCEPTRE 0.99.0, Gasperini screen (50,000 cells) | 1,517 / 251 | 336 / 59.4 | 4.5× | 0.79 |
-| SCEPTRE, Gasperini screen (207,324 cells) | – / 1,473 | – / 335 | 4.4× (8 threads) | 0.89 |
+Version 1.4.0 uses the library code of `v1.4.0-dev.4`. All figures below come
+from the complete final release run, completed 2026-10-22; the
+[release receipts](validation/receipts/v1.4.0/README.md) retain source hashes,
+tests, all 18 stages and quiet-start evidence.
 
-Both perturbation tools are Monte Carlo tests, so their overlap turns on the
-draws: over six seeds the Jaccard index on the full screen is 0.89 to
-0.96, and 0.90 to 0.96 between two RapidGLM seeds
-([validation/PERTURBATION_SEEDS.json](validation/PERTURBATION_SEEDS.json)).
-Bulk DE computes Cook's distances with DESeq2's robust dispersion as
-implemented in PyDESeq2 (MIT; Muzellec et al. 2023), the default from 1.2.0.
-RapidGLM's own estimator (`legacy_cooks: false`) flags more genes in designs
-with many small groups and gives Jaccard 0.58 and 0.90 on the two thyroid sets
-([docs/BULK_DE.md](docs/BULK_DE.md#legacy-cooks-distances-2026-10-01)). The
-timings are provisional: the workstation's performance cores were not all
-available, and the runs will be repeated when it is repaired.
+One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional.
+[Host details](docs/BENCHMARK.md#host). The table gives wall seconds at one /
+eight threads. RapidGLM uses its R interface here. Jaccard measures discovery
+overlap at FDR 0.1. The SCEPTRE rows use matched skew-normal acceptance
+(`fit_check: "ks"`); the stricter RapidGLM default adds confirmation draws.
+The R rows time API calls after input loading; SCEPTRE rows sum calibration,
+power and discovery calls, excluding setup.
 
-**Engine:**
-- *Accuracy.* All 39 identifiable problems from a binary128-referenced suite
-  are fitted, with coefficient errors of at most 6.6e-7 standard errors.
-- *Single fits.* Median speed-up over R `glm.fit` 5.6×, statsmodels 8.9× and
-  fastglm 3.5× (one thread, n ≥ 1e5;
-  [docs/GLM_COMPARISON.md](docs/GLM_COMPARISON.md)).
-- *Solvers.* Against Ceres Solver on identical problems, the safeguarded Newton
-  solvers are 2.1–2.7× faster than Levenberg–Marquardt (fixed dispersion) and
-  1.7–5.7× faster than BFGS (estimated dispersion), at equal or better accuracy
-  ([docs/SOLVERS.md](docs/SOLVERS.md)).
-- *Validation datasets.* Bulk DE agrees with DESeq2 at Jaccard 0.93–1.00 on
-  five datasets ([docs/BULK_DE.md](docs/BULK_DE.md)). Perturbation analysis
-  agrees with SCEPTRE at the Monte Carlo floor
-  ([docs/SCEPTRE_STAGING.md](docs/SCEPTRE_STAGING.md)).
+| Analysis | Reference (1 / 8) | RapidGLM (1 / 8) | Speedup | Jaccard |
+|---|---|---|---|---|
+| DESeq2 1.48.2, airway (8 samples) | 6.07 / 2.63 | 0.966 / 0.238 | 6.3× (1 thread) | 0.986 |
+| DESeq2, thyroid (128 samples) | 118 / 31.3 | 9.87 / 1.75 | 12.0× (1 thread) | 0.997 |
+| DESeq2, thyroid (647 samples) | 483 / 83.7 | 35.1 / 6.51 | 13.8× (1 thread) | 1.000 |
+| SCEPTRE 0.99.0, high MOI (50,000 cells) | 1,524 / 251 | 333 / 59.6 | 4.6× (1 thread) | 0.79 |
+| SCEPTRE, high MOI (207,324 cells) | – / 1,472 | – / 323 | 4.6× (8 threads) | 0.89 |
 
-Datasets, tools and the harness are described in
-[docs/BENCHMARK.md](docs/BENCHMARK.md). Every number has a receipt under
-[validation/](validation).
+The speedup depends on the workload and acceptance rule. On the low-MOI
+Replogle pilot at 16 threads, whole-command speedups over SCEPTRE are
+4.38× with `ks` and
+1.63× with the strict default.
+[The benchmark](docs/BENCHMARK.md) reports both rules and interfaces separately.
+Across six high-MOI seeds, Jaccard with SCEPTRE ranges from
+0.89 to 0.96.
+
+- **GLM engine:** with R-compatible aliasing, all 39
+  identifiable accuracy problems fit;
+  maximum coefficient error 6.6e-07 in units of the reference standard error.
+  Median single-fit speedups are 5.4× over R `glm.fit`,
+  8.3× over statsmodels and 3.2× over fastglm
+  (one thread, n ≥ 100,000; [GLM comparison](docs/GLM_COMPARISON.md)).
+- **NB solvers:** 2.2–2.8× over tight Levenberg–Marquardt with fixed
+  dispersion and 1.7–5.8× over tight BFGS with estimated dispersion
+  on identical problems ([solver comparison](docs/SOLVERS.md)).
+- **Bulk agreement:** Jaccard 0.983–1.000
+  with DESeq2 on five validation datasets ([bulk DE](docs/BULK_DE.md)).
+- **Gaussian cis-QTL:** 1.29× over tensorQTL at
+  10,000 permutations on Geuvadis chromosome 22, with the agreement and scope in
+  [the QTL report](docs/QTL_GAUSSIAN_SPEED.md).
+
+Datasets, tool versions, timing scopes and all current tables are in
+[the benchmark](docs/BENCHMARK.md). Every current figure comes from a final
+receipt under [validation/](validation).
 
 ## Quick start
 
@@ -133,6 +139,19 @@ expose the same functions.
   can bind to it the same way ([docs/C_API.md](docs/C_API.md#language-bindings)).
 - *Rust* ([bindings/rust](bindings/rust)): bindings over the C interface and a
   port of PyDESeq2's workflow whose per-gene fits run in RapidGLM.
+- *Special functions* (`include/rapidglm/vmath.hpp`, a standalone header):
+  RapidGLM's vectorized `log`, `log1p`, `exp`, `digamma` and `trigamma`, the
+  same bits on every processor within each division policy. `lgamma` uses
+  the C library in slow mode and RapidGLM's positive-argument kernel in fast
+  mode (negative arguments keep libm); also
+  `rapidglm_<f>_array` in the C interface, `rapidglm.special` in Python and
+  `special_<f>()` in R ([METHODS.md](METHODS.md#numerical-backend-special-functions)).
+
+The numerical policy defaults to `slow`. Set `RAPIDGLM_DIVISION=fast` before
+first use or pass an explicit `division="fast"` option for chips with fast
+division. [Backend choices](METHODS.md#division-policy) records the alternatives
+and accuracy checks; [CLI](docs/CLI.md) and [C API](docs/C_API.md) document the
+per-call options.
 
 ## Continuous integration and releases
 
@@ -165,6 +184,45 @@ headers link these numerical libraries through the exported `rapidglm::rapidglm`
 CMake target. Cholesky and triangular solves are done in-house by default;
 `-DRAPIDGLM_LAPACK_SOLVES=ON` uses LAPACK for large systems instead, with the
 caveats in [docs/CLI.md](docs/CLI.md).
+
+### Cross-compiling for aarch64 Linux
+
+From an x86 Linux host with Docker:
+
+```bash
+mkdir -p build-arm64
+docker run --rm --platform linux/amd64 -v "$PWD":/src:ro \
+  -v "$PWD/build-arm64":/out ubuntu:24.04 bash /src/scripts/build_arm64.sh
+```
+
+The script installs the cross compiler and arm64 LAPACKE/OpenBLAS, then uses
+[`cmake/toolchain-aarch64-linux-gnu.cmake`](cmake/toolchain-aarch64-linux-gnu.cmake)
+to build the header-only engine's consumers, shared and static C libraries,
+command-line program and tests. It checks the artifacts' architecture and runs
+selected unit tests, a C99 caller of the shared library and the small CLI suite
+under QEMU. When the five local edgeR reference datasets are available, it also
+runs their agreement checks. Artifacts, logs and elapsed times go in
+`build-arm64/`; the source mount stays read-only. Pass `all` after the script
+name for the full C++ suite, which is slow under emulation.
+
+The final selected ARM64 suite is recorded in
+[ARM64.json](validation/ARM64.json): 29 C++ cases with 5,281,712 assertions,
+28 CLI cases and the C99 caller pass under QEMU. The clean clone does not
+mount external edgeR comparison tables. The earlier full cross-architecture
+application study remains explicitly historical in
+[ARM64_DEV3.json](validation/ARM64_DEV3.json); its numerical differences are
+not relabeled as final-run measurements. These checks establish functionality
+under emulation, without an ARM hardware performance measurement.
+
+ARM uses the portable kernels in place of the x86 AVX2 and SHA paths. Compare
+application results with numerical tolerances: BLAS and floating-point rounding
+can differ. Integer resampling streams are identical; floating-point statistics
+can round differently. Linux aarch64 uses software binary128
+`long double`, so some paths are slower, especially under QEMU. The optional
+binary128 benchmark reference fitter is excluded; ARM performance and the R
+and Python packages are outside these checks.
+
+### Threading and numerical benchmarks
 
 Parallelism is across response features, controlled by `threads`. The perturbation
 workflow also schedules pairs and resampling draws as tasks within the same OpenMP
@@ -213,3 +271,21 @@ accepted, and from 1.1.0 the smallest are confirmed on 199,999 draws
 ([SKEW_NORMAL_CHECK.json](validation/SKEW_NORMAL_CHECK.json)). The checks
 reduce such cases; they cannot rule them out
 ([METHODS.md](METHODS.md#resampling)).
+
+Force the portable kernels, integer generators and SHA-1 path on x86 with
+`cmake -S . -B build-portable -DRAPIDGLM_FORCE_PORTABLE=ON` and run both
+`ctest --test-dir build-portable` and `python3 tests/test_cli.py build-portable/rapidglm`.
+CI includes this configuration; the whole ARM64 suite runs under QEMU on the
+weekly schedule, manual runs and tags, with the short sampler suite on pushes.
+
+Cis-QTL mapping is available as `rapidglm qtl config.json` for Gaussian,
+Poisson and NB response models, using phenotype BED and PLINK 1 genotypes.
+It reports nominal scores and permutation-calibrated gene p-values. See
+[configuration and output columns](docs/CLI.md#cis-qtl-mapping-qtl) and
+[the method](METHODS.md#cis-qtl-mapping). PLINK A1 is the counted allele;
+output starts use 1-based coordinates.
+
+On ARM64 the skew-normal KS discrepancy uses the double-precision identity
+Phi(z) − 2 T(z, shape), checked against the promoted Boost CDF. Inferential
+tails retain the distribution CDF. This avoids per-draw software binary128
+work in the KS check; integer resampling streams retain the same definitions.

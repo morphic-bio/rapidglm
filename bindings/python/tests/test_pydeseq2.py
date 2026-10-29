@@ -109,6 +109,24 @@ class PyDESeq2Backend(unittest.TestCase):
                 self.assertGreater(np.mean(ratio < 1e-3), 0.97, name)
         self.assertEqual(seen, {"irls", "alpha_mle", "wald_test"})
 
+    def test_bound_active_irls_uses_default_fallback(self):
+        from unittest.mock import patch
+        from rapidglm import capi
+        counts = np.ones((6, 1))
+        x = np.ones((6, 2)); x[3:, 1] = 0.01
+        expected = (np.array([[2., 3.]]), np.full((6, 1), 2.),
+                    np.full((6, 1), .2), np.array([True]))
+        for coefficient, optimized in ((30., False), (3., True)):
+            native = (np.array([[1., coefficient]]), np.ones((6, 1)),
+                      np.ones((6, 1)), np.array([True]), np.array([optimized]))
+            with patch.object(capi, "nb_floored_fits", return_value=native), \
+                 patch.object(DefaultInference, "irls", return_value=expected) as fallback:
+                inference = self.Inference(n_cpus=1)
+                got = inference.irls(counts, np.ones(6), x, np.ones(1), .5, 1e-8)
+                fallback.assert_called_once()
+                self.assertEqual(inference.fallbacks["irls"], 1)
+                for a, b in zip(got, expected): np.testing.assert_array_equal(a, b)
+
     def test_whole_analysis_agrees(self):
         inference = self.Inference(n_cpus=2)
         dds, ours = run(self.counts, self.md, inference)

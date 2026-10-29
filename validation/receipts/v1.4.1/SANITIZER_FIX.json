@@ -1,0 +1,33 @@
+{
+  "release_version": "1.4.1",
+  "tested_patch_commit": "55ff26b74702ae9e134988bb4554b4eb1cfaa3a1",
+  "tested_at_utc": "2026-10-22T20:58:59.003447+00:00",
+  "scope": "Local validation of the zero-column fix before the 1.4.1 version bump; full release CI is published in GitHub Actions.",
+  "sanitizers": {
+    "sanitizers": [
+      "address",
+      "undefined"
+    ],
+    "openmp": true,
+    "cases_passed": 29,
+    "assertions_passed": 4553,
+    "includes_existing_cooks_replacement_regression": true
+  },
+  "old_ubsan_failure_reproduced": true,
+  "zero_column_row_counts": [
+    0,
+    1,
+    3,
+    4,
+    5,
+    11
+  ],
+  "nonzero_column_cases_bit_identical_to_1_4_0": 28,
+  "source_sha256": {
+    "include/rapidglm/model.hpp": "c0c24086e8d5a9b47bfa4fe10c136ed90b5fb4c760429c4d1e08ac80fea89ee9",
+    "tests/test_solver.cpp": "180ed518776e38edec934ab40a26a309665312286953c3ac4d5b7474a31125bc"
+  },
+  "benchmark_version": "1.4.0",
+  "benchmark_commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "benchmarks_remeasured_for_1_4_1": false
+}

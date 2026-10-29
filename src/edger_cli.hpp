@@ -10,6 +10,13 @@ inline int run_edger_ql(const Tree &config, const std::string &config_path, Hash
                         std::chrono::steady_clock::time_point start) {
     for (const auto &key : {"covariates", "formula", "offset", "weights", "family", "units"})
         require(!config.count(key), (std::string(key) + " is not an edger-ql setting").c_str());
+    const std::vector<std::string> settings = {
+        "responses",    "design",        "output",     "coefficient",     "contrast",
+        "coefficients", "filter",        "min_count",  "min_total_count", "large_n",
+        "min_prop",     "normalization", "dispersion", "prior_count",     "threads"};
+    for (const auto &entry : config)
+        require(std::find(settings.begin(), settings.end(), entry.first) != settings.end(),
+                ("unknown edger-ql setting: " + entry.first).c_str());
     const auto responses_path = config.get<std::string>("responses");
     const auto design_path = config.get<std::string>("design");
     const auto output = config.get<std::string>("output");
@@ -79,6 +86,8 @@ inline int run_edger_ql(const Tree &config, const std::string &config_path, Hash
     };
     record << "{\"command\": \"edger-ql\", \"version\": \"" << version << "\", \"config\": ";
     quoted(record, config_path);
+    record << ",\n  \"division\": ";
+    quoted(record, vmath::division_name());
     record << ", \"samples\": " << counts.rows << ", \"genes\": " << counts.cols
            << ", \"kept\": " << result.kept << ", \"hypothesis\": ";
     hypothesis_record(record, hypothesis);

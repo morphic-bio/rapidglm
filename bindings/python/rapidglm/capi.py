@@ -14,6 +14,7 @@ package, or on the system library path.
 """
 
 import ctypes
+from functools import wraps
 import ctypes.util
 import os
 import pathlib
@@ -144,6 +145,8 @@ class _SceptreOptions(ctypes.Structure):
         ("response_ids", _text_p),
         ("family", ctypes.c_int),
         ("family_size", _size * 3),
+        ("null_start", ctypes.c_int),
+        ("batch_scoring", ctypes.c_int),
     ]
 
 
@@ -189,6 +192,7 @@ _APPROXIMATIONS = {"skew_normal": 1, "no_approximation": 0}
 _ADJUSTMENTS = {"BH": 0, "bonferroni": 1}
 _STREAM_KEYS = {"identity": 0, "position": 1}
 _ADJUSTMENT_FAMILIES = {"tested": 0, "listed": 1}
+_NULL_STARTS = {"refine": 0, "cold": 1}
 
 
 def _choice(name, value, choices):
@@ -196,6 +200,17 @@ def _choice(name, value, choices):
         return choices[value]
     except KeyError:
         raise ValueError(f"{name} must be one of {'/'.join(choices)}, not {value!r}") from None
+
+
+def _crt_draw_used(frame):
+    """Name the CRT sampler used in ``attrs`` (the C interface gives its code)."""
+    names = {code: name for name, code in _CRT_DRAWS.items()}
+    if "crt_draw_used" in frame.attrs:  # C API version 3 (1.5.0) on
+        frame.attrs["crt_draw_used"] = names[int(frame.attrs["crt_draw_used"])]
+    starts = {code: name for name, code in _NULL_STARTS.items()}
+    if "null_start_used" in frame.attrs:  # 1.6.0 on
+        frame.attrs["null_start_used"] = starts[int(frame.attrs["null_start_used"])]
+    return frame
 
 
 def _load():
@@ -227,11 +242,19 @@ def _library():
     if _lib is not None:
         return _lib
     lib = _load()
+    # The feature/API version must be established before binding newer symbols.
+    api = lib.rapidglm_c_api_version
+    api.restype, api.argtypes = ctypes.c_int, []
+    actual = api()
+    if actual < 3:
+        raise OSError(f"librapidglm_c has C API version {actual}, need 3")
     table_p = ctypes.c_void_p
     signatures = {
         "rapidglm_version": (ctypes.c_char_p, []),
         "rapidglm_c_api_version": (ctypes.c_int, []),
         "rapidglm_last_error": (ctypes.c_char_p, []),
+        "rapidglm_set_division": (ctypes.c_int, [ctypes.c_int, ctypes.POINTER(ctypes.c_int)]),
+        "rapidglm_division_mode": (ctypes.c_int, []),
         "rapidglm_table_rows": (_size, [table_p]),
         "rapidglm_table_columns": (_size, [table_p]),
         "rapidglm_table_column_name": (ctypes.c_char_p, [table_p, _size]),
@@ -356,13 +379,15 @@ def _library():
                 ctypes.POINTER(table_p),
             ],
         ),
+        "rapidglm_special_path": (ctypes.c_char_p, []),
     }
+    # Raw addresses (rapidglm.special passes ndarray.ctypes.data).
+    for f in ("log", "log1p", "exp", "lgamma", "digamma", "trigamma"):
+        signatures[f"rapidglm_{f}_array"] = (ctypes.c_int, [ctypes.c_void_p, ctypes.c_void_p, _size])
     for name, (restype, argtypes) in signatures.items():
         function = getattr(lib, name)
         function.restype = restype
         function.argtypes = argtypes
-    if lib.rapidglm_c_api_version() != 1:
-        raise OSError(f"librapidglm_c has C API version {lib.rapidglm_c_api_version()}, need 1")
     _lib = lib
     return lib
 
@@ -493,6 +518,7 @@ def _frame(table):
         frame.attrs[name.decode()] = (
             np.ctypeslib.as_array(pointer, (length.value,)).copy() if length.value else np.empty(0)
         )
+    frame.attrs["division"] = "fast" if frame.attrs["division_mode"] == 1 else "slow"
     return frame
 
 
@@ -504,9 +530,29 @@ def _index(frame, column, names):
     return frame
 
 
+def _division_parameter(function):
+    """Scope an explicit keyword-only division option to this calling thread."""
+    @wraps(function)
+    def wrapped(*args, **kwargs):
+        division = kwargs.get("division")
+        if division is None:
+            return function(*args, **kwargs)
+        mode = _choice("division", division, {"slow": 0, "fast": 1})
+        lib = _library()
+        previous = ctypes.c_int()
+        if lib.rapidglm_set_division(mode, ctypes.byref(previous)):
+            raise ValueError(lib.rapidglm_last_error().decode())
+        try:
+            return function(*args, **kwargs)
+        finally:
+            lib.rapidglm_set_division(previous.value, None)
+    return wrapped
+
+
+@_division_parameter
 def fit_batch(design, responses, family="nb", dispersion="ml", theta=None, tolerance=None,
               ridge=None, max_iterations=None, offset=None, weights=None, robust=False,
-              cox_reid=False, singular_ok=False, threads=1):
+              cox_reid=False, singular_ok=False, threads=1, *, division=None):
     """Fit one GLM per response column. Columns: feature, status, theta,
     theta_boundary, log_likelihood, iterations and, per design column j,
     beta<j>, se<j>, wald_p<j>, boundary<j>."""
@@ -523,12 +569,13 @@ def fit_batch(design, responses, family="nb", dispersion="ml", theta=None, toler
     return _index(frame, "feature", _feature_names(responses))
 
 
+@_division_parameter
 def bulk_de(design, counts, coefficient=None, contrast=None, coefficients=None, test="wald",
             size_factors="ratio", size_factor_values=None, trend="parametric", min_mean=None,
             keep_minimum_start=None, outlier_sd=None, cooks_filter=None, cooks_cutoff=None,
             min_replicates_for_replace=None, independent_filtering=None, alpha=None,
             lfc_shrink="none", min_dispersion=None, max_dispersion=None, legacy_cooks=True, seed=None,
-            threads=1):
+            threads=1, *, division=None):
     """Bulk differential expression by the DESeq2 procedure; counts are
     samples x genes. Tests the last design column unless ``coefficient``
     (a column index), ``contrast`` (one weight per column) or ``coefficients``
@@ -554,6 +601,8 @@ def bulk_de(design, counts, coefficient=None, contrast=None, coefficients=None, 
     if sum(given) > 1:
         raise ValueError("give one of coefficient, contrast and coefficients")
     if coefficient is not None:
+        if not 0 <= coefficient < x.cols or int(coefficient) != coefficient:
+            raise ValueError("coefficient outside the design")
         o.coefficient = int(coefficient)
     rows = None
     if contrast is not None:
@@ -561,6 +610,8 @@ def bulk_de(design, counts, coefficient=None, contrast=None, coefficients=None, 
     if coefficients is not None:
         rows = np.zeros((len(coefficients), x.cols))
         for r, j in enumerate(coefficients):
+            if not 0 <= j < x.cols or int(j) != j:
+                raise ValueError("coefficient outside the design")
             rows[r, int(j)] = 1
     if rows is not None:
         if rows.shape[1] != x.cols:
@@ -597,9 +648,10 @@ def bulk_de(design, counts, coefficient=None, contrast=None, coefficients=None, 
     return frame
 
 
+@_division_parameter
 def edger_ql(design, counts, coefficient=None, contrast=None, coefficients=None, filter=True,
              min_count=None, min_total_count=None, large_n=None, min_prop=None, normalization="tmm",
-             norm_factors=None, dispersion=None, prior_count=None, threads=1):
+             norm_factors=None, dispersion=None, prior_count=None, threads=1, *, division=None):
     """Quasi-likelihood differential expression following edgeR 4's default
     workflow (filterByExpr, TMM, glmQLFit, glmQLFTest); counts are samples x
     genes. Tests the last design column unless ``coefficient`` (a column
@@ -623,6 +675,8 @@ def edger_ql(design, counts, coefficient=None, contrast=None, coefficients=None,
     if sum(given) > 1:
         raise ValueError("give one of coefficient, contrast and coefficients")
     if coefficient is not None:
+        if not 0 <= coefficient < x.cols or int(coefficient) != coefficient:
+            raise ValueError("coefficient outside the design")
         o.coefficient = int(coefficient)
     rows = None
     if contrast is not None:
@@ -630,6 +684,8 @@ def edger_ql(design, counts, coefficient=None, contrast=None, coefficients=None,
     if coefficients is not None:
         rows = np.zeros((len(coefficients), x.cols))
         for r, j in enumerate(coefficients):
+            if not 0 <= j < x.cols or int(j) != j:
+                raise ValueError("coefficient outside the design")
             rows[r, int(j)] = 1
     if rows is not None:
         if rows.shape[1] != x.cols:
@@ -655,7 +711,8 @@ def edger_ql(design, counts, coefficient=None, contrast=None, coefficients=None,
     return frame
 
 
-def bulk_adjust(pvalue, base_mean, alpha=0.1, independent_filtering=True):
+@_division_parameter
+def bulk_adjust(pvalue, base_mean, alpha=0.1, independent_filtering=True, *, division=None):
     """Adjusted p-values of a bulk_de table at another alpha: Benjamini-Hochberg
     after the same independent filtering on baseMean. Returns (padj, threshold)."""
     lib = _library()
@@ -672,8 +729,9 @@ def bulk_adjust(pvalue, base_mean, alpha=0.1, independent_filtering=True):
     return padj, threshold.value
 
 
+@_division_parameter
 def nb_fixed_fits(design, counts, size_factors, dispersions, tolerance=1e-8, max_iterations=1000,
-                  min_beta=-30.0, max_beta=30.0, threads=1):
+                  min_beta=-30.0, max_beta=30.0, threads=1, *, division=None):
     """NB GLM fits at a fixed dispersion per feature with log size-factor offsets.
     counts: observations x features (dense). Returns (coefficients [features x
     columns, natural log], fitted [observations x features], hat values
@@ -696,13 +754,15 @@ def nb_fixed_fits(design, counts, size_factors, dispersions, tolerance=1e-8, max
     return beta, mu, hat, converged.astype(bool)
 
 
+@_division_parameter
 def nb_floored_fits(design, counts, size_factors, dispersions, min_mu=0.5, tolerance=1e-8,
-                    max_iterations=250, min_beta=-30.0, max_beta=30.0, threads=1):
+                    max_iterations=250, min_beta=-30.0, max_beta=30.0, threads=1, return_optimizer=False, *, division=None):
     """NB GLM fits as DESeq2 and PyDESeq2's irls make them: fitted counts floored
     at ``min_mu`` inside the iterations. counts: observations x features (dense).
     Returns (coefficients [features x columns, natural log], fitted [observations
     x features, unfloored means], hat values [observations x features, from the
-    floored weights], converged [features])."""
+    floored weights], converged [features]). With return_optimizer=True,
+    append a mask of successful native bounded-optimizer fallbacks."""
     lib = _library()
     x, xa = _dense(design)
     y, ya = _dense(counts, "counts")
@@ -718,11 +778,13 @@ def nb_floored_fits(design, counts, size_factors, dispersions, min_mu=0.5, toler
     if status != 0:
         raise ValueError(lib.rapidglm_last_error().decode())
     del xa, ya, sfa, da
-    return beta, mu, hat, converged.astype(bool)
+    result = (beta, mu, hat, converged.astype(bool))
+    return (*result, converged == 2) if return_optimizer else result
 
 
+@_division_parameter
 def nb_dispersions(design, counts, mu, start, min_dispersion=1e-8, max_dispersion=10.0,
-                   prior_variance=0.0, cox_reid=True, keep_minimum_start=True, threads=1):
+                   prior_variance=0.0, cox_reid=True, keep_minimum_start=True, threads=1, *, division=None):
     """Dispersions at fixed means from `start`: Cox-Reid adjusted NB likelihood,
     plus a normal prior on log dispersion centred at log(start) when
     prior_variance > 0. Returns (dispersions, converged)."""
@@ -770,22 +832,32 @@ def _family_size(o, family_size):
         o.family_size[k] = int(size)
 
 
+@_division_parameter
 def sceptre(design, responses, assignments, guides, pairs, moi="low", control_group=None,
             resampling_mechanism=None, integration="union", side="both",
             approximation="skew_normal", budgets=None, screen=None, null_model="sceptre",
-            effect_fits="significant", crt_draw="thinned", fit_check="strict",
+            effect_fits="significant", crt_draw="hazard", fit_check="strict",
             confirm_draws=None, cell_qc=True, assignment_qc=True,
             min_nonzero=None, alpha=None, qc_lower=None, qc_upper=None, max_mito=None,
             qc_total=None, qc_detected=None, qc_mito=None, adjustment="BH", family="nb",
             dispersion="ml", theta=None, tolerance=None, max_iterations=None, offset=None,
             seed=1, threads=1, stream_keys="identity", response_ids=None,
-            adjustment_family="tested", family_size=None, *, _grid=None):
+            adjustment_family="tested", family_size=None, null_start="refine",
+            batch_scoring=True, *, _grid=None, division=None):
     """Perturbation screen analysis by the SCEPTRE method.
 
     responses: cells x genes; assignments: cells x guides (binary calls).
     guides: DataFrame (or records) with id, target and non_targeting, one row
     per assignment column. pairs: DataFrame with response (column index or
     name), target and kind (discovery/negative/positive).
+
+    crt_draw: the sampler of CRT labels. "hazard" (default) draws them with
+    an AES-based generator and needs the processor's AES instructions;
+    without them it draws as "thinned" does, so CRT p-values depend on the
+    kind of processor. "thinned" (the default of releases before 1.5.0) and
+    "direct" (one uniform per cell) can be asked for. All three draw the same
+    law from different random streams, so their p-values differ within Monte
+    Carlo error. ``attrs["crt_draw_used"]`` names the sampler used.
 
     fit_check: acceptance of the skew-normal fit. "strict" (default) also
     checks the tail where the statistic lies and confirms small p-values on
@@ -811,12 +883,26 @@ def sceptre(design, responses, assignments, guides, pairs, moi="low", control_gr
     mapping by kind, such as {"discovery": 20000}, or the three sizes in the
     order discovery, negative, positive; None or 0: the pairs at hand.
 
+    null_start: how a pair's null is started with NT controls and
+    null_model="sceptre". "refine" (default): one Fisher-scoring step from the
+    response's null on all retained cells, using additive totals, then exact
+    passes over the pair's cells to the cold fit's convergence criteria; a
+    pair that does not converge is fitted cold. "cold": every pair fitted from
+    scratch, as before 1.6.0. Both give the same nulls to the convergence
+    tolerance. ``attrs`` holds null_start_used, null_refined and
+    null_cold_refits.
+
+    batch_scoring: CRT with complement controls (high MOI): score each
+    response's pairs together, all their draws of a stage in one pass over the
+    response's score records (True, default). The results are those of
+    scoring the pairs one by one (False).
+
     Columns: response, target, guide, kind, status, cells, nonzero_treatment,
     nonzero_control, draws, approximation, statistic, p_value, adjusted_p,
     log2fc, log2fc_se, sceptre_mean_ratio, mean_ratio_log2. ``attrs`` holds
-    retained_cells, the rejection counts, null_fits (null models fitted) and,
-    by kind, pairs_listed_<kind>, pairs_passing_qc_<kind> and
-    family_size_<kind> (the size of the adjustment family)."""
+    retained_cells, the rejection counts, null_fits (null models fitted),
+    crt_draw_used and, by kind, pairs_listed_<kind>, pairs_passing_qc_<kind>
+    and family_size_<kind> (the size of the adjustment family)."""
     # _grid: (discovery targets, negative targets, grid responses) from
     # sceptre_grid(), which then also gets the tally.
     lib = _library()
@@ -891,6 +977,8 @@ def sceptre(design, responses, assignments, guides, pairs, moi="low", control_gr
         keep.append(a)
     o.family = _choice("adjustment_family", adjustment_family, _ADJUSTMENT_FAMILIES)
     _family_size(o, family_size)
+    o.null_start = _choice("null_start", null_start, _NULL_STARTS)
+    o.batch_scoring = int(bool(batch_scoring))
     inputs = (ctypes.byref(x), ctypes.byref(y), ctypes.byref(g), g.cols, ids, targets,
               nt.ctypes.data_as(_int_p))
     listed = (len(pairs), pair_responses, pair_targets, kinds.ctypes.data_as(_int_p), ctypes.byref(o))
@@ -912,6 +1000,7 @@ def sceptre(design, responses, assignments, guides, pairs, moi="low", control_gr
         del discovery_keep, negative_keep, gr
         tally["kind"] = [kind_names[int(k)] for k in tally["kind"]]
     del xa, ya, ga, ids_keep, targets_keep, pr, pt_keep, keep
+    _crt_draw_used(frame)
     frame["kind"] = [kind_names[int(k)] for k in frame["kind"]]
     frame = _index(frame, "response", names)
     return frame if _grid is None else (frame, tally)
@@ -950,19 +1039,21 @@ def sceptre_grid(design, responses, assignments, guides, discovery_targets, nega
                    _grid=(list(discovery_targets), list(negative_targets), grid_responses))
 
 
+@_division_parameter
 def scan(design, responses, predictors, pairs=None, family="nb", dispersion="ml", theta=None,
          tolerance=None, ridge=None, max_iterations=None, offset=None, weights=None,
          null_model="direct", calibration="permutation", side="both", approximation="skew_normal",
-         budgets=None, screen=None, effect_fits="significant", crt_draw="thinned",
+         budgets=None, screen=None, effect_fits="significant", crt_draw="hazard",
          fit_check="strict", confirm_draws=None, strata=None,
-         alpha=None, min_nonzero=None, adjustment="BH", seed=1, threads=1):
+         alpha=None, min_nonzero=None, adjustment="BH", seed=1, threads=1, *, division=None):
     """Score scan: each response's null model is fitted once and tested against
     many predictors. pairs: None (every response x predictor) or a DataFrame
-    with response, predictor and optional family columns.
+    with response, predictor and optional family columns. crt_draw: the
+    sampler of calibration="crt", as for sceptre().
 
     Columns: response, predictor, family, status, statistic, p_value,
     adjusted_p, estimate, standard_error, effect, effect_se, draws,
-    approximation."""
+    approximation. ``attrs["crt_draw_used"]`` names the CRT sampler used."""
     lib = _library()
     x, xa = _dense(design)
     y, ya = _sparse(responses, "responses")
@@ -1003,4 +1094,4 @@ def scan(design, responses, predictors, pairs=None, family="nb", dispersion="ml"
     frame = _call(lib.rapidglm_scan, ctypes.byref(x), ctypes.byref(y), ctypes.byref(g), n_pairs,
                   pr[0], pp[0], pf[0], ctypes.byref(o))
     del xa, ya, ga, pr, pp, pf, keep
-    return _index(frame, "response", _feature_names(responses))
+    return _index(_crt_draw_used(frame), "response", _feature_names(responses))

@@ -1,0 +1,10 @@
+{
+  "exit": 0,
+  "started_utc": "2026-10-22T18:33:01.144985+00:00",
+  "finished_utc": "2026-10-22T20:16:57.223678+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 6203,
+  "cpu_policy_maximum_poll_gap_seconds": 1.571989398013102,
+  "cpu_policy_observed_quiet_starts": 7,
+  "error": null
+}

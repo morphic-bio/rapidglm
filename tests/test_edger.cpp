@@ -354,3 +354,112 @@ BOOST_AUTO_TEST_CASE(kernels_agree_with_direct_sums) {
     m(5, 5) = m(4, 4);
     BOOST_TEST(!small.factor(m, 1e-14));
 }
+
+BOOST_AUTO_TEST_CASE(near_poisson_deviance_and_null_calibration) {
+    for (double phi : {1e-12, 1e-16, 1e-20})
+        for (double m : {0.01, 1.0, 10.0, 100.0}) {
+            for (double y : {0.0, 1.0, 7.0, 100.0})
+                BOOST_TEST(detail::nb_unit_deviance(y, m, phi) == detail::nb_unit_deviance(y, m, 0),
+                           boost::test_tools::tolerance(1e-8));
+            const auto a = detail::nb_deviance_moments(m, phi);
+            const auto b = detail::nb_deviance_moments(m, 0);
+            BOOST_TEST(a.first == b.first, boost::test_tools::tolerance(1e-8));
+            BOOST_TEST(a.second == b.second, boost::test_tools::tolerance(1e-8));
+            const detail::DevianceMoments table(phi, 1000);
+            const auto factors = table.factors(m, std::log(m));
+            BOOST_TEST(factors.first == 2 * a.first / a.second, boost::test_tools::tolerance(2e-6));
+            BOOST_TEST(factors.second == 2 * a.first * a.first / a.second,
+                       boost::test_tools::tolerance(2e-6));
+        }
+    std::mt19937_64 rng(927);
+    Matrix x(6, 2, 1);
+    SparseCSC counts{6, 2000, {0}, {}, {}};
+    for (std::size_t i = 0; i < 6; ++i)
+        x(i, 1) = i >= 3;
+    for (std::size_t j = 0; j < 2000; ++j) {
+        for (std::size_t i = 0; i < 6; ++i) {
+            counts.row_index.push_back(i);
+            counts.values.push_back(std::poisson_distribution<int>(20 + j % 100)(rng));
+        }
+        counts.column_ptr.push_back(counts.values.size());
+    }
+    QlOptions o;
+    o.filter = false;
+    o.tmm = false;
+    o.dispersion = 1e-20;
+    const auto tiny = edger_ql(x, counts, 1, o);
+    o.dispersion = 0;
+    const auto poisson = edger_ql(x, counts, 1, o);
+    std::size_t nominal = 0, discoveries = 0;
+    for (std::size_t j = 0; j < 2000; ++j) {
+        BOOST_TEST(tiny.genes[j].p_value == poisson.genes[j].p_value,
+                   boost::test_tools::tolerance(1e-7));
+        nominal += tiny.genes[j].p_value < 0.1;
+        discoveries += tiny.genes[j].fdr < 0.1;
+    }
+    BOOST_TEST(nominal > 120u);
+    BOOST_TEST(nominal < 280u);
+    BOOST_TEST(discoveries < 10u);
+}
+
+BOOST_AUTO_TEST_CASE(edger_all_fits_failed_is_a_clean_error) {
+    auto b = bulk(4, 100, 10, .2, 95);
+    for (std::size_t i = 0; i < b.x.rows; ++i)
+        b.x(i, 1) = 1;
+    QlOptions o;
+    o.filter = false;
+    BOOST_CHECK_THROW(edger_ql(b.x, b.counts, 1, o), std::invalid_argument);
+    o.dispersion = .1;
+    BOOST_CHECK_THROW(edger_ql(b.x, b.counts, 1, o), std::invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE(edger_rejects_fractional_counts) {
+    auto b = bulk(4, 100, 10, .2, 95);
+    b.counts.values[0] += .5;
+    BOOST_CHECK_THROW(edger_ql(b.x, b.counts, 1), std::invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE(edger_prior_count_is_validated) {
+    auto b = bulk(4, 100, 10, .2, 95);
+    QlOptions o;
+    for (double v : {-1., std::numeric_limits<double>::infinity()}) {
+        o.prior_count = v;
+        BOOST_CHECK_THROW(edger_ql(b.x, b.counts, 1, o), std::invalid_argument);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(edger_newton_shortcut_halving_fallback_scale_and_joint_tests) {
+    auto b = bulk(6, 150, 20, .3, 82);
+    Vector off(12);
+    const detail::Cholesky ls(detail::crossprod(b.x, Vector(12, 1)));
+    bool halved = false;
+    for (std::size_t g = 0; g < 30; ++g) {
+        auto y = b.counts.column(g);
+        auto fast = detail::nb_fixed_fit(b.x, y, off, .3, {}, ls);
+        auto full = detail::nb_fixed_fit(b.x, y, off, .3, {}, ls, 60, true, false);
+        BOOST_REQUIRE(fast.ok);
+        BOOST_REQUIRE(full.ok);
+        BOOST_TEST(fast.deviance == full.deviance, boost::test_tools::tolerance(1e-9));
+        for (double start : {-3., 0., 4., 8.}) {
+            auto trial = detail::nb_fixed_fit(b.x, y, off, .3, {start, 0}, ls);
+            halved |= trial.halvings > 0;
+        }
+        auto limited = detail::nb_fixed_fit(b.x, y, off, .3, {}, ls, 1);
+        BOOST_TEST(!limited.ok);
+    }
+    BOOST_TEST(halved);
+    QlOptions o;
+    o.filter = false;
+    o.dispersion = .001;
+    auto scaled = edger_ql(b.x, b.counts, 1, o);
+    BOOST_TEST(scaled.scale > 1);
+    Matrix x(12, 3, 1);
+    for (std::size_t i = 0; i < 12; ++i) {
+        x(i, 1) = i >= 6;
+        x(i, 2) = i % 3;
+    }
+    o.dispersion = .3;
+    auto joint = edger_ql(x, b.counts, Hypothesis::coefficients(3, {1, 2}), o);
+    BOOST_TEST(joint.tested_df == 2u);
+    BOOST_TEST(std::isfinite(joint.genes[0].p_value));
+}

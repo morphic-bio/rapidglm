@@ -6,7 +6,6 @@
 #include <boost/math/distributions/fisher_f.hpp>
 #include <boost/math/distributions/gamma.hpp>
 #include <boost/math/distributions/normal.hpp>
-#include <boost/math/special_functions/trigamma.hpp>
 #include <optional>
 
 // Bulk RNA-seq differential expression following the procedure published for
@@ -62,6 +61,7 @@ struct BulkOptions {
     Vector lfc_prior_variance;
     std::uint64_t seed = 1; // prior-variance simulation (three or fewer residual df)
     int threads = 1;
+    DivisionMode division = DivisionMode::inherit;
 };
 struct BulkGene {
     std::string status = "not_run";
@@ -87,6 +87,19 @@ struct BulkResult {
     std::size_t replaced_genes = 0;
 };
 namespace detail {
+// A saturated observation has undefined Cook's distance. Round leverage close
+// to one before evaluating the denominator so a rounding error cannot make it
+// an arbitrarily large finite candidate for the legacy maximum-count rule.
+inline bool saturated_leverage(double leverage) {
+    return std::abs(leverage - 1) <= 4 * std::numeric_limits<double>::epsilon();
+}
+inline double cooks_distance(double residual, double leverage, std::size_t parameters) {
+    if (saturated_leverage(leverage))
+        leverage = 1;
+    return leverage < 1
+               ? residual * residual / parameters * leverage / ((1 - leverage) * (1 - leverage))
+               : nan;
+}
 // Median as R computes it: the mean of the two middle values for even counts.
 inline double median(Vector v) {
     require(!v.empty(), "median of no values");
@@ -405,26 +418,50 @@ inline MapFit nb_map_fit(const Matrix &x, const Vector &y, const Vector &offset,
 // squares on mu_f = max(s exp(X b), min_mu) with a ridge of 1e-6, from `start`
 // (or the least-squares fit of log(y / s + 0.1)), until the deviance
 // -2 log L(mu_f) changes by at most 1e-8 of itself plus 0.1. Coefficients are
-// kept within [-30, 30] (PyDESeq2 then switches to a bounded optimizer; here the
-// iterations continue on the bounded coefficients). Where no fitted count falls
+// kept within [-30, 30], switching to bounded likelihood optimization when IRLS
+// leaves the bounds or reaches its iteration limit. Where no fitted count falls
 // below min_mu this is the maximum likelihood fit (tolerance, coefficient bounds
 // and the iteration limit as PyDESeq2's defaults). Returns the unfloored means
 // s exp(X b), as DESeq2 does, the floored ones, and the leverages from the
 // floored weights.
 struct FlooredFit {
     Vector beta, mu, floored, hat;
+    // -2 log likelihood at the returned (unfloored) means, up to count-only terms.
     double deviance = nan;
-    bool converged = false;
+    bool converged = false, used_optimizer = false;
 };
 inline FlooredFit floored_nb_fit(const Matrix &x, const Vector &y, const Vector &offset,
                                  double dispersion, double min_mu, Vector start = {},
                                  std::size_t max_iterations = 250, double tolerance = 1e-8,
-                                 double min_beta = -30, double max_beta = 30) {
+                                 double min_beta = -30, double max_beta = 30,
+                                 bool scale_columns = false) {
     const std::size_t n = x.rows, p = x.cols;
+    // Bulk fits express bounds and ridge in units of each column's maximum
+    // magnitude. This makes changing a covariate's units leave the test unchanged.
+    if (scale_columns) {
+        Matrix z = x;
+        Vector scale(p, 0);
+        for (std::size_t j = 0; j < p; ++j) {
+            for (std::size_t i = 0; i < n; ++i)
+                scale[j] = std::max(scale[j], std::abs(x(i, j)));
+            if (!(scale[j] > 0))
+                return {};
+            for (std::size_t i = 0; i < n; ++i)
+                z(i, j) /= scale[j];
+            if (start.size() == p)
+                start[j] *= scale[j];
+        }
+        auto f = floored_nb_fit(z, y, offset, dispersion, min_mu, start, max_iterations, tolerance,
+                                min_beta, max_beta, false);
+        for (std::size_t j = 0; j < f.beta.size(); ++j)
+            f.beta[j] /= scale[j];
+        return f;
+    }
     constexpr double ridge = 1e-6;
     FlooredFit f;
-    if (start.size() != p ||
-        !std::all_of(start.begin(), start.end(), [](double b) { return std::isfinite(b); })) {
+    if (start.size() != p || !std::all_of(start.begin(), start.end(), [&](double b) {
+            return std::isfinite(b) && b >= min_beta && b <= max_beta;
+        })) {
         const Cholesky ls(crossprod(x, Vector(n, 1)), 1e-12, false);
         if (!ls.ok)
             return f;
@@ -436,17 +473,22 @@ inline FlooredFit floored_nb_fit(const Matrix &x, const Vector &y, const Vector 
     for (auto &b : start)
         b = std::clamp(b, min_beta, max_beta);
     f.beta = std::move(start);
+    const Vector beta_initial = f.beta;
     const double k = 1 / dispersion;
+    // The exponentials of whole vectors at once (vmath::exp_array).
     const auto floored_means = [&](const Vector &beta, Vector &mu) {
         mu = matvec(x, beta);
         for (std::size_t i = 0; i < n; ++i)
-            mu[i] = std::max(std::exp(mu[i] + offset[i]), min_mu);
+            mu[i] += offset[i];
+        vmath::exp_array(mu.data(), mu.data(), n);
+        for (std::size_t i = 0; i < n; ++i)
+            mu[i] = std::max(mu[i], min_mu);
     };
     // -2 times the NB log likelihood without its count-only terms.
     const auto deviance = [&](const Vector &mu) {
         double total = 0;
         for (std::size_t i = 0; i < n; ++i)
-            total += (y[i] + k) * std::log1p(mu[i] / k) - y[i] * std::log(mu[i]);
+            total += (y[i] + k) * std::log1p(mu[i] / k) - (y[i] > 0 ? y[i] * std::log(mu[i]) : 0);
         return 2 * total;
     };
     Vector mu, w(n), wz(n);
@@ -464,8 +506,10 @@ inline FlooredFit floored_nb_fit(const Matrix &x, const Vector &y, const Vector 
         if (!ch.ok)
             return f;
         auto beta = ch.solve(xtv(x, wz));
-        for (auto &b : beta)
-            b = std::clamp(b, min_beta, max_beta);
+        if (std::any_of(beta.begin(), beta.end(), [&](double b) {
+                return !std::isfinite(b) || b < min_beta || b > max_beta;
+            }))
+            break;
         f.beta = std::move(beta);
         floored_means(f.beta, mu);
         const double old = dev;
@@ -477,11 +521,102 @@ inline FlooredFit floored_nb_fit(const Matrix &x, const Vector &y, const Vector 
             break;
         }
     }
-    f.deviance = dev;
+    if (!f.converged) {
+        // As in PyDESeq2's irls_solver (MIT), switch to bounded likelihood
+        // optimization when IRLS leaves the bounds or exhausts its iterations.
+        // Independent implementation: projected BFGS with Armijo backtracking.
+        f.used_optimizer = true;
+        f.beta = beta_initial;
+        const auto objective = [&](const Vector &b, Vector &gradient) {
+            Vector means;
+            floored_means(b, means);
+            gradient.assign(p, 0);
+            double value = deviance(means) / 2;
+            for (std::size_t j = 0; j < p; ++j) {
+                value += ridge * b[j] * b[j] / 2;
+                gradient[j] = ridge * b[j];
+            }
+            const auto eta = matvec(x, b);
+            for (std::size_t i = 0; i < n; ++i) {
+                if (eta[i] + offset[i] <= std::log(min_mu))
+                    continue;
+                const double score = (means[i] - y[i]) / (1 + dispersion * means[i]);
+                for (std::size_t j = 0; j < p; ++j)
+                    gradient[j] += x(i, j) * score;
+            }
+            return value;
+        };
+        Vector grad;
+        double value = objective(f.beta, grad);
+        Matrix inverse(p, p);
+        for (std::size_t j = 0; j < p; ++j)
+            inverse(j, j) = 1;
+        for (std::size_t it = 0; it < std::max<std::size_t>(250, max_iterations); ++it) {
+            Vector projected = grad;
+            double norm = 0;
+            for (std::size_t j = 0; j < p; ++j) {
+                if ((f.beta[j] <= min_beta && grad[j] > 0) ||
+                    (f.beta[j] >= max_beta && grad[j] < 0))
+                    projected[j] = 0;
+                norm = std::max(norm, std::abs(projected[j]));
+            }
+            if (norm <= 1e-6) {
+                f.converged = true;
+                break;
+            }
+            Vector direction = matvec(inverse, projected);
+            for (auto &v : direction)
+                v = -v;
+            double slope = std::inner_product(grad.begin(), grad.end(), direction.begin(), 0.0);
+            if (!(slope < 0)) {
+                for (std::size_t j = 0; j < p; ++j)
+                    direction[j] = -projected[j];
+            }
+            Vector candidate(p), next_grad;
+            double next = value, step = 1;
+            bool accepted = false;
+            for (int back = 0; back < 60; ++back, step *= 0.5) {
+                double gain = 0;
+                for (std::size_t j = 0; j < p; ++j) {
+                    candidate[j] = std::clamp(f.beta[j] + step * direction[j], min_beta, max_beta);
+                    gain += grad[j] * (candidate[j] - f.beta[j]);
+                }
+                next = objective(candidate, next_grad);
+                if (gain < 0 && std::isfinite(next) && next <= value + 1e-4 * gain) {
+                    accepted = true;
+                    break;
+                }
+            }
+            if (!accepted)
+                break;
+            Vector delta(p), change(p);
+            for (std::size_t j = 0; j < p; ++j) {
+                delta[j] = candidate[j] - f.beta[j];
+                change[j] = next_grad[j] - grad[j];
+            }
+            const double sy = std::inner_product(delta.begin(), delta.end(), change.begin(), 0.0);
+            if (sy > 1e-12) {
+                const auto hy = matvec(inverse, change);
+                const double yhy =
+                    std::inner_product(change.begin(), change.end(), hy.begin(), 0.0);
+                for (std::size_t j = 0; j < p; ++j)
+                    for (std::size_t k = 0; k < p; ++k)
+                        inverse(j, k) += (1 + yhy / sy) * delta[j] * delta[k] / sy -
+                                         (hy[j] * delta[k] + delta[j] * hy[k]) / sy;
+            }
+            f.beta = std::move(candidate);
+            grad = std::move(next_grad);
+            value = next;
+        }
+        floored_means(f.beta, mu);
+        dev = deviance(mu);
+    }
     f.floored = mu;
     f.mu = matvec(x, f.beta);
     for (std::size_t i = 0; i < n; ++i)
-        f.mu[i] = std::exp(f.mu[i] + offset[i]);
+        f.mu[i] += offset[i];
+    vmath::exp_array(f.mu.data(), f.mu.data(), n);
+    f.deviance = deviance(f.mu);
     // Leverages diag(W^1/2 X (X'WX + ridge)^-1 X'W^1/2) at the floored weights.
     for (std::size_t i = 0; i < n; ++i)
         w[i] = mu[i] / (1 + mu[i] / k);
@@ -587,16 +722,24 @@ inline FilterResult independent_filter(const Vector &p_all, const Vector &filter
         }
         // Span 0.2 with three robustness passes reproduces the curve DESeq2 records.
         out.fit = detail::lowess(theta, rejections, 0.2, 3);
-        double peak = *std::max_element(out.fit.begin(), out.fit.end()), sq = 0;
+        // PyDESeq2's calibrated rules: no filtering when at most ten
+        // discoveries are possible; residual RMS over positive-rejection bins.
+        const double peak = *std::max_element(out.fit.begin(), out.fit.end());
+        double sq = 0;
+        std::size_t positive = 0, chosen = 0;
         for (std::size_t k = 0; k < theta.size(); ++k)
-            sq += std::pow(rejections[k] - out.fit[k], 2);
-        const double sd = std::sqrt(sq / (theta.size() - 1));
-        std::size_t chosen = 0;
-        for (std::size_t k = 0; k < theta.size(); ++k)
-            if (rejections[k] > peak - sd) {
-                chosen = k;
-                break;
+            if (rejections[k] > 0) {
+                sq += std::pow(rejections[k] - out.fit[k], 2);
+                ++positive;
             }
+        if (*std::max_element(rejections.begin(), rejections.end()) > 10) {
+            const double sd = positive ? std::sqrt(sq / positive) : 0;
+            for (std::size_t k = 0; k < theta.size(); ++k)
+                if (rejections[k] > peak - sd) {
+                    chosen = k;
+                    break;
+                }
+        }
         out.theta = theta[chosen];
         out.threshold = detail::quantile7(filter, theta[chosen]);
         for (std::size_t j = 0; j < genes; ++j)
@@ -667,6 +810,8 @@ inline double legacy_cooks_dispersion(const Vector &normalized, const Matrix &de
 struct NbFixedFits {
     Matrix coefficients; // features x design columns, natural log scale
     Matrix fitted, hat;  // observations x features
+    // Nonzero means converged. Floored fits use 2 for bounded optimization,
+    // allowing inference adapters to delegate that path to their own optimizer.
     std::vector<unsigned char> converged;
 };
 // NB GLM fits at a fixed dispersion per feature with log size-factor offsets.
@@ -783,7 +928,7 @@ inline NbFixedFits nb_floored_fits(const Matrix &design, const Matrix &counts,
             out.fitted(i, j) = f.mu[i];
             out.hat(i, j) = f.hat[i];
         }
-        out.converged[j] = f.converged;
+        out.converged[j] = f.converged ? (f.used_optimizer ? 2 : 1) : 0;
     });
     return out;
 }
@@ -847,6 +992,7 @@ nb_dispersions(const Matrix &design, const Matrix &counts, const Matrix &mu, con
 }
 inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
                           const BulkOptions &o = {}) {
+    const vmath::DivisionScope division(o.division);
     design.validate();
     counts.validate();
     const std::size_t m = counts.rows, genes = counts.cols, p = design.cols;
@@ -988,7 +1134,8 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
             // PyDESeq2 does): where a fitted count falls below min_mean the fit is
             // redone so.
             if (std::any_of(mu.begin(), mu.end(), [&](double v) { return !(v >= o.min_mean); })) {
-                const auto f = detail::floored_nb_fit(design, y, offset, rough, o.min_mean, start);
+                const auto f = detail::floored_nb_fit(design, y, offset, rough, o.min_mean, start,
+                                                      250, 1e-8, -30, 30, true);
                 if (f.converged) {
                     mu = f.mu;
                     start = f.beta;
@@ -1115,7 +1262,7 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
     const double s_lr = detail::mad(residuals), df = static_cast<double>(m - p);
     out.log_residual_variance = s_lr * s_lr;
     out.prior_variance =
-        df > 3 ? std::max(s_lr * s_lr - boost::math::trigamma(df / 2), 0.25)
+        df > 3 ? std::max(s_lr * s_lr - detail::trigamma(df / 2), 0.25)
                : std::max(detail::simulated_prior_variance(residuals, df, o.seed, o.threads), 0.25);
     const detail::LogThetaPrior base_prior{0, out.prior_variance};
     // MAP dispersions; dispersion outliers keep the gene-wise estimate. Then the
@@ -1165,10 +1312,6 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
         full_options.design = tested_summary;
         fo.design = reduced_summary;
         auto full = fit(tested.x, y, full_options);
-        if (!full.ok()) {
-            g.status = std::string("fit_") + status_name(full.status);
-            return full;
-        }
         const double ln2 = std::log(2.0);
         // DESeq2 fits with fitted counts floored at min_mean (minmu). Where a fitted
         // count of the maximum likelihood fit falls below it, or a coefficient has
@@ -1180,11 +1323,18 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
             return f.has_boundary() || std::any_of(f.fitted.begin(), f.fitted.end(),
                                                    [&](double v) { return !(v >= o.min_mean); });
         };
+        Vector floor_ridge(p, 0);
+        for (std::size_t c = 0; c < p; ++c) {
+            double scale = 0;
+            for (std::size_t i = 0; i < m; ++i)
+                scale = std::max(scale, std::abs(tested.x(i, c)));
+            floor_ridge[c] = 1e-6 * scale * scale;
+        }
         std::optional<detail::FlooredFit> floored;
         double floored_se = nan;
-        if (below(full)) {
+        if (!full.ok() || below(full)) {
             auto refit = detail::floored_nb_fit(tested.x, y, offset, g.dispersion, o.min_mean,
-                                                full.coefficients);
+                                                full.coefficients, 250, 1e-8, -30, 30, true);
             if (refit.converged) {
                 // The Wald variance at the floored means (DESeq2 documents minmu
                 // for its Wald test; PyDESeq2 uses the unfloored means here).
@@ -1194,7 +1344,7 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
                 const auto information = detail::crossprod(tested.x, w);
                 auto ridged = information;
                 for (std::size_t c = 0; c < p; ++c)
-                    ridged(c, c) += 1e-6;
+                    ridged(c, c) += floor_ridge[c];
                 const detail::Cholesky ch(ridged, 1e-14, false);
                 if (ch.ok) {
                     const auto inverse = ch.inverse();
@@ -1214,9 +1364,10 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
                     w[i] = refit.floored[i] / (1 + g.dispersion * refit.floored[i]);
                 auto floored_information = detail::crossprod(tested.x, w);
                 for (std::size_t c = 0; c < p; ++c)
-                    floored_information(c, c) += 1e-6;
+                    floored_information(c, c) += floor_ridge[c];
                 const detail::Cholesky fh(floored_information, 1e-14, false);
                 if (fh.ok) {
+                    full.status = FitStatus::converged;
                     full.coefficients = refit.beta;
                     full.fitted = refit.mu;
                     full.working_weights = w;
@@ -1224,6 +1375,11 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
                     full.boundary_coefficients.assign(p, 0);
                     floored = std::move(refit);
                 }
+            }
+            if (!floored) {
+                g.status = "floored_fit_failed";
+                full.status = FitStatus::iteration_limit;
+                return full;
             }
         }
         const bool boundary = !floored && hypothesis_boundary(full, target);
@@ -1239,19 +1395,16 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
         }
         if (o.lrt) {
             auto null = fit(reduced, y, fo);
-            if (!null.ok()) {
-                g.status = std::string("reduced_") + status_name(null.status);
-                return full;
-            }
-            if (floored || below(null)) {
-                // Both fits with the floor: the statistic is the difference of their
-                // deviances at the floored means.
+            if (floored || !null.ok() || below(null)) {
+                // Both coefficient fits use the floor; likelihoods are evaluated
+                // at their returned, unfloored means (DESeq2 black-box reference).
                 const auto full_floored =
                     floored ? *floored
                             : detail::floored_nb_fit(tested.x, y, offset, g.dispersion, o.min_mean,
-                                                     full.coefficients);
-                const auto null_floored = detail::floored_nb_fit(reduced, y, offset, g.dispersion,
-                                                                 o.min_mean, null.coefficients);
+                                                     full.coefficients, 250, 1e-8, -30, 30, true);
+                const auto null_floored =
+                    detail::floored_nb_fit(reduced, y, offset, g.dispersion, o.min_mean,
+                                           null.coefficients, 250, 1e-8, -30, 30, true);
                 if (!full_floored.converged || !null_floored.converged) {
                     g.status = "floored_fit_failed";
                     return full;
@@ -1337,8 +1490,11 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
         return std::max((var - base_mean) / (base_mean * base_mean), 0.25 * trend);
     };
     std::vector<Vector> cooks(genes);
+    // Byte storage: each gene is written by one worker (vector<bool> would race).
+    std::vector<unsigned char> saturated(genes, 0);
     const auto cook_distances = [&](std::size_t j, const Vector &y, const FitResult &f) {
         Vector d(m, nan);
+        saturated[j] = 0;
         if (!f.ok() || f.fitted.size() != m || f.covariance.rows != p)
             return d;
         const double arob = o.legacy_cooks ? legacy_dispersion(y, out.genes[j].base_mean)
@@ -1351,8 +1507,9 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
                 for (std::size_t b = 0; b < p; ++b)
                     h += tested.x(i, a) * f.covariance(a, b) * tested.x(i, b);
             h *= w;
+            saturated[j] |= detail::saturated_leverage(h);
             const double r = (y[i] - mu) / std::sqrt(mu + arob * mu * mu);
-            d[i] = h < 1 ? r * r / p * h / ((1 - h) * (1 - h)) : nan;
+            d[i] = detail::cooks_distance(r, h, p);
         }
         return d;
     };
@@ -1423,10 +1580,27 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
             auto &g = out.genes[j];
             const auto &y = replaced[j];
             g.replaced = true;
+            g.base_mean = 0;
+            for (std::size_t i = 0; i < m; ++i)
+                g.base_mean += y[i] / sf[i] / m;
+            // Discard every first-pass test before attempting the replacement fit.
+            g.log2_fold_change = g.lfc_se = g.statistic = g.p_value = nan;
+            mle[j].clear();
+            if (g.base_mean == 0) {
+                g.status = "replacement_all_zero";
+                g.log2_fold_change = g.lfc_se = g.statistic = 0;
+                g.p_value = 1;
+                cooks[j].assign(m, nan);
+                return;
+            }
             Vector mu;
             Vector start;
             gene_dispersion(y, g, mu, start);
             auto full = finish(j, y, mu, start);
+            if (g.status.rfind("ok", 0) != 0) {
+                g.log2_fold_change = g.lfc_se = g.statistic = nan;
+                g.p_value = 1;
+            }
             cooks[j] = cook_distances(j, y, full);
             keep_mle(j, full);
         });
@@ -1496,7 +1670,10 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
             continue;
         g.max_cooks = max_cooks(cooks[j], 3, flag_limit);
         bool outlier = std::isfinite(g.max_cooks) && g.max_cooks > cutoff;
-        if (outlier && o.legacy_cooks) {
+        // An undefined saturated distance prevents establishing which sample
+        // has the largest distance. In that case a count-rank exemption cannot
+        // override an above-cutoff distance in an eligible replicated cell.
+        if (outlier && o.legacy_cooks && !saturated[j]) {
             // Legacy rule (PyDESeq2): not an outlier when three or more samples have
             // larger counts than the sample with the largest distance over all samples.
             const auto y = counts.column(j); // original counts

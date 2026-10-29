@@ -1,74 +1,421 @@
 # Changelog
 
-## 1.4.0 (development releases 1.4.0-dev.1 and 1.4.0-dev.2, 2026-10-17)
+## Unreleased
 
-Bulk DE (`bulk-de`) now fits low counts as DESeq2 does, and two workflows are
-new: quasi-likelihood DE following edgeR 4 (`edger-ql`) and cis-QTL mapping
-(`qtl`, provisional). The perturbation workflow, single fits, batch fits and
-score scans are unchanged. The code of 1.4.0 is tagged `v1.4.0-dev.2` for
-testing (`v1.4.0-dev.1` before the single-thread work on `edger-ql` and the
-MatrixMarket reader); the benchmark receipts and README tables are those of
-1.3.0 and follow in the release.
+- **NT-control pair nulls start from the response's reference (`null_start`).**
+  With NT controls and the SCEPTRE null, each response's null is now also
+  fitted once on all retained cells. A pair takes one Fisher-scoring step from
+  it, using the NT cells' totals and its target cells' totals at the reference,
+  then exact Newton passes over its cells to the cold fit's convergence
+  criteria, with step halving. A pair that does not converge, or whose
+  response's reference has a boundary, is fitted cold (METHODS.md, Mergeable
+  null start).
+  - Nulls agree with the cold fit to the convergence tolerance. On the Replogle
+    pilot all empirical p-values, statuses and discoveries are unchanged, and
+    77 of 16,062 skew-normal tail p-values below 3e-17 differ by more than 1e-4.
+  - Null work fell from 20.9 to 5.1 thread-ms per pair. On 8 threads the `ks`
+    run took 592 s instead of 1,262 s, and the `strict` run 3,028 s instead of
+    3,666 s.
+  - `null_start: "cold"` gives the nulls of releases before 1.6.0, byte for
+    byte. Select it with the `sceptre` key `null_start`,
+    `SceptreOptions::null_start`, `rapidglm_sceptre_options.null_start`
+    (`RAPIDGLM_NULL_START_*`) in C, or `null_start` in Python's and R's
+    `sceptre()` and `sceptre_grid()`.
+  - Run records state `null_start`, `null_start_used`, `null_refined` and
+    `null_cold_refits`. The C table carries them as scalars, Python's `attrs`
+    and R's `attr(, "run")` by name. A tiled run's plan includes the default.
+  - The measured alternatives are in `validation/MERGEABLE_NULL.json`: the
+    one-step null alone (all-cells or NT-only reference), an NT-only base with
+    a quadratic model, a lockstep batched cold fit, and an index-mapped score
+    kernel.
+- **Batch scoring of high-MOI CRT tests, on by default** (`batch_scoring`). With
+  complement controls each response's pairs are scored together, stage by
+  stage: all their draws of a stage in one pass over the response's score
+  records, in blocks of 32,768 cells (a sparse × dense product, two draws at a
+  time with AVX2 where available). Records are bit for bit those of the pair
+  pipeline, which `batch_scoring: false` keeps, on AVX2, portable and ARM64
+  builds and at any thread count. On 100 targets × 7,418 genes of the
+  Gasperini screen (8 threads) the legacy settings (`reuse_draws`,
+  `confirm_draws: 0`) ran 1.92 times as fast and the default 1.22 times as fast;
+  extrapolated to the full test set on 16 cores, about 4.6 h become 2.0 h and
+  9.6 h become 7.8 h. The option is in the CLI, `SceptreOptions`, the C
+  interface (`rapidglm_sceptre_options.batch_scoring`, appended; default 1),
+  and `sceptre()` and `sceptre_grid()` in Python and R. Shared screens,
+  sequential screens and early stopping keep the pair pipeline. The
+  alternatives measured, among them lockstep fits of response nulls and
+  propensity models as matrix products (about 4% less null-fit time and under
+  1% less wall time, not adopted), are in `validation/BATCH_SCORING.json`.
 
-**For a user of 1.3.0 who changes no option:** `bulk-de` results change for
-genes with a fitted count below 0.5 (low counts, groups of zeros, samples with
-small size factors such as pseudobulk samples of few cells) and for genes whose
-starting dispersion moves to the 1e-8 floor; the other genes are unchanged.
-Agreement with DESeq2 improves: airway Jaccard 0.932 to 0.986, kang 0.973 to
-1.000, and a Perturb-seq pseudobulk design from 0.09-0.88 to 0.97-1.00.
+## 1.5.0 (unreleased)
 
-- **DESeq2's floored fits in `bulk-de`** (`min_mean`, default 0.5). Where a
-  fitted count falls below the floor, or a coefficient has no finite estimate,
-  the gene is fitted as DESeq2 fits it, with fitted counts floored at 0.5 inside
-  the iterations (PyDESeq2's irls_solver, MIT, ported with attribution); its
-  Wald SE comes from the floored means, which reproduces DESeq2's. A group of
-  zeros now has DESeq2's finite fold change and Wald test instead of the LR
-  test with status `boundary_lrt`. The initial means of non-group designs use
-  the same fits.
-- **DESeq2's starting dispersion** in `bulk-de`: the smaller of the rough
-  (fitted values floored at 1) and moments estimates, as PyDESeq2 computes it.
-- **`nb_floored_fits`** (C `rapidglm_nb_floored_fits`, Python
-  `capi.nb_floored_fits`): batch fits with the floor. The PyDESeq2 back end
-  (`rapidglm.pydeseq2.RapidGLMInference`) uses them for `irls`, so it now gives
-  PyDESeq2's default results.
-- **Quasi-likelihood DE following edgeR 4** (`edger-ql`; C++ `edger_ql`,
-  `QlOptions`). The default workflow of edgeR 4.6.2: `filterByExpr`, TMM,
-  the common Cox-Reid dispersion of the most abundant genes, quasi-dispersions
-  from adjusted unit deviances with the average quasi-dispersion rule, their
-  moderation against average log CPM and quasi-likelihood F tests, written from
-  the papers, the documentation and black-box runs. On five of eight datasets
-  the discoveries at FDR 0.1 are edgeR's; on the GTEx thyroid sets the
-  differences trace to genes whose edgeR fits report deviances that are not
-  those of their fitted values ([METHODS.md](METHODS.md#quasi-likelihood-differential-expression)).
-  Scripts: `validate_edger.py`, `reference_edger.R`, `reference_edger_fits.R`.
-- **cis-QTL mapping** (`qtl`; C++ `cis_qtl`), after jaxQTL (MIT; Zhang et al.
-  2025): score tests of each cis variant against a covariate-only NB, Poisson
-  or Gaussian null, permutations that refit the null, and the Beta
-  approximation of the permutation maxima. Inputs: a phenotype BED, PLINK
-  genotypes, covariates and library sizes. Provisional. On Geuvadis chromosome
-  22 (580 genes, 462 samples) the Gaussian model's eGenes are FastQTL's and
-  tensorQTL's (Jaccard 0.99, the same lead variant for every gene) and the NB
-  model's are jaxQTL's NB eGenes (Jaccard 0.99): `scripts/compare_eqtl.py`.
-  The cross products of the scores run in register tiles (with AVX2 fused
-  multiply-adds where available), and Gaussian permutations are scored in
-  batches against a basis computed once per gene.
-- **Faster `edger-ql` on one thread** (1.4.0-dev.2). The Newton fits form X'WX
-  as one weighted cross product of the design (its lower triangle, in register
-  tiles), compute linear predictors and their exponentials four at a time (an
-  AVX2 exponential within one unit in the last place of the C library's), and
-  after a whole step confirm convergence from the score and a bound from the
-  previous information, which saves a factorization per fit without changing the
-  fit. Leverages come from one triangular kernel, TMM selects its order
-  statistics instead of sorting, and the deviance-moment table is built once per
-  run. GTEx thyroid (647 samples, 28,764 genes), whole command on one efficiency
-  core: 52.4 s to 12.7 s (128 samples: 13.1 s to 3.3 s). Results agree with
-  1.4.0-dev.1 to rounding; the discoveries are the same on all eight validation
-  datasets.
-- **Faster MatrixMarket input for the CLI** (1.4.0-dev.2). A file in (feature,
-  observation) order is read straight into the matrix, other orders are grouped
-  by feature in linear time instead of sorted, and the SHA-1 input fingerprint
-  uses the SHA extensions where the processor has them. The thyroid counts (241
-  MB): 3.2 s to 0.7 s.
+- **Stable Cook's flags for leverage-one samples.** Leverages within four
+  machine epsilons of one are treated as saturated. Their undefined distances
+  do not enter the finite maximum, and a saturated sample prevents the legacy
+  count-rank exemption. All 16 thyroid32 regression genes agree with stored
+  DESeq2 flags; the other bulk datasets are unchanged.
+- **Division policy: `slow` by default, with an explicit `fast` mode.**
+  Select it through `RAPIDGLM_DIVISION`, the CLI's `division` key, C++ options,
+  the C thread-local option, or Python, R and Rust parameters. Explicit call
+  choices propagate to workers and restore the prior policy on return or error.
+  CMake can set the fallback with `RAPIDGLM_DIVISION_DEFAULT`.
+  Fast mode selects measured eligible kernels on Zen 3; the alternatives,
+  accuracy limits and reasons are in `validation/DIVISION_CHOICES.json`.
+  The numerical kernels retain identical bits across AVX2, portable and ARM64
+  paths within each mode. Run records state the resolved mode.
+- The special-function end-to-end benchmark now uses the public SCEPTRE
+  high-MOI dataset for NB effect fits.
+
+- **CRT labels are drawn with the `hazard` sampler by default** (`crt_draw`),
+  in every interface: the `sceptre` and `scan` settings, `SceptreOptions`,
+  `ScanOptions` and `crt_sampler()` in C++, `rapidglm_sceptre_options_init`
+  and `rapidglm_scan_options_init` (`RAPIDGLM_CRT_HAZARD`) in C, and
+  `crt_draw` of `sceptre()`, `sceptre_grid()` and `scan()` in Python and
+  `sceptre()` and `sceptre_grid()` in R. `crt_draw: "thinned"`, the default
+  until now, gives the results of 1.4.1; `direct` remains.
+  - CRT p-values change within Monte Carlo error: `hazard` draws the same
+    independent Bernoulli labels from a new random stream.
+  - They depend on the hardware: `hazard` needs the processor's AES
+    instructions (x86 since about 2010, Apple and server Arm processors) and
+    draws with the thinned sampler, from thinned's stream, without them, and in
+    builds with `RAPIDGLM_FORCE_PORTABLE`. A run that draws CRT labels then
+    warns (before, any run that set `crt_draw: "hazard"` did), and the run
+    record states the sampler used (`crt_draw_used`), now for `scan` as well as
+    `sceptre`. The C interface's `sceptre` and `scan` tables carry it as the
+    scalar `crt_draw_used` (a `RAPIDGLM_CRT_*` value), and Python's `attrs`
+    and R's `attr(, "run")` by name.
+  - A tiled CRT run's plan includes the default sampler and, without AES
+    instructions, the fallback: a checkpoint written by 1.4.1 with the default
+    sampler is not resumed, and tiles drawn on processors with and without AES
+    instructions are not merged.
+  - Speed, measured with the 1.4.1 code (4e2b39a) and one binary for both
+    samplers, on 20 targets × 7,418 genes of the Gasperini panel (the 5
+    targets with discoveries in the 1.4.0 100-target receipt, 10 more of
+    that panel and 5 non-targeting targets; 148,360 pairs, 207,324 cells),
+    16 threads on CPUs 16-31 under the timing lock, two runs each: by
+    default (independent draws, 199,999 confirmation draws) `hazard` takes
+    369.5 and 370.9 s and `thinned` 483.8 and 490.7 s, 1.31 times as fast
+    (1.35 times in CPU time; 95.5 and 95.7 million draws).
+    With `reuse_draws` and `confirm_draws: 0`, SCEPTRE's practice, the two
+    take the same time within run-to-run variation (187.2 and 191.2 s against
+    183.2 and 192.9 s, and 179.3 s at a second seed): each target's draws are
+    generated once, and scoring takes nearly all the time.
+  - On that subset `hazard` agrees with `thinned` as closely as `thinned`
+    agrees with itself at another seed, the yardstick. By default the
+    correlation of log10 p over the 144,087 tested pairs is 0.9883 (thinned
+    at two seeds: 0.9883); 19 of the 20 discoveries at BH 0.1 are shared (19
+    of 20 between the seeds); 4.70% and 0.96% of the 35,763 negative-control
+    p-values are below 0.05 and 0.01, against 4.71% and 0.95% (4.62% and 0.99%
+    at the second seed). With `reuse_draws`: 0.9880 (yardstick 0.9881), 19
+    discoveries shared of 20 and 19 (18 of 19 and 19), and 4.70% and 0.94%
+    against 4.62% and 0.95%. Statuses and observed statistics are identical
+    ([validation/CRT_BATCHING.json](validation/CRT_BATCHING.json)).
+- **Special functions (`include/rapidglm/vmath.hpp`).** A standalone header
+  (C++17 standard library only) with `log`, `log1p`, `exp`, `lgamma`, `digamma`
+  and `trigamma` of double, as arrays (`<f>_array`) and one value at a time.
+  `log`, `log1p`, `exp`, `digamma` and `trigamma` are RapidGLM's and give the
+  same bits on every processor and path: AVX2 with FMA (chosen at run time),
+  AArch64 Advanced SIMD, portable, and the one-value forms. `lgamma` is the C
+  library's `lgamma_r` in slow mode; fast mode uses the earlier own kernel for
+  positive arguments and libm for negative arguments.
+  - In slow mode, `log` and `log1p` use no division: exponent and mantissa from the bits, a
+    degree-19 polynomial by Estrin's scheme, exact splits, and log1p's
+    rounding correction c/u formed without dividing.
+  - `exp` is the AVX2 exp of `kernels.hpp`, moved here with a portable FMA
+    path and full-range handling. `detail::exp_array` calls it, with the same
+    bits on [-700, 700].
+  - Historical development measurements on pikachu's efficiency cores, in ns per element: log 3.3
+    (glibc 4.7), log1p 4.7 (glibc 9.5-11.5), exp 2.6 (glibc 7.5), digamma 10.0
+    and trigamma 6.5 (boost::math's double-precision versions: 11.2 and 7.0).
+  - Largest errors measured: 0.67, 0.68, 0.86, 3.7 and 2.7 ulp.
+  - METHODS.md (Numerical backend, Choice of backends) lists every alternative
+    measured and the reason for each choice.
+- The count paths use the faster backend at each call site, measured on those
+  cores:
+  - The exponentials of the log-link means, of bulk DE's floored NB fits and
+    of edgeR-QL's fixed-dispersion fits are taken as one array.
+  - edgeR-QL's unit deviances take their logarithms as arrays.
+  - Elsewhere logarithms stay one at a time with glibc's functions, as in
+    1.4.1; arrays did not pay there.
+  - digamma and trigamma come from boost::math without promotion to long
+    double (1.4.1 promoted). They are faster per call; in the workloads the
+    choice made no difference beyond noise.
+  - The threaded paths (count-likelihood terms, the QTL Beta calibration) call
+    `lgamma_r` instead of `std::lgamma`, which writes `signgam`. The values
+    are the same.
+- Results move at rounding level:
+  - The special-function changes alone leave discoveries unchanged on the
+    DESeq2 and edgeR agreement datasets; the separate leverage-one Cook rule
+    above changes thyroid32 flags. The historical special-function agreement
+    metrics equal 1.4.1's to the digits reported. One airway gene's
+    gene-wise dispersion, on a flat likelihood at the 1e-8 lower bound, moves
+    from 1.07e-8 to 1e-8.
+  - On 24 Replogle pseudobulk perturbations (205,512 tests per method) no
+    discovery changes. edgeR-QL p-values move by up to 1.5e-4 relative
+    (8.3e-5 above p = 1e-20) where a prior df of 1,209 sits on a flat
+    objective.
+- One thread on an efficiency core, against 1.4.1 (development measurements of
+  the final candidate, `validation/VMATH.json`; the 1.5.0 receipts run
+  re-measures every workload):
+  - edgeR-QL on GTEx thyroid: 12.57 against 13.09 s.
+  - NB batch fit: 2.91 against 3.06 s.
+  - bulk DE on thyroid (35.18 against 35.10 s) and on a Replogle perturbation
+    (35.79 against 35.84 s): unchanged, inside the 1.5% that a rebuild with
+    only a different code layout moved.
+- A first version took log, log1p, exp and lgamma from SLEEF 3.9.0. It was
+  removed because its log divides and was slower than glibc's on these cores.
+  The count paths ran 2-13% slower (bulk DE on thyroid 39.9 against 35.2 s),
+  although 2-7% faster on a performance core (`validation/VMATH.json`).
+- C API version 3 adds `rapidglm_log_array`, `rapidglm_log1p_array`,
+  `rapidglm_exp_array`, `rapidglm_lgamma_array`, `rapidglm_digamma_array`,
+  `rapidglm_trigamma_array` and `rapidglm_special_path`. It also covers the
+  `crt_draw_used` scalar of the `rapidglm_sceptre` and `rapidglm_scan` tables
+  (above), which Python reads only from version 3 on.
+  - Python gains `rapidglm.special` (NumPy arrays of any shape, `out=`).
+  - R gains `special_log()`, `special_log1p()`, `special_exp()`,
+    `special_lgamma()`, `special_digamma()`, `special_trigamma()` and
+    `special_path()`, with attributes kept and NA and NaN as in base R. One
+    C++ entry point allocates the result, copies the attributes and checks for
+    NaN in cache-sized blocks.
+  - Their tests reproduce the C++ values of RapidGLM's functions bit for bit.
+- `benchmarks/special_functions.cpp` and `scripts/benchmark_special_functions.py`
+  (a benchmark stage of its own, `validation/SPECIAL_FUNCTIONS.json`) report ns
+  per element and the largest ulp error. They compare against glibc,
+  boost::math (both policies), a transcription of Boost's double-precision
+  digamma and trigamma for AVX2 (`benchmarks/boost_polygamma.hpp`), NumPy and
+  SciPy, and base R.
+
+- **Single-precision Gaussian permutation scores (new default).** The
+  projected Gaussian cis-QTL permutations (no prior weights, offset, ridge or
+  robust covariance) compute their score product in single precision:
+  each permuted response is residualized and scaled to unit residual
+  variance in double, so the float factors are O(1) whatever the
+  phenotype's units, R'G_res is summed in float within 128-sample panels
+  (six-by-sixteen AVX2/FMA or portable tiles) and in double across panels,
+  and maxima are taken from that double result. Scales, information,
+  observed statistics, nominal output, refitted permutations and the Beta
+  calibration stay in double precision.
+  `CisQtlOptions::permutation_precision` and the `qtl` setting
+  `permutation_precision` (`single` or `double`) select it; `double` keeps
+  the 1.4.1 arithmetic. The run record states the precision used (null
+  without permutations), and `scripts/compare_eqtl.py` copies it into its
+  summary. See METHODS.md for the accuracy design and limits.
+- Permutation maxima within a relative tolerance below the observed
+  statistic now count as extreme for the empirical p-value: 1e-5 for
+  single-precision scores and 1e-9 otherwise. Some designs make maxima equal
+  to the observed statistic in exact arithmetic (an intercept only and a
+  private variant in every sample gives an exact permutation p-value of 1),
+  and rounding decided such ties before, giving values from about 0.2 to 0.9
+  in either precision, including in 1.4.1. `double` output stays byte for byte
+  that of 1.4.1 on Geuvadis chromosome 22 with 1,000 permutations, a 60-gene
+  subset with 10,000 permutations and nominal output, and an NB subset.
+- On chromosome 22 (580 genes, 1,000 permutations), single precision leaves
+  every status, lead and observed statistic unchanged. Twelve empirical
+  p-values (all with |z| < 4) rise by 1/1001, each through one maximum within
+  the 1e-5 tie tolerance; beta_p moves by at most 2.6e-5 relative. On the
+  test shapes, permutation maxima agree with double to within 1.03e-6 of
+  max(1, |z|).
+- For single-precision maxima, the Beta calibration treats maxima with a
+  relative variance up to 1e-8 (a relative SD of 1e-4) as constant. That is
+  six orders of magnitude above the float rounding of maxima that are equal
+  in exact arithmetic, so such genes still report `ok_beta_failed`, and
+  maxima with a relative SD of 1e-3 are still fitted, as in double precision.
+- Shared Gaussian permutation overheads are faster without changing results:
+  the maxima are taken in lanes (AVX2 where available), and genotypes and
+  shuffled responses are gathered in cache-line blocks.
+- Micro-benchmark (`benchmarks/qtl_precision.cpp`, built with
+  `RAPIDGLM_BENCHMARKS`): one synthetic gene (462 samples, 43 covariates
+  including the intercept, 4,500 variants, 10,000 permutations, one thread)
+  on efficiency core 31 takes 1.737 s in double and 1.010 s in single
+  precision (1.72×), the best of six alternating runs under the timing lock.
+  The score product runs at 12.0 and 20.6 GFMA/s end to end, and the packed
+  products alone at 13.3 and 25.6 GFMA/s. The portable float kernel runs at
+  12.2 GFMA/s against 3.2 for the portable double kernel.
+- Timed on twelve efficiency cores under the timing protocol
+  (`validation/QTL_SINGLE_PRECISION.json`), with 10,000 permutations, single
+  precision takes:
+  - Geuvadis chromosome 22: 74.4 s, against 146.5 s for tensorQTL 1.0.10
+    the same day (1.97×) and 117.2 s in double precision (1.4.0 receipt);
+  - genome-wide (20,427 genes, 6,317,351 variants): 2,515 s at a 3.8 GiB
+    peak, against 4,683 s and 7.2 GiB for tensorQTL (1.86×; 2026-10-23,
+    same host setting) and 3,987 s and 25.9 GiB in double precision
+    (1.4.1).
+
+  Genome-wide, single and double precision give the same 9,575 eGenes and
+  identical leads and observed statistics. 2,687 empirical p-values rise by
+  1 to 5 counts out of 10,001 through the tie tolerance, and beta_p moves by
+  at most 5.5e-5 relative.
+- **Faster single-precision permutations** (after the commit that added
+  them, 4e2b39a), in four parts; the first three leave every output byte for
+  byte as it was:
+  - The permutation maxima are taken inside the float product's register
+    tiles, so a batch's 512 × m score matrix (18 MB at 4,500 variants) is never
+    written and read back. Each six-by-sixteen tile adds its 128-sample
+    panels' float sums to double partials in a 768-byte L1 scratch, in sample
+    order as before, then scales them by the inverse information, takes |z|
+    and folds it into its permutations' running maxima, skipping NaN and
+    infinity as before (`detail::fused_maxima`, AVX2/FMA and portable). The
+    projected genotypes are packed once per gene in groups of sixteen
+    variants, and variants are taken 128 at a time so that a block's packed
+    genotypes stay in L2 for every tile. The compiled AVX2 sample loop keeps
+    its twelve accumulators in registers without spills; tiles small enough
+    to hold double partials in registers ran four times slower.
+  - Each worker thread keeps its buffers from gene to gene in a workspace that
+    grows to its largest gene, instead of allocating, faulting in and clearing
+    them for every gene, and returns glibc's free pages (`malloc_trim`) after
+    a gene whose buffers grew by a megabyte or more: without that, the blocks
+    that workers outgrew stayed resident and raised the genome-wide peak by
+    0.8 GiB.
+  - Shuffles compute their generator values in bulk with the vectorized
+    Philox and run the Fisher–Yates swaps over them, with rejection
+    thresholds from a table and remainders without division (Lemire, Kaser
+    and Kurz 2019); a shuffle that rejects a value continues with the
+    following blocks, so every shuffle is unchanged. The shuffles of 10,000
+    permutations of 462 samples take 32 ms instead of 59 ms on an efficiency
+    core, where two 64-bit divisions per swap had taken most of the time.
+  - Permutations that the covariates fit poorly (centred sum of squares at
+    most twice the residual sum of squares) are scored from their centred
+    response instead of their residual, which skips the product Q T' and its
+    subtraction; at the Geuvadis dimensions that is every permutation. The
+    float rounding bounds grow by at most √2. This part changes
+    single-precision results in their last bits: on the test shapes,
+    permutation maxima agree with double precision to within 9.7e-7 of
+    max(1, |z|) (1.03e-6 before), within the documented bound. On Geuvadis
+    chromosome 22 with 10,000 permutations, statuses, leads and observed
+    statistics are unchanged, 76 empirical p-values rise by 1 to 3 counts out
+    of 10,001 against double precision (77 before), beta_p agrees with double
+    to within 2.3e-5 relative (2.5e-5 before; 4.1e-6 wherever
+    beta_p > 1e-10), and both precisions find the same 267 eGenes at Storey
+    q < 0.05. With 1,000 permutations the same 12 empirical p-values rise by
+    1/1001 as before and beta_p agrees to within 3.8e-5 (at beta_p ≈ 2e-49;
+    5.0e-6 wherever beta_p > 1e-10).
+
+  After the first three parts, single-precision output was byte-identical to
+  that of 4e2b39a on Geuvadis chromosome 22 with 1,000 and 10,000
+  permutations, on the genome-wide panel with 10 permutations, and on test
+  shapes covering 37–462 samples, 1–4,500 variants, both precisions, NB
+  refits, nominal output and 1, 3 and 4 threads, natively and with
+  `RAPIDGLM_FORCE_PORTABLE`. Double precision and NB refits remain byte for
+  byte as before: the double-precision chromosome 22 tables with 1,000 and
+  10,000 permutations equal those of the 1.4.0 receipts.
+
+  Micro-benchmark (`benchmarks/qtl_precision.cpp`, whose new `genes` mode
+  times many genes on many threads): synthetic genes of 462 samples, 43
+  covariates and 4,500 variants, 10,000 permutations in single precision, on
+  efficiency cores under the timing lock, the best of two alternating rounds
+  (one thread on CPU 31, twelve on CPUs 16–27):
+
+  | Build | 1 gene, 1 thread | 12 genes, 1 thread | 48 genes, 12 threads |
+  |---|---|---|---|
+  | 4e2b39a | 1.017 s | 1.017 s per gene, 20.4 GFMA/s | 0.1020 s per gene, 17.0 GFMA/s per thread |
+  | first three parts | 0.924 s | 0.923 s per gene, 22.5 GFMA/s | 0.0823 s per gene, 21.1 GFMA/s per thread |
+  | all four parts | 0.912 s | 0.907 s per gene, 22.9 GFMA/s | 0.0806 s per gene, 21.5 GFMA/s per thread |
+
+  (GFMA/s counts the multiply-adds of the score product alone.) Each of twelve
+  threads now runs at 94% of the one-thread rate, against 83% for 4e2b39a,
+  whose score matrices left the caches; per gene, twelve threads are 1.26×
+  and one thread 1.12× faster than 4e2b39a. The packed product with its
+  maxima runs at 26.0 GFMA/s on one core (25.0 for the product alone before),
+  the portable version at 12.3. Double precision is unchanged (1.72 s for the
+  one-gene run, against 1.75 s).
+
+  Peak resident memory, untimed with 12 threads and measured the same way
+  for both builds: the genome-wide panel with 10 permutations, 3.35 GiB
+  against 3.52 GiB for 4e2b39a (every worker then holds buffers for the HLA
+  region's windows of up to 26,032 variants); Geuvadis chromosome 22,
+  0.65 GiB in single precision with 1,000 or 10,000 permutations (0.90 and
+  0.94 GiB), and 0.82 and 0.88 GiB in double precision (0.84 GiB both).
+- **Compact genotype storage.** `Genotypes` gains a hard-call form beside the
+  dosage form, which keeps working: `hard_calls` holds the two-bit codes of a
+  variant-major PLINK 1 .bed, missing code included, in `call_bytes()` bytes
+  per variant, and `validate()` accepts either form. `rapidglm qtl` keeps the
+  .bed codes as read (repacked only when the BED's samples are not the .fam's
+  in .fam order) instead of expanding every call to a double. `cis_qtl`
+  decodes each gene's cis variants into its genotype block as it tests the
+  gene, with each variant's mean dosage from its codes
+  (`Genotypes::mean_dosage`, four calls at a time through a table of byte
+  sums) instead of a mean vector over all variants. Sums
+  of whole dosages are exact, so results are bit-identical: the Geuvadis
+  chromosome 22 tables (Gaussian with 1,000 permutations in single and in
+  double precision, nominal output, NB with 50 permutations, `min_maf` 0.1
+  with nominal output) and the genome-wide cis table (10 permutations) are
+  byte-identical to those of the previous build, and the double-precision
+  chromosome 22 table to that of 1.4.1.
+- Other memory reductions, with identical output: the CLI packs variant IDs
+  and alleles into one string (31 rather than 128 bytes per Geuvadis variant),
+  trims the spare capacity of the .bim vectors and, after `min_maf`
+  filtering, of the kept variants' arrays, frees the phenotype table
+  once the responses are built; each gene reserves its nominal rows; and
+  single-precision permutations no longer hold a batch's scores (about 6.5
+  rather than 10 kB per cis variant at 462 samples; see above).
+- Peak resident memory, untimed with 12 threads: Geuvadis chromosome 22 with
+  1,000 permutations, 1.14 GiB for 1.4.1 → 0.65 GiB in single and 0.82 GiB
+  in double precision; the genome-wide panel (20,427 genes, 6,317,351
+  variants), measured with 10 permutations, which allocate the same per-gene
+  buffers as 10,000, 25.8 → 3.35 GiB (the 1.4.1 run with 10,000 permutations
+  peaked at 25.9 GiB; tensorQTL at 7.2 GiB). The calls take 0.68 GiB instead
+  of 21.7 GiB; most of the rest is the gene workers' buffers in the HLA
+  region, where 143 genes have more than 15,000 cis variants.
+
+## 1.4.1 (2026-10-22)
+
+- Return an empty weighted cross-product matrix immediately when the design
+  has zero columns. This avoids undefined behavior from forming row pointers
+  into empty storage, including in a Cook's replacement refit when every
+  coefficient is at a boundary. Add a regression covering six row counts.
+- The focused solver and bulk suites pass ASan/UBSan with OpenMP (29 cases,
+  4,553 assertions). All 28 checked nonempty-design cross-products are
+  bit-identical to 1.4.0; this patch changes no fitting or resampling rule.
+- Benchmark tables and raw receipts remain the completed **1.4.0** run on
+  `f0ecfbd` (`v1.4.0-dev.4`). They have not been remeasured for 1.4.1.
+  See the [patch validation](validation/receipts/v1.4.1/README.md) and
+  [benchmark provenance](validation/receipts/v1.4.0/README.md).
+
+## 1.4.0 (2026-10-22)
+
+The library is the code of `v1.4.0-dev.4`; this release adds the receipts and
+documentation measured with it. Every stage in the complete 18-stage release
+run was measured afresh. One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional.
+
+- **Bulk and pseudobulk DE:** fitted-count flooring (default `min_mean: 0.5`),
+  rough/moments starting dispersions, bounded fallback with covariate-unit
+  invariance, and independent filtering following the documented and
+  black-box-validated rules. Replaced-count base means and failed-refit
+  p-values are corrected. Low-count and boundary genes can change results
+  relative to 1.3.0; shared trends and priors can also move other genes.
+- **Floored-fit interfaces:** C `rapidglm_nb_floored_fits` and Python
+  `capi.nb_floored_fits`; the PyDESeq2 inference backend uses native fits and
+  delegates unsupported/fallback cases to DefaultInference. MIT PyDESeq2
+  ports carry attribution in DEPENDENCIES.md.
+- **Quasi-likelihood DE:** `edger-ql` / C++ `edger_ql` implements filtering,
+  TMM, common Cox-Reid dispersion, adjusted deviances, moderation and QL
+  testing following edgeR 4's publications, documentation and public API
+  outputs. Near-Poisson deviances and fit failure handling are stable.
+  Inputs must be nonnegative integer counts. Known reference-fit differences
+  and small-panel moderation limits are documented in METHODS.md.
+- **Cis-QTL mapping:** Gaussian, Poisson and NB score tests, empirical
+  permutation calibration and Beta approximation, with PLINK/BED input,
+  checked outputs, stable ties, per-gene singular statuses and failed-draw
+  accounting. Only phenotype chromosomes are decoded; MAF filtering is
+  in-place. Validation covers chromosome 22, not a genome-wide run.
+- **Faster Gaussian permutations:** project genotypes once per gene and
+  score batches of 512 responses with packed AVX2/FMA or portable kernels.
+  On the final matched 10,000-permutation panel, RapidGLM takes
+  117.19 s versus tensorQTL's 151.53 s
+  (1.29×), with unchanged empirical p-values
+  and lead variants relative to dev.3. See
+  [QTL_GAUSSIAN_SPEED.md](docs/QTL_GAUSSIAN_SPEED.md).
+- **Numerical and input handling:** tiled weighted cross products and
+  leverages, vectorized predictor/mean updates, quicker MatrixMarket input
+  and SHA-accelerated fingerprints where available; binding, matrix input
+  and QTL file validation fixes. Perturbation streams and acceptance-rule
+  definitions are unchanged from 1.3.0.
+- **ARM64:** cross-build support, selected QEMU checks, and double-precision
+  KS CDF checks with unchanged integer streams. Floating-point results can
+  differ by architecture; numerical limits are retained explicitly.
+- **Validation:** native and portable C++ (172 cases each), C99, CLI (28
+  cases on each build), Python/R, Rust, selected ARM64 and container suites
+  pass. Final agreements and timing scopes are in the
+  [release collection](validation/receipts/v1.4.0/README.md).
 
 ## 1.3.0 (2026-10-10)
 

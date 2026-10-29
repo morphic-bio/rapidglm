@@ -1,0 +1,78 @@
+{
+  "version": "1.4.0",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "measured_tag": "v1.4.0-dev.4",
+  "platform": "aarch64 Linux cross-build and QEMU on x86_64",
+  "cpus": "0-7, nice 10 (untimed correctness checks)",
+  "emulated_cpu": "qemu-aarch64 -cpu max",
+  "compiler": "aarch64-linux-gnu-g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "qemu": "qemu-aarch64 version 8.2.2 (Debian 1:8.2.2+ds-0ubuntu1.18)\nCopyright (c) 2003-2023 Fabrice Bellard and the QEMU Project developers",
+  "unit_tests": {
+    "passed": 29,
+    "available": 172,
+    "assertions": 5281712
+  },
+  "arm64_c99": {
+    "passed": true
+  },
+  "arm64_cli": {
+    "passed": 28
+  },
+  "artifacts": [
+    "/out/rapidglm: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (GNU/Linux), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=5bd7dad5ef995201504fb0c51aba1246570fc747, for GNU/Linux 3.7.0, not stripped",
+    "/out/rapidglm_tests: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (GNU/Linux), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=18ee167fd6b8a628047e0de8625928b39858a0fc, for GNU/Linux 3.7.0, not stripped",
+    "/out/rapidglm_c_test: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=4db2c386e01b34cc1eaf47f5e7ee6ca68716ab03, for GNU/Linux 3.7.0, not stripped",
+    "/out/librapidglm_c.so.1.4.0: ELF 64-bit LSB shared object, ARM aarch64, version 1 (GNU/Linux), dynamically linked, BuildID[sha1]=2d21656bbad9885424b1a20583e01573961b0c92, not stripped",
+    "/tmp/tmp.nFbMIS2WO1/static-member.o: ELF 64-bit LSB relocatable, ARM aarch64, version 1 (GNU/Linux), not stripped"
+  ],
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--cpuset-cpus",
+    "0-7",
+    "-e",
+    "BUILD_JOBS=4",
+    "-v",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/candidate-clone:/src:ro",
+    "-v",
+    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/arm64:/out",
+    "rapidglm-arm64-review-toolchain:local",
+    "nice",
+    "-n",
+    "10",
+    "bash",
+    "/src/scripts/build_arm64.sh",
+    "ars_*,philox_*,exponential_ziggurat*,thinned_*,hazard_*,batched_*,kernels_agree_with_direct_sums,market_reader_is_independent_of_entry_order,sha1_matches_published_digests,leverages_and_fixed_dispersion_fits,rank_windows_equal_average_rank_trims,edger_ql_finds_changed_genes_and_is_reproducible,count_loader_equals_the_csc_reader,deviance_moment_table_interpolates,*qtl*,blocked_product_kernels_agree_with_direct_sums,beta_maximum_likelihood_recovers_its_parameters,cis_windows_and_nominal_pairs"
+  ],
+  "scope": "Selected generator, sampler, matrix-kernel, QTL and QL tests. Clean-clone checks do not mount external edgeR reference data. No native ARM64 performance measurement is claimed.",
+  "source_identity": {
+    "candidate_container_commit": "eb4aae9ddff5768f6d881eb7d1fff21878ba0be8",
+    "final_candidate_commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "library_bindings_tests_build_files_identical": true,
+    "scopes": [
+      "include",
+      "src",
+      "CMakeLists.txt",
+      "cmake",
+      "Dockerfile",
+      "bindings/python/rapidglm",
+      "bindings/r",
+      "bindings/rust/src",
+      "bindings/rust/Cargo.toml",
+      "bindings/rust/build.rs",
+      "tests"
+    ],
+    "only_changes_after_container_checkout": "Release runner and benchmark timing guards/reference-path configuration."
+  },
+  "logs_sha256": {
+    "arm64/unit-tests.log": "e03e0a66c2677fd6a16a9bc3ded5da366b3d4faff5cc4df56d098f29a85151dc",
+    "arm64/c-api-test.log": "bc8fc80e015f65a159b5687f41963cd0b392509a921833892fdd6b3766c07541",
+    "arm64/cli-tests.log": "dc3a32c058117c1aeedc7788c1c08aa1528d8297945c3f42312aa1d8589ed503"
+  },
+  "_provenance": {
+    "version": "1.4.0",
+    "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+    "worktree_dirty": false
+  }
+}

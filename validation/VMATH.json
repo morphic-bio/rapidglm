@@ -1,0 +1,3479 @@
+{
+ "purpose": "RapidGLM 1.5.0 special functions (include/rapidglm/vmath.hpp): the backend chosen for each function and context on the benchmark host's efficiency cores, every alternative measured, agreement with 1.4.1 and end-to-end timings",
+ "base": {
+  "commit": "4e2b39a (1.4.1 plus single-precision QTL work)",
+  "binary_sha256": [
+   "6864f5159b26da71fcbe9cbf5f3e13d79a16c7f0f369a17785a531e3a840dbcf",
+   "rapidglm",
+   "a7fdec108afb07dc9e3a393ab2ee4f4e7135626d762b6e6faeaf9c8dbd203bbe",
+   "rapidglm_effect_benchmark",
+   "04a0e5c9e939620dbf31cb243f8f65dfbc48532652571782cbfd263e08ea7270",
+   "rapidglm_glm_batch"
+  ]
+ },
+ "worktree": "/mnt/pikachu/rapidglm-vmath (branch vmath)",
+ "status": "Development measurements for the merge decision. The formal 1.5.0 numbers come from the 1.5.0 receipts run, which re-measures the special-functions stage and every end-to-end workload under the full protocol. Timings and agreement are of build F (branch vmath on 4e2b39a before the rebase); the commit (2cfae98 on fc2705a) differs from F only in the branch that evaluates out-of-domain vector lanes of log and log1p at 1 before the scalar code replaces them (build F2): the same bits (unit-test digests), and byte-identical outputs of F and F2 on bulk DE (airway, kang) and edgeR-QL (thyroid32, airway, sim8). The final timing of F2 was dropped because another session's job kept the host above the quiet threshold.",
+ "host": {
+  "processor": "13th Gen Intel(R) Core(TM) i9-13900KF",
+  "efficiency_cores": "16-31 (Gracemont), turbo on, up to 4.3 GHz",
+  "performance_cores": "0-15 capped at 2.2 GHz since 2026-10-23 (untimed work only)",
+  "compiler": "g++ 12.3.0, -O3",
+  "glibc": "2.35",
+  "boost": "1.74"
+ },
+ "choices": {
+  "note": "Efficiency core: CPU 16 (Gracemont), one thread, under the shared lock after the quiet-host check, 4,096 arguments in cache, the least time per element. Performance core: CPU 5 (Golden Cove, capped at 2.2 GHz since 2026-10-23), untimed, for comparison only. Ranges: tiny log-uniform (1e-300, 1e-5), unit (1e-5, 3), moderate (3, 100), large log-uniform (100, 1e300), nb y + 1/alpha (y geometric, mean 20; alpha log-uniform 1e-8 to 1e3), negative (-1, 0), exp_small (-1, 1), exp_wide (-700, 700). max_ulp: 10^6 arguments per range against long double references. These historical slow-policy choices were made on the efficiency cores; the division_modes section records the subsequent Zen 3 selection, and they issue about one 256-bit division per 32 cycles.",
+  "functions": {
+   "log": {
+    "alternatives": [
+     {
+      "implementation": "glibc",
+      "description": "glibc 2.35 libm, one value at a time",
+      "ns_per_element_efficiency_core": {
+       "tiny": 4.718,
+       "unit": 5.023,
+       "moderate": 4.717,
+       "large": 4.718,
+       "nb": 4.768
+      },
+      "max_ulp": {
+       "tiny": 0.062,
+       "unit": 0.515,
+       "moderate": 0.5,
+       "large": 0.123,
+       "nb": 0.505
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 5.05,
+       "unit": 5.944,
+       "moderate": 5.05,
+       "large": 5.051,
+       "nb": 5.22
+      }
+     },
+     {
+      "implementation": "rapidglm_avx2",
+      "description": "RapidGLM, AVX2 array (chosen code)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 3.281,
+       "unit": 3.281,
+       "moderate": 3.281,
+       "large": 3.281,
+       "nb": 3.281
+      },
+      "max_ulp": {
+       "tiny": 0.062,
+       "unit": 0.66,
+       "moderate": 0.527,
+       "large": 0.123,
+       "nb": 0.611
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 2.592,
+       "unit": 2.59,
+       "moderate": 2.591,
+       "large": 2.593,
+       "nb": 2.592
+      }
+     },
+     {
+      "implementation": "rapidglm_portable",
+      "description": "RapidGLM, portable array (std::fma through the C library on x86-64)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 47.928,
+       "unit": 47.929,
+       "moderate": 47.928,
+       "large": 47.929,
+       "nb": 47.929
+      },
+      "max_ulp": {
+       "tiny": 0.062,
+       "unit": 0.66,
+       "moderate": 0.527,
+       "large": 0.123,
+       "nb": 0.611
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 85.434,
+       "unit": 85.437,
+       "moderate": 85.438,
+       "large": 85.435,
+       "nb": 85.434
+      }
+     },
+     {
+      "implementation": "rapidglm_scalar",
+      "description": "RapidGLM, one value at a time (scalar code compiled for FMA)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 9.589,
+       "unit": 9.599,
+       "moderate": 9.598,
+       "large": 9.594,
+       "nb": 9.591
+      },
+      "max_ulp": {
+       "tiny": 0.062,
+       "unit": 0.66,
+       "moderate": 0.527,
+       "large": 0.123,
+       "nb": 0.611
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 8.702,
+       "unit": 8.678,
+       "moderate": 8.685,
+       "large": 8.709,
+       "nb": 8.677
+      }
+     },
+     {
+      "implementation": "sleef_u10_avx2",
+      "description": "SLEEF 3.9.0 u10 AVX2",
+      "ns_per_element_efficiency_core": {
+       "tiny": 6.762,
+       "unit": 6.762,
+       "moderate": 6.761,
+       "large": 6.762,
+       "nb": 6.762
+      },
+      "max_ulp": {
+       "tiny": 0.062,
+       "unit": 0.751,
+       "moderate": 0.549,
+       "large": 0.123,
+       "nb": 0.71
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     },
+     {
+      "implementation": "sleef_u10_portable",
+      "description": "SLEEF 3.9.0 u10 scalar FMA (purecfma)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 29.767,
+       "unit": 29.767,
+       "moderate": 29.767,
+       "large": 29.767,
+       "nb": 29.767
+      },
+      "max_ulp": {
+       "tiny": 0.062,
+       "unit": 0.751,
+       "moderate": 0.549,
+       "large": 0.123,
+       "nb": 0.71
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     }
+    ],
+    "contexts": {
+     "engine_scalar": {
+      "choice": "glibc std::log",
+      "reason": "one value at a time glibc takes 4.7 ns against 9.6 ns for RapidGLM's scalar code"
+     },
+     "engine_array": {
+      "choice": "RapidGLM vmath::log_array in edgeR-QL's unit deviances; glibc elsewhere",
+      "reason": "batched there edgeR-QL on thyroid took 12.634 s against 12.937 s scalar (round 2); batching the NB likelihood, count deviance and theta scores was slower (NB batch 2.991 against 2.893 s, round 1), and bulk DE's floored fits changed by -0.7% and +0.4%, inside the 1.5% layout noise"
+     },
+     "vmath_array": {
+      "choice": "RapidGLM (AVX2, Advanced SIMD, portable)",
+      "reason": "3.3 ns against glibc 4.7 and SLEEF 6.8, 0.67 ulp, and the same bits on every processor"
+     }
+    }
+   },
+   "log1p": {
+    "alternatives": [
+     {
+      "implementation": "glibc",
+      "description": "glibc 2.35 libm, one value at a time",
+      "ns_per_element_efficiency_core": {
+       "negative": 10.096,
+       "tiny": 3.839,
+       "unit": 10.649,
+       "moderate": 11.644,
+       "large": 10.765
+      },
+      "max_ulp": {
+       "negative": 0.797,
+       "tiny": 0.504,
+       "unit": 0.812,
+       "moderate": 0.683,
+       "large": 0.54
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "negative": 12.086,
+       "tiny": 4.219,
+       "unit": 11.368,
+       "moderate": 13.679,
+       "large": 11.399
+      }
+     },
+     {
+      "implementation": "rapidglm_avx2",
+      "description": "RapidGLM, AVX2 array (chosen code)",
+      "ns_per_element_efficiency_core": {
+       "negative": 4.6,
+       "tiny": 140.397,
+       "unit": 4.598,
+       "moderate": 4.598,
+       "large": 4.609
+      },
+      "max_ulp": {
+       "negative": 0.65,
+       "tiny": 0.5,
+       "unit": 0.675,
+       "moderate": 0.516,
+       "large": 0.503
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "negative": 3.19,
+       "tiny": 5.881,
+       "unit": 3.189,
+       "moderate": 3.188,
+       "large": 3.188
+      }
+     },
+     {
+      "implementation": "rapidglm_portable",
+      "description": "RapidGLM, portable array (std::fma through the C library on x86-64)",
+      "ns_per_element_efficiency_core": {
+       "negative": 53.338,
+       "tiny": 4.58,
+       "unit": 53.338,
+       "moderate": 53.338,
+       "large": 53.338
+      },
+      "max_ulp": {
+       "negative": 0.65,
+       "tiny": 0.5,
+       "unit": 0.675,
+       "moderate": 0.516,
+       "large": 0.503
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "negative": 92.73,
+       "tiny": 7.744,
+       "unit": 92.733,
+       "moderate": 92.71,
+       "large": 92.731
+      }
+     },
+     {
+      "implementation": "rapidglm_scalar",
+      "description": "RapidGLM, one value at a time (scalar code compiled for FMA)",
+      "ns_per_element_efficiency_core": {
+       "negative": 12.675,
+       "tiny": 2.783,
+       "unit": 12.675,
+       "moderate": 12.674,
+       "large": 12.677
+      },
+      "max_ulp": {
+       "negative": 0.65,
+       "tiny": 0.5,
+       "unit": 0.675,
+       "moderate": 0.516,
+       "large": 0.503
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "negative": 11.934,
+       "tiny": 4.123,
+       "unit": 11.924,
+       "moderate": 12.152,
+       "large": 11.911
+      }
+     },
+     {
+      "implementation": "sleef_u10_avx2",
+      "description": "SLEEF 3.9.0 u10 AVX2",
+      "ns_per_element_efficiency_core": {
+       "negative": 7.867,
+       "tiny": 123.006,
+       "unit": 7.867,
+       "moderate": 7.867,
+       "large": 7.867
+      },
+      "max_ulp": {
+       "negative": 0.743,
+       "tiny": 0.5,
+       "unit": 0.753,
+       "moderate": 0.551,
+       "large": 0.51
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     },
+     {
+      "implementation": "sleef_u10_portable",
+      "description": "SLEEF 3.9.0 u10 scalar FMA (purecfma)",
+      "ns_per_element_efficiency_core": {
+       "negative": 30.932,
+       "tiny": 170.696,
+       "unit": 30.93,
+       "moderate": 30.93,
+       "large": 30.93
+      },
+      "max_ulp": {
+       "negative": 0.743,
+       "tiny": 0.5,
+       "unit": 0.753,
+       "moderate": 0.551,
+       "large": 0.51
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     }
+    ],
+    "contexts": {
+     "engine_scalar": {
+      "choice": "glibc std::log1p, and log1p_by_log (glibc log and one division) where 1.4.1 used it",
+      "reason": "one value at a time glibc takes 10.1-11.6 ns against 12.7 ns for RapidGLM's scalar code"
+     },
+     "engine_array": {
+      "choice": "RapidGLM vmath::log1p_array in edgeR-QL's unit deviances",
+      "reason": "see log: the edgeR unit deviances are the one place where arrays paid"
+     },
+     "vmath_array": {
+      "choice": "RapidGLM",
+      "reason": "4.6 ns against glibc 10.1-11.6 and SLEEF 7.9, 0.68 ulp"
+     }
+    }
+   },
+   "exp": {
+    "alternatives": [
+     {
+      "implementation": "glibc",
+      "description": "glibc 2.35 libm, one value at a time",
+      "ns_per_element_efficiency_core": {
+       "exp_small": 4.942,
+       "exp_wide": 7.886
+      },
+      "max_ulp": {
+       "exp_small": 0.504,
+       "exp_wide": 0.505
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "exp_small": 5.063,
+       "exp_wide": 9.519
+      }
+     },
+     {
+      "implementation": "rapidglm_avx2",
+      "description": "RapidGLM, AVX2 array (chosen code)",
+      "ns_per_element_efficiency_core": {
+       "exp_small": 2.546,
+       "exp_wide": 2.55
+      },
+      "max_ulp": {
+       "exp_small": 0.847,
+       "exp_wide": 0.85
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "exp_small": 1.484,
+       "exp_wide": 1.485
+      }
+     },
+     {
+      "implementation": "rapidglm_portable",
+      "description": "RapidGLM, portable array (std::fma through the C library on x86-64)",
+      "ns_per_element_efficiency_core": {
+       "exp_small": 31.859,
+       "exp_wide": 31.859
+      },
+      "max_ulp": {
+       "exp_small": 0.847,
+       "exp_wide": 0.85
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "exp_small": 52.853,
+       "exp_wide": 52.733
+      }
+     },
+     {
+      "implementation": "rapidglm_scalar",
+      "description": "RapidGLM, one value at a time (scalar code compiled for FMA)",
+      "ns_per_element_efficiency_core": {
+       "exp_small": 8.46,
+       "exp_wide": 8.459
+      },
+      "max_ulp": {
+       "exp_small": 0.847,
+       "exp_wide": 0.85
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "exp_small": 7.969,
+       "exp_wide": 7.974
+      }
+     },
+     {
+      "implementation": "sleef_u10_avx2",
+      "description": "SLEEF 3.9.0 u10 AVX2",
+      "ns_per_element_efficiency_core": {
+       "exp_small": 4.431,
+       "exp_wide": 4.431
+      },
+      "max_ulp": {
+       "exp_small": 0.826,
+       "exp_wide": 0.85
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     },
+     {
+      "implementation": "sleef_u10_portable",
+      "description": "SLEEF 3.9.0 u10 scalar FMA (purecfma)",
+      "ns_per_element_efficiency_core": {
+       "exp_small": 28.835,
+       "exp_wide": 28.835
+      },
+      "max_ulp": {
+       "exp_small": 0.826,
+       "exp_wide": 0.85
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     }
+    ],
+    "contexts": {
+     "engine_scalar": {
+      "choice": "glibc std::exp",
+      "reason": "one value at a time glibc takes 4.9-7.9 ns against 8.5 ns for RapidGLM's scalar code"
+     },
+     "engine_array": {
+      "choice": "RapidGLM vmath::exp_array: the log-link means, bulk DE's floored NB fits and edgeR-QL's fixed-dispersion fits (kernels.hpp exp_array calls it)",
+      "reason": "2.6 ns against glibc 7.9; the NB batch fit took 2.908 s against 3.062 s for 1.4.1 (final build)"
+     },
+     "vmath_array": {
+      "choice": "RapidGLM",
+      "reason": "2.6 ns against glibc 7.9 and SLEEF 4.4; 0.86 ulp"
+     }
+    }
+   },
+   "lgamma": {
+    "alternatives": [
+     {
+      "implementation": "boost",
+      "description": "boost::math 1.74, default policy (double promoted to long double)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 127.866,
+       "unit": 30.855,
+       "moderate": 480.036,
+       "large": 45.29,
+       "nb": 230.221
+      },
+      "max_ulp": {
+       "tiny": 0.5,
+       "unit": 0.501,
+       "moderate": 0.501,
+       "large": 0.5,
+       "nb": 0.501
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 258.852,
+       "unit": 47.764,
+       "moderate": 590.574,
+       "large": 59.371,
+       "nb": 288.199
+      }
+     },
+     {
+      "implementation": "boost_double",
+      "description": "boost::math 1.74, promote_double<false> (its double-precision algorithm)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 8.22,
+       "unit": 14.54,
+       "moderate": 45.701,
+       "large": 9.664,
+       "nb": 32.934
+      },
+      "max_ulp": {
+       "tiny": 0.608,
+       "unit": 2.371,
+       "moderate": 3.167,
+       "large": 2.009,
+       "nb": 2.948
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 10.041,
+       "unit": 13.905,
+       "moderate": 55.735,
+       "large": 11.828,
+       "nb": 39.737
+      }
+     },
+     {
+      "implementation": "glibc",
+      "description": "glibc 2.35 libm, one value at a time",
+      "ns_per_element_efficiency_core": {
+       "tiny": 7.713,
+       "unit": 13.581,
+       "moderate": 10.947,
+       "large": 9.181,
+       "nb": 11.469
+      },
+      "max_ulp": {
+       "tiny": 0.551,
+       "unit": 1.779,
+       "moderate": 2.224,
+       "large": 1.072,
+       "nb": 2.251
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 9.458,
+       "unit": 13.159,
+       "moderate": 12.659,
+       "large": 10.708,
+       "nb": 12.966
+      }
+     },
+     {
+      "implementation": "glibc_lgamma_r",
+      "description": "glibc 2.35 lgamma_r (vmath::lgamma)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 8.144,
+       "unit": 13.696,
+       "moderate": 10.918,
+       "large": 8.835,
+       "nb": 11.46
+      },
+      "max_ulp": {
+       "tiny": 0.551,
+       "unit": 1.779,
+       "moderate": 2.224,
+       "large": 1.072,
+       "nb": 2.251
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 9.567,
+       "unit": 13.297,
+       "moderate": 12.671,
+       "large": 10.899,
+       "nb": 13.016
+      }
+     },
+     {
+      "implementation": "sleef_u10_avx2",
+      "description": "SLEEF 3.9.0 u10 AVX2",
+      "ns_per_element_efficiency_core": {
+       "tiny": 197.792,
+       "unit": 45.308,
+       "moderate": 40.903,
+       "large": 70.275,
+       "nb": 41.418
+      },
+      "max_ulp": {
+       "tiny": 0.5,
+       "unit": 0.783,
+       "moderate": 0.519,
+       "large": 0.5,
+       "nb": 0.751
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     },
+     {
+      "implementation": "sleef_u10_portable",
+      "description": "SLEEF 3.9.0 u10 scalar FMA (purecfma)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 319.986,
+       "unit": 157.225,
+       "moderate": 173.314,
+       "large": 187.681,
+       "nb": 173.337
+      },
+      "max_ulp": {
+       "tiny": 0.5,
+       "unit": 0.783,
+       "moderate": 0.519,
+       "large": 0.5,
+       "nb": 0.751
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     }
+    ],
+    "contexts": {
+     "engine_scalar": {
+      "choice": "glibc lgamma_r",
+      "reason": "11.5 ns on the NB arguments against Boost double 32.9 and promoted 230; lgamma_r rather than std::lgamma because std::lgamma writes the global signgam from threaded callers (the values are the same)"
+     },
+     "engine_array": {
+      "choice": "none (no call site takes lgamma as an array)",
+      "reason": ""
+     },
+     "vmath_array": {
+      "choice": "glibc lgamma_r",
+      "reason": "fastest measured: SLEEF's lgamma took 41.4 ns; bits follow the platform libm"
+     }
+    }
+   },
+   "digamma": {
+    "alternatives": [
+     {
+      "implementation": "boost",
+      "description": "boost::math 1.74, default policy (double promoted to long double)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 23.39,
+       "unit": 25.757,
+       "moderate": 55.954,
+       "large": 57.031,
+       "nb": 54.687
+      },
+      "max_ulp": {
+       "tiny": 0.5,
+       "unit": 0.539,
+       "moderate": 0.539,
+       "large": 0.5,
+       "nb": 0.541
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 26.808,
+       "unit": 27.764,
+       "moderate": 61.6,
+       "large": 61.817,
+       "nb": 59.695
+      }
+     },
+     {
+      "implementation": "boost_algorithm_avx2",
+      "description": "Boost's double-precision algorithm transcribed for AVX2 (benchmarks/boost_polygamma.hpp), one division per recurrence step",
+      "ns_per_element_efficiency_core": {
+       "tiny": 7.674,
+       "unit": 9.083,
+       "moderate": 11.938,
+       "large": 8.166,
+       "nb": 13.32
+      },
+      "max_ulp": {
+       "tiny": 0.993,
+       "unit": 2.769,
+       "moderate": 2.731,
+       "large": 1.428,
+       "nb": 3.015
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 3.307,
+       "unit": 4.02,
+       "moderate": 6.342,
+       "large": 4.747,
+       "nb": 6.959
+      }
+     },
+     {
+      "implementation": "boost_algorithm_avx2_one_division",
+      "description": "the same with the digamma recurrence as one fraction",
+      "ns_per_element_efficiency_core": {
+       "tiny": 7.685,
+       "unit": 8.565,
+       "moderate": 10.376,
+       "large": 7.963,
+       "nb": 11.456
+      },
+      "max_ulp": {
+       "tiny": 0.993,
+       "unit": 2.769,
+       "moderate": 4.517,
+       "large": 1.428,
+       "nb": 5.418
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 3.31,
+       "unit": 4.204,
+       "moderate": 6.316,
+       "large": 4.734,
+       "nb": 6.924
+      }
+     },
+     {
+      "implementation": "boost_double",
+      "description": "boost::math 1.74, promote_double<false> (its double-precision algorithm)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 5.969,
+       "unit": 7.338,
+       "moderate": 10.91,
+       "large": 38.409,
+       "nb": 11.235
+      },
+      "max_ulp": {
+       "tiny": 0.993,
+       "unit": 3.253,
+       "moderate": 2.666,
+       "large": 1.428,
+       "nb": 3.143
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 7.64,
+       "unit": 7.566,
+       "moderate": 12.013,
+       "large": 16.258,
+       "nb": 12.109
+      }
+     },
+     {
+      "implementation": "rapidglm_avx2",
+      "description": "RapidGLM, AVX2 array (chosen code)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 10.468,
+       "unit": 10.684,
+       "moderate": 8.992,
+       "large": 8.07,
+       "nb": 10.001
+      },
+      "max_ulp": {
+       "tiny": 0.993,
+       "unit": 3.736,
+       "moderate": 2.281,
+       "large": 0.609,
+       "nb": 3.148
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 5.198,
+       "unit": 5.418,
+       "moderate": 5.097,
+       "large": 4.443,
+       "nb": 6.03
+      }
+     },
+     {
+      "implementation": "rapidglm_portable",
+      "description": "RapidGLM, portable array (std::fma through the C library on x86-64)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 43.716,
+       "unit": 46.42,
+       "moderate": 74.685,
+       "large": 75.676,
+       "nb": 69.835
+      },
+      "max_ulp": {
+       "tiny": 0.993,
+       "unit": 3.736,
+       "moderate": 2.281,
+       "large": 0.609,
+       "nb": 3.148
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 66.897,
+       "unit": 75.208,
+       "moderate": 123.808,
+       "large": 134.77,
+       "nb": 123.113
+      }
+     },
+     {
+      "implementation": "rapidglm_scalar",
+      "description": "RapidGLM, one value at a time (scalar code compiled for FMA)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 11.772,
+       "unit": 14.985,
+       "moderate": 12.652,
+       "large": 17.631,
+       "nb": 13.389
+      },
+      "max_ulp": {
+       "tiny": 0.993,
+       "unit": 3.736,
+       "moderate": 2.281,
+       "large": 0.609,
+       "nb": 3.148
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 10.878,
+       "unit": 16.518,
+       "moderate": 13.162,
+       "large": 23.181,
+       "nb": 13.792
+      }
+     },
+     {
+      "implementation": "rapidglm_first_avx2",
+      "description": "RapidGLM's first avx2 version (SLEEF log inside digamma; trigamma terms counted by six compares)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 10.581,
+       "unit": 10.751,
+       "moderate": 11.256,
+       "large": 10.278,
+       "nb": 12.28
+      },
+      "max_ulp": {
+       "tiny": 0.993,
+       "unit": 3.736,
+       "moderate": 2.281,
+       "large": 0.609,
+       "nb": 3.148
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     },
+     {
+      "implementation": "rapidglm_first_portable",
+      "description": "RapidGLM's first portable version (SLEEF log inside digamma; trigamma terms counted by six compares)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 42.843,
+       "unit": 46.121,
+       "moderate": 53.609,
+       "large": 58.833,
+       "nb": 53.853
+      },
+      "max_ulp": {
+       "tiny": 0.993,
+       "unit": 3.736,
+       "moderate": 2.281,
+       "large": 0.609,
+       "nb": 3.148
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     }
+    ],
+    "contexts": {
+     "engine_scalar": {
+      "choice": "boost::math double-precision policy",
+      "reason": "per call faster than RapidGLM's scalar code; in the workloads S2 (ours) against D2 (Boost double) differed by -1.7% to +0.4%, inside the 1.5% layout noise, so the per-call result decides",
+      "scalar_call_ns": {
+       "boost x=1.5 repeated": 15.531,
+       "boost_double x=1.5 repeated": 5.578,
+       "rapidglm x=1.5 repeated": 12.254,
+       "boost x=1.5 dependent": 26.427,
+       "boost_double x=1.5 dependent": 13.347,
+       "rapidglm x=1.5 dependent": 31.565,
+       "boost x=4 repeated": 17.305,
+       "boost_double x=4 repeated": 7.051,
+       "rapidglm x=4 repeated": 13.84,
+       "boost x=4 dependent": 29.299,
+       "boost_double x=4 dependent": 15.118,
+       "rapidglm x=4 dependent": 32.785,
+       "boost x=15 repeated": 44.999,
+       "boost_double x=15 repeated": 9.964,
+       "rapidglm x=15 repeated": 11.867,
+       "boost x=15 dependent": 60.115,
+       "boost_double x=15 dependent": 18.717,
+       "rapidglm x=15 dependent": 22.761,
+       "boost x=300 repeated": 44.999,
+       "boost_double x=300 repeated": 9.965,
+       "rapidglm x=300 repeated": 11.874,
+       "boost x=300 dependent": 60.108,
+       "boost_double x=300 dependent": 18.717,
+       "rapidglm x=300 dependent": 22.822
+      }
+     },
+     "engine_array": {
+      "choice": "none (no call site takes digamma as an array)",
+      "reason": ""
+     },
+     "vmath_array": {
+      "choice": "RapidGLM AVX2",
+      "reason": "10.0 ns on the NB arguments against Boost double 11.2, Boost's algorithm in AVX2 13.3 and RapidGLM's first version 12.3; 3.7 ulp (Boost double 3.3). Boost's scalar code is faster on (1e-5, 3): 7.3 against 10.7 ns"
+     }
+    }
+   },
+   "trigamma": {
+    "alternatives": [
+     {
+      "implementation": "boost",
+      "description": "boost::math 1.74, default policy (double promoted to long double)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 1063.417,
+       "unit": 12.799,
+       "moderate": 14.482,
+       "large": 14.125,
+       "nb": 14.729
+      },
+      "max_ulp": {
+       "tiny": 0.5,
+       "unit": 0.696,
+       "moderate": 0.576,
+       "large": 0.562,
+       "nb": 0.691
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 1662.96,
+       "unit": 21.048,
+       "moderate": 25.343,
+       "large": 25.419,
+       "nb": 25.258
+      }
+     },
+     {
+      "implementation": "boost_algorithm_avx2",
+      "description": "Boost's double-precision algorithm transcribed for AVX2 (benchmarks/boost_polygamma.hpp), one division per recurrence step",
+      "ns_per_element_efficiency_core": {
+       "tiny": 33.71,
+       "unit": 7.652,
+       "moderate": 7.448,
+       "large": 7.526,
+       "nb": 7.594
+      },
+      "max_ulp": {
+       "tiny": 4.205,
+       "unit": 2.963,
+       "moderate": 2.334,
+       "large": 2.249,
+       "nb": 2.444
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 5.97,
+       "unit": 3.409,
+       "moderate": 2.975,
+       "large": 3.061,
+       "nb": 3.14
+      }
+     },
+     {
+      "implementation": "boost_double",
+      "description": "boost::math 1.74, promote_double<false> (its double-precision algorithm)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 1092.4,
+       "unit": 6.814,
+       "moderate": 7.116,
+       "large": 81.861,
+       "nb": 7.452
+      },
+      "max_ulp": {
+       "tiny": 4.205,
+       "unit": 2.106,
+       "moderate": 1.564,
+       "large": 1.518,
+       "nb": 2.126
+      },
+      "bit_identical_across_processors": false,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 1661.156,
+       "unit": 6.532,
+       "moderate": 8.285,
+       "large": 27.014,
+       "nb": 8.497
+      }
+     },
+     {
+      "implementation": "rapidglm_avx2",
+      "description": "RapidGLM, AVX2 array (chosen code)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 14.337,
+       "unit": 13.979,
+       "moderate": 5.387,
+       "large": 4.915,
+       "nb": 6.552
+      },
+      "max_ulp": {
+       "tiny": 1.9,
+       "unit": 2.484,
+       "moderate": 2.239,
+       "large": 0.993,
+       "nb": 2.401
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 7.802,
+       "unit": 7.771,
+       "moderate": 2.944,
+       "large": 2.634,
+       "nb": 3.546
+      }
+     },
+     {
+      "implementation": "rapidglm_portable",
+      "description": "RapidGLM, portable array (std::fma through the C library on x86-64)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 35.607,
+       "unit": 40.491,
+       "moderate": 23.0,
+       "large": 27.364,
+       "nb": 24.596
+      },
+      "max_ulp": {
+       "tiny": 1.9,
+       "unit": 2.484,
+       "moderate": 2.239,
+       "large": 0.993,
+       "nb": 2.401
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 57.296,
+       "unit": 64.154,
+       "moderate": 36.957,
+       "large": 47.761,
+       "nb": 39.714
+      }
+     },
+     {
+      "implementation": "rapidglm_scalar",
+      "description": "RapidGLM, one value at a time (scalar code compiled for FMA)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 13.463,
+       "unit": 15.592,
+       "moderate": 7.095,
+       "large": 11.082,
+       "nb": 7.858
+      },
+      "max_ulp": {
+       "tiny": 1.9,
+       "unit": 2.484,
+       "moderate": 2.239,
+       "large": 0.993,
+       "nb": 2.401
+      },
+      "bit_identical_across_processors": true,
+      "source": "validation/SPECIAL_FUNCTIONS.json",
+      "ns_per_element_performance_core_2_2GHz_untimed": {
+       "tiny": 13.438,
+       "unit": 22.755,
+       "moderate": 7.459,
+       "large": 18.986,
+       "nb": 8.759
+      }
+     },
+     {
+      "implementation": "rapidglm_first_avx2",
+      "description": "RapidGLM's first avx2 version (SLEEF log inside digamma; trigamma terms counted by six compares)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 15.541,
+       "unit": 15.205,
+       "moderate": 7.384,
+       "large": 7.104,
+       "nb": 8.349
+      },
+      "max_ulp": {
+       "tiny": 1.9,
+       "unit": 2.484,
+       "moderate": 2.239,
+       "large": 0.993,
+       "nb": 2.401
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     },
+     {
+      "implementation": "rapidglm_first_portable",
+      "description": "RapidGLM's first portable version (SLEEF log inside digamma; trigamma terms counted by six compares)",
+      "ns_per_element_efficiency_core": {
+       "tiny": 34.903,
+       "unit": 37.816,
+       "moderate": 26.322,
+       "large": 33.079,
+       "nb": 27.23
+      },
+      "max_ulp": {
+       "tiny": 1.9,
+       "unit": 2.484,
+       "moderate": 2.239,
+       "large": 0.993,
+       "nb": 2.401
+      },
+      "bit_identical_across_processors": true,
+      "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build, 4e2b39a + uncommitted, CPU 16, 2026-10-24); not re-measured"
+     }
+    ],
+    "contexts": {
+     "engine_scalar": {
+      "choice": "boost::math double-precision policy",
+      "reason": "as digamma",
+      "scalar_call_ns": {
+       "boost x=1.5 repeated": 17.552,
+       "boost_double x=1.5 repeated": 5.177,
+       "rapidglm x=1.5 repeated": 11.682,
+       "boost x=1.5 dependent": 21.858,
+       "boost_double x=1.5 dependent": 14.418,
+       "rapidglm x=1.5 dependent": 30.88,
+       "boost x=4 repeated": 16.338,
+       "boost_double x=4 repeated": 7.21,
+       "rapidglm x=4 repeated": 8.555,
+       "boost x=4 dependent": 25.576,
+       "boost_double x=4 dependent": 17.288,
+       "rapidglm x=4 dependent": 26.321,
+       "boost x=15 repeated": 16.175,
+       "boost_double x=15 repeated": 7.214,
+       "rapidglm x=15 repeated": 6.601,
+       "boost x=15 dependent": 27.901,
+       "boost_double x=15 dependent": 18.368,
+       "rapidglm x=15 dependent": 21.881,
+       "boost x=300 repeated": 16.173,
+       "boost_double x=300 repeated": 7.214,
+       "rapidglm x=300 repeated": 6.633,
+       "boost x=300 dependent": 27.902,
+       "boost_double x=300 dependent": 18.368,
+       "rapidglm x=300 dependent": 21.881
+      }
+     },
+     "engine_array": {
+      "choice": "none (no call site takes trigamma as an array)",
+      "reason": ""
+     },
+     "vmath_array": {
+      "choice": "RapidGLM AVX2",
+      "reason": "6.6 ns on the NB arguments against Boost double 7.5, Boost's algorithm in AVX2 7.6 and the first version 8.4; 2.7 ulp (Boost double 4.2). On (1e-5, 3) Boost's scalar code (6.8 ns) and its AVX2 transcription (7.7) are faster than ours (14.0); on a performance core the transcription is faster on the NB arguments (3.1 against 3.6 ns)"
+     }
+    }
+   }
+  },
+  "division_modes": {
+   "default": "slow",
+   "slow": {
+    "host": "pikachu",
+    "processor": "Intel Gracemont efficiency core",
+    "measurements": "The pre-existing choices/functions and development records in this receipt remain labelled as pikachu measurements.",
+    "selected": "Unchanged from dev.2."
+   },
+   "fast": {
+    "host": "biocloudgpu1",
+    "processor": "AMD Ryzen Threadripper PRO 5965WX (Zen 3)",
+    "measurement_receipt": "validation/DIVISION_CHOICES.json",
+    "geometric_mean_ns_per_element": {
+     "log": {
+      "glibc": 3.5668,
+      "rapidglm_portable": 50.892,
+      "rapidglm_scalar": 5.6618,
+      "rapidglm_avx2": 1.2984,
+      "own_v1_scalar_fma": 5.7232,
+      "own_v1_scalar": 26.439,
+      "own_v1_portable": 26.439,
+      "own_v1_avx2": 1.6064
+     },
+     "log1p": {
+      "glibc": 5.1352,
+      "rapidglm_portable": 30.8864,
+      "rapidglm_scalar": 6.5725,
+      "rapidglm_avx2": 2.097,
+      "own_v1_scalar_fma": 6.7241,
+      "own_v1_scalar": 27.1858,
+      "own_v1_portable": 28.4021,
+      "own_v1_avx2": 1.808
+     },
+     "exp": {
+      "glibc": 4.2789,
+      "rapidglm_portable": 31.945,
+      "rapidglm_scalar": 5.4535,
+      "rapidglm_avx2": 0.857
+     },
+     "lgamma": {
+      "glibc": 7.7966,
+      "glibc_lgamma_r": 7.7773,
+      "boost": 92.4784,
+      "boost_double": 13.1162,
+      "own_v1_scalar_fma": 13.5173,
+      "own_v1_scalar": 61.2394,
+      "own_v1_portable": 61.694,
+      "own_v1_avx2": 5.2145,
+      "fast_vmath_array": 5.4385
+     },
+     "digamma": {
+      "boost": 40.3492,
+      "boost_double": 7.2469,
+      "rapidglm_portable": 56.3625,
+      "rapidglm_scalar": 9.9537,
+      "rapidglm_avx2": 2.914,
+      "boost_algorithm_avx2": 2.6656,
+      "boost_algorithm_avx2_one_division": 2.7007,
+      "own_v1_scalar_fma": 9.7218,
+      "own_v1_scalar": 49.2502,
+      "own_v1_portable": 48.6354,
+      "own_v1_avx2": 3.2253
+     },
+     "trigamma": {
+      "boost": 39.4467,
+      "boost_double": 18.0408,
+      "rapidglm_portable": 27.5305,
+      "rapidglm_scalar": 7.6774,
+      "rapidglm_avx2": 1.8915,
+      "boost_algorithm_avx2": 1.7388,
+      "own_v1_scalar_fma": 9.6796,
+      "own_v1_scalar": 28.8727,
+      "own_v1_portable": 28.8618,
+      "own_v1_avx2": 2.7113
+     }
+    },
+    "functions": {
+     "log": {
+      "engine_scalar": "glibc",
+      "engine_array": "current division-free where already batched",
+      "vmath_array": "current division-free",
+      "reason": "Current AVX2 wins over the earlier division-based algorithm; scalar glibc remains faster."
+     },
+     "log1p": {
+      "engine_scalar": "glibc and existing stable log-ratio expression",
+      "engine_array": "earlier division-based log1p in edgeR deviances",
+      "vmath_array": "earlier division-based log1p",
+      "reason": "Earlier AVX2 is faster on Zen 3, within 1 ulp; scalar glibc is faster than either own scalar kernel.",
+      "boost_double_check": "Measured in exclusive Slurm job 657, two rounds, five ranges. The Boost wrapper delegates to glibc and is slower or tied. Raw times and errors: DIVISION_CHOICES.json boost_log1p_check."
+     },
+     "exp": {
+      "engine_scalar": "glibc",
+      "engine_array": "current division-free",
+      "vmath_array": "current division-free",
+      "reason": "Current AVX2 wins; there is no separate earlier exp algorithm."
+     },
+     "lgamma": {
+      "engine_scalar": "glibc lgamma_r",
+      "engine_array": "none",
+      "vmath_array": "earlier own positive kernel, libm for negative values",
+      "reason": "Earlier AVX2 wins over glibc; glibc wins scalar calls."
+     },
+     "digamma": {
+      "engine_scalar": "Boost double policy",
+      "engine_array": "none",
+      "vmath_array": "Boost-derived AVX2, ordinary recurrence",
+      "reason": "Fastest eligible array implementation. Combined recurrence exceeds accuracy bound. Boost double wins scalar repeated and dependent calls after fair FMA inlining."
+     },
+     "trigamma": {
+      "engine_scalar": "Boost double policy",
+      "engine_array": "none",
+      "vmath_array": "current own kernel",
+      "reason": "Boost-derived FMA rational wins dependent-call microbenchmarks, but is 1.5% slower on edgeR QL and gives no bulk-DE gain in paired end-to-end measurements. Keep Boost double at engine call sites. Faster rational AVX2 exceeds the tighter standalone API accuracy bound."
+     }
+    }
+   }
+  }
+ },
+ "sleef_attempt": {
+  "note": "The first 1.5.0 backend: SLEEF 3.9.0 u10 (AVX2, Advanced SIMD, scalar FMA) for log, log1p, exp and lgamma, removed. Efficiency-core timings (CPU 16, one thread, under the lock) against the 1.4.1 base; its log, log1p and lgamma divide (double-double arithmetic), and Gracemont issues about one 256-bit division per 32 cycles. Performance-core figures are untimed (CPU 5, capped at 2.2 GHz).",
+  "efficiency_core_first_build": {
+   "bulk_de_replogle_AAAS": {
+    "base": [
+     35.823,
+     35.783
+    ],
+    "new": [
+     35.838,
+     35.793
+    ],
+    "waited": [
+     20.01,
+     20.02,
+     160.14,
+     20.02
+    ],
+    "min": {
+     "base": 35.783,
+     "new": 35.793
+    },
+    "speedup": 0.9997206157628588
+   },
+   "bulk_de_thyroid": {
+    "base": [
+     35.138,
+     35.149
+    ],
+    "new": [
+     39.121,
+     39.127
+    ],
+    "waited": [
+     20.02,
+     570.53,
+     20.01,
+     20.02
+    ],
+    "min": {
+     "base": 35.138,
+     "new": 39.121
+    },
+    "speedup": 0.898187674139209
+   },
+   "edger_ql_thyroid": {
+    "base": [
+     13.127,
+     13.096,
+     13.092
+    ],
+    "new": [
+     13.944,
+     13.956,
+     13.965
+    ],
+    "waited": [
+     20.02,
+     20.02,
+     20.02,
+     20.02,
+     20.02,
+     20.02
+    ],
+    "min": {
+     "base": 13.092,
+     "new": 13.944
+    },
+    "speedup": 0.9388984509466437
+   },
+   "nb_glm_batch_5000x5x1000": {
+    "base": [
+     3.146,
+     3.043,
+     3.047,
+     3.045,
+     3.053
+    ],
+    "new": [
+     3.531,
+     3.533,
+     3.537,
+     3.541,
+     3.534
+    ],
+    "waited": [
+     20.02,
+     20.02,
+     20.01,
+     20.02,
+     20.02,
+     20.02,
+     20.01,
+     20.02,
+     20.01,
+     20.01
+    ],
+    "min": {
+     "base": 3.043,
+     "new": 3.531
+    },
+    "speedup": 0.8617955253469273
+   }
+  },
+  "efficiency_core_final_build": {
+   "bulk_de_thyroid": {
+    "base": [
+     35.175,
+     35.189
+    ],
+    "final": [
+     39.851,
+     39.862
+    ],
+    "waited": [
+     20.02,
+     20.02,
+     20.02,
+     20.02
+    ],
+    "min": {
+     "base": 35.175,
+     "final": 39.851
+    },
+    "speedup": 0.8826629193746706
+   },
+   "edger_ql_thyroid": {
+    "base": [
+     13.126,
+     13.129,
+     13.115
+    ],
+    "final": [
+     13.41,
+     13.433,
+     13.411
+    ],
+    "waited": [
+     30.03,
+     20.02,
+     20.02,
+     20.02,
+     20.02,
+     20.02
+    ],
+    "min": {
+     "base": 13.115,
+     "final": 13.41
+    },
+    "speedup": 0.9780014914243103
+   },
+   "nb_glm_batch_5000x5x1000": {
+    "base": [
+     3.055,
+     3.044,
+     3.05,
+     3.062,
+     3.055
+    ],
+    "final": [
+     3.456,
+     3.459,
+     3.452,
+     3.459,
+     3.46
+    ],
+    "waited": [
+     20.02,
+     20.02,
+     20.02,
+     20.02,
+     20.01,
+     20.02,
+     20.02,
+     20.02,
+     20.02,
+     20.02
+    ],
+    "min": {
+     "base": 3.044,
+     "final": 3.452
+    },
+    "speedup": 0.8818076477404403
+   }
+  },
+  "performance_core_indicative": {
+   "note": "untimed, CPU 5 (performance core capped at 2.2 GHz), not under the lock; for comparison only",
+   "nb_glm_batch_5000x5x1000": {
+    "base": [
+     4.13,
+     4.13,
+     4.14
+    ],
+    "new": [
+     3.85,
+     3.85,
+     3.85
+    ]
+   },
+   "bulk_de_thyroid128": {
+    "base": [
+     13.64,
+     13.67
+    ],
+    "new": [
+     12.84,
+     12.93
+    ]
+   },
+   "edger_ql_thyroid128": {
+    "base": [
+     4.01,
+     4.01
+    ],
+    "new": [
+     3.92,
+     3.94
+    ]
+   }
+  },
+  "kernels_ns_per_element": {
+   "log": 6.762,
+   "log1p": 7.867,
+   "exp": 4.43,
+   "lgamma": 41.42,
+   "source": "earlier validation/SPECIAL_FUNCTIONS.json (SLEEF build), NB arguments; log1p on (1e-5, 3)"
+  }
+ },
+ "timing": {
+  "note": "one thread on efficiency core 16 under the shared lock (/mnt/pikachu/e2e_bench_20260926/pikachu_timed.lock), a quiet-host check (load <= 4, CPU 16 under 20% busy for two 10-s samples) before every run, variants alternated in rotating order; seconds are whole-command wall times; speedup = base minimum / variant minimum",
+  "variants": {
+   "base": "1.4.1 base (4e2b39a)",
+   "S": "scalar logs as 1.4.1, exponentials of the log-link means and floored fits as arrays, vmath digamma/trigamma",
+   "B": "S plus the logarithms of the NB likelihood, count deviance, theta scores, edgeR unit deviances and floored fits as arrays (the earlier SLEEF design with RapidGLM's log and log1p)",
+   "D": "S with boost::math double-policy digamma/trigamma",
+   "S2_D2": "S and D rebuilt with vmath's one-value forms calling non-inlined instances",
+   "M2": "S2 plus edgeR unit deviances as arrays",
+   "M3": "M2 plus bulk DE floored-fit logarithms as arrays",
+   "F": "final candidate: M2 with boost::math double-policy digamma/trigamma (the commit differs only in the out-of-domain-lane branch of log and log1p; byte-identical outputs)"
+  },
+  "round1": {
+   "note": "base, S, B, D",
+   "cpu": "16",
+   "variants": {
+    "base": "<scratch>/vmath2/bin-base",
+    "S": "<scratch>/vmath2/bin-S",
+    "B": "<scratch>/vmath2/bin-B",
+    "D": "<scratch>/vmath2/bin-D"
+   },
+   "started_utc": "2026-10-25T01:25:49Z",
+   "finished_utc": "2026-10-25T01:58:48Z",
+   "workloads": {
+    "bulk_de_thyroid": {
+     "seconds": {
+      "base": [
+       35.172,
+       35.182
+      ],
+      "S": [
+       35.306,
+       35.299
+      ],
+      "B": [
+       35.771,
+       35.779
+      ],
+      "D": [
+       34.744,
+       34.752
+      ]
+     },
+     "min": {
+      "base": 35.172,
+      "S": 35.299,
+      "B": 35.771,
+      "D": 34.744
+     },
+     "speedup_vs_base": {
+      "S": 0.9964,
+      "B": 0.9833,
+      "D": 1.0123
+     },
+     "quiet_wait_seconds": [
+      20.02,
+      20.02,
+      20.02,
+      20.01,
+      20.02,
+      20.02,
+      20.02,
+      20.02
+     ]
+    },
+    "bulk_de_replogle_AAAS": {
+     "seconds": {
+      "base": [
+       35.867,
+       35.818
+      ],
+      "S": [
+       35.634,
+       35.681
+      ],
+      "B": [
+       35.969,
+       35.956
+      ],
+      "D": [
+       35.587,
+       35.591
+      ]
+     },
+     "min": {
+      "base": 35.818,
+      "S": 35.634,
+      "B": 35.956,
+      "D": 35.587
+     },
+     "speedup_vs_base": {
+      "S": 1.0052,
+      "B": 0.9962,
+      "D": 1.0065
+     },
+     "quiet_wait_seconds": [
+      20.02,
+      20.01,
+      20.02,
+      20.01,
+      20.01,
+      20.02,
+      20.02,
+      20.02
+     ]
+    },
+    "edger_ql_thyroid": {
+     "seconds": {
+      "base": [
+       13.111,
+       13.119,
+       13.12
+      ],
+      "S": [
+       12.907,
+       12.924,
+       12.937
+      ],
+      "B": [
+       12.839,
+       12.644,
+       12.644
+      ],
+      "D": [
+       12.897,
+       12.918,
+       12.93
+      ]
+     },
+     "min": {
+      "base": 13.111,
+      "S": 12.907,
+      "B": 12.644,
+      "D": 12.897
+     },
+     "speedup_vs_base": {
+      "S": 1.0158,
+      "B": 1.0369,
+      "D": 1.0166
+     },
+     "quiet_wait_seconds": [
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02
+     ]
+    },
+    "nb_glm_batch_5000x5x1000": {
+     "seconds": {
+      "base": [
+       3.059,
+       3.072,
+       3.059,
+       3.055,
+       3.059
+      ],
+      "S": [
+       2.927,
+       2.893,
+       2.893,
+       2.904,
+       2.897
+      ],
+      "B": [
+       3.002,
+       3.001,
+       2.998,
+       2.997,
+       2.991
+      ],
+      "D": [
+       2.895,
+       2.896,
+       2.902,
+       2.909,
+       2.899
+      ]
+     },
+     "min": {
+      "base": 3.055,
+      "S": 2.893,
+      "B": 2.991,
+      "D": 2.895
+     },
+     "speedup_vs_base": {
+      "S": 1.056,
+      "B": 1.0214,
+      "D": 1.0553
+     },
+     "quiet_wait_seconds": [
+      20.02,
+      20.01,
+      20.02,
+      20.01,
+      20.01,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.01,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02
+     ]
+    }
+   }
+  },
+  "round2_bulk": {
+   "note": "base, S2, M3, D2",
+   "cpu": "16",
+   "variants": {
+    "base": "<scratch>/vmath2/bin-base",
+    "S2": "<scratch>/vmath2/bin-S2",
+    "M3": "<scratch>/vmath2/bin-M3",
+    "D2": "<scratch>/vmath2/bin-D2"
+   },
+   "started_utc": "2026-10-25T02:09:01Z",
+   "finished_utc": "2026-10-25T02:23:48Z",
+   "workloads": {
+    "bulk_de_thyroid": {
+     "seconds": {
+      "base": [
+       35.384,
+       35.214
+      ],
+      "S2": [
+       34.663,
+       34.665
+      ],
+      "M3": [
+       34.898,
+       34.889
+      ],
+      "D2": [
+       35.257,
+       35.273
+      ]
+     },
+     "min": {
+      "base": 35.214,
+      "S2": 34.663,
+      "M3": 34.889,
+      "D2": 35.257
+     },
+     "speedup_vs_base": {
+      "S2": 1.0159,
+      "M3": 1.0093,
+      "D2": 0.9988
+     },
+     "quiet_wait_seconds": [
+      20.02,
+      20.01,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02
+     ]
+    },
+    "bulk_de_replogle_AAAS": {
+     "seconds": {
+      "base": [
+       35.854,
+       35.829
+      ],
+      "S2": [
+       35.865,
+       35.847
+      ],
+      "M3": [
+       35.748,
+       35.688
+      ],
+      "D2": [
+       35.743,
+       35.811
+      ]
+     },
+     "min": {
+      "base": 35.829,
+      "S2": 35.847,
+      "M3": 35.688,
+      "D2": 35.743
+     },
+     "speedup_vs_base": {
+      "S2": 0.9995,
+      "M3": 1.004,
+      "D2": 1.0024
+     },
+     "quiet_wait_seconds": [
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.01,
+      20.02
+     ]
+    }
+   }
+  },
+  "round2_edger": {
+   "note": "base, S2, M2, D2",
+   "cpu": "16",
+   "variants": {
+    "base": "<scratch>/vmath2/bin-base",
+    "S2": "<scratch>/vmath2/bin-S2",
+    "M2": "<scratch>/vmath2/bin-M2",
+    "D2": "<scratch>/vmath2/bin-D2"
+   },
+   "started_utc": "2026-10-25T02:24:39Z",
+   "finished_utc": "2026-10-25T02:31:34Z",
+   "workloads": {
+    "edger_ql_thyroid": {
+     "seconds": {
+      "base": [
+       13.113,
+       13.13,
+       13.124
+      ],
+      "S2": [
+       12.937,
+       12.95,
+       12.937
+      ],
+      "M2": [
+       12.634,
+       12.66,
+       12.668
+      ],
+      "D2": [
+       12.915,
+       12.921,
+       12.919
+      ]
+     },
+     "min": {
+      "base": 13.113,
+      "S2": 12.937,
+      "M2": 12.634,
+      "D2": 12.915
+     },
+     "speedup_vs_base": {
+      "S2": 1.0136,
+      "M2": 1.0379,
+      "D2": 1.0153
+     },
+     "quiet_wait_seconds": [
+      20.02,
+      20.02,
+      40.04,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02
+     ]
+    }
+   }
+  },
+  "round2_glm": {
+   "note": "base, S2, D2 (M2 and M3 build identical benchmark binaries to S2)",
+   "cpu": "16",
+   "variants": {
+    "base": "<scratch>/vmath2/bin-base",
+    "S2": "<scratch>/vmath2/bin-S2",
+    "D2": "<scratch>/vmath2/bin-D2"
+   },
+   "started_utc": "2026-10-25T02:31:54Z",
+   "finished_utc": "2026-10-25T02:40:36Z",
+   "workloads": {
+    "nb_glm_batch_5000x5x1000": {
+     "seconds": {
+      "base": [
+       3.05,
+       3.067,
+       3.054,
+       3.071,
+       3.051
+      ],
+      "S2": [
+       2.896,
+       2.898,
+       2.9,
+       2.889,
+       2.892
+      ],
+      "D2": [
+       2.913,
+       2.901,
+       2.902,
+       2.91,
+       2.908
+      ]
+     },
+     "min": {
+      "base": 3.05,
+      "S2": 2.889,
+      "D2": 2.901
+     },
+     "speedup_vs_base": {
+      "S2": 1.0557,
+      "D2": 1.0514
+     },
+     "quiet_wait_seconds": [
+      20.02,
+      20.02,
+      20.01,
+      20.01,
+      20.02,
+      20.01,
+      20.01,
+      20.0,
+      20.02,
+      20.01,
+      20.01,
+      20.02,
+      20.02,
+      20.02,
+      20.02
+     ]
+    }
+   }
+  },
+  "final": {
+   "note": "base and build F (development; the formal numbers come from the 1.5.0 receipts run)",
+   "cpu": "16",
+   "variants": {
+    "base": "<scratch>/vmath2/bin-base",
+    "F": "<scratch>/vmath2/bin-F"
+   },
+   "started_utc": "2026-10-25T02:47:53Z",
+   "finished_utc": "2026-10-25T03:10:55Z",
+   "workloads": {
+    "bulk_de_thyroid": {
+     "seconds": {
+      "base": [
+       35.232,
+       35.183,
+       35.098
+      ],
+      "F": [
+       35.191,
+       35.176,
+       35.314
+      ]
+     },
+     "min": {
+      "base": 35.098,
+      "F": 35.176
+     },
+     "speedup_vs_base": {
+      "F": 0.9978
+     },
+     "quiet_wait_seconds": [
+      20.02,
+      20.01,
+      20.01,
+      20.02,
+      20.02,
+      20.01
+     ]
+    },
+    "bulk_de_replogle_AAAS": {
+     "seconds": {
+      "base": [
+       35.836,
+       35.878,
+       35.86
+      ],
+      "F": [
+       35.812,
+       35.808,
+       35.785
+      ]
+     },
+     "min": {
+      "base": 35.836,
+      "F": 35.785
+     },
+     "speedup_vs_base": {
+      "F": 1.0014
+     },
+     "quiet_wait_seconds": [
+      20.01,
+      20.01,
+      20.02,
+      20.02,
+      20.02,
+      20.02
+     ]
+    },
+    "edger_ql_thyroid": {
+     "seconds": {
+      "base": [
+       13.085,
+       13.097,
+       13.095,
+       13.101
+      ],
+      "F": [
+       12.583,
+       12.574,
+       12.672,
+       12.634
+      ]
+     },
+     "min": {
+      "base": 13.085,
+      "F": 12.574
+     },
+     "speedup_vs_base": {
+      "F": 1.0406
+     },
+     "quiet_wait_seconds": [
+      20.01,
+      20.02,
+      20.01,
+      20.01,
+      20.02,
+      20.02,
+      20.01,
+      20.01
+     ]
+    },
+    "nb_glm_batch_5000x5x1000": {
+     "seconds": {
+      "base": [
+       3.141,
+       3.066,
+       3.077,
+       3.092,
+       3.062,
+       3.066
+      ],
+      "F": [
+       2.913,
+       2.913,
+       2.918,
+       2.911,
+       2.911,
+       2.908
+      ]
+     },
+     "min": {
+      "base": 3.062,
+      "F": 2.908
+     },
+     "speedup_vs_base": {
+      "F": 1.053
+     },
+     "quiet_wait_seconds": [
+      20.01,
+      20.01,
+      20.01,
+      20.02,
+      20.02,
+      20.01,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02,
+      20.02
+     ]
+    }
+   }
+  },
+  "layout_note": "D and D2 differ only in code layout (D calls no vmath one-value function), yet bulk DE on thyroid took 34.74 and 35.26 s: differences of about 1.5% on these cores are not attributed to the functions"
+ },
+ "agreement": {
+  "note": "scratch agree.py (validate_bulk.py and validate_edger.py metrics against the stored DESeq2 1.48.2 and edgeR 4.6.2 references, without timing) for the 1.4.1 base and build F; [base, F] pairs, the largest relative changes between them and the discoveries that flip",
+  "bulk": {
+   "airway": {
+    "jaccard": [
+     0.9862338196013971,
+     0.9862338196013971
+    ],
+    "pvalue_spearman": [
+     0.9998132796511495,
+     0.9998132796511495
+    ],
+    "discoveries_vs_deseq2": [
+     [
+      4833,
+      4834
+     ],
+     [
+      4833,
+      4834
+     ]
+    ],
+    "size_factor_max_rel_diff": [
+     3.1086244689504383e-15,
+     3.1086244689504383e-15
+    ],
+    "median_rel_diff": [
+     {
+      "dispGeneEst": 0.0,
+      "dispersion": 0.010235569480133183,
+      "log2FoldChange": 0.000148753103855217,
+      "pvalue": 0.004337693162211695
+     },
+     {
+      "dispGeneEst": 0.0,
+      "dispersion": 0.010235569480131533,
+      "log2FoldChange": 0.000148753103855217,
+      "pvalue": 0.004337693162218219
+     }
+    ],
+    "prior_variance": [
+     [
+      0.4974974974974975,
+      0.528528528528528
+     ],
+     [
+      0.4974974974974975,
+      0.528528528528528
+     ]
+    ],
+    "shrinkage_lfc_pearson": [
+     0.9998944797824416,
+     0.9998944797824421
+    ],
+    "threads_identical": [
+     true,
+     true
+    ],
+    "statuses_equal": true,
+    "max_rel_change": {
+     "pvalue": 2.255948970688698e-11,
+     "padj": 2.255958385191574e-11,
+     "log2FoldChange": 4.404409889011154e-11,
+     "dispersion": 3.4521826065201906e-13,
+     "dispGeneEst": 0.06161238436277138
+    },
+    "discovery_flips": [],
+    "fdr": [
+     null,
+     null
+    ]
+   },
+   "kang": {
+    "jaccard": [
+     1.0,
+     1.0
+    ],
+    "pvalue_spearman": [
+     0.999999291999292,
+     0.999999291999292
+    ],
+    "discoveries_vs_deseq2": [
+     [
+      635,
+      635
+     ],
+     [
+      635,
+      635
+     ]
+    ],
+    "size_factor_max_rel_diff": [
+     3.774758283725532e-15,
+     3.774758283725532e-15
+    ],
+    "median_rel_diff": [
+     {
+      "dispGeneEst": 0.0,
+      "dispersion": 0.0008224804410433411,
+      "log2FoldChange": 2.1795100580618918e-05,
+      "pvalue": 0.0005975742571918306
+     },
+     {
+      "dispGeneEst": 0.0,
+      "dispersion": 0.0008224804410755697,
+      "log2FoldChange": 2.179510058079041e-05,
+      "pvalue": 0.0005975742572109459
+     }
+    ],
+    "prior_variance": [
+     [
+      0.8798796469056693,
+      0.878151255741531
+     ],
+     [
+      0.8798796469057446,
+      0.878151255741531
+     ]
+    ],
+    "shrinkage_lfc_pearson": [
+     0.9999992953706077,
+     0.9999992953706077
+    ],
+    "threads_identical": [
+     true,
+     true
+    ],
+    "statuses_equal": true,
+    "max_rel_change": {
+     "pvalue": 2.0063934244627983e-11,
+     "padj": 2.0063812455069527e-11,
+     "log2FoldChange": 1.4191337297908437e-12,
+     "dispersion": 3.940062847949422e-13,
+     "dispGeneEst": 2.3007479700128095e-09
+    },
+    "discovery_flips": [],
+    "fdr": [
+     null,
+     null
+    ]
+   },
+   "sim3": {
+    "jaccard": [
+     0.983402489626556,
+     0.983402489626556
+    ],
+    "pvalue_spearman": [
+     0.9999989738927951,
+     0.9999989738927951
+    ],
+    "discoveries_vs_deseq2": [
+     [
+      239,
+      239
+     ],
+     [
+      239,
+      239
+     ]
+    ],
+    "size_factor_max_rel_diff": [
+     1.887379141862766e-15,
+     1.887379141862766e-15
+    ],
+    "median_rel_diff": [
+     {
+      "dispGeneEst": 0.00010681618258063098,
+      "dispersion": 0.002038294846705776,
+      "log2FoldChange": 3.19789693017075e-05,
+      "pvalue": 0.0005733885805339041
+     },
+     {
+      "dispGeneEst": 0.00010681618258139041,
+      "dispersion": 0.0020382948467076783,
+      "log2FoldChange": 3.197896930224827e-05,
+      "pvalue": 0.0005733885805334118
+     }
+    ],
+    "prior_variance": [
+     [
+      0.25,
+      0.25
+     ],
+     [
+      0.25,
+      0.25
+     ]
+    ],
+    "shrinkage_lfc_pearson": [
+     0.9999816668000394,
+     0.9999816668000394
+    ],
+    "threads_identical": [
+     true,
+     true
+    ],
+    "statuses_equal": true,
+    "max_rel_change": {
+     "pvalue": 1.4515784342388769e-12,
+     "padj": 1.45155505774335e-12,
+     "log2FoldChange": 1.5182809796728e-12,
+     "dispersion": 3.031924042297548e-14,
+     "dispGeneEst": 2.5583497923905323e-13
+    },
+    "discovery_flips": [],
+    "fdr": [
+     0.12133891213389121,
+     0.12133891213389121
+    ]
+   },
+   "sim3b": {
+    "jaccard": [
+     1.0,
+     1.0
+    ],
+    "pvalue_spearman": [
+     0.9999989596990232,
+     0.9999989596990232
+    ],
+    "discoveries_vs_deseq2": [
+     [
+      201,
+      201
+     ],
+     [
+      201,
+      201
+     ]
+    ],
+    "size_factor_max_rel_diff": [
+     2.3314683517128287e-15,
+     2.3314683517128287e-15
+    ],
+    "median_rel_diff": [
+     {
+      "dispGeneEst": 0.0001098281391005928,
+      "dispersion": 0.0021773393699709015,
+      "log2FoldChange": 1.8220355679387884e-05,
+      "pvalue": 0.0005062301107448218
+     },
+     {
+      "dispGeneEst": 0.00010982813908272435,
+      "dispersion": 0.0021773393699715616,
+      "log2FoldChange": 1.8220355679062258e-05,
+      "pvalue": 0.0005062301107441468
+     }
+    ],
+    "prior_variance": [
+     [
+      0.25,
+      0.25
+     ],
+     [
+      0.25,
+      0.25
+     ]
+    ],
+    "shrinkage_lfc_pearson": [
+     0.9999750883291226,
+     0.9999750883725947
+    ],
+    "threads_identical": [
+     true,
+     true
+    ],
+    "statuses_equal": true,
+    "max_rel_change": {
+     "pvalue": 4.807945874301851e-12,
+     "padj": 4.80846118853992e-12,
+     "log2FoldChange": 1.584192363045629e-11,
+     "dispersion": 2.7589644966917774e-14,
+     "dispGeneEst": 4.866745850068032e-13
+    },
+    "discovery_flips": [],
+    "fdr": [
+     0.0845771144278607,
+     0.0845771144278607
+    ]
+   },
+   "sim8": {
+    "jaccard": [
+     1.0,
+     1.0
+    ],
+    "pvalue_spearman": [
+     0.9999486090592878,
+     0.9999486090592878
+    ],
+    "discoveries_vs_deseq2": [
+     [
+      253,
+      253
+     ],
+     [
+      253,
+      253
+     ]
+    ],
+    "size_factor_max_rel_diff": [
+     4.107825191113079e-15,
+     4.107825191113079e-15
+    ],
+    "median_rel_diff": [
+     {
+      "dispGeneEst": 0.00013170011334792596,
+      "dispersion": 0.0012484200391052122,
+      "log2FoldChange": 1.1956535921715257e-05,
+      "pvalue": 0.0003156184184558305
+     },
+     {
+      "dispGeneEst": 0.00013170011335068656,
+      "dispersion": 0.001248420039100653,
+      "log2FoldChange": 1.1956535922026431e-05,
+      "pvalue": 0.0003156184184568307
+     }
+    ],
+    "prior_variance": [
+     [
+      0.25,
+      0.25
+     ],
+     [
+      0.25,
+      0.25
+     ]
+    ],
+    "shrinkage_lfc_pearson": [
+     0.9999999862402144,
+     0.9999999862402144
+    ],
+    "threads_identical": [
+     true,
+     true
+    ],
+    "statuses_equal": true,
+    "max_rel_change": {
+     "pvalue": 1.6460646434545142e-12,
+     "padj": 1.646322337993693e-12,
+     "log2FoldChange": 2.0310138170288797e-12,
+     "dispersion": 3.6269685991423655e-14,
+     "dispGeneEst": 1.378733942390615e-13
+    },
+    "discovery_flips": [],
+    "fdr": [
+     0.05928853754940711,
+     0.05928853754940711
+    ]
+   }
+  },
+  "edger": {
+   "airway": {
+    "log10_p_max_abs": [
+     0.0015235434683402715,
+     0.001523601256711693
+    ],
+    "log10_p_median_abs": [
+     9.690327279177069e-05,
+     9.69022940999209e-05
+    ],
+    "discoveries": [
+     6568,
+     6568
+    ],
+    "discoveries_edger": [
+     6568,
+     6568
+    ],
+    "discoveries_shared": [
+     6568,
+     6568
+    ],
+    "df_prior": [
+     5.388017569470622,
+     5.388017704882303
+    ],
+    "dispersion": [
+     0.011332614071982697,
+     0.011332614063711968
+    ],
+    "average_ql_dispersion": [
+     1,
+     1
+    ],
+    "s2_post_max_rel": [
+     0.0008935752898697746,
+     0.0008935625685680959
+    ],
+    "norm_factor_max_rel": [
+     3.6637359812630166e-15,
+     3.6637359812630166e-15
+    ],
+    "logfc_max_abs": [
+     3.4306004101702925e-05,
+     3.430606987364637e-05
+    ],
+    "max_rel_change": {
+     "PValue": 3.033911793195336e-07,
+     "FDR": 3.033911796737137e-07,
+     "logFC": 3.853665782087722e-08,
+     "s2_post": 1.6313290602527108e-08
+    },
+    "discovery_flips": []
+   },
+   "kang": {
+    "log10_p_max_abs": [
+     0.0028843301649121855,
+     0.0028841267809553983
+    ],
+    "log10_p_median_abs": [
+     0.00015049498936958727,
+     0.00015049052878168823
+    ],
+    "discoveries": [
+     695,
+     695
+    ],
+    "discoveries_edger": [
+     695,
+     695
+    ],
+    "discoveries_shared": [
+     695,
+     695
+    ],
+    "df_prior": [
+     9.154079321584792,
+     9.154079019004376
+    ],
+    "dispersion": [
+     0.023343329634757472,
+     0.023343329637075673
+    ],
+    "average_ql_dispersion": [
+     1,
+     1
+    ],
+    "s2_post_max_rel": [
+     0.0006881724935202671,
+     0.000688170906902541
+    ],
+    "norm_factor_max_rel": [
+     4.551914400963142e-15,
+     4.551914400963142e-15
+    ],
+    "logfc_max_abs": [
+     3.493731437043124e-05,
+     3.4937322206829435e-05
+    ],
+    "max_rel_change": {
+     "PValue": 6.016179610224109e-07,
+     "FDR": 5.198722749518328e-07,
+     "logFC": 3.233505451590059e-09,
+     "s2_post": 1.7902957461782515e-08
+    },
+    "discovery_flips": []
+   },
+   "sim3": {
+    "log10_p_max_abs": [
+     0.0029036331708489627,
+     0.0029034924433366527
+    ],
+    "log10_p_median_abs": [
+     6.355316035312059e-05,
+     6.354993558733979e-05
+    ],
+    "discoveries": [
+     187,
+     187
+    ],
+    "discoveries_edger": [
+     187,
+     187
+    ],
+    "discoveries_shared": [
+     187,
+     187
+    ],
+    "df_prior": [
+     6.7347950858176935,
+     6.734794702558068
+    ],
+    "dispersion": [
+     0.12595658084882494,
+     0.1259565808489396
+    ],
+    "average_ql_dispersion": [
+     1,
+     1
+    ],
+    "s2_post_max_rel": [
+     0.001444513344090792,
+     0.001444521100208207
+    ],
+    "norm_factor_max_rel": [
+     4.3298697960381105e-15,
+     4.3298697960381105e-15
+    ],
+    "logfc_max_abs": [
+     1.3834532053280668e-06,
+     1.3834531906731229e-06
+    ],
+    "max_rel_change": {
+     "PValue": 4.103279450114402e-07,
+     "FDR": 3.6470724676367247e-07,
+     "logFC": 5.182434892518672e-11,
+     "s2_post": 3.318492218810982e-08
+    },
+    "discovery_flips": []
+   },
+   "sim3b": {
+    "log10_p_max_abs": [
+     0.0029298092408094334,
+     0.0029298092567344725
+    ],
+    "log10_p_median_abs": [
+     6.504120253206236e-05,
+     6.504120217686732e-05
+    ],
+    "discoveries": [
+     165,
+     165
+    ],
+    "discoveries_edger": [
+     165,
+     165
+    ],
+    "discoveries_shared": [
+     165,
+     165
+    ],
+    "df_prior": [
+     5.541792816735839,
+     5.5417928167374315
+    ],
+    "dispersion": [
+     0.138097705666019,
+     0.13809770566645832
+    ],
+    "average_ql_dispersion": [
+     1,
+     1
+    ],
+    "s2_post_max_rel": [
+     0.0014734796860265131,
+     0.001473479690510593
+    ],
+    "norm_factor_max_rel": [
+     4.440892098500626e-15,
+     4.440892098500626e-15
+    ],
+    "logfc_max_abs": [
+     3.4353466213943307e-06,
+     3.43534663294065e-06
+    ],
+    "max_rel_change": {
+     "PValue": 1.2065601088585975e-07,
+     "FDR": 1.2065601088585975e-07,
+     "logFC": 1.0665477209084205e-09,
+     "s2_post": 1.552481301820152e-11
+    },
+    "discovery_flips": []
+   },
+   "sim8": {
+    "log10_p_max_abs": [
+     0.006312256453561815,
+     0.006312256216180145
+    ],
+    "log10_p_median_abs": [
+     2.2913697683625556e-05,
+     2.29136893410975e-05
+    ],
+    "discoveries": [
+     262,
+     262
+    ],
+    "discoveries_edger": [
+     262,
+     262
+    ],
+    "discoveries_shared": [
+     262,
+     262
+    ],
+    "df_prior": [
+     11.818615806213165,
+     11.818615805464129
+    ],
+    "dispersion": [
+     0.08791887188111208,
+     0.08791887188070266
+    ],
+    "average_ql_dispersion": [
+     1.5891825936145414,
+     1.5891825936208908
+    ],
+    "s2_post_max_rel": [
+     0.0012736352561943942,
+     0.001273635245426119
+    ],
+    "norm_factor_max_rel": [
+     4.773959005888173e-15,
+     4.773959005888173e-15
+    ],
+    "logfc_max_abs": [
+     8.002410134544391e-06,
+     8.002409341179018e-06
+    ],
+    "max_rel_change": {
+     "PValue": 7.725065258481693e-10,
+     "FDR": 7.725066746571927e-10,
+     "logFC": 3.001153987852145e-10,
+     "s2_post": 3.747838699939913e-11
+    },
+    "discovery_flips": []
+   },
+   "thyroid32": {
+    "log10_p_max_abs": [
+     0.004702308131619759,
+     0.004702307869695943
+    ],
+    "log10_p_median_abs": [
+     4.7279682831607994e-05,
+     4.7279681083728375e-05
+    ],
+    "discoveries": [
+     1364,
+     1364
+    ],
+    "discoveries_edger": [
+     1387,
+     1387
+    ],
+    "discoveries_shared": [
+     1364,
+     1364
+    ],
+    "df_prior": [
+     4.096143217889779,
+     4.096143217147825
+    ],
+    "dispersion": [
+     0.11845130823723596,
+     0.11845130823794324
+    ],
+    "average_ql_dispersion": [
+     1.8523363019695942,
+     1.8523363019588923
+    ],
+    "s2_post_max_rel": [
+     0.001533183385567627,
+     0.0015331834564364932
+    ],
+    "norm_factor_max_rel": [
+     4.551914400963142e-15,
+     4.551914400963142e-15
+    ],
+    "logfc_max_abs": [
+     0.0003395633480041127,
+     0.00033956335911344837
+    ],
+    "max_rel_change": {
+     "PValue": 2.399847120702122e-08,
+     "FDR": 2.1063960528177495e-08,
+     "logFC": 1.1166983521248268e-08,
+     "s2_post": 5.73332363171586e-10
+    },
+    "discovery_flips": []
+   },
+   "thyroid128": {
+    "log10_p_max_abs": [
+     0.017516828379399385,
+     0.017516894127957983
+    ],
+    "log10_p_median_abs": [
+     4.257450606780233e-05,
+     4.257588831001191e-05
+    ],
+    "discoveries": [
+     822,
+     822
+    ],
+    "discoveries_edger": [
+     830,
+     830
+    ],
+    "discoveries_shared": [
+     822,
+     822
+    ],
+    "df_prior": [
+     3.9104512721591846,
+     3.910450970471372
+    ],
+    "dispersion": [
+     0.12253246440312882,
+     0.12253246440305357
+    ],
+    "average_ql_dispersion": [
+     1.9365926692503468,
+     1.9365926692511166
+    ],
+    "s2_post_max_rel": [
+     0.00118806255845616,
+     0.0011880650142712668
+    ],
+    "norm_factor_max_rel": [
+     5.10702591327572e-15,
+     5.10702591327572e-15
+    ],
+    "logfc_max_abs": [
+     0.00013451357958171872,
+     0.00013451357996019375
+    ],
+    "max_rel_change": {
+     "PValue": 4.677953416715819e-07,
+     "FDR": 4.6779534150456475e-07,
+     "logFC": 7.091531951634762e-10,
+     "s2_post": 1.8664731611217028e-08
+    },
+    "discovery_flips": []
+   },
+   "thyroid": {
+    "log10_p_max_abs": [
+     0.09459395126600612,
+     0.09459400617890878
+    ],
+    "log10_p_median_abs": [
+     9.116911503213865e-05,
+     9.116916908792627e-05
+    ],
+    "discoveries": [
+     7481,
+     7481
+    ],
+    "discoveries_edger": [
+     7479,
+     7479
+    ],
+    "discoveries_shared": [
+     7478,
+     7478
+    ],
+    "df_prior": [
+     3.875226897465943,
+     3.8752266624458933
+    ],
+    "dispersion": [
+     0.13639418499633676,
+     0.13639418499525574
+    ],
+    "average_ql_dispersion": [
+     1.8479788680051266,
+     1.8479788680137317
+    ],
+    "s2_post_max_rel": [
+     0.0012400260874912972,
+     0.0012400258865313818
+    ],
+    "norm_factor_max_rel": [
+     4.884981308350689e-15,
+     4.884981308350689e-15
+    ],
+    "logfc_max_abs": [
+     2.1393116021395375e-05,
+     2.13931130269851e-05
+    ],
+    "max_rel_change": {
+     "PValue": 2.6115783035505e-07,
+     "FDR": 2.6115783035801606e-07,
+     "logFC": 1.891115093751481e-09,
+     "s2_post": 2.6570030801494507e-09
+    },
+    "discovery_flips": []
+   }
+  },
+  "mock_null": {
+   "base": {
+    "tests": 70000,
+    "valid": 69995,
+    "rate_0_05": 0.023673119508536324,
+    "rate_0_01": 0.005357525537538396,
+    "rate_0_001": 0.0014572469462104437
+   },
+   "new": {
+    "tests": 70000,
+    "valid": 69995,
+    "rate_0_05": 0.023673119508536324,
+    "rate_0_01": 0.005357525537538396,
+    "rate_0_001": 0.0014572469462104437
+   }
+  }
+ },
+ "replogle_subset": {
+  "note": "24 K562-essential pseudobulk perturbations (every 1/24 of the sorted list), bulk DE and edgeR-QL of build F against the stored full-v1.4.1 outputs: genes, discoveries [1.4.1, F] (padj < 0.1, FDR <= 0.1), largest relative p-value change, statuses equal, flips",
+  "perturbations": {
+   "CKAP5": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      7,
+      7
+     ],
+     "pvalue_max_rel": 6.692358744583248e-13,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      296,
+      296
+     ],
+     "pvalue_max_rel": 2.6179350953153426e-06,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "DPH6": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      0,
+      0
+     ],
+     "pvalue_max_rel": 4.241435100012389e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      2900,
+      2900
+     ],
+     "pvalue_max_rel": 1.7758879561686356e-08,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "CCDC59": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      371,
+      371
+     ],
+     "pvalue_max_rel": 2.953503262757383e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      2743,
+      2743
+     ],
+     "pvalue_max_rel": 5.3963118463667164e-05,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "ATP6V0D1": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      21,
+      21
+     ],
+     "pvalue_max_rel": 4.981347588650367e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      3262,
+      3262
+     ],
+     "pvalue_max_rel": 1.7481621269070044e-05,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "CYP2A13": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      0,
+      0
+     ],
+     "pvalue_max_rel": 8.046472204056404e-13,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      2964,
+      2964
+     ],
+     "pvalue_max_rel": 7.64030228363008e-07,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "AAAS": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      1,
+      1
+     ],
+     "pvalue_max_rel": 6.678306454101149e-13,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      876,
+      876
+     ],
+     "pvalue_max_rel": 3.787867335703402e-06,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "KPNB1": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      2511,
+      2511
+     ],
+     "pvalue_max_rel": 8.484034415395969e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      3053,
+      3053
+     ],
+     "pvalue_max_rel": 3.4670149142346956e-06,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "GOLGA6L1": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      0,
+      0
+     ],
+     "pvalue_max_rel": 1.0704359370676761e-11,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      1781,
+      1781
+     ],
+     "pvalue_max_rel": 7.05339563007698e-06,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "HNRNPC": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      3615,
+      3615
+     ],
+     "pvalue_max_rel": 9.945623838480939e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      4074,
+      4074
+     ],
+     "pvalue_max_rel": 1.2461581413638656e-05,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "MED28": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      4025,
+      4025
+     ],
+     "pvalue_max_rel": 7.680174128468445e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      5001,
+      5001
+     ],
+     "pvalue_max_rel": 1.4367012976808895e-10,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "EXOC2": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      11,
+      11
+     ],
+     "pvalue_max_rel": 1.6449870468738691e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      3772,
+      3772
+     ],
+     "pvalue_max_rel": 0.00015357822316844626,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "MRPS22": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      138,
+      138
+     ],
+     "pvalue_max_rel": 3.579050103050051e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      2427,
+      2427
+     ],
+     "pvalue_max_rel": 3.787337682984598e-05,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "NUP98": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      2788,
+      2788
+     ],
+     "pvalue_max_rel": 8.518892576876811e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      3166,
+      3166
+     ],
+     "pvalue_max_rel": 7.907487309347958e-07,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "PKMYT1": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      3,
+      3
+     ],
+     "pvalue_max_rel": 4.8672556310817226e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      3683,
+      3683
+     ],
+     "pvalue_max_rel": 1.6003869004384547e-05,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "PREB": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      0,
+      0
+     ],
+     "pvalue_max_rel": 6.995641827895032e-13,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      3538,
+      3538
+     ],
+     "pvalue_max_rel": 3.244416614482559e-08,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "RAD17": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      29,
+      29
+     ],
+     "pvalue_max_rel": 1.0168808992564585e-11,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      2590,
+      2590
+     ],
+     "pvalue_max_rel": 5.01703516246781e-06,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "RPL17": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      3633,
+      3633
+     ],
+     "pvalue_max_rel": 1.6932119359363578e-11,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      4192,
+      4192
+     ],
+     "pvalue_max_rel": 2.5780816618488275e-05,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "NDUFS5": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      10,
+      10
+     ],
+     "pvalue_max_rel": 7.057548112735246e-13,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      1684,
+      1684
+     ],
+     "pvalue_max_rel": 3.35884307307516e-05,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "SLC35G6": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      0,
+      0
+     ],
+     "pvalue_max_rel": 4.560817532965228e-13,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      2006,
+      2006
+     ],
+     "pvalue_max_rel": 4.390986296114386e-06,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "SRSF6": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      10,
+      10
+     ],
+     "pvalue_max_rel": 6.095559073961732e-13,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      755,
+      755
+     ],
+     "pvalue_max_rel": 8.559347109232396e-06,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "RRN3": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      909,
+      909
+     ],
+     "pvalue_max_rel": 1.6616212432371146e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      2259,
+      2259
+     ],
+     "pvalue_max_rel": 3.5022470518812476e-09,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "TIMM13": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      354,
+      354
+     ],
+     "pvalue_max_rel": 1.4815521588181473e-11,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      2434,
+      2434
+     ],
+     "pvalue_max_rel": 2.4184391047360167e-05,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "VPS41": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      85,
+      85
+     ],
+     "pvalue_max_rel": 2.209232189372632e-12,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      279,
+      279
+     ],
+     "pvalue_max_rel": 3.3952701499766695e-07,
+     "status_equal": true,
+     "flips": []
+    }
+   },
+   "TUBGCP6": {
+    "bulk-de": {
+     "genes": 8563,
+     "discoveries": [
+      1,
+      1
+     ],
+     "pvalue_max_rel": 3.1237827440819114e-13,
+     "status_equal": true,
+     "flips": []
+    },
+    "edger-ql": {
+     "genes": 8563,
+     "discoveries": [
+      2246,
+      2246
+     ],
+     "pvalue_max_rel": 4.4446199693148174e-05,
+     "status_equal": true,
+     "flips": []
+    }
+   }
+  }
+ },
+ "arm64": {
+  "note": "scripts/build_arm64.sh in the cached Ubuntu 24.04 toolchain image (rapidglm-arm64-review-toolchain:local; aarch64-linux-gnu-g++ 13.3, qemu-aarch64 -cpu max, glibc 2.39), docker --cpuset-cpus 0-3, on the final sources: 40 unit test cases (generators, kernels, vmath_*, NB likelihood and theta, bulk DE and edgeR cases) passed with 5245111 assertions, the C API test passed, 30 CLI tests passed; the dataset agreement step was skipped (reference datasets not mounted)",
+  "filter": "ars_*,philox_*,exponential_ziggurat*,thinned_*,hazard_*,batched_*,kernels_agree_with_direct_sums,market_reader_is_independent_of_entry_order,sha1_matches_published_digests,leverages_and_fixed_dispersion_fits,rank_windows_equal_average_rank_trims,edger_ql_finds_changed_genes_and_is_reproducible,count_loader_equals_the_csc_reader,deviance_moment_table_interpolates,vmath_*,nb_fixed_and_ml,poisson_offset_weights_score,nb_ml_*,likelihood_matches_independent_probability_masses,count_deviance_against_saturated_likelihood,nb_theta_optimizer_against_derivative_free_reference,nb_ml_fit_against_independent_profile_optimum,response_only_terms_match_direct_gamma_functions,bulk_de_finds_changes_and_is_thread_invariant,floored_fits_optimize_bounds_and_covariate_units,floored_fit_pins_deseq2_black_box_reference,nb_fixed_theta_fits_take_newton_steps,unit_deviance_is_stable_far_from_the_count,deviance_moments_equal_sums_over_the_pmf,near_poisson_deviance_and_null_calibration,edger_newton_shortcut_halving_fallback_scale_and_joint_tests",
+  "vmath_path": "neon",
+  "digests": {
+   "log": "0x41e2d41d9503f5b",
+   "log1p": "0x9f1c6f67a18fba58",
+   "exp": "0x3b6f865d9b3d2499",
+   "lgamma": "0x606a370cd6d0a78b",
+   "digamma": "0x9bef21efa1f73abe",
+   "trigamma": "0x5249ee3947805d62"
+  },
+  "digests_equal_to_x86_avx2_and_portable": {
+   "log": true,
+   "log1p": true,
+   "exp": true,
+   "digamma": true,
+   "trigamma": true
+  },
+  "lgamma_note": "lgamma follows the platform libm: digest 0x606a370cd6d0a78b here (glibc 2.39), 0xdeaff326f015c105 on x86-64 (glibc 2.35)",
+  "timings_seconds": {
+   "configure_build": "391",
+   "unit_tests": "1284",
+   "cli_tests": "372"
+  }
+ },
+ "binaries": {
+  "F": [
+   "107ce8b45ba9e23d967299208f67015e7c19da441cce5f72eed2f2ef65b6d05b",
+   "rapidglm",
+   "2361089f6a9b9badf8640a3cedddda80a64638350c07252d6cb8260d18c1600d",
+   "rapidglm_effect_benchmark",
+   "e4a6a5b93d0ff07153100ca40effe31a0f664258651f28f63406608d9d67a4c4",
+   "rapidglm_glm_batch",
+   "cb60f678d5c1602b96cc87aeffd6db2a11322430734c3770becfc29e29bbb964",
+   "rapidglm_special_functions"
+  ],
+  "F2": [
+   "a7f1093765452f5d7606950a320d22751af9663b7b5140860cd22d61ba4b3538",
+   "rapidglm",
+   "e4a6a5b93d0ff07153100ca40effe31a0f664258651f28f63406608d9d67a4c4",
+   "rapidglm_glm_batch",
+   "2361089f6a9b9badf8640a3cedddda80a64638350c07252d6cb8260d18c1600d",
+   "rapidglm_effect_benchmark",
+   "a65826848098bcb2b88b91630c14628b43fc5367562d87ab8c2bcb373d579c92",
+   "rapidglm_special_functions"
+  ]
+ },
+ "public_effect_workload": {
+  "name": "sceptre_nb_effect_fits_public_high_moi",
+  "source_receipt": "validation/PUBLIC_SCEPTRE.json",
+  "data": "Public SCEPTRE high-MOI example; complement controls, union guides, 148 pairs, 45919 cells.",
+  "replaces": "The earlier non-public effect workload is excluded; none of its timings are reused."
+ }
+}

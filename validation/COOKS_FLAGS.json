@@ -1,0 +1,228 @@
+{
+ "purpose": "Why bulk_de and DESeq2 1.48.2 set aside different genes as Cook's outliers on the 128-sample GTEx thyroid set, from black-box outputs.",
+ "command": "python3 scripts/validate_cooks_flags.py --output validation/COOKS_FLAGS.json",
+ "version": "1.4.0",
+ "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+ "dataset": "thyroid128 (validation/work/benchmark/thyroid128), coefficient sex[T.female]",
+ "cutoff": 2.3416695968548935,
+ "samples_by_cell_size": {
+  "1-2": 35,
+  "3-6": 49,
+  "7+": 44
+ },
+ "deseq2": {
+  "flagged": 224,
+  "genes_with_replaced_counts": 68,
+  "distances_unchanged_by_replacement": true,
+  "flags_from_own_distances_cells_3_to_6": {
+   "genes": 224,
+   "equal": true
+  },
+  "with_three_larger_counts_exception": {
+   "genes": 224,
+   "equal": true
+  }
+ },
+ "rapidglm": {
+  "flagged": 219,
+  "genes_with_replaced_counts": 67
+ },
+ "flagged_by_both": 217,
+ "deseq2_only": {
+  "genes": 7,
+  "by_reason": {
+   "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement": 5,
+   "design level with all-zero counts: no finite bulk_de distance": 2
+  },
+  "detail": [
+   {
+    "gene": 381,
+    "base_mean": 5.12684211270668,
+    "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+    "all_zero_levels": [],
+    "deseq2_max_cooks_over_cutoff": 1.6117190776491048,
+    "rapidglm_max_cooks_over_cutoff": 0.8960111823895317,
+    "replaced": {
+     "deseq2": true,
+     "rapidglm": true
+    },
+    "dispersion_rapidglm": 4.84133942619242
+   },
+   {
+    "gene": 4120,
+    "base_mean": 5.81280590584081,
+    "reason": "design level with all-zero counts: no finite bulk_de distance",
+    "all_zero_levels": [
+     "age[T.age40_49]",
+     "age[T.age70_79]"
+    ],
+    "deseq2_max_cooks_over_cutoff": 1.0852620237735993,
+    "rapidglm_max_cooks_over_cutoff": NaN,
+    "replaced": {
+     "deseq2": true,
+     "rapidglm": false
+    },
+    "dispersion_rapidglm": 36.28009766463504
+   },
+   {
+    "gene": 8429,
+    "base_mean": 79.4307788421398,
+    "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+    "all_zero_levels": [],
+    "deseq2_max_cooks_over_cutoff": 3.2827344758849026,
+    "rapidglm_max_cooks_over_cutoff": 3.0746156897184074,
+    "replaced": {
+     "deseq2": true,
+     "rapidglm": true
+    },
+    "dispersion_rapidglm": 4.420944397857232
+   },
+   {
+    "gene": 8499,
+    "base_mean": 3.62705079791712,
+    "reason": "design level with all-zero counts: no finite bulk_de distance",
+    "all_zero_levels": [
+     "hardy[T.hardy1]",
+     "age[T.age70_79]"
+    ],
+    "deseq2_max_cooks_over_cutoff": 3.3666021847255063,
+    "rapidglm_max_cooks_over_cutoff": NaN,
+    "replaced": {
+     "deseq2": true,
+     "rapidglm": false
+    },
+    "dispersion_rapidglm": 103.63070883287882
+   },
+   {
+    "gene": 12204,
+    "base_mean": 39.2489682526166,
+    "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+    "all_zero_levels": [],
+    "deseq2_max_cooks_over_cutoff": 2.872176151585817,
+    "rapidglm_max_cooks_over_cutoff": 0.39748132729402935,
+    "replaced": {
+     "deseq2": true,
+     "rapidglm": true
+    },
+    "dispersion_rapidglm": 1.4392980006564922
+   },
+   {
+    "gene": 19303,
+    "base_mean": 33.833918206705,
+    "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+    "all_zero_levels": [],
+    "deseq2_max_cooks_over_cutoff": 1.2717385962839562,
+    "rapidglm_max_cooks_over_cutoff": 0.9172273162547214,
+    "replaced": {
+     "deseq2": true,
+     "rapidglm": true
+    },
+    "dispersion_rapidglm": 0.579223444466396
+   },
+   {
+    "gene": 25911,
+    "base_mean": 46.9233222502218,
+    "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+    "all_zero_levels": [],
+    "deseq2_max_cooks_over_cutoff": 1.3000999845024732,
+    "rapidglm_max_cooks_over_cutoff": 0.7838877628979972,
+    "replaced": {
+     "deseq2": true,
+     "rapidglm": true
+    },
+    "dispersion_rapidglm": 1.214691387003768
+   }
+  ]
+ },
+ "rapidglm_only": {
+  "genes": 2,
+  "by_reason": {
+   "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement": 2
+  },
+  "detail": [
+   {
+    "gene": 5672,
+    "base_mean": 5.40601682532048,
+    "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+    "all_zero_levels": [],
+    "deseq2_max_cooks_over_cutoff": 0.8688259006645643,
+    "rapidglm_max_cooks_over_cutoff": 1.026216561495669,
+    "replaced": {
+     "deseq2": true,
+     "rapidglm": true
+    },
+    "dispersion_rapidglm": 0.7120661701275851
+   },
+   {
+    "gene": 11839,
+    "base_mean": 121.467894799517,
+    "reason": "counts replaced: bulk_de flags on the refit, DESeq2 on the fit before replacement",
+    "all_zero_levels": [],
+    "deseq2_max_cooks_over_cutoff": 0.7832851038939844,
+    "rapidglm_max_cooks_over_cutoff": 1.364322763177145,
+    "replaced": {
+     "deseq2": true,
+     "rapidglm": true
+    },
+    "dispersion_rapidglm": 2.3260542046784014
+   }
+  ]
+ },
+ "_provenance": {
+  "version": "1.4.0",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "worktree_dirty": false
+ },
+ "measured_tag": "v1.4.0-dev.4",
+ "host_note": "This is a correctness receipt. Its stage ran on CPUs 0-7 under nice 10; any elapsed-time fields are diagnostic and are not performance measurements. One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional. Final timings on the 16 identical efficiency cores (CPUs 16-31), one thread per core: one on 16, four on 16-19, eight on 16-23, twelve on 16-27, sixteen on 16-31. Each timed command holds the shared lock and starts after two consecutive ten-second quiet samples: one-minute load <=4 and every selected CPU <20% busy. Both samples are retained. Untimed work uses CPUs 0-7 under nice 10. These release timings are final, not provisional.",
+ "_timing_scope": "Correctness/test diagnostics only; not used for benchmark performance tables.",
+ "_benchmark_host_configuration": {
+  "workstation": "Intel Core i9-13900KF",
+  "ram_gib": 125,
+  "bios_version": "1836",
+  "bios_date": "04/16/2026",
+  "microcode": "0x133",
+  "power_limits": {
+   "long_term": {
+    "power_limit_watts": 253.0,
+    "time_window_microseconds": 55967744
+   },
+   "short_term": {
+    "power_limit_watts": 253.0,
+    "time_window_microseconds": 2440
+   }
+  },
+  "memory": {
+   "modules": 4,
+   "module_gib": 32,
+   "configured_rate_mt_per_second": 4200,
+   "evidence": "Final host setting supplied by the user; BIOS/microcode and RAPL limits independently read at preflight."
+  },
+  "faulty_performance_cores": {
+   "physical_cores": 2,
+   "logical_cpus": [
+    8,
+    9,
+    10,
+    11
+   ],
+   "maximum_khz": 2200000,
+   "thread_siblings": {
+    "8": "8-9",
+    "9": "8-9",
+    "10": "10-11",
+    "11": "10-11"
+   },
+   "timed": false
+  },
+  "cap_faulty_cores_service": {
+   "enabled": true,
+   "executable": "/usr/local/sbin/cap-faulty-cores"
+  },
+  "fixed_cpu_clock_service": {
+   "enabled": false
+  },
+  "reproducibility": "Every timed run is pinned to identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Absolute seconds from other host settings are not directly comparable; matched tool speed-up ratios are the comparison of interest.",
+  "verified_utc": "2026-10-22T00:08:31.141014+00:00"
+ }
+}

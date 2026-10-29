@@ -51,12 +51,13 @@ int main(int argc, char **argv) {
             ro.test_id = index;
             ro.approximate = false;
             ro.budgets = {499};
-            auto result = resample(s, d.assignment, crt_sampler(d.probability), ro);
+            auto result =
+                resample(s, d.assignment, crt_sampler(d.probability, CrtDraw::thinned), ro);
             require(result.valid, "invalid calibration test");
             rows[i].p = result.p_value;
             if (i >= 1000)
                 return;
-            auto sampler = crt_sampler(d.probability);
+            auto sampler = crt_sampler(d.probability, CrtDraw::thinned);
             BinaryScoreWorkspace binary(s);
             std::vector<std::size_t> selected;
             for (std::size_t j = 0; j < d.assignment.size(); ++j)

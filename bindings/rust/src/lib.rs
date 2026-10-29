@@ -48,7 +48,7 @@ pub fn version() -> String {
         .into_owned()
 }
 
-/// The C API version the library implements (this crate is written for 1).
+/// The C API version the library implements (this crate uses the legacy subset of version 2).
 pub fn c_api_version() -> i32 {
     unsafe { ffi::rapidglm_c_api_version() }
 }
@@ -185,10 +185,57 @@ impl Table {
     }
 }
 
+/// Numerical backend policy. Inherit uses the environment or build default.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+#[repr(i32)]
+pub enum DivisionMode {
+    #[default]
+    Inherit = -1,
+    Slow = 0,
+    Fast = 1,
+}
+
+struct DivisionScope(i32);
+impl DivisionScope {
+    fn new(mode: DivisionMode) -> Result<Self> {
+        let mut previous = -1;
+        let resolved = if matches!(mode, DivisionMode::Inherit) {
+            division_mode()? as i32
+        } else {
+            mode as i32
+        };
+        check(unsafe { ffi::rapidglm_set_division(resolved, &mut previous) })?;
+        Ok(Self(previous))
+    }
+}
+impl Drop for DivisionScope {
+    fn drop(&mut self) {
+        // A previously returned option is always valid, including while unwinding.
+        unsafe { ffi::rapidglm_set_division(self.0, std::ptr::null_mut()) };
+    }
+}
+
+/// Run synchronous binding calls with a thread-local division mode; restore the
+/// previous mode on return or panic. Other threads are unaffected.
+pub fn with_division<T>(mode: DivisionMode, call: impl FnOnce() -> Result<T>) -> Result<T> {
+    let _scope = DivisionScope::new(mode)?;
+    call()
+}
+
+/// The resolved division mode on this thread.
+pub fn division_mode() -> Result<DivisionMode> {
+    match unsafe { ffi::rapidglm_division_mode() } {
+        0 => Ok(DivisionMode::Slow),
+        1 => Ok(DivisionMode::Fast),
+        _ => Err(Error("invalid RAPIDGLM_DIVISION environment value".into())),
+    }
+}
+
 /// Options of RapidGLM's own DESeq2-procedure analysis ([`bulk_de`]); the
 /// fields not listed keep the C layer's defaults (docs/CLI.md).
 #[derive(Debug, Clone, Default)]
 pub struct BulkOptions {
+    pub division: DivisionMode,
     /// Tested design column (default: the last).
     pub coefficient: Option<usize>,
     /// A contrast over the design columns instead of one coefficient.
@@ -204,6 +251,7 @@ pub struct BulkOptions {
 /// `bulk-de`. `counts` is samples x genes. Columns: baseMean, log2FoldChange,
 /// lfcSE, stat, pvalue, padj, dispersions and Cook's values (rapidglm_c.h).
 pub fn bulk_de(design: &Matrix, counts: &Matrix, options: &BulkOptions) -> Result<Table> {
+    let _division = DivisionScope::new(options.division)?;
     if design.rows != counts.rows {
         return Err(Error(
             "design and counts need the same number of samples".into(),

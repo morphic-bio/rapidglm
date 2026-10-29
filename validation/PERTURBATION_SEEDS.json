@@ -1,8 +1,10 @@
 {
- "purpose": "Agreement of the perturbation workflow with SCEPTRE 0.99.0 on the Gasperini benchmark (207,324 cells) under several seeds, and between the seeds",
+ "purpose": "Agreement of the perturbation workflow with SCEPTRE 0.99.0 on the Gasperini benchmark (gasperini) under several seeds, and between the seeds",
+ "dataset": "gasperini",
+ "options": {},
  "command": "python3 scripts/validate_perturbation_seeds.py --runs RUNS --work DIR --output OUT",
- "version": "1.3.0",
- "commit": "303cae173dc64d6ec55dcdd0ffb7fbc61969973d",
+ "version": "1.4.0",
+ "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
  "configuration": "the benchmark's run with fit_check ks (scripts/benchmark_applications.py, tool rapidglm-cli-ks), with its seed and with the others; discoveries are BH at 0.1 over the discovery pairs both tools tested",
  "sceptre_discoveries": 101,
  "runs": [
@@ -53,5 +55,62 @@
   "mean": 0.9308502014232086,
   "max": 0.96,
   "pairs_of_seeds": 15
+ },
+ "_provenance": {
+  "version": "1.4.0",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "worktree_dirty": false
+ },
+ "measured_tag": "v1.4.0-dev.4",
+ "host_note": "This is a correctness receipt. Its stage ran on CPUs 0-7 under nice 10; any elapsed-time fields are diagnostic and are not performance measurements. One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional. Final timings on the 16 identical efficiency cores (CPUs 16-31), one thread per core: one on 16, four on 16-19, eight on 16-23, twelve on 16-27, sixteen on 16-31. Each timed command holds the shared lock and starts after two consecutive ten-second quiet samples: one-minute load <=4 and every selected CPU <20% busy. Both samples are retained. Untimed work uses CPUs 0-7 under nice 10. These release timings are final, not provisional.",
+ "_timing_scope": "Correctness/test diagnostics only; not used for benchmark performance tables.",
+ "_benchmark_host_configuration": {
+  "workstation": "Intel Core i9-13900KF",
+  "ram_gib": 125,
+  "bios_version": "1836",
+  "bios_date": "04/16/2026",
+  "microcode": "0x133",
+  "power_limits": {
+   "long_term": {
+    "power_limit_watts": 253.0,
+    "time_window_microseconds": 55967744
+   },
+   "short_term": {
+    "power_limit_watts": 253.0,
+    "time_window_microseconds": 2440
+   }
+  },
+  "memory": {
+   "modules": 4,
+   "module_gib": 32,
+   "configured_rate_mt_per_second": 4200,
+   "evidence": "Final host setting supplied by the user; BIOS/microcode and RAPL limits independently read at preflight."
+  },
+  "faulty_performance_cores": {
+   "physical_cores": 2,
+   "logical_cpus": [
+    8,
+    9,
+    10,
+    11
+   ],
+   "maximum_khz": 2200000,
+   "thread_siblings": {
+    "8": "8-9",
+    "9": "8-9",
+    "10": "10-11",
+    "11": "10-11"
+   },
+   "timed": false
+  },
+  "cap_faulty_cores_service": {
+   "enabled": true,
+   "executable": "/usr/local/sbin/cap-faulty-cores"
+  },
+  "fixed_cpu_clock_service": {
+   "enabled": false
+  },
+  "reproducibility": "Every timed run is pinned to identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Absolute seconds from other host settings are not directly comparable; matched tool speed-up ratios are the comparison of interest.",
+  "verified_utc": "2026-10-22T00:08:31.141014+00:00"
  }
 }

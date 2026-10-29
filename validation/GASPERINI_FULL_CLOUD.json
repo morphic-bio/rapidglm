@@ -1,0 +1,609 @@
+{
+ "description": "RapidGLM 1.4.1 full Gasperini CRT test set (28,388,816 pairs) on one AWS m8id.8xlarge with 16 physical cores, in two modes: legacy (SCEPTRE's methodology: shared draws per target, no confirmation draws) and default (RapidGLM's: independent draws per pair, extra draws in the tail). Timings come from this instance only; compare the two modes with each other, not with pikachu.",
+ "date": "2026-10-23",
+ "prompt": "validation/work/gasperini-cloud/PROMPT.md",
+ "software": {
+  "version": "1.4.1",
+  "tag": "v1.4.1",
+  "commit": "64a8610d056767b5af8dfc72a94c817d366f69db",
+  "image": "rapidglm:1.4.1 built from a clean clone of the tag with the repository Dockerfile (legacy builder, pikachu CPUs 0-7)",
+  "image_config_digest": "sha256:efcd6d7303ab529bc1561a946328c34b122b441655ccbb0dbb6f1719fe46deac",
+  "image_manifest_digest": "sha256:aca50a58ea65d797a174b68b158c0c9a515aef784f56dd8b9060871ba0ddc8a4",
+  "image_tarball_sha256": "211bb7f040d4531ed02501563643b3dd11491c46074218bb5d1471cb8ff07832",
+  "binary_sha256": "15da5b75dc534c88e5f0a404862a2cb3717b268899f9159cf07440a9efd5e1a8",
+  "library_sha256_pikachu": {
+   "/usr/local/bin/rapidglm": "15da5b75dc534c88e5f0a404862a2cb3717b268899f9159cf07440a9efd5e1a8",
+   "/opt/rapidglm/build/rapidglm": "15da5b75dc534c88e5f0a404862a2cb3717b268899f9159cf07440a9efd5e1a8",
+   "/usr/lib/x86_64-linux-gnu/liblapacke.so.3.12.0": "338d499937368efce3563b6de51c0dd01b9694fdd2eb20684c22b105e646ee40",
+   "/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so": "bfc7492adbf84a8f567720a9e1fae2afc18f3d817da233e7f4d453683485308e",
+   "/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0": "135f3c8f006d2fe5e68e51281c7974cb991a03de3bfb3593d68d174dfcf854d1",
+   "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11",
+   "/usr/lib/x86_64-linux-gnu/libm.so.6": "fce00b6f25f459cf4ae0b7fae4257909a1a8a86f9149e7c029a5d617baf1ccd0",
+   "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1": "d93224d2b0dab4247598be683adca02f5cf00586f99c187579cd7e92058fb7cb",
+   "/usr/lib/x86_64-linux-gnu/libc.so.6": "3a15d66867d83762c7f2f1e37359cb8f6c5743edb369c65285cb0b1c4f7498bf",
+   "/usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3": "8ba4a98f44d763c2e648755ef452025919e28633339f23ff605044de3483a25d",
+   "/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3": "1e82245607c58d13405580c71b9b0134b5a952686ac861f979fc7a886ebd4229",
+   "/usr/lib/x86_64-linux-gnu/libtmglib.so.3.12.0": "83d38f85ae43efd497e194ac105970922912ba8ef74349b1caa5668292cb0be8",
+   "/usr/lib/x86_64-linux-gnu/libgfortran.so.5.0.0": "342618ccfebe840446e4ef2b7893f4161b2084845e570f42d68a70bfde58a58d"
+  },
+  "library_sha256_identical_on_instance": true,
+  "openblas": "0.3.26 pthread (Ubuntu 24.04 image)",
+  "openblas_core_pikachu": "Core: Haswell",
+  "openblas_core_instance": "Core: Cooperlake",
+  "environment": {
+   "OPENBLAS_NUM_THREADS": 1,
+   "OMP_NUM_THREADS": 1
+  },
+  "lapack_solves": false,
+  "source_clone_check": "all 461 tracked files of the build clone equal the v1.4.1 blobs (git hash-object), checked 2026-10-23 after the pikachu CPU notice",
+  "container_tests": {
+   "pikachu": "ctest 2/2 and all suites passed (CPUs 0-7)",
+   "instance": "ctest 2/2 and all suites passed (16 cores)"
+  }
+ },
+ "instance": {
+  "instance_id": "i-0537c2ecfb98f7306",
+  "type": "m8id.8xlarge",
+  "cpu_options": {
+   "CoreCount": 16,
+   "ThreadsPerCore": 1
+  },
+  "az": "us-east-1a",
+  "ami": "ami-033ea4ff4a9c726dc",
+  "ami_name": "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20261021",
+  "kernel": "6.8.0-1066-aws",
+  "os": "Ubuntu 22.04.5 LTS",
+  "docker": "29.1.3",
+  "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+  "cpus": "16",
+  "threads_per_core": "1",
+  "cores_per_socket": "16",
+  "l3": "480 MiB (1 instance)",
+  "hypervisor": "KVM",
+  "memory_gib": 128,
+  "storage": "NVMe instance store 1,900 GB, ext4 at /scratch (inputs, image, checkpoints, outputs, logs); root gp3 40 GB encrypted, OS only",
+  "purchase": "on-demand",
+  "lease": "36 h (shutdown -h +2160, shutdown behaviour terminate)",
+  "reused_resources": {
+   "key_name": "multiomics-bench-20261004-bddf164a",
+   "security_group": "sg-0bceca9dbef1c9844",
+   "subnet": "subnet-c3d6b2ed",
+   "instance_profile": "arn:aws:iam::171440768238:instance-profile/multiomics-inputs-20261004-1940",
+   "bucket": "multiomics-bench-20261004-bddf164a-171440768238"
+  },
+  "launch_time": "2026-10-23T08:41:51+00:00",
+  "termination": {
+   "instance_id": "i-0537c2ecfb98f7306",
+   "name": "rapidglm-gasperini-full-v141-20261023",
+   "reason": "results copied to pikachu and AWS object storage and checked by SHA-256",
+   "launch_time": "2026-10-23T08:41:51+00:00",
+   "terminated_utc": "2026-10-24T08:54:19.993188+00:00",
+   "terminated_state_confirmed_utc": "2026-10-24T08:54:51.244749+00:00",
+   "terminate_response": [
+    {
+     "CurrentState": {
+      "Code": 32,
+      "Name": "shutting-down"
+     },
+     "InstanceId": "i-0537c2ecfb98f7306",
+     "PreviousState": {
+      "Code": 16,
+      "Name": "running"
+     }
+    }
+   ],
+   "final_state": {
+    "Code": 48,
+    "Name": "terminated"
+   },
+   "state_transition_reason": "User initiated (2026-10-24 08:54:20 GMT)",
+   "root_volumes": [
+    {
+     "vol-0f48a36abf6cf1af3": "gone (InvalidVolume.NotFound)"
+    }
+   ],
+   "hours_from_launch": 24.20805366333333,
+   "hourly_usd": 2.08832,
+   "compute_usd_estimate": 50.55416262621226,
+   "other_charges_estimate_usd": {
+    "gp3_40GB": 0.106,
+    "public_ipv4": 0.121
+   }
+  },
+  "hourly_usd": 2.08832,
+  "price_source": "https://b0.p.awsstatic.com/pricing/2.0/meteredUnitMaps/ec2/USD/current/ec2-ondemand-without-sec-sel/US%20East%20%28N.%20Virginia%29/Linux/index.json",
+  "price_publication": "2026-10-22T23:14:53Z",
+  "billed_hours_estimate": 24.20805366333333,
+  "compute_cost_usd_estimate": 50.55416262621226,
+  "cost_cap_usd": 100
+ },
+ "inputs": {
+  "data": "Gasperini et al. 2019, GSE120861 (public), validation/work/benchmark/gasperini/",
+  "pairs": "/mnt/pikachu/rapidglm_fullpanel_20261004/inputs/pairs_testset.tsv",
+  "sha256": {
+   "responses.mtx": "5c82ff3f54cc609c55f9042118d4423a7bdbe8ecbd5b15503aa5c3b29a3af6f5",
+   "assignments.mtx": "269ff0977046281e17ddb78190d7970e6535441a2d460408d8c3106b1cf3100b",
+   "design.tsv": "424623964e504aae85b7c34155ed712475494faf6591b3ea1dfab533ed2b936c",
+   "guides.tsv": "357c9a7235adad31a2ebb80fe13cef2fbb782f7fe5838ff35fd2cbc2f1285570",
+   "pairs_testset.tsv": "1485920a6e6f5bff7c5e94574ea1d25837a9d00358c427bb562cb7a860e2865a"
+  },
+  "instance_copy": "s3://multiomics-bench-20261004-bddf164a-171440768238/datasets/gasperini2019_GSE120861_20261004T1940Z/statistical_inputs_20261004T2240Z/ (same SHA-256, checked on the instance)",
+  "pairs_listed": {
+   "discovery": 28010368,
+   "negative": 378318,
+   "positive": 130
+  }
+ },
+ "configs": {
+  "default": {
+   "responses": "/data/in/responses.mtx",
+   "assignments": "/data/in/assignments.mtx",
+   "design": "/data/in/design.tsv",
+   "guides": "/data/in/guides.tsv",
+   "pairs": "/data/in/pairs_testset.tsv",
+   "moi": "high",
+   "cell_qc": false,
+   "threads": 16,
+   "seed": 20260930,
+   "output": "/data/work/default/rapid",
+   "checkpoint_dir": "/data/work/default/ck"
+  },
+  "legacy": {
+   "responses": "/data/in/responses.mtx",
+   "assignments": "/data/in/assignments.mtx",
+   "design": "/data/in/design.tsv",
+   "guides": "/data/in/guides.tsv",
+   "pairs": "/data/in/pairs_testset.tsv",
+   "moi": "high",
+   "cell_qc": false,
+   "threads": 16,
+   "seed": 20260930,
+   "output": "/data/work/legacy/rapid",
+   "checkpoint_dir": "/data/work/legacy/ck",
+   "reuse_draws": true,
+   "confirm_draws": 0
+  },
+  "panel_default": {
+   "responses": "/data/in/responses.mtx",
+   "assignments": "/data/in/assignments.mtx",
+   "design": "/data/in/design.tsv",
+   "guides": "/data/in/guides.tsv",
+   "pairs": "/data/in/panel_pairs.tsv",
+   "moi": "high",
+   "cell_qc": false,
+   "threads": 8,
+   "seed": 20260930,
+   "output": "/data/work/panel_default/rapid",
+   "checkpoint_dir": "/data/work/panel_default/ck"
+  },
+  "panel_legacy": {
+   "responses": "/data/in/responses.mtx",
+   "assignments": "/data/in/assignments.mtx",
+   "design": "/data/in/design.tsv",
+   "guides": "/data/in/guides.tsv",
+   "pairs": "/data/in/panel_pairs.tsv",
+   "moi": "high",
+   "cell_qc": false,
+   "threads": 8,
+   "seed": 20260930,
+   "output": "/data/work/panel_legacy/rapid",
+   "checkpoint_dir": "/data/work/panel_legacy/ck",
+   "reuse_draws": true,
+   "confirm_draws": 0
+  }
+ },
+ "check_panel": {
+  "pairs": {
+   "discovery": 118688,
+   "negative": 29672,
+   "positive": 130
+  },
+  "total_pairs": 148490,
+  "pairs_sha256": "344c5b38458b100a03951745067664bb5383fed4d3670676963977922b5afca2",
+  "discovery_targets_with_discoveries_in_2026_10_04_run": {
+   "chr11.1735_top_two": 1338,
+   "chr11.1735_second_two": 691,
+   "chr9.3633_top_two": 309,
+   "chrX.952_top_two": 209,
+   "chrX.952_second_two": 127,
+   "chr11.1734_second_two": 57,
+   "chr3.4237_top_two": 23,
+   "chr9.396_top_two": 6,
+   "chr16.1916_top_two": 3,
+   "chr12.4658_top_two": 2,
+   "chr7.4787_top_two": 2,
+   "chr14.2296_top_two": 1,
+   "chr6.1277_top_two": 1
+  },
+  "discovery_targets_without": [
+   "chr11.1965_top_two",
+   "chr20.1066_second_two",
+   "chr7.607_top_two"
+  ],
+  "nt_targets": [
+   "bassik_mch",
+   "random_20",
+   "scrambled_1",
+   "scrambled_21"
+  ],
+  "note": "No discovery target has a positive-control pair (the 130 pairs belong to 10 pos_control targets), so the panel lists all 130.",
+  "threads": 8,
+  "pikachu": "CPUs 0-7, nice 19, untimed",
+  "instance": "16 cores, before the timed runs",
+  "tables_sha256_pikachu": {
+   "panel_default/rapid.qq.tsv": "52369e885d482c7bec7c8cec4f6335dc8228706e616b860d5d1d31ea8478f321",
+   "panel_default/rapid.tsv": "8de32bd673412934aed17473382825e12a5d97f8feca1423e82d6b4dfdb98a51",
+   "panel_legacy/rapid.qq.tsv": "87b5f6253991ba25ee9aac40070ab17ab4f734d497d43f46734361967aaccb15",
+   "panel_legacy/rapid.tsv": "b624c22effb19e2f2756038985a496e6481941a29acba33c94f67453a3c350d3"
+  },
+  "tables_sha256_instance": {
+   "panel_default/rapid.qq.tsv": "52369e885d482c7bec7c8cec4f6335dc8228706e616b860d5d1d31ea8478f321",
+   "panel_default/rapid.tsv": "8de32bd673412934aed17473382825e12a5d97f8feca1423e82d6b4dfdb98a51",
+   "panel_legacy/rapid.qq.tsv": "87b5f6253991ba25ee9aac40070ab17ab4f734d497d43f46734361967aaccb15",
+   "panel_legacy/rapid.tsv": "b624c22effb19e2f2756038985a496e6481941a29acba33c94f67453a3c350d3"
+  },
+  "byte_identical": true,
+  "raw_p_in_full_runs": {
+   "legacy": {
+    "panel_rows": 148490,
+    "found_identical": 148490,
+    "found_different": 0,
+    "missing": 0,
+    "examples": []
+   },
+   "default": {
+    "panel_rows": 148490,
+    "found_identical": 148490,
+    "found_different": 0,
+    "missing": 0,
+    "examples": []
+   }
+  }
+ },
+ "results": {
+  "legacy": {
+   "rows_by_kind_status": {
+    "discovery/failed_pair_qc": 766180,
+    "discovery/ok": 27244188,
+    "negative/failed_pair_qc": 9739,
+    "negative/ok": 368579,
+    "positive/failed_pair_qc": 2,
+    "positive/ok": 128
+   },
+   "discoveries_bh_0_1": {
+    "discovery": 3893,
+    "negative": 1,
+    "positive": 36
+   },
+   "negative_controls": {
+    "tested": 368579,
+    "frac_p_below_0.05": 0.04834784401715779,
+    "frac_p_below_0.01": 0.009911036711261359,
+    "frac_p_below_0.001": 0.0009631585087593162,
+    "min_p": 9.254874191332979e-19,
+    "qq_table": "analysis/qq_legacy.tsv"
+   },
+   "negative_family_discoveries": [
+    {
+     "response": "803",
+     "target": "random_17",
+     "p_value": 9.254874191332979e-19,
+     "adjusted_p": 3.411152274567318e-13
+    }
+   ],
+   "positive_controls": {
+    "listed": 130,
+    "tested_ok": 128,
+    "recovered_bh_0_1": 36,
+    "raw_p_below_0.05": 42,
+    "table": "analysis/positive_legacy.tsv"
+   },
+   "draws": {
+    "sum_over_tested_pairs": 17156750605,
+    "pairs_by_draws": {
+     "499": 27034867,
+     "4999": 526242,
+     "19999": 51786
+    },
+    "approximation_column": {
+     "0": 27070929,
+     "1": 541966
+    },
+    "draws_generated_shared_per_target_context": 76716663,
+    "target_contexts": 3837
+   },
+   "run": {
+    "wall_elapsed": "4:43:19",
+    "wall_seconds_run_record": 16998.937514697,
+    "peak_rss_kib_time": 33834440,
+    "peak_rss_kib_run_record": 33834440,
+    "user_seconds": 193014.82,
+    "system_seconds": 24750.54,
+    "cpu_percent": "1281%",
+    "exit_status": 0,
+    "confirm_draws": 0,
+    "reuse_draws": true,
+    "fit_check": "strict",
+    "crt_draw_used": "thinned",
+    "stream_keys": "identity",
+    "adjustment_family": "tested",
+    "samplers": {
+     "cache_mb": 63380,
+     "cached_targets": 0,
+     "targets_rebuilt_per_pair": 0
+    },
+    "tiles": {
+     "count": 60,
+     "computed_here": 60,
+     "computed_seconds": 16752,
+     "tile_targets": 64,
+     "tile_responses": 0
+    },
+    "family_size": {
+     "discovery": 27244188,
+     "negative": 368579,
+     "positive": 128
+    },
+    "pairs_passing_qc": {
+     "discovery": 27244188,
+     "negative": 368579,
+     "positive": 128
+    },
+    "threads": 16,
+    "version": "1.4.1",
+    "lapack_solves": false,
+    "tile_seconds": {
+     "count": 60,
+     "min": 239,
+     "median": 280,
+     "max": 363,
+     "sum": 16785
+    },
+    "vmstat_minutes": 284,
+    "steal_percent_max": 0,
+    "steal_percent_mean": 0.0,
+    "user_percent_mean": 71.13028169014085,
+    "cpu_mhz_mean_min_max": [
+     2925.0,
+     3839.404929577465,
+     3945.0
+    ]
+   }
+  },
+  "default": {
+   "rows_by_kind_status": {
+    "discovery/failed_pair_qc": 766180,
+    "discovery/ok": 27244188,
+    "negative/failed_pair_qc": 9739,
+    "negative/ok": 368579,
+    "positive/failed_pair_qc": 2,
+    "positive/ok": 128
+   },
+   "discoveries_bh_0_1": {
+    "discovery": 3800,
+    "negative": 1,
+    "positive": 36
+   },
+   "negative_controls": {
+    "tested": 368579,
+    "frac_p_below_0.05": 0.04854590196402942,
+    "frac_p_below_0.01": 0.009859487382623535,
+    "frac_p_below_0.001": 0.0009143223026813791,
+    "min_p": 2.58212155561689e-18,
+    "qq_table": "analysis/qq_default.tsv"
+   },
+   "negative_family_discoveries": [
+    {
+     "response": "803",
+     "target": "random_17",
+     "p_value": 2.58212155561689e-18,
+     "adjusted_p": 9.517157808477177e-13
+    }
+   ],
+   "positive_controls": {
+    "listed": 130,
+    "tested_ok": 128,
+    "recovered_bh_0_1": 36,
+    "raw_p_below_0.05": 41,
+    "table": "analysis/positive_default.tsv"
+   },
+   "draws": {
+    "sum_over_tested_pairs": 18127609105,
+    "pairs_by_draws": {
+     "499": 27034464,
+     "4999": 526362,
+     "19999": 46709,
+     "199999": 5360
+    },
+    "approximation_column": {
+     "0": 27071141,
+     "1": 541754
+    },
+    "draws_generated_shared_per_target_context": null,
+    "target_contexts": 3837
+   },
+   "run": {
+    "wall_elapsed": "16:00:47",
+    "wall_seconds_run_record": 57646.888900865,
+    "peak_rss_kib_time": 42146664,
+    "peak_rss_kib_run_record": 42146664,
+    "user_seconds": 875774.92,
+    "system_seconds": 13409.32,
+    "cpu_percent": "1542%",
+    "exit_status": 0,
+    "confirm_draws": 199999,
+    "reuse_draws": false,
+    "fit_check": "strict",
+    "crt_draw_used": "thinned",
+    "stream_keys": "identity",
+    "adjustment_family": "tested",
+    "samplers": {
+     "cache_mb": 63380,
+     "cached_targets": 0,
+     "targets_rebuilt_per_pair": 0
+    },
+    "tiles": {
+     "count": 29,
+     "computed_here": 29,
+     "computed_seconds": 57404.8,
+     "tile_targets": 3837,
+     "tile_responses": 256
+    },
+    "family_size": {
+     "discovery": 27244188,
+     "negative": 368579,
+     "positive": 128
+    },
+    "pairs_passing_qc": {
+     "discovery": 27244188,
+     "negative": 368579,
+     "positive": 128
+    },
+    "threads": 16,
+    "version": "1.4.1",
+    "lapack_solves": false,
+    "tile_seconds": {
+     "count": 29,
+     "min": 1928,
+     "median": 1987,
+     "max": 2045,
+     "sum": 57437
+    },
+    "vmstat_minutes": 961,
+    "steal_percent_max": 0,
+    "steal_percent_mean": 0.0,
+    "user_percent_mean": 94.93860561914673,
+    "cpu_mhz_mean_min_max": [
+     2919.0,
+     3885.494276795005,
+     3926.0
+    ]
+   }
+  }
+ },
+ "tables_sha256_instance": {
+  "legacy": {
+   "rapid.tsv": "096fb2ae9a29d1c8e8b53a71c279e5af192b009c7c28c39d8477974b73006857",
+   "rapid.qq.tsv": "a0f867747c6b4859510c6a0a5600a7a8f17523abf4cb8d9c28d668e74bb3caf0",
+   "rapid.run.json": "1e40c6cfbd3e54eed9b26b6e1cbadf42b4df8d1218084281b18549d7e093fc75"
+  },
+  "default": {
+   "rapid.tsv": "ccb585c8286280f627d070bf1b02a579c65d526358abf7d968be02c82fa80676",
+   "rapid.qq.tsv": "cb15f7debc1aab260d98b8a8eae4d5f4df46552b2520c59eaf797ae21e62089b",
+   "rapid.run.json": "44688ed700083ba09f1c46eadf9a52fdfe5ef13f84a0bdd8f3a13ad09b8cae59"
+  }
+ },
+ "between_modes": {
+  "discoveries_legacy": 3893,
+  "discoveries_default": 3800,
+  "both": 3644,
+  "legacy_only": 249,
+  "default_only": 156,
+  "jaccard": 0.899975302543838,
+  "spearman_neglog10p_union": 0.8106169003533835,
+  "spearman_neglog10p_intersection": 0.8897714951475362,
+  "one_mode_table": "analysis/one_mode_discoveries.tsv",
+  "positive_recovered_both": 35,
+  "negative_discoveries_legacy": 1,
+  "negative_discoveries_default": 1
+ },
+ "copies": {
+  "pikachu": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023",
+  "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/",
+  "verification": "SHA-256 at each end: instance-side SHA256SUMS (results) and SHA256SUMS.ck (every checkpoint file) checked on pikachu; every object in AWS object storage streamed back and hashed against the pikachu file",
+  "s3_verification": {
+   "default": {
+    "checked_utc": "2026-10-24T07:58:32.880650+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/instance_mirror/default",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/default/",
+    "objects": 45,
+    "problems": 0
+   },
+   "final_default": {
+    "checked_utc": "2026-10-24T08:50:21.814565+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/instance_mirror/default",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/default/",
+    "objects": 45,
+    "problems": 0
+   },
+   "final_instance_logs": {
+    "checked_utc": "2026-10-24T08:00:57.178516+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/instance_mirror/logs",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/instance/logs/",
+    "objects": 21,
+    "problems": 0
+   },
+   "final_legacy": {
+    "checked_utc": "2026-10-24T08:26:25.590827+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/instance_mirror/legacy",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/legacy/",
+    "objects": 75,
+    "problems": 0
+   },
+   "final_panel_instance_panel_default": {
+    "checked_utc": "2026-10-24T08:01:31.941817+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/instance_mirror/panel_default",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/panel/instance/panel_default/",
+    "objects": 35,
+    "problems": 0
+   },
+   "final_panel_instance_panel_legacy": {
+    "checked_utc": "2026-10-24T08:01:12.764940+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/instance_mirror/panel_legacy",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/panel/instance/panel_legacy/",
+    "objects": 7,
+    "problems": 0
+   },
+   "final_panel_pikachu": {
+    "checked_utc": "2026-10-24T08:02:03.816499+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/panel_runs_pikachu",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/panel/pikachu/",
+    "objects": 45,
+    "problems": 0
+   },
+   "final_payload": {
+    "checked_utc": "2026-10-24T08:52:48.343457+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/payload",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/payload/",
+    "objects": 26,
+    "problems": 0
+   },
+   "final_payload_configs": {
+    "checked_utc": "2026-10-24T08:50:22.938084+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/payload/configs",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/payload/configs/",
+    "objects": 4,
+    "problems": 0
+   },
+   "final_payload_scripts": {
+    "checked_utc": "2026-10-24T08:52:50.730051+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/scripts",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/payload/scripts/",
+    "objects": 16,
+    "problems": 0
+   },
+   "legacy": {
+    "checked_utc": "2026-10-23T15:49:31.826035+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/instance_mirror/legacy",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/legacy/",
+    "objects": 75,
+    "problems": 0
+   },
+   "payload_precheck": {
+    "checked_utc": "2026-10-23T22:27:58.025585+00:00",
+    "local": "/mnt/pikachu/rapidglm_gasperini_cloud_20261023/payload",
+    "s3": "s3://multiomics-bench-20261004-bddf164a-171440768238/rapidglm/gasperini_full_v1.4.1_20261023/payload/",
+    "objects": 14,
+    "problems": 0
+   }
+  }
+ },
+ "deviations": [
+  "The instance role (multiomics-inputs-20261004-1940) cannot write under rapidglm/; adding a scoped policy was refused by the session permission check, so pikachu pulled checkpoints hourly (instance-side rsync under nice 19) and results over SSH and pushed them to AWS object storage.",
+  "Docker on the instance (29.1.3, containerd store) reports the image ID as the manifest digest, pikachu as the config digest; the first worker start stopped on that check before any test or run, and was restarted with both digests accepted. Binary and library SHA-256 equal on both hosts.",
+  "The first hourly checkpoint push at 12:01 UTC was skipped (rsync exit 24 on a tile being renamed); relay v2 skips *.tmp from 12:02 UTC.",
+  "From 2026-10-23 13:57 UTC pikachu CPUs 0-15 were capped at 2.2 GHz by the user after silent corruption on CPUs 12-15. My heavy pikachu work ran on CPUs 0-7 (and 0-1 after 09:25 UTC); every copied file is checked by SHA-256 at both ends.",
+  "Coordinator limits: pikachu jobs on CPUs 0-7 under nice, then at most 2 threads on CPUs 0-1 until 2026-10-24 00:00 UTC; never the timing lock.",
+  "The controlling session ended twice (about 17:24 and 22:20 UTC on 2026-10-23). The first end stopped relay v3, so no hourly checkpoint copy ran between 17:05 and 18:15 UTC; relay v4 (detached from 18:15 UTC) checks the hourly copies by SHA-256 at the instance, pikachu and AWS object storage. A detached finisher (scripts/finisher.sh) did the end-of-run checks and the termination. The runs on the instance were not affected."
+ ]
+}

@@ -10,13 +10,14 @@
 \usage{
 glm_fit(x, y, weights = NULL, start = NULL, etastart = NULL, mustart = NULL,
         offset = NULL, family = gaussian(), control = list(), intercept = TRUE,
-        singular.ok = TRUE)
+        singular.ok = TRUE, division = NULL)
 
 glm(formula, family = gaussian, data, weights, subset, na.action, start = NULL,
     etastart, mustart, offset, control = list(...), model = TRUE,
-    method = glm_fit, x = FALSE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...)
+    method = glm_fit, x = FALSE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ..., division = NULL)
 }
 \arguments{
+\item{division}{Optional numerical backend policy, \code{"slow"} or \code{"fast"}; \code{NULL} inherits the environment/build default.}
   \item{x, y, weights, start, etastart, mustart, offset, family, control, intercept, singular.ok}{
     As for \code{\link[stats]{glm.fit}}.}
   \item{formula, data, subset, na.action, model, method, contrasts, ...}{

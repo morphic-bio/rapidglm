@@ -118,14 +118,24 @@ def timed_run(run, threads, args, *arguments):
             if (busy_seconds(cpus) - before) / (3 * len(cpus)) < 0.2 or time.time() - start > args.idle_timeout:
                 break
         record["waited_for_idle_seconds"] = round(time.time() - start - 3, 1)
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        from quiet_run import wait_quiet, wait_memory
+        if os.environ.get("RAPIDGLM_MIN_AVAILABLE_GIB"):
+            wait_memory(float(os.environ["RAPIDGLM_MIN_AVAILABLE_GIB"]))
+        record["waited_for_quiet_host_seconds"] = wait_quiet(cpus, label=f"{run.__name__} threads={threads}")
+    record["load"] = load()[0]
+    if cpus:
         busy, own = busy_seconds(cpus), os.times()
     result = run(*arguments)
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        from quiet_run import finish_measurement
+        finish_measurement()
     if cpus:
         after = os.times()
         ours = sum(after[:4]) - sum(own[:4])  # this process and the children it has waited for
         wall = after.elapsed - own.elapsed
         record["others_cpu"] = round(max(0.0, busy_seconds(cpus) - busy - ours) / (wall * len(cpus)), 4)
-        record["contended"] = record["others_cpu"] > 0.2
+        record["contended"] = record["others_cpu"] > 0.05
     else:
         record["contended"] = record["load"] > CORES / 4
     return result, record

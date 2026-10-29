@@ -140,7 +140,20 @@ BOOST_AUTO_TEST_CASE(sceptre_recipe_routes_treatment_and_nt_subsets) {
     options.effect_fits = EffectFits::all;
     options.resampling.budgets = {99};
     options.resampling.approximate = false;
+    // The cold fit of each pair's cells, as computed independently below; the
+    // default refined start agrees with it to the convergence tolerance.
+    options.null_start = NullStart::cold;
     auto baseline = sceptre(data.design, responses, assignments, guides, pairs, {}, options);
+    options.null_start = NullStart::refine;
+    const auto refined = sceptre(data.design, responses, assignments, guides, pairs, {}, options);
+    options.null_start = NullStart::cold;
+    BOOST_TEST(refined.null_refined == 2u);
+    for (std::size_t i = 0; i < 2; ++i) {
+        BOOST_TEST(refined.tests[i].status == baseline.tests[i].status);
+        BOOST_TEST(std::abs(refined.tests[i].statistic - baseline.tests[i].statistic) <=
+                   1e-9 * (1 + std::abs(baseline.tests[i].statistic)));
+        BOOST_TEST(refined.tests[i].p_value == baseline.tests[i].p_value);
+    }
     for (std::size_t target = 0; target < 2; ++target) {
         std::vector<std::size_t> cells, selected;
         for (std::size_t i = 0; i < 192; ++i)

@@ -2,18 +2,21 @@
 
 ``bulk_de``, ``sceptre``, ``sceptre_grid``, ``scan`` and ``fit_batch`` run the
 applications and the batch engine through the C interface (``rapidglm.capi``,
-needs librapidglm_c); ``rapidglm.deseq`` wraps bulk_de in PyDESeq2's workflow
-(DeseqDataSet, DeseqStats). ``rapidglm.fit`` fits one model through the compiled
+needs librapidglm_c), as do the special functions of ``rapidglm.special``;
+``rapidglm.deseq`` wraps bulk_de in PyDESeq2's workflow (DeseqDataSet,
+DeseqStats). ``rapidglm.fit`` fits one model through the compiled
 extension; ``rapidglm.statsmodels.GLM`` is a drop-in replacement for
 ``statsmodels.api.GLM`` that returns statsmodels results objects.
 """
 
 import numpy as np
 
+from . import special
 from .capi import bulk_de, edger_ql, fit_batch, library_version, scan, sceptre, sceptre_grid
 
-__all__ = ["bulk_de", "edger_ql", "sceptre", "sceptre_grid", "scan", "fit_batch", "fit", "library_version"]
-__version__ = "1.4.0"
+__all__ = ["bulk_de", "edger_ql", "sceptre", "sceptre_grid", "scan", "fit_batch", "fit", "library_version",
+           "special"]
+__version__ = "1.6.0"
 
 
 def fit(
@@ -29,6 +32,7 @@ def fit(
     max_iterations=100,
     singular_ok=True,
     alias_tolerance=1e-11,
+    division=None,
 ):
     """Fit one GLM. family is gaussian, poisson, binomial or nb (log link for
     counts, logit for binomial). For nb, theta is estimated by maximum
@@ -57,4 +61,5 @@ def fit(
         int(max_iterations),
         bool(singular_ok),
         float(alias_tolerance),
+        "" if division is None else str(division),
     )

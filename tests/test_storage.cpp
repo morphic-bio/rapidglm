@@ -122,6 +122,9 @@ BOOST_AUTO_TEST_CASE(cached_target_and_response_contexts_match_independent_pair_
         options.model.offset[i] = 0.02 * std::sin(i);
         options.model.weights[i] = i % 29 == 0 ? 0 : 0.5 + i % 3;
     }
+    // The independent fits below are cold fits of each pair's cells
+    // (test_mergeable_null.cpp compares the default refined start with them).
+    options.null_start = NullStart::cold;
     for (bool nt_controls : {false, true})
         for (auto mode : {FitMethod::direct, FitMethod::sceptre_null})
             for (auto keys : {StreamKeys::identity, StreamKeys::position}) {

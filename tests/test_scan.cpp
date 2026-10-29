@@ -202,3 +202,33 @@ BOOST_AUTO_TEST_CASE(empirical_screen_stops_or_continues_at_the_first_budget) {
     ro.screen = 1.5;
     BOOST_CHECK_THROW(resample_permutation(score, d.g.column(3), {}, ro), std::exception);
 }
+
+// CTest also runs this case alone with RAPIDGLM_DIVISION=invalid. Explicit
+// options must take precedence before batch/scan workers consult the environment.
+BOOST_AUTO_TEST_CASE(division_options_precede_environment_in_batches_and_scans) {
+    const auto previous = vmath::set_division(DivisionMode::inherit);
+    const auto d = data(19, 80);
+    for (auto mode : {DivisionMode::slow, DivisionMode::fast}) {
+        for (int threads : {1, 3}) {
+            FitOptions model;
+            model.family = Family::poisson;
+            model.division = mode;
+            const auto fits = fit_batch(d.x, d.y, model, threads);
+            BOOST_REQUIRE(fits.size() == 3u);
+            for (const auto &fit : fits)
+                BOOST_CHECK(fit.ok());
+            ScanOptions scan;
+            scan.model = model;
+            scan.threads = threads;
+            scan.calibration = Calibration::asymptotic;
+            scan.effect_fits = EffectFits::none;
+            const auto results = score_scan(d.x, d.y, d.g, {}, scan);
+            BOOST_REQUIRE(results.size() == 12u);
+            for (const auto &result : results) {
+                BOOST_TEST(result.status == "ok");
+                BOOST_CHECK(std::isfinite(result.p_value));
+            }
+        }
+    }
+    vmath::set_division(previous);
+}

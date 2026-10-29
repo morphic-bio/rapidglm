@@ -4,9 +4,7 @@
 #include "kernels.hpp"
 #include "sparse.hpp"
 #include <boost/math/distributions/fisher_f.hpp>
-#include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/special_functions/trigamma.hpp>
 #include <functional>
 #include <string>
 
@@ -20,7 +18,7 @@
 // quasi-likelihood F tests.
 //
 // Written from the papers, the documentation of edgeR and limma and black-box
-// runs of edgeR 4.6.2 (validation/work/edger/EDGER_QL_SPEC.md); no edgeR or limma
+// runs of edgeR 4.6.2 (docs/EDGER_QL_SPEC.md); no edgeR or limma
 // source was read. Where the documentation leaves a rule open and black-box runs
 // settled it, the rule is the one the runs showed; the remaining differences are
 // listed in METHODS.md. The unit-deviance moments here are exact; edgeR's own
@@ -44,6 +42,7 @@ struct QlOptions {
     // Prior count (per average library) of the reported log fold changes.
     double prior_count = 0.125;
     int threads = 1;
+    DivisionMode division = DivisionMode::inherit;
 };
 struct QlGene {
     bool kept = false;
@@ -282,11 +281,65 @@ inline double nb_unit_deviance(double y, double m, double phi) {
                 t -= (y + 1 / phi) * log1pmx(difference / (y + 1 / phi));
         } else if (phi > 0) {
             const double k = 1 / phi;
-            t = y * std::log(y / m) + (y + k) * std::log((m + k) / (y + k));
+            t = y * std::log(y / m) + (y + k) * std::log1p((m - y) / (y + k));
         } else
             t = y * std::log(y / m) + difference;
     }
     return std::isnan(t) ? t : 2 * std::max(0.0, t);
+}
+// out[i] = nb_unit_deviance(y[i], m[i], phi) for n observations, the same
+// arithmetic with the logarithms of all of them taken at once (vmath): the
+// arguments each observation needs, log(1 + (m - y)/y) or log(y/m),
+// log(1 + (m - y)/(y + 1/phi)), log1p(phi m) or log1p((m - y)/(y + 1/phi)),
+// are gathered in observation order and evaluated as two arrays.
+inline void nb_unit_deviances(const double *y, const double *m, std::size_t n, double phi,
+                              double *out) {
+    thread_local Vector scratch;
+    scratch.resize(3 * n);
+    double *logs = scratch.data(), *log1ps = logs + 2 * n;
+    std::size_t a = 0, b = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        if (y[i] == 0) {
+            if (phi > 0)
+                log1ps[b++] = phi * m[i];
+            continue;
+        }
+        const double difference = m[i] - y[i];
+        if (std::abs(difference) < 0.125 * y[i]) {
+            logs[a++] = 1 + difference / y[i];
+            if (phi > 0)
+                logs[a++] = 1 + difference / (y[i] + 1 / phi);
+        } else {
+            logs[a++] = y[i] / m[i];
+            if (phi > 0) {
+                const double k = 1 / phi;
+                log1ps[b++] = (m[i] - y[i]) / (y[i] + k);
+            }
+        }
+    }
+    vmath::log_array(logs, logs, a);
+    vmath::log1p_array(log1ps, log1ps, b);
+    a = b = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        double t;
+        if (y[i] == 0)
+            t = phi > 0 ? log1ps[b++] / phi : m[i];
+        else {
+            const double difference = m[i] - y[i];
+            if (std::abs(difference) < 0.125 * y[i]) {
+                t = y[i] * log1pmx_from_log(difference / y[i], logs[a++]);
+                if (phi > 0)
+                    t -= (y[i] + 1 / phi) *
+                         log1pmx_from_log(difference / (y[i] + 1 / phi), logs[a++]);
+            } else if (phi > 0) {
+                const double k = 1 / phi;
+                const double first = logs[a++];
+                t = y[i] * first + (y[i] + k) * log1ps[b++];
+            } else
+                t = y[i] * logs[a++] + difference;
+        }
+        out[i] = std::isnan(t) ? t : 2 * std::max(0.0, t);
+    }
 }
 // The factor of a symmetric matrix scaled to unit diagonal, as detail::Cholesky
 // computes it (without a condition estimate), refactored in place for each
@@ -368,10 +421,12 @@ struct FixedFit {
     Vector beta, mu, log_mu;
     double deviance = nan;
     bool ok = false;
+    std::size_t iterations = 0, halvings = 0;
 };
 inline FixedFit nb_fixed_fit(const Matrix &x, const Vector &y, const Vector &offset, double phi,
                              const Vector &start, const Cholesky &least_squares,
-                             std::size_t max_iterations = 60, bool want_deviance = true) {
+                             std::size_t max_iterations = 60, bool want_deviance = true,
+                             bool convergence_shortcut = true) {
     const std::size_t n = x.rows, p = x.cols;
     FixedFit f;
     if (start.size() == p)
@@ -395,10 +450,13 @@ inline FixedFit nb_fixed_fit(const Matrix &x, const Vector &y, const Vector &off
         exp_array(log_mu.data(), mu.data(), n);
         return finite;
     };
+    thread_local Vector unit;
     const auto deviance = [&](const Vector &mu) {
+        unit.resize(n);
+        nb_unit_deviances(y.data(), mu.data(), n, phi, unit.data());
         double total = 0;
         for (std::size_t i = 0; i < n; ++i)
-            total += nb_unit_deviance(y[i], mu[i], phi);
+            total += unit[i];
         return total;
     };
     f.mu.resize(n);
@@ -424,6 +482,7 @@ inline FixedFit nb_fixed_fit(const Matrix &x, const Vector &y, const Vector &off
     const double tolerance = 1e-14 * (100 + total);
     bool halving = false;
     for (std::size_t it = 0; it < max_iterations; ++it) {
+        f.iterations = it + 1;
         for (std::size_t i = 0; i < n; ++i) {
             const double inverse = 1 / (1 + phi * f.mu[i]);
             weight[i] = f.mu[i] * (1 + phi * y[i]) * inverse * inverse;
@@ -460,7 +519,7 @@ inline FixedFit nb_fixed_fit(const Matrix &x, const Vector &y, const Vector &off
             // linear predictor, so the decrement there is at most exp(delta) b'A^-1 b
             // with the information A here. When that bound does not settle it, the
             // next step computes the decrement.
-            if (it + 1 < max_iterations) {
+            if (convergence_shortcut && it + 1 < max_iterations) {
                 double delta = 0;
                 for (std::size_t i = 0; i < n; ++i) {
                     delta = std::max(delta, std::abs(f.log_mu[i] - next_log_mu[i]));
@@ -484,6 +543,7 @@ inline FixedFit nb_fixed_fit(const Matrix &x, const Vector &y, const Vector &off
         const double allowed = current + 1e-12 * (current + 0.1);
         double t = 1, value = nan;
         for (int h = 0; h < 40; ++h, t /= 2) {
+            f.halvings += h > 0;
             for (std::size_t j = 0; j < p; ++j)
                 next[j] = f.beta[j] + t * step[j];
             value = means(next, next_mu, next_log_mu) ? deviance(next_mu) : nan;
@@ -929,22 +989,22 @@ inline SqueezedVariances squeeze_variances(const Vector &s2, const Vector &d,
         x[i] = std::max(s2[i], floor);
         const double half = d[i] / 2;
         if (half > 0) {
-            e[i] = std::log(x[i]) - boost::math::digamma(half) + std::log(half);
-            w[i] = 1 / boost::math::trigamma(half);
+            e[i] = std::log(x[i]) - detail::digamma(half) + std::log(half);
+            w[i] = 1 / detail::trigamma(half);
         }
     }
     const double span =
         g <= 500 ? 1 : 0.3 + 0.7 * std::pow(500.0 / static_cast<double>(g), 1.0 / 3);
     const auto trend = weighted_lowess(covariate, e, w, span, delta);
     const auto log_scale = [&](double d0, std::size_t i) {
-        return trend[i] + boost::math::digamma(d0 / 2) - std::log(d0 / 2);
+        return trend[i] + detail::digamma(d0 / 2) - std::log(d0 / 2);
     };
     Vector lgamma_half(g);
     for (std::size_t i = 0; i < g; ++i)
         if (d[i] > 0)
             lgamma_half[i] = log_gamma(d[i] / 2);
     const auto objective = [&](double log_d0) {
-        const double d0 = std::exp(log_d0), shift = boost::math::digamma(d0 / 2) - std::log(d0 / 2),
+        const double d0 = std::exp(log_d0), shift = detail::digamma(d0 / 2) - std::log(d0 / 2),
                      lgamma_d0 = log_gamma(d0 / 2);
         long double total = 0;
         for (std::size_t i = 0; i < g; ++i)
@@ -1028,14 +1088,18 @@ inline FitOptions fixed_dispersion_options(double phi, const Vector &offset,
 //    library, offsets log(library + 2 x that), at phi / a (one-row hypotheses).
 inline QlResult edger_ql(const Matrix &design, const SparseCSC &counts,
                          const Hypothesis &hypothesis, const QlOptions &o = {}) {
+    const vmath::DivisionScope division(o.division);
     design.validate();
     counts.validate();
     const std::size_t n = counts.rows, genes = counts.cols, p = design.cols;
     require(design.rows == n && hypothesis.contrasts.cols == p, "edger_ql dimensions mismatch");
     require(n > p, "edger_ql needs more samples than design columns");
     require(o.threads > 0, "threads must be positive");
+    require(o.prior_count >= 0 && std::isfinite(o.prior_count),
+            "prior_count must be finite and nonnegative");
     for (double v : counts.values)
-        require(v >= 0 && std::isfinite(v), "counts must be nonnegative");
+        require(v >= 0 && std::isfinite(v) && std::floor(v) == v,
+                "edger_ql requires nonnegative integer counts");
     QlResult out;
     out.genes.resize(genes);
     out.tested_df = hypothesis.df();
@@ -1216,6 +1280,7 @@ inline QlResult edger_ql(const Matrix &design, const SparseCSC &counts,
             terms.emplace_back(row(r), Vector(n, 1));
         const Vector ones(n, 1);
         const detail::Cholesky least_squares(detail::crossprod(design, ones), 1e-12, false);
+        require(least_squares.ok, "singular design for dispersion estimation");
         const auto objective = [&](double s) {
             const double phi = s * s * s * s;
             parallel_for(top.size(), o.threads, [&](auto k) {
@@ -1255,12 +1320,17 @@ inline QlResult edger_ql(const Matrix &design, const SparseCSC &counts,
                 apl[k] = value - 0.5 * log_det;
             });
             long double total = 0;
-            for (double v : apl)
-                if (std::isfinite(v))
-                    total += v;
+            for (double v : apl) {
+                // Every candidate must use exactly the same dispersion genes.
+                // An incomplete objective is invalid, never a smaller gene set.
+                if (!std::isfinite(v))
+                    return std::numeric_limits<double>::infinity();
+                total += v;
+            }
             return -static_cast<double>(total);
         };
         const double s = detail::brent_minimum(objective, 0, std::pow(4.0, 0.25), 1e-5);
+        require(std::isfinite(objective(s)), "dispersion objective failed for the fixed gene set");
         out.dispersion = s * s * s * s;
     } else {
         require(o.dispersion >= 0 && std::isfinite(o.dispersion), "invalid dispersion");
@@ -1313,10 +1383,12 @@ inline QlResult edger_ql(const Matrix &design, const SparseCSC &counts,
                 w[i] = f.mu[i] / (1 + working * f.mu[i]);
             const auto leverage = detail::fit_leverage(tested.x, tested_transpose, w);
             const double log_a = std::log(a);
+            Vector unit(n);
+            detail::nb_unit_deviances(v.data(), f.mu.data(), n, working, unit.data());
             double dev = 0, adj = 0, df = 0;
             for (std::size_t i = 0; i < n; ++i) {
                 const double h = std::clamp(leverage[i], 0.0, 1.0);
-                const double d = detail::nb_unit_deviance(v[i], f.mu[i], working);
+                const double d = unit[i];
                 dev += d;
                 const auto [inverse_scale, k] = moments.factors(f.mu[i] / a, f.log_mu[i] - log_a);
                 adj += d * inverse_scale;
@@ -1335,6 +1407,7 @@ inline QlResult edger_ql(const Matrix &design, const SparseCSC &counts,
                 x.push_back(ave[r]);
                 v.push_back(std::pow(s2[r], 0.25));
             }
+        require(!x.empty(), "no genes could be fitted for quasi-dispersion estimation");
         const auto [lo, hi] = std::minmax_element(x.begin(), x.end());
         auto smooth = detail::r_lowess(x, v, 0.5, 3, 0.01 * (*hi - *lo));
         for (auto &s : smooth)

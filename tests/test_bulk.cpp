@@ -408,3 +408,257 @@ BOOST_AUTO_TEST_CASE(legacy_cooks_dispersion_follows_pydeseq2) {
     const Vector flat = {100, 101, 99, 100, 100, 102};
     BOOST_TEST(detail::legacy_cooks_dispersion(flat, Matrix(6, 1, 1.0), 100.333333) == 0.04);
 }
+
+BOOST_AUTO_TEST_CASE(floored_fits_optimize_bounds_and_covariate_units) {
+    Matrix x(20, 2, 1);
+    Vector y(20), offset(20);
+    for (std::size_t i = 0; i < 20; ++i) {
+        x(i, 1) = i >= 10;
+        y[i] = i < 10 ? 0 : 10 + i % 4;
+    }
+    const auto a = detail::floored_nb_fit(x, y, offset, 0.2, 0.5, {}, 250, 1e-8, -30, 30, true);
+    for (std::size_t i = 0; i < 20; ++i)
+        x(i, 1) *= 0.01;
+    const auto b = detail::floored_nb_fit(x, y, offset, 0.2, 0.5, {}, 250, 1e-8, -30, 30, true);
+    BOOST_REQUIRE(a.converged);
+    BOOST_REQUIRE(b.converged);
+    BOOST_TEST(a.deviance == b.deviance, boost::test_tools::tolerance(1e-10));
+    BOOST_TEST(a.beta[1] == b.beta[1] * 0.01, boost::test_tools::tolerance(1e-9));
+    auto bound = detail::floored_nb_fit(x, y, offset, 0.2, 0.5, {}, 1, 1e-8, -1, 1);
+    BOOST_TEST(bound.used_optimizer);
+    BOOST_TEST(bound.beta[1] <= 1);
+    // Whole-procedure p-values must also survive a change of units.
+    auto d = simulate(992, 6, 150);
+    d.y[0] = y = Vector(12, 10);
+    for (std::size_t i = 0; i < 6; ++i)
+        d.y[0][i] = 0;
+    BulkOptions o;
+    o.coefficient = 1;
+    o.cooks_filter = false;
+    const auto first = bulk_de(d.x, dense_columns(d.y), o);
+    for (std::size_t i = 0; i < d.x.rows; ++i)
+        d.x(i, 1) *= 0.01;
+    const auto second = bulk_de(d.x, dense_columns(d.y), o);
+    BOOST_TEST(first.genes[0].p_value == second.genes[0].p_value,
+               boost::test_tools::tolerance(1e-5));
+}
+
+BOOST_AUTO_TEST_CASE(independent_filter_few_rejections_and_positive_residual_rms) {
+    Vector p(200, .9), mean(200);
+    for (std::size_t i = 0; i < 200; ++i)
+        mean[i] = i + 1;
+    for (std::size_t i = 195; i < 200; ++i)
+        p[i] = 1e-8;
+    auto few = independent_filter(p, mean, .1, true);
+    BOOST_TEST(few.theta == 0);
+    for (std::size_t i = 155; i < 200; ++i)
+        p[i] = .008 + .0001 * (i - 155);
+    auto many = independent_filter(p, mean, .1, true);
+    double sq = 0, peak = *std::max_element(many.fit.begin(), many.fit.end());
+    std::size_t positive = 0, chosen = 0;
+    for (std::size_t k = 0; k < many.fit.size(); ++k)
+        if (many.rejections[k].second > 0) {
+            ++positive;
+            sq += std::pow(many.rejections[k].second - many.fit[k], 2);
+        }
+    const double threshold = peak - std::sqrt(sq / positive);
+    for (std::size_t k = 0; k < many.fit.size(); ++k)
+        if (many.rejections[k].second > threshold) {
+            chosen = k;
+            break;
+        }
+    BOOST_TEST(many.theta == many.rejections[chosen].first);
+}
+
+BOOST_AUTO_TEST_CASE(cooks_replacement_all_zero_discards_first_test) {
+    auto d = simulate(101, 7, 250);
+    d.y[0].assign(14, 0);
+    d.y[0][13] = 50;
+    BulkOptions o;
+    o.coefficient = 1;
+    o.independent_filtering = false;
+    o.size_factors.assign(14, 1);
+    const auto r = bulk_de(d.x, dense_columns(d.y), o);
+    const auto &g = r.genes[0];
+    BOOST_REQUIRE(g.replaced);
+    BOOST_TEST(g.base_mean == 0);
+    BOOST_TEST(g.p_value == 1);
+    BOOST_TEST(g.adjusted_p == 1);
+    BOOST_TEST(g.statistic == 0);
+    BOOST_TEST(g.status == "replacement_all_zero");
+}
+
+BOOST_AUTO_TEST_CASE(floored_lrt_and_replacement_have_explicit_status) {
+    auto d = simulate(91, 7, 200);
+    d.y[0].assign(14, 0);
+    for (std::size_t i = 7; i < 14; ++i)
+        d.y[0][i] = 20 + i % 3;
+    BulkOptions o;
+    o.coefficient = 1;
+    o.lrt = true;
+    o.cooks_filter = false;
+    auto r = bulk_de(d.x, dense_columns(d.y), o);
+    BOOST_TEST(r.genes[0].status == "ok");
+    BOOST_TEST(r.genes[0].p_value < 1e-6);
+    // A failed floor optimization is explicitly unsuccessful, even if the
+    // bounded iterates and means happen to be finite.
+    Matrix x(4, 2, 1);
+    Vector y{0, 0, 10, 10};
+    auto f = detail::floored_nb_fit(x, y, Vector(4), .2, .5);
+    BOOST_TEST(!f.converged);
+}
+
+BOOST_AUTO_TEST_CASE(floored_fit_pins_deseq2_black_box_reference) {
+    // DESeq2 1.48.2, nbinomWaldTest(minmu=.5), supplied factors=1 and
+    // dispersions=.2; scripts/reference_review_regressions.R reproduces it.
+    Matrix x(20, 2, 1);
+    Vector y(20), offset(20);
+    for (std::size_t i = 0; i < 20; ++i) {
+        x(i, 1) = i >= 10;
+        y[i] = i < 10 ? 0 : 10 + i % 4;
+    }
+    auto f = detail::floored_nb_fit(x, y, offset, .2, .5);
+    BOOST_REQUIRE(f.converged);
+    BOOST_TEST(f.beta[1] / std::log(2.) == 5.991127447802053, boost::test_tools::tolerance(1e-6));
+    Vector w(20);
+    for (std::size_t i = 0; i < 20; ++i)
+        w[i] = f.floored[i] / (1 + .2 * f.floored[i]);
+    auto h = detail::crossprod(x, w), a = h;
+    for (std::size_t j = 0; j < 2; ++j)
+        a(j, j) += 1e-6;
+    auto inverse = detail::Cholesky(a).inverse();
+    double variance = 0;
+    for (std::size_t j = 0; j < 2; ++j)
+        for (std::size_t k = 0; k < 2; ++k)
+            variance += inverse(1, j) * h(j, k) * inverse(k, 1);
+    BOOST_TEST(std::sqrt(variance) / std::log(2.) == .7192475816565518,
+               boost::test_tools::tolerance(1e-6));
+    const auto null = detail::floored_nb_fit(Matrix(20, 1, 1), y, offset, .2, .5);
+    BOOST_REQUIRE(null.converged);
+    const double lr = null.deviance - f.deviance;
+    // DESeq2 1.48.2 nbinomLRT on the same supplied factors and dispersion.
+    BOOST_TEST(lr == 92.02103007895477, boost::test_tools::tolerance(1e-7));
+    BOOST_TEST(boost::math::cdf(boost::math::complement(
+                   boost::math::chi_squared_distribution<double>(1), lr)) == 8.576025085782601e-22,
+               boost::test_tools::tolerance(1e-5));
+}
+
+BOOST_AUTO_TEST_CASE(successful_cooks_replacement_refits_a_floored_gene) {
+    auto d = simulate(712, 7, 200);
+    d.y[0] = {0, 0, 0, 0, 0, 0, 0, 20, 21, 19, 20, 22, 18, 5000};
+    BulkOptions o;
+    o.coefficient = 1;
+    o.size_factors.assign(14, 1);
+    const auto r = bulk_de(d.x, dense_columns(d.y), o);
+    const auto &g = r.genes[0];
+    BOOST_REQUIRE(g.replaced);
+    BOOST_TEST(g.status == "ok");
+    BOOST_TEST(g.base_mean == 129.0 / 14, boost::test_tools::tolerance(1e-12));
+    BOOST_TEST(std::isfinite(g.log2_fold_change));
+    BOOST_TEST(std::isfinite(g.lfc_se));
+    BOOST_TEST(g.p_value < 1e-6);
+}
+
+BOOST_AUTO_TEST_CASE(moments_start_prefers_the_smaller_pydeseq2_estimate) {
+    // PyDESeq2 0.5.2 public helpers on this column: rough=0.66873563,
+    // moments=-0.37142857. The minimum starts at the dispersion floor.
+    auto d = simulate(711, 4, 200);
+    for (std::size_t i = 0; i < 8; ++i)
+        d.x(i, 1) = i;
+    d.y[0] = {0, 0, 5, 20, 10, 40, 5, 20};
+    BulkOptions o;
+    o.coefficient = 1;
+    o.cooks_filter = false;
+    o.size_factors = {.01, .02, 1, 1, 1, 1, 1, 1};
+    const auto kept = bulk_de(d.x, dense_columns(d.y), o);
+    BOOST_TEST(kept.genes[0].dispersion_gene == o.min_dispersion);
+    o.keep_minimum_start = false;
+    const auto optimized = bulk_de(d.x, dense_columns(d.y), o);
+    BOOST_TEST(optimized.genes[0].dispersion_gene > .001);
+}
+
+BOOST_AUTO_TEST_CASE(cooks_distance_rounds_saturated_leverage) {
+    for (double h : {1.0, std::nextafter(1.0, 0.0), std::nextafter(1.0, 2.0)})
+        for (double r : {0.0, 0.25, 100.0})
+            BOOST_TEST(std::isnan(detail::cooks_distance(r, h, 3)));
+    // Ordinary observations retain the original formula, bit for bit.
+    for (double h : {0.0, 0.25, 0.9, 1 - 8 * std::numeric_limits<double>::epsilon()})
+        BOOST_TEST(detail::cooks_distance(2, h, 3) == 4.0 / 3 * h / ((1 - h) * (1 - h)));
+}
+
+BOOST_AUTO_TEST_CASE(cooks_single_entry_design_is_stable_under_ulp_weight_changes) {
+    Matrix x(10, 3, 1);
+    for (std::size_t i = 0; i < x.rows; ++i) {
+        x(i, 1) = i >= 5;
+        x(i, 2) = i == 2;
+    }
+    // The singleton column fits observation 2 exactly for any positive weights.
+    // Compute leverage by the same cross-product/inverse route as bulk_de.
+    const Vector y{10, 11, 1, 12, 10, 500, 12, 11, 10, 12};
+    for (int direction : {-1, 0, 1}) {
+        Vector w(x.rows);
+        for (std::size_t i = 0; i < w.size(); ++i) {
+            w[i] = 0.5 + 0.1 * i;
+            if (direction)
+                w[i] = std::nextafter(w[i], direction < 0 ? 0.0 : 2.0);
+        }
+        const detail::Cholesky factor(detail::crossprod(x, w), 1e-12, false);
+        const auto inverse = factor.inverse();
+        Vector distances(x.rows);
+        for (std::size_t i = 0; i < x.rows; ++i) {
+            double h = 0;
+            for (std::size_t a = 0; a < x.cols; ++a)
+                for (std::size_t b = 0; b < x.cols; ++b)
+                    h += x(i, a) * inverse(a, b) * x(i, b);
+            h *= w[i];
+            distances[i] = detail::cooks_distance(i == 5 ? 100 : 1, h, x.cols);
+        }
+        BOOST_TEST(std::isnan(distances[2]));
+        std::size_t top = 0;
+        for (std::size_t i = 1; i < distances.size(); ++i)
+            if (std::isfinite(distances[i]) &&
+                (!std::isfinite(distances[top]) || distances[i] > distances[top]))
+                top = i;
+        BOOST_TEST(top == 5u);
+        BOOST_TEST(distances[top] > 10);
+        std::size_t larger = 0;
+        for (double count : y)
+            larger += count > y[top];
+        BOOST_TEST(larger < 3u);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(cooks_saturated_design_keeps_flags_under_weight_perturbations) {
+    auto b = simulate(4, 6, 300);
+    Matrix x(12, 3, 1);
+    for (std::size_t i = 0; i < x.rows; ++i) {
+        x(i, 1) = i >= 6;
+        x(i, 2) = i == 2;
+    }
+    b.y[1].assign(12, 200);
+    b.y[1][7] = 5000;
+    BulkOptions o;
+    o.coefficient = 1;
+    o.size_factors.assign(12, 1);
+    const auto base = bulk_de(x, dense_columns(b.y), o);
+    BOOST_TEST(base.genes[1].status == "cooks_outlier");
+    for (double direction : {0.0, 2.0}) {
+        o.size_factors.assign(12, std::nextafter(1.0, direction));
+        const auto changed = bulk_de(x, dense_columns(b.y), o);
+        for (std::size_t j = 0; j < b.y.size(); ++j)
+            BOOST_TEST((base.genes[j].status == "cooks_outlier") ==
+                       (changed.genes[j].status == "cooks_outlier"));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(division_option_preserves_aggregate_initializers) {
+    const FitOptions fit_options{Family::poisson};
+    const BulkOptions bulk_options{2};
+    const QlOptions ql_options{false};
+    BOOST_CHECK(fit_options.family == Family::poisson);
+    BOOST_CHECK_EQUAL(bulk_options.coefficient, 2);
+    BOOST_CHECK(!ql_options.filter);
+    BOOST_CHECK(fit_options.division == DivisionMode::inherit);
+    BOOST_CHECK(bulk_options.division == DivisionMode::inherit);
+    BOOST_CHECK(ql_options.division == DivisionMode::inherit);
+}

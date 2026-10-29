@@ -22,7 +22,8 @@
 #ifdef __GLIBC__
 #include <malloc.h>
 #endif
-#if defined(__x86_64__) && (defined(__GNUC__) || defined(__clang__))
+#if defined(__x86_64__) && !defined(RAPIDGLM_FORCE_PORTABLE) &&                                    \
+    (defined(__GNUC__) || defined(__clang__))
 #include <cpuid.h>
 #include <immintrin.h>
 #define RAPIDGLM_SHA_NI 1
@@ -317,7 +318,17 @@ inline SparseCSC read_market(const std::string &path) {
     } while (dimension_line.empty() || dimension_line[0] == '%');
     std::size_t features, cells, nnz;
     std::istringstream dimensions(dimension_line);
-    require(static_cast<bool>(dimensions >> features >> cells >> nnz) && features > 0 && cells > 0,
+    std::string ftoken, ctoken, ntoken, extra;
+    const auto size = [](const std::string &token, std::size_t &value) {
+        if (token.empty() || token.front() < '0' || token.front() > '9')
+            return false;
+        const auto parsed = std::from_chars(token.data(), token.data() + token.size(), value);
+        return parsed.ec == std::errc() && parsed.ptr == token.data() + token.size();
+    };
+    require(static_cast<bool>(dimensions >> ftoken >> ctoken >> ntoken) && !(dimensions >> extra) &&
+                size(ftoken, features) && size(ctoken, cells) && size(ntoken, nnz) &&
+                features > 0 && cells > 0 && features < std::vector<std::size_t>().max_size() &&
+                nnz <= Vector().max_size(),
             "invalid MatrixMarket dimensions");
     // The entries are parsed in place with std::from_chars, which rounds values
     // exactly as the stream does and is much faster on large matrices.
@@ -347,8 +358,8 @@ inline SparseCSC read_market(const std::string &path) {
             ++cursor;
         std::int64_t whole;
         const auto result = std::from_chars(cursor, end, whole);
-        if (result.ec == std::errc() && std::abs(whole) < (std::int64_t(1) << 53) &&
-            (result.ptr == end || space(*result.ptr))) {
+        if (result.ec == std::errc() && whole > -(std::int64_t(1) << 53) &&
+            whole < (std::int64_t(1) << 53) && (result.ptr == end || space(*result.ptr))) {
             value = static_cast<double>(whole);
             cursor = result.ptr;
             return true;
@@ -493,7 +504,17 @@ inline CountMatrix read_market_counts(const std::string &path, int threads = 1) 
              dimension_line[0] == '%');
     std::size_t features, cells, nnz;
     std::istringstream dimensions(dimension_line);
-    require(static_cast<bool>(dimensions >> features >> cells >> nnz) && features > 0 && cells > 0,
+    std::string ftoken, ctoken, ntoken, extra;
+    const auto size = [](const std::string &token, std::size_t &value) {
+        if (token.empty() || token.front() < '0' || token.front() > '9')
+            return false;
+        const auto parsed = std::from_chars(token.data(), token.data() + token.size(), value);
+        return parsed.ec == std::errc() && parsed.ptr == token.data() + token.size();
+    };
+    require(static_cast<bool>(dimensions >> ftoken >> ctoken >> ntoken) && !(dimensions >> extra) &&
+                size(ftoken, features) && size(ctoken, cells) && size(ntoken, nnz) &&
+                features > 0 && cells > 0 && features < std::vector<std::size_t>().max_size() &&
+                nnz <= Vector().max_size(),
             "invalid MatrixMarket dimensions");
     require(cells <= std::numeric_limits<std::uint32_t>::max(), "too many observations for counts");
     const bool pattern = type == "pattern";

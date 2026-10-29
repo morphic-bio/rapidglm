@@ -39,6 +39,36 @@ def write_design(path, x):
 
 
 class CAPI(unittest.TestCase):
+    def test_floored_optimizer_fallback_metadata(self):
+        from rapidglm import capi
+        x = np.ones((20, 2)); x[:10, 1] = 0; x[10:, 1] = .01
+        y = np.r_[np.zeros(10), 10 + np.arange(10, 20) % 4][:, None]
+        *_, converged, optimized = capi.nb_floored_fits(
+            x, y, np.ones(20), np.array([.2]), max_iterations=1,
+            min_beta=-1, max_beta=1, return_optimizer=True)
+        self.assertTrue(converged[0])
+        self.assertTrue(optimized[0])
+
+    def test_old_api_checked_before_new_symbols(self):
+        from unittest.mock import patch
+        from rapidglm import capi
+        class Version:
+            def __call__(self): return 1
+        class Old:
+            rapidglm_c_api_version = Version()
+            def __getattr__(self, name):
+                raise AssertionError("looked up new symbol before version check: " + name)
+        with patch.object(capi, "_lib", None), patch.object(capi, "_load", return_value=Old()):
+            with self.assertRaisesRegex(OSError, "need 3"): capi._library()
+
+    def test_bad_hypothesis_dimensions(self):
+        x = np.ones((8, 2)); y = np.ones((8, 20))
+        for method in (rapidglm.bulk_de, rapidglm.edger_ql):
+            for options in ({"coefficient": -1}, {"coefficient": 2},
+                            {"coefficients": [-1]}, {"contrast": [1]}):
+                with self.assertRaises(ValueError): method(x, y, **options)
+        with self.assertRaises(ValueError): rapidglm.edger_ql(x, y, norm_factors=[1])
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = pathlib.Path(self.tmp.name)
@@ -142,10 +172,13 @@ class CAPI(unittest.TestCase):
         files["predictors"] = write_market(self.root / "predictors.mtx", predictors)
         for calibration in ("permutation", "asymptotic"):
             with self.subTest(calibration=calibration):
-                table, _ = self.cli("scan", **files, calibration=calibration, budgets=[99, 999], seed=5)
+                table, record = self.cli("scan", **files, calibration=calibration, budgets=[99, 999],
+                                         seed=5)
                 frame = rapidglm.scan(design, counts[:, :40], predictors, calibration=calibration,
                                       budgets=[99, 999], seed=5)
                 self.assert_same(table, frame, text=("family", "status"))
+                self.assertEqual(record["crt_draw"], "hazard")
+                self.assertEqual(frame.attrs["crt_draw_used"], record["crt_draw_used"])
                 self.assertEqual((frame["status"] == "ok").sum(), 78)  # gene 3 is all zero
 
     def screen(self):
@@ -209,6 +242,36 @@ class CAPI(unittest.TestCase):
                 self.assert_same(self.cli_kinds(table), frame, text=("target", "guide", "kind", "status"))
                 self.assertGreaterEqual((frame["status"] == "ok").sum(), 5)
                 self.assertEqual(frame.attrs["discovery_rejections"], record["discovery_rejections"])
+                # hazard by default, thinned without AES instructions, as the CLI says.
+                self.assertEqual(record["crt_draw"], config.get("crt_draw", "hazard"))
+                self.assertIn(record["crt_draw_used"], ("hazard", "thinned", "direct"))
+                self.assertEqual(frame.attrs["crt_draw_used"], record["crt_draw_used"])
+
+    def test_sceptre_null_start_matches_cli(self):
+        # Low MOI: NT-control pair nulls, refined from the response's reference or cold.
+        x, responses, assignments, guides, pairs, files = self.screen()
+        common = dict(moi="low", budgets=[199, 999], seed=5)
+        frames = {}
+        for start in ("refine", "cold"):
+            with self.subTest(null_start=start):
+                table, record = self.cli("sceptre", **files, **common, null_start=start)
+                frame = rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, null_start=start)
+                self.assert_same(self.cli_kinds(table), frame, text=("target", "guide", "kind", "status"))
+                self.assertEqual(record["null_start"], start)
+                self.assertEqual(record["null_start_used"], start)
+                self.assertEqual(frame.attrs["null_start_used"], start)
+                for name in ("null_refined", "null_cold_refits", "null_fits"):
+                    self.assertEqual(frame.attrs[name], record[name], name)
+                frames[start] = frame
+        refine, cold = frames["refine"], frames["cold"]
+        self.assertGreater(refine.attrs["null_refined"], 0)
+        self.assertEqual(cold.attrs["null_refined"], 0)
+        self.assertTrue((refine["status"] == cold["status"]).all())
+        ok = (cold["status"] == "ok").to_numpy()
+        self.assertGreaterEqual(ok.sum(), 3)
+        np.testing.assert_allclose(refine["statistic"][ok], cold["statistic"][ok], rtol=1e-6, atol=1e-12)
+        with self.assertRaisesRegex(ValueError, "null_start must be one of refine/cold"):
+            rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, null_start="warm")
 
     def test_sceptre_stream_keys_and_families_match_cli(self):
         x, responses, assignments, guides, pairs, files = self.screen()
@@ -255,6 +318,12 @@ class CAPI(unittest.TestCase):
                     keys = "stream_keys" in arguments or "response_ids" in arguments
                     self.assertEqual(frame["p_value"].equals(default["p_value"]), not keys)
                     self.assertEqual(frame["adjusted_p"].equals(default["adjusted_p"]), not arguments)
+        # Batch scoring (the default) gives the records of scoring pair by pair.
+        unbatched = rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, batch_scoring=False)
+        pd.testing.assert_frame_equal(unbatched, default, check_exact=True)
+        table, record = self.cli("sceptre", **files, **common, batch_scoring=False)
+        self.assertFalse(record["batch_scoring"])
+        self.assert_same(self.cli_kinds(table), default, text=("target", "guide", "kind", "status"))
         with self.assertRaisesRegex(ValueError, "stream_keys must be one of identity/position"):
             rapidglm.sceptre(x, responses, assignments, guides, pairs, **common, stream_keys="name")
         with self.assertRaisesRegex(ValueError, "adjustment_family must be one of tested/listed"):

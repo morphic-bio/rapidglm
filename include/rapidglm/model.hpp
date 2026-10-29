@@ -1,5 +1,6 @@
 #pragma once
 #include "lapack.hpp"
+#include "vmath.hpp"
 #include <algorithm>
 #include <array>
 #include <boost/math/special_functions/digamma.hpp>
@@ -18,6 +19,7 @@
 
 namespace rapidglm {
 using Vector = std::vector<double>;
+using DivisionMode = vmath::DivisionMode;
 inline constexpr double nan = std::numeric_limits<double>::quiet_NaN();
 inline void require(bool ok, const char *message) {
     if (!ok)
@@ -110,6 +112,7 @@ struct FitOptions {
     // design, held unchanged, and only without prior weights; results are the
     // same with or without it.
     std::shared_ptr<const detail::DesignSummary> design;
+    DivisionMode division = DivisionMode::inherit;
 };
 struct FitResult {
     Family family = Family::gaussian;
@@ -472,6 +475,8 @@ struct WeightedQR {
 inline Matrix crossprod(const Matrix &x, const Vector &w) {
     const std::size_t n = x.rows, p = x.cols;
     Matrix a(p, p);
+    if (p == 0)
+        return a;
     double v_small[64];
     Vector v_large;
     double *v = 4 * p <= 64 ? v_small : (v_large.resize(4 * p), v_large.data());
@@ -687,19 +692,45 @@ inline double mean_link(double eta, Family family) {
         return std::numeric_limits<double>::infinity();
     return std::exp(std::max(-700.0, eta));
 }
+// digamma and trigamma of the count paths: boost::math's double-precision
+// algorithms (no promotion to long double), which one value at a time are faster
+// than vmath's on the benchmark host's efficiency cores (METHODS.md, Numerical
+// backend).
+using DoublePolicy = boost::math::policies::policy<boost::math::policies::promote_double<false>>;
+inline double digamma(double x) {
+    return boost::math::digamma(x, DoublePolicy());
+}
+inline double trigamma(double x) {
+    return boost::math::trigamma(x, DoublePolicy());
+}
+// mean_link of the log link in place over linear predictors, the exponentials
+// from vmath::exp_array: eta > 700 gives +inf (exp(710) overflows) and eta below
+// -700, or NaN, exp(-700), as mean_link.
+inline void exp_means(Vector &eta) {
+    for (auto &e : eta)
+        e = e > 700 ? 710 : std::max(-700.0, e);
+    vmath::exp_array(eta.data(), eta.data(), eta.size());
+}
 inline Vector means(const Matrix &x, const Vector &beta, const Vector &offset, Family family,
                     const SparseRows *rows = nullptr) {
     auto mu = matvec(x, beta, rows);
+    const bool log_link = family == Family::poisson || family == Family::negative_binomial;
     for (std::size_t i = 0; i < mu.size(); ++i)
-        mu[i] = mean_link(mu[i] + offset[i], family);
+        mu[i] = log_link ? mu[i] + offset[i] : mean_link(mu[i] + offset[i], family);
+    if (log_link)
+        exp_means(mu);
     return mu;
 }
 // Same values as means(x, ...): each group's eta is the same row product.
 inline Vector means(const RowGroups &g, const Vector &beta, const Vector &offset, Family family) {
     const auto eta = matvec(g.rows, beta);
+    const bool log_link = family == Family::poisson || family == Family::negative_binomial;
     Vector mu(g.group.size());
     for (std::size_t i = 0; i < mu.size(); ++i)
-        mu[i] = mean_link(eta[g.group[i]] + offset[i], family);
+        mu[i] =
+            log_link ? eta[g.group[i]] + offset[i] : mean_link(eta[g.group[i]] + offset[i], family);
+    if (log_link)
+        exp_means(mu);
     return mu;
 }
 // log(1 + r) for r > -1 from one logarithm: log(u) r / (u - 1) with u = 1 + r
@@ -822,7 +853,7 @@ struct CountTerms {
             if (beyond_counts != 0)
                 total += beyond_counts * std::log(t) - factorials;
             if (below_weight != 0)
-                total -= below_weight * std::lgamma(t);
+                total -= below_weight * vmath::detail::lgamma(t);
             total += below + beyond;
         }
         cached_theta = theta;
@@ -859,8 +890,8 @@ struct CountTerms {
                 second += e.weight * (1 / z + trigamma_correction(z));
                 weights += e.weight;
             }
-            first -= weights * boost::math::digamma(t);
-            second -= weights * boost::math::trigamma(t);
+            first -= weights * detail::digamma(theta);
+            second -= weights * detail::trigamma(theta);
         }
         return {first, second};
     }
@@ -912,6 +943,17 @@ inline double likelihood(const Vector &y, const Vector &mu, const Vector &a, Fam
 inline double log1pmx(double r) {
     if (std::abs(r) >= 1e-3)
         return r - log1p_by_log(r);
+    return r * r * (0.5 + r * (-1.0 / 3 + r * (0.25 + r * (-0.2 + r / 6))));
+}
+// log1p_by_log and log1pmx with log u (u = 1 + r rounded) from the caller, for
+// loops that take the logarithms of a whole vector at once (vmath::log_array).
+inline double log1p_from_log(double r, double log_u) {
+    const double u = 1 + r;
+    return u == 1 ? r : log_u * (r / (u - 1));
+}
+inline double log1pmx_from_log(double r, double log_u) {
+    if (std::abs(r) >= 1e-3)
+        return r - log1p_from_log(r, log_u);
     return r * r * (0.5 + r * (-1.0 / 3 + r * (0.25 + r * (-0.2 + r / 6))));
 }
 // The deviance of a count fit, the scale of the relative convergence criterion.
@@ -2095,6 +2137,7 @@ inline FitResult fit_from(const Matrix &x, const Vector &y, const FitOptions &o,
 // dip that hides an interior maximum. Such fits run from both o.theta and the upper
 // bound and keep the higher likelihood; reported iterations count both.
 inline FitResult fit(const Matrix &x, const Vector &y, const FitOptions &o) {
+    const vmath::DivisionScope division(o.division);
     bool at_bound = false;
     auto r = detail::fit_from(x, y, o, false, &at_bound);
     if (!at_bound)
@@ -2111,6 +2154,7 @@ inline FitResult fit(const Matrix &x, const Vector &y, const FitOptions &o) {
 // Poisson estimates; theta maximizes the NB likelihood with those means fixed.
 // This is not a joint NB fit and supplies no coefficient Wald/LR inference.
 inline FitResult fit_sceptre_null(const Matrix &x, const Vector &y, const FitOptions &o = {}) {
+    const vmath::DivisionScope division(o.division);
     require(o.family == Family::negative_binomial && o.dispersion == Dispersion::ml &&
                 o.ridge == 0 && !o.nb_warm_start && !o.cox_reid,
             "SCEPTRE null requires unpenalized NB with ML dispersion, no NB warm start and no "

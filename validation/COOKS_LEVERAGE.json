@@ -1,0 +1,200 @@
+{
+  "purpose": "Untimed Cook leverage-one black-box comparison",
+  "datasets": {
+    "thyroid32": {
+      "genes": 28769,
+      "status_changes": [
+        124,
+        2473,
+        3042,
+        4006,
+        4047,
+        4911,
+        8403,
+        8406,
+        8588,
+        9595,
+        11873,
+        12124,
+        14136,
+        14584,
+        15915,
+        16379,
+        16656,
+        16829
+      ],
+      "discovery_changes": [
+        4047,
+        8403,
+        8406,
+        15915,
+        16656
+      ],
+      "discoveries": [
+        1625,
+        1620
+      ],
+      "changed_columns": [
+        "status",
+        "pvalue",
+        "padj"
+      ],
+      "finished_utc": "2026-10-25T16:32:05.350120+00:00",
+      "previous_16_all_flagged": true,
+      "reference_16_all_missing_p": true,
+      "previous_16_statuses": {
+        "2436": "cooks_outlier",
+        "4047": "cooks_outlier",
+        "8406": "cooks_outlier",
+        "9596": "cooks_outlier",
+        "10471": "cooks_outlier",
+        "10472": "cooks_outlier",
+        "11136": "cooks_outlier",
+        "11873": "cooks_outlier",
+        "11875": "cooks_outlier",
+        "14136": "cooks_outlier",
+        "15915": "cooks_outlier",
+        "16829": "cooks_outlier",
+        "16873": "cooks_outlier",
+        "18372": "cooks_outlier",
+        "20378": "cooks_outlier",
+        "23378": "cooks_outlier"
+      },
+      "all_changed_genes_flagged_by_reference": true
+    },
+    "airway": {
+      "genes": 22369,
+      "status_changes": [],
+      "discovery_changes": [],
+      "discoveries": [
+        4833,
+        4833
+      ],
+      "changed_columns": [],
+      "finished_utc": "2026-10-25T16:32:06.016129+00:00"
+    },
+    "kang": {
+      "genes": 1000,
+      "status_changes": [],
+      "discovery_changes": [],
+      "discoveries": [
+        635,
+        635
+      ],
+      "changed_columns": [],
+      "finished_utc": "2026-10-25T16:32:06.068382+00:00"
+    },
+    "sim3": {
+      "genes": 4000,
+      "status_changes": [],
+      "discovery_changes": [],
+      "discoveries": [
+        239,
+        239
+      ],
+      "changed_columns": [],
+      "finished_utc": "2026-10-25T16:32:06.148458+00:00"
+    },
+    "sim3b": {
+      "genes": 4000,
+      "status_changes": [],
+      "discovery_changes": [],
+      "discoveries": [
+        201,
+        201
+      ],
+      "changed_columns": [],
+      "finished_utc": "2026-10-25T16:32:06.227825+00:00"
+    },
+    "sim8": {
+      "genes": 4000,
+      "status_changes": [],
+      "discovery_changes": [],
+      "discoveries": [
+        253,
+        253
+      ],
+      "changed_columns": [],
+      "finished_utc": "2026-10-25T16:32:06.327198+00:00"
+    },
+    "thyroid128": {
+      "genes": 28769,
+      "status_changes": [],
+      "discovery_changes": [],
+      "discoveries": [
+        790,
+        790
+      ],
+      "changed_columns": [],
+      "finished_utc": "2026-10-25T16:32:10.506631+00:00"
+    },
+    "thyroid": {
+      "genes": 28769,
+      "status_changes": [],
+      "discovery_changes": [],
+      "discoveries": [
+        7178,
+        7178
+      ],
+      "changed_columns": [],
+      "finished_utc": "2026-10-25T16:32:25.015155+00:00"
+    }
+  },
+  "previous_16_status_flips": [
+    2436,
+    4047,
+    8406,
+    9596,
+    10471,
+    10472,
+    11136,
+    11873,
+    11875,
+    14136,
+    15915,
+    16829,
+    16873,
+    18372,
+    20378,
+    23378
+  ],
+  "completed_utc": "2026-10-25T16:32:25.015451+00:00",
+  "chosen_rule": "Within four double machine epsilons of one, Cook leverage is exactly one and its distance is undefined (NaN). Saturation alone does not flag a gene. When an eligible replicated cell has a finite Cook distance above cutoff, an undefined saturated distance prevents the legacy largest-distance count-rank exemption.",
+  "alternatives": [
+    {
+      "rule": "dev.2: unrounded leverage and largest finite distance",
+      "thyroid32_discoveries": 1625,
+      "outcome": "Roundoff-dependent; eight of the sixteen regression genes were unflagged."
+    },
+    {
+      "rule": "Round within four epsilons; exclude saturated distance and retain count-rank exemption",
+      "thyroid32_discoveries": 1621,
+      "regression_genes_flagged": 15,
+      "outcome": "Rejected: failed one of sixteen required reference flags."
+    },
+    {
+      "rule": "Round within four epsilons; do not grant count-rank exemption when saturation makes the maximum undefined",
+      "thyroid32_discoveries": 1620,
+      "regression_genes_flagged": 16,
+      "additional_status_changes_against_dev2": 18,
+      "all_changed_genes_flagged_by_deseq2": true,
+      "outcome": "Selected: all sixteen required flags agree; all seven other bulk datasets have identical numeric and text columns."
+    }
+  ],
+  "unit_tests": {
+    "cases": 5,
+    "assertions": 653,
+    "passed": true,
+    "coverage": [
+      "exact leverage one",
+      "adjacent representable leverage below and above one",
+      "ordinary leverage formula identity",
+      "single-entry design column with weights perturbed by one ulp",
+      "bulk flags after one-ulp size-factor perturbations"
+    ]
+  },
+  "input_sha256": {
+    "validation/work/benchmark/thyroid32/counts.mtx": "c60e988542caacb914e45dc1a88e956f1612d940509ddf5c6a670104d2d45093",
+    "validation/work/benchmark/thyroid32/x.tsv": "c27fa73bfe388ac301181e6329674807a7f9999f2d5e0bbb5ba3ce27f14216d0"
+  }
+}

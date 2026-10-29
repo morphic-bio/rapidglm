@@ -29,7 +29,12 @@
 extern "C" {
 #endif
 
-#define RAPIDGLM_C_API_VERSION 1
+/* Version 3 (1.5.0): the crt_draw_used scalar of the sceptre and scan tables and
+ * the special functions rapidglm_<f>_array and rapidglm_special_path.
+ * Version 4 (1.6.0): null_start and batch_scoring appended to
+ * rapidglm_sceptre_options, and the null_start_used, null_refined and
+ * null_cold_refits scalars of the rapidglm_sceptre table. */
+#define RAPIDGLM_C_API_VERSION 4
 
 enum { RAPIDGLM_OK = 0, RAPIDGLM_ERROR_INVALID = 1, RAPIDGLM_ERROR_FAILED = 2 };
 
@@ -37,6 +42,13 @@ enum { RAPIDGLM_OK = 0, RAPIDGLM_ERROR_INVALID = 1, RAPIDGLM_ERROR_FAILED = 2 };
 const char *rapidglm_version(void);
 int rapidglm_c_api_version(void);
 const char *rapidglm_last_error(void);
+/* Thread-local division option. INHERIT uses RAPIDGLM_DIVISION or the build
+ * default. Setting an option returns the previous raw option through previous
+ * when non-NULL; restore it after a scoped call. Worker threads inherit it.
+ * rapidglm_division_mode returns the resolved mode, or -2 on invalid environment. */
+enum { RAPIDGLM_DIVISION_INHERIT = -1, RAPIDGLM_DIVISION_SLOW = 0, RAPIDGLM_DIVISION_FAST = 1 };
+int rapidglm_set_division(int mode, int *previous);
+int rapidglm_division_mode(void);
 
 typedef struct {
     size_t rows, cols;
@@ -159,7 +171,8 @@ int rapidglm_nb_fixed_fits(const rapidglm_dense *design, const rapidglm_dense *c
 /* The same fits as DESeq2 and PyDESeq2's irls make them: fitted counts floored at
  * min_mu inside the iterations (ridge 1e-6, coefficients within [min_beta,
  * max_beta], deviance tolerance `tolerance`, at most max_iterations steps);
- * fitted = the unfloored means, hat from the floored weights. */
+ * fitted = the unfloored means, hat from the floored weights. converged is 0
+ * for failure, 1 for IRLS convergence, 2 for native bounded-optimizer convergence. */
 int rapidglm_nb_floored_fits(const rapidglm_dense *design, const rapidglm_dense *counts,
                              const double *size_factors, const double *dispersions, double min_mu,
                              double tolerance, size_t max_iterations, double min_beta,
@@ -211,6 +224,9 @@ enum {
 enum { RAPIDGLM_SIDE_BOTH = 0, RAPIDGLM_SIDE_LEFT = 1, RAPIDGLM_SIDE_RIGHT = 2 };
 enum { RAPIDGLM_NULL_SCEPTRE = 0, RAPIDGLM_NULL_DIRECT = 1 };
 enum { RAPIDGLM_EFFECTS_SIGNIFICANT = 0, RAPIDGLM_EFFECTS_ALL = 1, RAPIDGLM_EFFECTS_NONE = 2 };
+/* CRT label samplers. hazard (the default) needs the processor's AES
+ * instructions and draws with thinned (the default of releases before 1.5.0)
+ * without them; result tables state the sampler used as crt_draw_used. */
 enum { RAPIDGLM_CRT_THINNED = 0, RAPIDGLM_CRT_DIRECT = 1, RAPIDGLM_CRT_HAZARD = 2 };
 /* Acceptance of the skew-normal fit: strict also checks the tail on the
  * statistic's side; ks is the check of releases before 1.0.0. */
@@ -227,6 +243,12 @@ enum { RAPIDGLM_STREAMS_IDENTITY = 0, RAPIDGLM_STREAMS_POSITION = 1 };
  * every listed pair, those that fail pair QC counting with p = 1 (releases
  * before 1.3.0). */
 enum { RAPIDGLM_FAMILY_TESTED = 0, RAPIDGLM_FAMILY_LISTED = 1 };
+/* How a pair's null is started with NT controls and RAPIDGLM_NULL_SCEPTRE.
+ * refine (the default): one Fisher-scoring step from the response's null on
+ * all retained cells, using additive totals, then exact passes over the pair's
+ * cells to the cold fit's convergence criteria (a pair that does not converge
+ * is fitted cold). cold: every pair fitted from scratch, as before 1.6.0. */
+enum { RAPIDGLM_NULL_START_REFINE = 0, RAPIDGLM_NULL_START_COLD = 1 };
 
 typedef struct {
     size_t struct_size;
@@ -246,7 +268,7 @@ typedef struct {
     uint64_t seed;
     int threads;
     int bonferroni; /* Bonferroni instead of BH adjustment of discovery pairs */
-    int crt_draw;   /* default RAPIDGLM_CRT_THINNED */
+    int crt_draw;   /* default RAPIDGLM_CRT_HAZARD */
     int fit_check;  /* default RAPIDGLM_FIT_CHECK_STRICT */
     /* Draws on which a skew-normal p-value too small for the last budget to
      * check is confirmed (strict check). Default RAPIDGLM_CONFIRM_AUTO: ten
@@ -264,6 +286,11 @@ typedef struct {
      * lists only some of them; those not listed count with p = 1). Default 0:
      * the pairs at hand. */
     size_t family_size[3];
+    int null_start; /* default RAPIDGLM_NULL_START_REFINE */
+    /* CRT with complement controls: score each response's pairs together, all
+     * their draws of a stage in one pass (default 1). The records are those of
+     * scoring the pairs one by one (0). */
+    int batch_scoring;
 } rapidglm_sceptre_options;
 /* high_moi selects the MOI-dependent defaults (control group, mechanism). */
 void rapidglm_sceptre_options_init(rapidglm_sceptre_options *options, int high_moi);
@@ -276,9 +303,13 @@ void rapidglm_sceptre_options_init(rapidglm_sceptre_options *options, int high_m
  * for a pair outside its adjustment family), log2fc, log2fc_se,
  * sceptre_mean_ratio, mean_ratio_log2. Scalars: retained_cells,
  * calibration_rejections, power_rejections, discovery_rejections, null_fits
- * (null models fitted) and, for <kind> in discovery, negative and positive,
- * pairs_listed_<kind>, pairs_passing_qc_<kind> and family_size_<kind> (the
- * size of the adjustment family). */
+ * (null models fitted), crt_draw_used (the RAPIDGLM_CRT_* sampler used),
+ * null_start_used (the RAPIDGLM_NULL_START_* used), null_refined (pair nulls
+ * refined from the response's reference), null_cold_refits (pairs fitted cold
+ * because refining did not converge) and,
+ * for <kind> in discovery, negative and positive, pairs_listed_<kind>,
+ * pairs_passing_qc_<kind> and family_size_<kind> (the size of the adjustment
+ * family). */
 int rapidglm_sceptre(const rapidglm_dense *design, const rapidglm_sparse *responses,
                      const rapidglm_sparse *assignments, size_t n_guides,
                      const char *const *guide_ids, const char *const *guide_targets,
@@ -337,7 +368,7 @@ typedef struct {
     int bonferroni;
     uint64_t seed;
     int threads;
-    int crt_draw;         /* default RAPIDGLM_CRT_THINNED */
+    int crt_draw;         /* default RAPIDGLM_CRT_HAZARD */
     int fit_check;        /* default RAPIDGLM_FIT_CHECK_STRICT */
     size_t confirm_draws; /* as for rapidglm_sceptre_options */
 } rapidglm_scan_options;
@@ -346,11 +377,27 @@ void rapidglm_scan_options_init(rapidglm_scan_options *options);
 /* predictors: observations x predictors. Pairs: NULL (all response x predictor
  * pairs) or n_pairs response/predictor indices with optional family names.
  * Columns: response, predictor, family, status, statistic, p_value, adjusted_p,
- * estimate, standard_error, effect, effect_se, draws, approximation. */
+ * estimate, standard_error, effect, effect_se, draws, approximation. Scalar:
+ * crt_draw_used (the RAPIDGLM_CRT_* sampler used). */
 int rapidglm_scan(const rapidglm_dense *design, const rapidglm_sparse *responses,
                   const rapidglm_sparse *predictors, size_t n_pairs, const size_t *pair_responses,
                   const size_t *pair_predictors, const char *const *pair_families,
                   const rapidglm_scan_options *options, rapidglm_table **result);
+
+/* Special functions of double over arrays (include/rapidglm/vmath.hpp; since C
+ * API version 3): out[i] = f(x[i]) for n values; out may equal x. log, log1p,
+ * exp, digamma and trigamma are RapidGLM's (digamma and trigamma for x >= 0, NaN
+ * below; METHODS.md), the same bits on every processor; lgamma is the C
+ * library's lgamma_r. Return RAPIDGLM_ERROR_INVALID when n > 0 and x or out is
+ * NULL. */
+int rapidglm_log_array(const double *x, double *out, size_t n);
+int rapidglm_log1p_array(const double *x, double *out, size_t n);
+int rapidglm_exp_array(const double *x, double *out, size_t n);
+int rapidglm_lgamma_array(const double *x, double *out, size_t n);
+int rapidglm_digamma_array(const double *x, double *out, size_t n);
+int rapidglm_trigamma_array(const double *x, double *out, size_t n);
+/* The path those functions take on this processor: "avx2", "neon" or "portable". */
+const char *rapidglm_special_path(void);
 
 #ifdef __cplusplus
 }

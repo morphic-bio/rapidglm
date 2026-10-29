@@ -55,6 +55,15 @@ int main(void) {
     size_t length = 0, j, called = 0;
     const double *padj, *sf;
 
+    {
+        int previous = -9, original = rapidglm_division_mode();
+        CHECK(rapidglm_set_division(RAPIDGLM_DIVISION_FAST, &previous) == RAPIDGLM_OK);
+        CHECK(rapidglm_division_mode() == RAPIDGLM_DIVISION_FAST);
+        CHECK(rapidglm_set_division(77, NULL) != RAPIDGLM_OK);
+        CHECK(rapidglm_division_mode() == RAPIDGLM_DIVISION_FAST);
+        CHECK(rapidglm_set_division(previous, NULL) == RAPIDGLM_OK);
+        CHECK(rapidglm_division_mode() == original);
+    }
     build();
     counts.rows = SAMPLES;
     counts.cols = GENES;
@@ -66,6 +75,7 @@ int main(void) {
 
     rapidglm_fit_options_init(&fit);
     CHECK(rapidglm_fit_batch(&x, &counts, &fit, 2, &t) == RAPIDGLM_OK);
+    CHECK(rapidglm_table_scalar(t, "division_mode") == rapidglm_division_mode());
     CHECK(rapidglm_table_rows(t) == GENES);
     CHECK(rapidglm_table_numeric(t, "beta1") != NULL);
     CHECK(strcmp(rapidglm_table_text(t, "status", 0), "converged") == 0);
@@ -74,6 +84,7 @@ int main(void) {
     rapidglm_bulk_options_init(&bulk);
     bulk.lfc_shrinkage = RAPIDGLM_SHRINK_NORMAL;
     CHECK(rapidglm_bulk_de(&x, &counts, &bulk, &t) == RAPIDGLM_OK);
+    CHECK(rapidglm_table_scalar(t, "division_mode") == rapidglm_division_mode());
     CHECK(rapidglm_table_rows(t) == GENES);
     CHECK(rapidglm_table_columns(t) == 17);
     padj = rapidglm_table_numeric(t, "padj");
@@ -85,6 +96,44 @@ int main(void) {
     CHECK(rapidglm_table_scalar(t, "prior_variance") >= 0.25);
     CHECK(isnan(rapidglm_table_scalar(t, "no_such_value")));
     rapidglm_table_free(t);
+
+    /* New 1.4 entry points are callable by a C99 client, including failure. */
+    {
+        rapidglm_ql_options ql;
+        rapidglm_ql_options_init(&ql);
+        CHECK(rapidglm_edger_ql(&x, &counts, &ql, &t) == RAPIDGLM_OK);
+        CHECK(rapidglm_table_numeric(t, "F") != NULL);
+        CHECK(isfinite(rapidglm_table_scalar(t, "dispersion")));
+        rapidglm_table_free(t);
+        values[0] += 0.5;
+        t = NULL;
+        CHECK(rapidglm_edger_ql(&x, &counts, &ql, &t) != RAPIDGLM_OK);
+        CHECK(t == NULL);
+        values[0] -= 0.5;
+    }
+    {
+        double dense[SAMPLES * GENES], factors[SAMPLES], disp[GENES];
+        double beta[GENES * 2], mu[SAMPLES * GENES], hat[SAMPLES * GENES];
+        int converged[GENES];
+        rapidglm_dense y = {SAMPLES, GENES, dense};
+        for (j = 0; j < SAMPLES; ++j)
+            factors[j] = 1;
+        for (j = 0; j < GENES; ++j) {
+            size_t i;
+            disp[j] = .1;
+            for (i = 0; i < SAMPLES; ++i)
+                dense[i * GENES + j] = values[column_ptr[j] + i];
+        }
+        CHECK(rapidglm_nb_floored_fits(&x, &y, factors, disp, .5, 1e-8, 250, -30, 30, 1, beta, mu,
+                                       hat, converged) == RAPIDGLM_OK);
+        CHECK(converged[0] && isfinite(beta[1]) && hat[0] >= 0);
+        {
+            rapidglm_dense means = {SAMPLES, GENES, mu};
+            CHECK(rapidglm_nb_dispersions(&x, &y, &means, disp, 1e-8, 10, 0, 1, 1, 1, disp,
+                                          converged) == RAPIDGLM_OK);
+            CHECK(disp[0] > 0 && converged[0]);
+        }
+    }
 
     /* A joint Wald test is refused with a message. */
     {

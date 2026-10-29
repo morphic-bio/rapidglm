@@ -1,0 +1,1498 @@
+{
+ "receipt": "Genome-wide Gaussian cis-eQTL scan of Geuvadis (462 samples, 20,427 expressed autosomal genes): RapidGLM 1.4.1 qtl against tensorQTL 1.0.10, both with 10,000 permutations",
+ "version": "1.4.1",
+ "tag": "v1.4.1",
+ "repository_commit": "64a8610d056767b5af8dfc72a94c817d366f69db",
+ "repository_dirty_files": [
+  "M scripts/eqtl_prep_expression.py",
+  " M scripts/replogle_pilot.py",
+  " M scripts/summarize_review_eqtl.py",
+  "?? validation/EQTL_GENOME_WIDE.json",
+  "?? validation/REPLOGLE_PSEUDOBULK_FULL.json"
+ ],
+ "binary": {
+  "path": "validation/work/large-runs-pikachu/clone/build/rapidglm",
+  "tag": "v1.4.1",
+  "commit": "64a8610d056767b5af8dfc72a94c817d366f69db",
+  "clone_clean": true,
+  "version": "1.4.1",
+  "sha256": "24b3124dd6cbb88ec73b8cf84be33860f3436556ec2ca19b5aa1e26beb291f44",
+  "librapidglm_c_sha256": "b1b330fa5d2ec1c6dd71cade84c74b13aeb51dff006fc11cabe0c695162a7f14",
+  "build": {
+   "configure": "cmake -S clone -B clone/build -DCMAKE_BUILD_TYPE=Release -DBLA_VENDOR=OpenBLAS plus the paths of the extracted OpenBLAS 0.3.20 and LAPACKE (validation/local-data/numerical-deps); default project options",
+   "cache": {
+    "BLAS_openblas_LIBRARY": "/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so",
+    "BLA_VENDOR": "OpenBLAS",
+    "CMAKE_BUILD_TYPE": "Release",
+    "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
+    "LAPACKE_LIBRARY": "/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/liblapacke.a",
+    "RAPIDGLM_BENCHMARKS": "OFF",
+    "RAPIDGLM_FORCE_PORTABLE": "OFF",
+    "RAPIDGLM_LAPACK_SOLVES": "OFF",
+    "RAPIDGLM_OPENMP": "ON",
+    "RAPIDGLM_PYTHON": "OFF",
+    "RAPIDGLM_SANITIZERS": "OFF",
+    "RAPIDGLM_SOLVER_BENCHMARK": "OFF",
+    "RAPIDGLM_TESTS": "ON"
+   },
+   "compiler": "c++ (Ubuntu 12.3.0-1ubuntu1~22.04.3) 12.3.0",
+   "cpus": "0-7,12-15 under nice 10",
+   "script": "validation/work/large-runs-pikachu/build_and_test.sh"
+  },
+  "tests": {
+   "ctest": {
+    "passed": 2,
+    "tests": 2,
+    "engine_cases": 173,
+    "engine_no_errors": true
+   },
+   "cli": {
+    "ran": 28,
+    "ok": true
+   },
+   "log_sha256": {
+    "ctest.log": "c440e08be84da4d59fa34a834a0b3ac44727069ee1a28876783b27534b0b507a",
+    "cli-tests.log": "1adca938aace20b4d5f90e7243e8e6cf75b94efce209134bd4c4f6c96ef35508"
+   }
+  }
+ },
+ "host": "One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed command is pinned to the 16 identical efficiency cores (CPUs 16-31, stock 800 MHz-4.3 GHz), one thread per core, under the shared lock after a quiet-host check. Same host setting as the 1.4.0 receipts; absolute seconds from other host settings are not directly comparable. On the user's order, every performance core (CPUs 0-15) was capped at 2.2 GHz from 2026-10-23 13:57 UTC (cap-faulty-cores.service; before that only CPUs 8-11); turbo and CPUs 16-31 were unchanged, the guarded policy kept matching, and no timed command ran on CPUs 0-15 (they held only drivers and untimed work).",
+ "version_relation": {
+  "measured_release": "1.4.1 (v1.4.1, 64a8610); the paper keeps the 1.4.0 receipts (v1.4.0-dev.4, f0ecfbd) for the shared benchmarks",
+  "code_difference": "Between f0ecfbd and 64a8610 the library differs only by an early return for zero-column weighted cross-products (include/rapidglm/model.hpp) and version strings.",
+  "same_outputs_evidence": [
+   "Replogle pilot (20 perturbations): every RapidGLM bulk-de and edger-ql table byte-identical to the 1.4.0 pilot (pilot-v1.4.0-final), run records equal apart from version, paths and timings; DESeq2 and edgeR outputs identical too (REPLOGLE_PSEUDOBULK_FULL.json, pilot_check).",
+   "Geuvadis chr22: the 580 chromosome-22 rows of the genome-wide 1.4.1 qtl run byte-identical to the 1.4.0 chr22 receipt run (EQTL_GENOME_WIDE.json, chr22_check)."
+  ]
+ },
+ "protocol": {
+  "lock": "/mnt/pikachu/e2e_bench_20260926/pikachu_timed.lock",
+  "quiet_start": "Two consecutive ten-second samples with one-minute load <= 4 and every selected CPU < 20% busy (scripts/quiet_run.py); the retained samples are in timing-audit.jsonl.",
+  "cpu_policy": "intel_pstate/no_turbo = 0; CPUs 16-31 scaling_min_freq 800000 and scaling_max_freq 4300000; CPUs 8-11 scaling_max_freq 2200000. Checked once per second during every supervised block and synchronously at every quiet start, with the unchanged 1.4.0 guard code (validation/receipts/v1.4.0/cpu_policy.py, policy_hook); never changed.",
+  "untimed": "Preparation, comparisons, downloads and drivers on CPUs 0-7 and 12-15 under nice; CPUs 8-11 never used.",
+  "contention": "others_cpu: busy time of the timed CPUs not spent by the measured commands, as a share of those CPUs over the wall time; a run above 0.05 counts as contended and is re-run.",
+  "runner": "validation/work/large-runs-pikachu/run.sh under supervise.py"
+ },
+ "audit": {
+  "supervised_blocks": [
+   {
+    "label": "full",
+    "stages": [
+     "full_rapidglm",
+     "full_deseq2",
+     "full_rapidglm_edger_ql",
+     "full_edger",
+     "eqtl_rapidglm",
+     "eqtl_tensorqtl"
+    ],
+    "exit": 143,
+    "started_utc": "2026-10-23T10:30:15.936167+00:00",
+    "finished_utc": "2026-10-23T22:25:49.110335+00:00",
+    "cpu_policy_unchanged": true,
+    "cpu_policy_samples": 42834,
+    "cpu_policy_maximum_poll_gap_seconds": 2.6674812429992016,
+    "cpu_policy_observed_quiet_starts": 6,
+    "error": null
+   },
+   {
+    "label": "pilotcheck",
+    "stages": [
+     "pilotcheck"
+    ],
+    "exit": 0,
+    "started_utc": "2026-10-23T08:45:41.458182+00:00",
+    "finished_utc": "2026-10-23T10:29:30.500758+00:00",
+    "cpu_policy_unchanged": true,
+    "cpu_policy_samples": 6218,
+    "cpu_policy_maximum_poll_gap_seconds": 2.003883319994202,
+    "cpu_policy_observed_quiet_starts": 4,
+    "error": null
+   },
+   {
+    "label": "tensorqtl_rerun",
+    "stages": [
+     "eqtl_tensorqtl"
+    ],
+    "exit": 0,
+    "started_utc": "2026-10-23T22:26:06.897908+00:00",
+    "finished_utc": "2026-10-23T23:44:33.417634+00:00",
+    "cpu_policy_unchanged": true,
+    "cpu_policy_samples": 4697,
+    "cpu_policy_maximum_poll_gap_seconds": 1.0303212809958495,
+    "cpu_policy_observed_quiet_starts": 1,
+    "error": null
+   }
+  ],
+  "stages": {
+   "eqtl_rapidglm": {
+    "quiet_starts": 1,
+    "start_load_range": [
+     3.2529296875,
+     3.2529296875
+    ],
+    "policy_checked_starts": 1,
+    "waited_for_quiet_seconds": [
+     130.12
+    ],
+    "exits": [
+     "0"
+    ],
+    "commands": [
+     {
+      "exit": 0,
+      "others_cpu": 0.000358621730692415,
+      "contended": false,
+      "outer_wall_seconds": 3987.4884247530135,
+      "started_utc": "2026-10-23T20:33:41.602780+00:00",
+      "directory": "/mnt/pikachu/rapidglm/validation/work/eqtl/runs-genomewide-v1.4.1/rapidglm_gaussian10000"
+     }
+    ]
+   },
+   "eqtl_tensorqtl": {
+    "quiet_starts": 2,
+    "start_load_range": [
+     2.99267578125,
+     3.3486328125
+    ],
+    "policy_checked_starts": 2,
+    "waited_for_quiet_seconds": [
+     160.15,
+     20.02
+    ],
+    "exits": [
+     "143",
+     "0"
+    ],
+    "commands": [
+     {
+      "exit": 143,
+      "others_cpu": 0.07917474683515022,
+      "contended": true,
+      "outer_wall_seconds": 2576.0107629350096,
+      "started_utc": "2026-10-23T21:42:52.391751+00:00",
+      "directory": "/mnt/pikachu/rapidglm/validation/work/eqtl/runs-genomewide-v1.4.1/tensorqtl"
+     },
+     {
+      "exit": 0,
+      "others_cpu": 0.0044782700838684845,
+      "contended": false,
+      "outer_wall_seconds": 4683.169975733006,
+      "started_utc": "2026-10-23T22:26:30.030864+00:00",
+      "directory": "/mnt/pikachu/rapidglm/validation/work/eqtl/runs-genomewide-v1.4.1/tensorqtl"
+     }
+    ]
+   }
+  },
+  "policy_events": {
+   "started": 3,
+   "launch_check": 3,
+   "runner_started": 3,
+   "policy_check": 53749,
+   "heartbeat": 3582,
+   "pre_command_check": 11,
+   "quiet_start_observed": 11,
+   "final_check": 3,
+   "finished": 3
+  },
+  "policy_checks_matched": 53766,
+  "policy_mismatches_or_aborts": [],
+  "audit_files": {
+   "CPU_POLICY_AUDIT.jsonl": "validation/work/large-runs-pikachu/CPU_POLICY_AUDIT.jsonl",
+   "timing-audit.jsonl": "validation/work/large-runs-pikachu/timing-audit.jsonl",
+   "status.txt": "validation/work/large-runs-pikachu/status.txt"
+  }
+ },
+ "genotypes": {
+  "source": "E-GEUV-1 genotype release (1000 Genomes phase 1 + Omni-imputed, 465 individuals, GRCh37), https://ftp.ebi.ac.uk/biostudies/fire/E-GEUV-/001/E-GEUV-1/Files/E-GEUV-1/genotypes/; same source and naming as chr22 (docs/GEUVADIS.md)",
+  "downloads": [
+   {
+    "chromosome": 1,
+    "file": "GEUVADIS.chr1.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3801653416,
+    "md5": "195b2159b626937c14f268b073d6399a",
+    "ebi_md5": "195b2159b626937c14f268b073d6399a",
+    "match": true,
+    "checked_utc": "2026-10-23T11:50:07Z"
+   },
+   {
+    "chromosome": 2,
+    "file": "GEUVADIS.chr2.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 4212682251,
+    "md5": "75d8eecfdf2fa604c508afbc79c0c553",
+    "ebi_md5": "75d8eecfdf2fa604c508afbc79c0c553",
+    "match": true,
+    "checked_utc": "2026-10-23T11:50:12Z"
+   },
+   {
+    "chromosome": 3,
+    "file": "GEUVADIS.chr3.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3499720232,
+    "md5": "4d46f6ec74cf424b34cfa8bd1eb9d4c5",
+    "ebi_md5": "4d46f6ec74cf424b34cfa8bd1eb9d4c5",
+    "match": true,
+    "checked_utc": "2026-10-23T11:50:17Z"
+   },
+   {
+    "chromosome": 4,
+    "file": "GEUVADIS.chr4.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3527197454,
+    "md5": "4aec8ad8b53dd6c32ac040859a5779e8",
+    "ebi_md5": "4aec8ad8b53dd6c32ac040859a5779e8",
+    "match": true,
+    "checked_utc": "2026-10-23T11:54:46Z"
+   },
+   {
+    "chromosome": 5,
+    "file": "GEUVADIS.chr5.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3218983315,
+    "md5": "f031246d68cf7f38be55685b43b4114c",
+    "ebi_md5": "f031246d68cf7f38be55685b43b4114c",
+    "match": true,
+    "checked_utc": "2026-10-23T11:55:00Z"
+   },
+   {
+    "chromosome": 6,
+    "file": "GEUVADIS.chr6.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3105922899,
+    "md5": "900aec0863f36214fcd77c8f9047257c",
+    "ebi_md5": "900aec0863f36214fcd77c8f9047257c",
+    "match": true,
+    "checked_utc": "2026-10-23T11:55:28Z"
+   },
+   {
+    "chromosome": 7,
+    "file": "GEUVADIS.chr7.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2879287973,
+    "md5": "b8312afa11594aa5a1e70663bcb86985",
+    "ebi_md5": "b8312afa11594aa5a1e70663bcb86985",
+    "match": true,
+    "checked_utc": "2026-10-23T11:59:08Z"
+   },
+   {
+    "chromosome": 8,
+    "file": "GEUVADIS.chr8.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2770730274,
+    "md5": "53008d07ab8a2bbc27e3e2fe747870d9",
+    "ebi_md5": "53008d07ab8a2bbc27e3e2fe747870d9",
+    "match": true,
+    "checked_utc": "2026-10-23T12:09:31Z",
+    "after_repair": true
+   },
+   {
+    "chromosome": 9,
+    "file": "GEUVADIS.chr9.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2102961096,
+    "md5": "ed50819e920cde4bb365fdf66c5b749f",
+    "ebi_md5": "ed50819e920cde4bb365fdf66c5b749f",
+    "match": true,
+    "checked_utc": "2026-10-23T11:59:23Z"
+   },
+   {
+    "chromosome": 10,
+    "file": "GEUVADIS.chr10.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2409908382,
+    "md5": "5aaf58b19191e64d3360c9e3e8991b05",
+    "ebi_md5": "5aaf58b19191e64d3360c9e3e8991b05",
+    "match": true,
+    "checked_utc": "2026-10-23T12:01:54Z"
+   },
+   {
+    "chromosome": 11,
+    "file": "GEUVADIS.chr11.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2424331073,
+    "md5": "275e7c14e79675ad628c6aaed576d7ca",
+    "ebi_md5": "275e7c14e79675ad628c6aaed576d7ca",
+    "match": true,
+    "checked_utc": "2026-10-23T12:02:27Z"
+   },
+   {
+    "chromosome": 12,
+    "file": "GEUVADIS.chr12.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2335219056,
+    "md5": "3f0882b54e287fab061c6ff89bb491e5",
+    "ebi_md5": "3f0882b54e287fab061c6ff89bb491e5",
+    "match": true,
+    "checked_utc": "2026-10-23T12:12:33Z",
+    "after_repair": true
+   },
+   {
+    "chromosome": 13,
+    "file": "GEUVADIS.chr13.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1765436668,
+    "md5": "1a01f756e2a35b891630a7f1d6960fda",
+    "ebi_md5": "1a01f756e2a35b891630a7f1d6960fda",
+    "match": true,
+    "checked_utc": "2026-10-23T12:05:13Z"
+   },
+   {
+    "chromosome": 14,
+    "file": "GEUVADIS.chr14.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1601351955,
+    "md5": "d37d0d471bbe36acaa38013e38da1a2a",
+    "ebi_md5": "d37d0d471bbe36acaa38013e38da1a2a",
+    "match": true,
+    "checked_utc": "2026-10-23T12:07:04Z"
+   },
+   {
+    "chromosome": 15,
+    "file": "GEUVADIS.chr15.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1435479095,
+    "md5": "ef368400d3678824c94d874780bcec79",
+    "ebi_md5": "ef368400d3678824c94d874780bcec79",
+    "match": true,
+    "checked_utc": "2026-10-23T12:08:44Z"
+   },
+   {
+    "chromosome": 16,
+    "file": "GEUVADIS.chr16.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1544115287,
+    "md5": "fe251a7f82953a0b4d997a827819d81c",
+    "ebi_md5": "fe251a7f82953a0b4d997a827819d81c",
+    "match": true,
+    "checked_utc": "2026-10-23T12:10:19Z"
+   },
+   {
+    "chromosome": 17,
+    "file": "GEUVADIS.chr17.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1337961373,
+    "md5": "a82477edffd73bedeb4e73700db5cfd4",
+    "ebi_md5": "a82477edffd73bedeb4e73700db5cfd4",
+    "match": true,
+    "checked_utc": "2026-10-23T12:18:30Z",
+    "after_repair": true
+   },
+   {
+    "chromosome": 18,
+    "file": "GEUVADIS.chr18.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1391130898,
+    "md5": "13346cf3e268743f0a7dea6bc8988591",
+    "ebi_md5": "13346cf3e268743f0a7dea6bc8988591",
+    "match": true,
+    "checked_utc": "2026-10-23T12:17:45Z"
+   },
+   {
+    "chromosome": 19,
+    "file": "GEUVADIS.chr19.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1066397100,
+    "md5": "b4bcd1b92ec25f51b8772200f0190ee9",
+    "ebi_md5": "b4bcd1b92ec25f51b8772200f0190ee9",
+    "match": true,
+    "checked_utc": "2026-10-23T12:15:01Z"
+   },
+   {
+    "chromosome": 20,
+    "file": "GEUVADIS.chr20.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1084090339,
+    "md5": "83b32dfb10e6d1d072421964e201a778",
+    "ebi_md5": "83b32dfb10e6d1d072421964e201a778",
+    "match": true,
+    "checked_utc": "2026-10-23T12:16:09Z"
+   },
+   {
+    "chromosome": 21,
+    "file": "GEUVADIS.chr21.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 674786914,
+    "md5": "1ac8e4b74c4236f8ec5ff29b8151669b",
+    "ebi_md5": "1ac8e4b74c4236f8ec5ff29b8151669b",
+    "match": true,
+    "checked_utc": "2026-10-23T12:17:20Z"
+   }
+  ],
+  "first_checks": [
+   {
+    "chromosome": 1,
+    "file": "GEUVADIS.chr1.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3801653416,
+    "md5": "23bc0508e47e75e2d9a6c19e07e39ed7",
+    "ebi_md5": "195b2159b626937c14f268b073d6399a",
+    "match": false,
+    "checked_utc": "2026-10-23T10:20:34Z"
+   },
+   {
+    "chromosome": 2,
+    "file": "GEUVADIS.chr2.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 4212682251,
+    "md5": "a9c44f5728ae333604c3d23aa0dc9bf4",
+    "ebi_md5": "75d8eecfdf2fa604c508afbc79c0c553",
+    "match": false,
+    "checked_utc": "2026-10-23T10:20:34Z"
+   },
+   {
+    "chromosome": 3,
+    "file": "GEUVADIS.chr3.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3499720232,
+    "md5": "4d46f6ec74cf424b34cfa8bd1eb9d4c5",
+    "ebi_md5": "4d46f6ec74cf424b34cfa8bd1eb9d4c5",
+    "match": true,
+    "checked_utc": "2026-10-23T10:20:34Z"
+   },
+   {
+    "chromosome": 4,
+    "file": "GEUVADIS.chr4.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3527197454,
+    "md5": "4aec8ad8b53dd6c32ac040859a5779e8",
+    "ebi_md5": "4aec8ad8b53dd6c32ac040859a5779e8",
+    "match": true,
+    "checked_utc": "2026-10-23T11:54:46Z"
+   },
+   {
+    "chromosome": 5,
+    "file": "GEUVADIS.chr5.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3218983315,
+    "md5": "f031246d68cf7f38be55685b43b4114c",
+    "ebi_md5": "f031246d68cf7f38be55685b43b4114c",
+    "match": true,
+    "checked_utc": "2026-10-23T10:20:39Z"
+   },
+   {
+    "chromosome": 6,
+    "file": "GEUVADIS.chr6.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3105922899,
+    "md5": "96a06d48788a74718cfa7528b54b79dd",
+    "ebi_md5": "900aec0863f36214fcd77c8f9047257c",
+    "match": false,
+    "checked_utc": "2026-10-23T10:24:20Z"
+   },
+   {
+    "chromosome": 7,
+    "file": "GEUVADIS.chr7.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2879287973,
+    "md5": "b8312afa11594aa5a1e70663bcb86985",
+    "ebi_md5": "b8312afa11594aa5a1e70663bcb86985",
+    "match": true,
+    "checked_utc": "2026-10-23T11:59:08Z"
+   },
+   {
+    "chromosome": 8,
+    "file": "GEUVADIS.chr8.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2770730274,
+    "md5": "8e5d4e8132b34cff8c8d462be7f277eb",
+    "ebi_md5": "53008d07ab8a2bbc27e3e2fe747870d9",
+    "match": false,
+    "checked_utc": "2026-10-23T11:59:10Z"
+   },
+   {
+    "chromosome": 9,
+    "file": "GEUVADIS.chr9.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2102961096,
+    "md5": "ed50819e920cde4bb365fdf66c5b749f",
+    "ebi_md5": "ed50819e920cde4bb365fdf66c5b749f",
+    "match": true,
+    "checked_utc": "2026-10-23T11:59:23Z"
+   },
+   {
+    "chromosome": 10,
+    "file": "GEUVADIS.chr10.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2409908382,
+    "md5": "5aaf58b19191e64d3360c9e3e8991b05",
+    "ebi_md5": "5aaf58b19191e64d3360c9e3e8991b05",
+    "match": true,
+    "checked_utc": "2026-10-23T12:01:54Z"
+   },
+   {
+    "chromosome": 11,
+    "file": "GEUVADIS.chr11.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2424331073,
+    "md5": "275e7c14e79675ad628c6aaed576d7ca",
+    "ebi_md5": "275e7c14e79675ad628c6aaed576d7ca",
+    "match": true,
+    "checked_utc": "2026-10-23T12:02:27Z"
+   },
+   {
+    "chromosome": 12,
+    "file": "GEUVADIS.chr12.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2335219056,
+    "md5": "7b7356439c678a677dbc2541885c9a62",
+    "ebi_md5": "3f0882b54e287fab061c6ff89bb491e5",
+    "match": false,
+    "checked_utc": "2026-10-23T12:04:42Z"
+   },
+   {
+    "chromosome": 13,
+    "file": "GEUVADIS.chr13.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1765436668,
+    "md5": "1a01f756e2a35b891630a7f1d6960fda",
+    "ebi_md5": "1a01f756e2a35b891630a7f1d6960fda",
+    "match": true,
+    "checked_utc": "2026-10-23T12:05:13Z"
+   },
+   {
+    "chromosome": 14,
+    "file": "GEUVADIS.chr14.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1601351955,
+    "md5": "d37d0d471bbe36acaa38013e38da1a2a",
+    "ebi_md5": "d37d0d471bbe36acaa38013e38da1a2a",
+    "match": true,
+    "checked_utc": "2026-10-23T12:07:04Z"
+   },
+   {
+    "chromosome": 15,
+    "file": "GEUVADIS.chr15.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1435479095,
+    "md5": "ef368400d3678824c94d874780bcec79",
+    "ebi_md5": "ef368400d3678824c94d874780bcec79",
+    "match": true,
+    "checked_utc": "2026-10-23T12:08:44Z"
+   },
+   {
+    "chromosome": 16,
+    "file": "GEUVADIS.chr16.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1544115287,
+    "md5": "fe251a7f82953a0b4d997a827819d81c",
+    "ebi_md5": "fe251a7f82953a0b4d997a827819d81c",
+    "match": true,
+    "checked_utc": "2026-10-23T12:10:19Z"
+   },
+   {
+    "chromosome": 17,
+    "file": "GEUVADIS.chr17.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1337961373,
+    "md5": "195bd348612d19b15cfaf84b99ff1adb",
+    "ebi_md5": "a82477edffd73bedeb4e73700db5cfd4",
+    "match": false,
+    "checked_utc": "2026-10-23T12:12:15Z"
+   },
+   {
+    "chromosome": 18,
+    "file": "GEUVADIS.chr18.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1391130898,
+    "md5": "13346cf3e268743f0a7dea6bc8988591",
+    "ebi_md5": "13346cf3e268743f0a7dea6bc8988591",
+    "match": true,
+    "checked_utc": "2026-10-23T12:17:45Z"
+   },
+   {
+    "chromosome": 19,
+    "file": "GEUVADIS.chr19.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1066397100,
+    "md5": "b4bcd1b92ec25f51b8772200f0190ee9",
+    "ebi_md5": "b4bcd1b92ec25f51b8772200f0190ee9",
+    "match": true,
+    "checked_utc": "2026-10-23T12:15:01Z"
+   },
+   {
+    "chromosome": 20,
+    "file": "GEUVADIS.chr20.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1084090339,
+    "md5": "83b32dfb10e6d1d072421964e201a778",
+    "ebi_md5": "83b32dfb10e6d1d072421964e201a778",
+    "match": true,
+    "checked_utc": "2026-10-23T12:16:09Z"
+   },
+   {
+    "chromosome": 21,
+    "file": "GEUVADIS.chr21.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 674786914,
+    "md5": "1ac8e4b74c4236f8ec5ff29b8151669b",
+    "ebi_md5": "1ac8e4b74c4236f8ec5ff29b8151669b",
+    "match": true,
+    "checked_utc": "2026-10-23T12:17:20Z"
+   }
+  ],
+  "repairs": [
+   {
+    "chromosome": 6,
+    "file": "GEUVADIS.chr6.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3105922899,
+    "ebi_md5": "900aec0863f36214fcd77c8f9047257c",
+    "chunk_bytes": 67108864,
+    "chunks": 47,
+    "differing_chunks": [
+     {
+      "chunk": 16,
+      "offset": 1073741824,
+      "bytes_differing": 201,
+      "first_differing_offsets": [
+       1113656946,
+       1113656947,
+       1113656948,
+       1113656949,
+       1113656950
+      ],
+      "xor_of_first": [
+       3,
+       254,
+       122,
+       172,
+       20
+      ],
+      "third_equals_local": false,
+      "third_equals_refetch": true
+     },
+     {
+      "chunk": 25,
+      "offset": 1677721600,
+      "bytes_differing": 201,
+      "first_differing_offsets": [
+       1690269843,
+       1690269844,
+       1690269845,
+       1690269846,
+       1690269847
+      ],
+      "xor_of_first": [
+       232,
+       191,
+       177,
+       180,
+       57
+      ],
+      "third_equals_local": false,
+      "third_equals_refetch": true
+     },
+     {
+      "chunk": 31,
+      "offset": 2080374784,
+      "bytes_differing": 200,
+      "first_differing_offsets": [
+       2100386614,
+       2100386615,
+       2100386616,
+       2100386617,
+       2100386618
+      ],
+      "xor_of_first": [
+       117,
+       108,
+       190,
+       117,
+       179
+      ],
+      "third_equals_local": false,
+      "third_equals_refetch": true
+     }
+    ],
+    "assembled_md5": "900aec0863f36214fcd77c8f9047257c",
+    "match": true,
+    "written_md5": "900aec0863f36214fcd77c8f9047257c",
+    "replaced_utc": "2026-10-23T10:47:43Z"
+   },
+   {
+    "chromosome": 1,
+    "file": "GEUVADIS.chr1.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 3801653416,
+    "ebi_md5": "195b2159b626937c14f268b073d6399a",
+    "chunk_bytes": 67108864,
+    "chunks": 57,
+    "differing_chunks": [
+     {
+      "chunk": 51,
+      "offset": 3422552064,
+      "bytes_differing": 199,
+      "first_differing_offsets": [
+       3446779258,
+       3446779259,
+       3446779260,
+       3446779261,
+       3446779262
+      ],
+      "xor_of_first": [
+       214,
+       87,
+       108,
+       164,
+       202
+      ],
+      "third_equals_local": false,
+      "third_equals_refetch": true
+     }
+    ],
+    "assembled_md5": "195b2159b626937c14f268b073d6399a",
+    "match": true,
+    "written_md5": "195b2159b626937c14f268b073d6399a",
+    "replaced_utc": "2026-10-23T11:01:04Z"
+   },
+   {
+    "chromosome": 2,
+    "file": "GEUVADIS.chr2.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 4212682251,
+    "ebi_md5": "75d8eecfdf2fa604c508afbc79c0c553",
+    "chunk_bytes": 67108864,
+    "chunks": 63,
+    "differing_chunks": [
+     {
+      "chunk": 53,
+      "offset": 3556769792,
+      "bytes_differing": 199,
+      "first_differing_offsets": [
+       3578945384,
+       3578945385,
+       3578945386,
+       3578945387,
+       3578945388
+      ],
+      "xor_of_first": [
+       152,
+       20,
+       155,
+       3,
+       105
+      ],
+      "third_equals_local": false,
+      "third_equals_refetch": true
+     }
+    ],
+    "assembled_md5": "75d8eecfdf2fa604c508afbc79c0c553",
+    "match": true,
+    "written_md5": "75d8eecfdf2fa604c508afbc79c0c553",
+    "replaced_utc": "2026-10-23T11:01:46Z"
+   },
+   {
+    "chromosome": 8,
+    "file": "GEUVADIS.chr8.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2770730274,
+    "ebi_md5": "53008d07ab8a2bbc27e3e2fe747870d9",
+    "chunk_bytes": 67108864,
+    "chunks": 42,
+    "differing_chunks": [
+     {
+      "chunk": 4,
+      "offset": 268435456,
+      "bytes_differing": 201,
+      "first_differing_offsets": [
+       320183542,
+       320183543,
+       320183544,
+       320183545,
+       320183546
+      ],
+      "xor_of_first": [
+       6,
+       212,
+       169,
+       6,
+       29
+      ],
+      "third_equals_local": true,
+      "third_equals_refetch": false
+     },
+     {
+      "chunk": 15,
+      "offset": 1006632960,
+      "bytes_differing": 200,
+      "first_differing_offsets": [
+       1051746016,
+       1051746017,
+       1051746018,
+       1051746019,
+       1051746020
+      ],
+      "xor_of_first": [
+       214,
+       131,
+       110,
+       223,
+       70
+      ],
+      "third_equals_local": false,
+      "third_equals_refetch": true
+     }
+    ],
+    "assembled_md5": "53008d07ab8a2bbc27e3e2fe747870d9",
+    "match": true,
+    "written_md5": "53008d07ab8a2bbc27e3e2fe747870d9",
+    "replaced_utc": "2026-10-23T12:09:28Z"
+   },
+   {
+    "chromosome": 12,
+    "file": "GEUVADIS.chr12.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 2335219056,
+    "ebi_md5": "3f0882b54e287fab061c6ff89bb491e5",
+    "chunk_bytes": 67108864,
+    "chunks": 35,
+    "differing_chunks": [
+     {
+      "chunk": 26,
+      "offset": 1744830464,
+      "bytes_differing": 199,
+      "first_differing_offsets": [
+       1747780036,
+       1747780037,
+       1747780038,
+       1747780039,
+       1747780040
+      ],
+      "xor_of_first": [
+       119,
+       42,
+       128,
+       78,
+       231
+      ],
+      "third_equals_local": false,
+      "third_equals_refetch": true
+     }
+    ],
+    "assembled_md5": "3f0882b54e287fab061c6ff89bb491e5",
+    "match": true,
+    "written_md5": "3f0882b54e287fab061c6ff89bb491e5",
+    "replaced_utc": "2026-10-23T12:12:31Z"
+   },
+   {
+    "chromosome": 17,
+    "file": "GEUVADIS.chr17.PH1PH2_465.IMPFRQFILT_BIALLELIC_PH.annotv2.genotypes.vcf.gz",
+    "bytes": 1337961373,
+    "ebi_md5": "a82477edffd73bedeb4e73700db5cfd4",
+    "chunk_bytes": 67108864,
+    "chunks": 20,
+    "differing_chunks": [
+     {
+      "chunk": 8,
+      "offset": 536870912,
+      "bytes_differing": 199,
+      "first_differing_offsets": [
+       597545828,
+       597545829,
+       597545830,
+       597545831,
+       597545832
+      ],
+      "xor_of_first": [
+       94,
+       65,
+       76,
+       14,
+       209
+      ],
+      "third_equals_local": false,
+      "third_equals_refetch": true
+     }
+    ],
+    "assembled_md5": "a82477edffd73bedeb4e73700db5cfd4",
+    "match": true,
+    "written_md5": "a82477edffd73bedeb4e73700db5cfd4",
+    "replaced_utc": "2026-10-23T12:18:28Z"
+   }
+  ],
+  "integrity_note": {
+   "files_failing_md5_first": [
+    1,
+    2,
+    6,
+    8,
+    12,
+    17
+   ],
+   "corrupted_runs_in_first_downloads": [
+    [
+     6,
+     16,
+     201
+    ],
+    [
+     6,
+     25,
+     201
+    ],
+    [
+     6,
+     31,
+     200
+    ],
+    [
+     1,
+     51,
+     199
+    ],
+    [
+     2,
+     53,
+     199
+    ],
+    [
+     8,
+     15,
+     200
+    ],
+    [
+     12,
+     26,
+     199
+    ],
+    [
+     17,
+     8,
+     199
+    ]
+   ],
+   "corrupted_runs_in_refetches": [
+    [
+     8,
+     4,
+     201
+    ]
+   ],
+   "run_bytes": [
+    199,
+    200,
+    201
+   ],
+   "download_cpus": "First downloads: curl over HTTPS (TLS 1.3, AES-256-GCM), six at a time, on CPUs 12-15 (taskset, nice 10). Re-fetches: chr1, chr2, chr6 on CPUs 0-3; chr8, chr12, chr17 on CPUs 0-7,12-15. All writes to /mnt/pikachu (md0).",
+   "finding": "Each corrupted run is 199-201 contiguous bytes replaced by unrelated bytes, not single bit flips. Re-reading a corrupted file gave the same MD5, so the bytes were stored wrongly. TLS authenticates data in transit, so the damage most likely arose on this host after decryption (memory, CPU or the write path); which one is not established. Every file was repaired by taking, range by range, the copy two fetches agreed on, and accepted only with EBI's MD5.",
+   "host_note": "The user capped all performance cores (CPUs 0-15) at 2.2 GHz at 13:57 UTC that day."
+  },
+  "chr22": "existing 2026-10-16 download (MD5 25ed20e8cb1d4dab14892a92a9965c03, matches EBI) and its prepared files, unchanged",
+  "filters": "scripts/eqtl_prep_genotypes.sh CHR for chromosomes 1-21 (the chr22 filters): the 462 RNA-seq individuals; biallelic SNVs; called in all 462; MAF >= 0.05; GT only; ID CHR_POS_REF_ALT_b37",
+  "per_chromosome": {
+   "1": {
+    "n_input_records": 3003379,
+    "n_snv_complete": 2242795,
+    "n_final": 476250,
+    "n_dup_positions": 0
+   },
+   "2": {
+    "n_input_records": 3305169,
+    "n_snv_complete": 2583204,
+    "n_final": 528991,
+    "n_dup_positions": 0
+   },
+   "3": {
+    "n_input_records": 2761233,
+    "n_snv_complete": 2008342,
+    "n_final": 421102,
+    "n_dup_positions": 0
+   },
+   "4": {
+    "n_input_records": 2734521,
+    "n_snv_complete": 1996484,
+    "n_final": 437625,
+    "n_dup_positions": 0
+   },
+   "5": {
+    "n_input_records": 2528287,
+    "n_snv_complete": 1992708,
+    "n_final": 409410,
+    "n_dup_positions": 0
+   },
+   "6": {
+    "n_input_records": 2422398,
+    "n_snv_complete": 1909540,
+    "n_final": 431636,
+    "n_dup_positions": 0
+   },
+   "7": {
+    "n_input_records": 2213456,
+    "n_snv_complete": 1743060,
+    "n_final": 375808,
+    "n_dup_positions": 0
+   },
+   "8": {
+    "n_input_records": 2182244,
+    "n_snv_complete": 1722906,
+    "n_final": 353682,
+    "n_dup_positions": 0
+   },
+   "9": {
+    "n_input_records": 1651005,
+    "n_snv_complete": 1315484,
+    "n_final": 273575,
+    "n_dup_positions": 0
+   },
+   "10": {
+    "n_input_records": 1881218,
+    "n_snv_complete": 1494667,
+    "n_final": 325470,
+    "n_dup_positions": 0
+   },
+   "11": {
+    "n_input_records": 1893512,
+    "n_snv_complete": 1483376,
+    "n_final": 318835,
+    "n_dup_positions": 0
+   },
+   "12": {
+    "n_input_records": 1826599,
+    "n_snv_complete": 1439657,
+    "n_final": 305421,
+    "n_dup_positions": 0
+   },
+   "13": {
+    "n_input_records": 1371941,
+    "n_snv_complete": 1086982,
+    "n_final": 236380,
+    "n_dup_positions": 0
+   },
+   "14": {
+    "n_input_records": 1257238,
+    "n_snv_complete": 987594,
+    "n_final": 207234,
+    "n_dup_positions": 0
+   },
+   "15": {
+    "n_input_records": 1129648,
+    "n_snv_complete": 891194,
+    "n_final": 183324,
+    "n_dup_positions": 0
+   },
+   "16": {
+    "n_input_records": 1209688,
+    "n_snv_complete": 960280,
+    "n_final": 198490,
+    "n_dup_positions": 0
+   },
+   "17": {
+    "n_input_records": 1045927,
+    "n_snv_complete": 819263,
+    "n_final": 173934,
+    "n_dup_positions": 0
+   },
+   "18": {
+    "n_input_records": 1087908,
+    "n_snv_complete": 868956,
+    "n_final": 184323,
+    "n_dup_positions": 0
+   },
+   "19": {
+    "n_input_records": 815341,
+    "n_snv_complete": 642521,
+    "n_final": 150948,
+    "n_dup_positions": 0
+   },
+   "20": {
+    "n_input_records": 854517,
+    "n_snv_complete": 682965,
+    "n_final": 143082,
+    "n_dup_positions": 0
+   },
+   "21": {
+    "n_input_records": 518482,
+    "n_snv_complete": 412205,
+    "n_final": 92544,
+    "n_dup_positions": 0
+   },
+   "22": {
+    "n_input_records": 493859,
+    "n_snv_complete": 391610,
+    "n_final": 89287,
+    "n_dup_positions": 0
+   }
+  },
+  "genome_wide": {
+   "prefix": "validation/work/eqtl/data/genotypes/autosomes",
+   "variants": 6317351,
+   "bim_rows": 6317351,
+   "built": "bcftools concat of chr1-22 .vcf.gz, then plink2 --make-bed and --make-pgen (validation/work/large-runs-pikachu/prepare_genotypes.sh)",
+   "checks": [
+    "chr22 bim rows identical",
+    "sample order matches samples.txt",
+    "chr22 genotype bytes identical: True"
+   ],
+   "join_note": "A first join (12:21 UTC) listed the chromosomes in lexicographic order; the set was rejoined in numeric order (12:24 UTC) before any timed use.",
+   "sha256": {
+    "bed": "61d0500ae10ec1137bee80e5f41ff58da25f05f1280141166fc8e86cb23a2bfa",
+    "bim": "2e0ce428ae9f8709918e2adb416a55bc626993fc3492f7d1f0748e494f520daf",
+    "fam": "99abcb5c20ac7e76726990b13afdaebd7d29a7798ba70987e21f247d22e97a94",
+    "pgen": "0f2dbfbef72a5c21f6e0f7992157edc92a405374723ed9c09ae82ef620f6953f",
+    "pvar": "890e7a8612ae48f3eb9ccedc673a030f67a60ff95f2049d49208b308c7f97a3b",
+    "psam": "e04e9a889a0b33726738468cc4db9f2b19116e268fefee9c85abc7dc8a04af41"
+   },
+   "tensorqtl_reads": "pgen (pgenlib present, as in the chr22 receipt run)",
+   "rapidglm_reads": "bed/bim/fam"
+  },
+  "tools": {
+   "plink2": "PLINK v2.0.0-a.7.13LM AVX2 Intel (15 Oct 2026)",
+   "bcftools": "bcftools 1.13"
+  }
+ },
+ "phenotypes": {
+  "file": "validation/work/eqtl/data/expression-genomewide/autosomes.expr_int.bed.gz",
+  "sha256": "ee0803ce126658ca2aa86795f920d0d1358fda0604076ea4c9040fabd30138ca",
+  "genes": 20427,
+  "made_by": "scripts/eqtl_prep_expression.py --chr all --n-expr-pcs 36 (this change: --chr all writes every expressed autosomal gene, ordered by chromosome and TSS) into data/expression-genomewide",
+  "reproduction": {
+   "samples.txt": true,
+   "sample_info.tsv": true,
+   "library_size.tsv": true,
+   "offset_log_libsize.tsv": true,
+   "genes_expressed.tsv": true,
+   "expression_pcs.tsv": true
+  },
+  "chr22_rows_identical_to_chr22_bed": true
+ },
+ "covariates": {
+  "file": "validation/work/eqtl/data/covariates/covariates.fastqtl.txt",
+  "sha256": "3cb400dba06421204a5246fe63ca69ceb888aa166f8fc263f245352d5b81ab93",
+  "count": 42,
+  "unchanged": true,
+  "note": "The 42 covariates of the chr22 receipts, unchanged: genotype PCs 1-5 from chr22 (LD-pruned chr22 SNVs), expression PCs 1-36 from all 20,427 expressed genes, and sex. Keeping them lets the chr22 genes of the genome-wide run be checked against the chr22 receipts."
+ },
+ "settings": {
+  "window": 1000000,
+  "seed": 20261016,
+  "permutations": 10000,
+  "family": "gaussian",
+  "cpus": "16-27",
+  "threads": 12
+ },
+ "timed": {
+  "rapidglm_gaussian10000": {
+   "wall_seconds": 3987.0,
+   "user_seconds": 47542.97,
+   "system_seconds": 33.51,
+   "peak_rss_kbytes": 27152020,
+   "peak_rss_gib": 25.89,
+   "exit_status": 0,
+   "time_log_sha256": "a6bca0d054f61d79568c708285d60269513b299127a7feee2b09aa9183594c7a",
+   "host": {
+    "command": [
+     "/mnt/pikachu/rapidglm/validation/work/large-runs-pikachu/clone/build/rapidglm",
+     "qtl",
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/runs-genomewide-v1.4.1/rapidglm_gaussian10000/config.json"
+    ],
+    "cpus": "16-27",
+    "load_before": [
+     3.2529296875,
+     11.7431640625,
+     15.57958984375
+    ],
+    "started_utc": "2026-10-23T20:33:41.602780+00:00",
+    "waited_for_idle_seconds": 0.0,
+    "waited_for_quiet_seconds": 130.12,
+    "commit": "64a8610d056767b5af8dfc72a94c817d366f69db",
+    "exit": 0,
+    "cpus_busy_seconds": 47593.640000000014,
+    "outer_wall_seconds": 3987.4884247530135,
+    "load_after": [
+     15.29443359375,
+     15.4736328125,
+     15.63427734375
+    ],
+    "command_cpu_seconds": 47576.48,
+    "others_cpu": 0.000358621730692415,
+    "contended": false
+   },
+   "config": {
+    "phenotypes": "/mnt/pikachu/rapidglm/validation/work/eqtl/data/expression-genomewide/autosomes.expr_int.bed",
+    "genotypes": "/mnt/pikachu/rapidglm/validation/work/eqtl/data/genotypes/autosomes",
+    "covariates": "/mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt",
+    "family": "gaussian",
+    "window": 1000000,
+    "permutations": 10000,
+    "seed": 20261016,
+    "threads": 12,
+    "output": "/mnt/pikachu/rapidglm/validation/work/eqtl/runs-genomewide-v1.4.1/rapidglm_gaussian10000/autosomes"
+   },
+   "run_record": {
+    "command": "qtl",
+    "version": "1.4.1",
+    "config": "/mnt/pikachu/rapidglm/validation/work/eqtl/runs-genomewide-v1.4.1/rapidglm_gaussian10000/config.json",
+    "samples": 462,
+    "phenotypes": 20427,
+    "phenotypes_tested": 20248,
+    "variants": 6317351,
+    "covariates": 42,
+    "window": 1000000,
+    "permutations": 10000,
+    "seed": 20261016,
+    "threads": 12,
+    "min_maf": 0,
+    "family": "gaussian",
+    "wall_seconds": 3985.903026877
+   }
+  },
+  "tensorqtl": {
+   "wall_seconds": 4683.0,
+   "user_seconds": 38925.68,
+   "system_seconds": 5781.48,
+   "peak_rss_kbytes": 7525728,
+   "peak_rss_gib": 7.18,
+   "exit_status": 0,
+   "time_log_sha256": "03e282d7bb5bbe2b1682e194f4ec0f199d63277557fd81d3f1dedeec5d17ddc7",
+   "host": {
+    "command": [
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/venv-tensorqtl/bin/python",
+     "-I",
+     "-m",
+     "tensorqtl",
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/data/genotypes/autosomes",
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/data/expression-genomewide/autosomes.expr_int.bed.gz",
+     "autosomes",
+     "--covariates",
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt",
+     "--mode",
+     "cis",
+     "--permutations",
+     "10000",
+     "--window",
+     "1000000",
+     "--seed",
+     "20261016",
+     "-o",
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/runs-genomewide-v1.4.1/tensorqtl"
+    ],
+    "cpus": "16-27",
+    "load_before": [
+     3.3486328125,
+     3.3076171875,
+     3.74609375
+    ],
+    "started_utc": "2026-10-23T22:26:30.030864+00:00",
+    "waited_for_idle_seconds": 0.0,
+    "waited_for_quiet_seconds": 20.02,
+    "commit": "64a8610d056767b5af8dfc72a94c817d366f69db",
+    "exit": 0,
+    "cpus_busy_seconds": 44958.82999999996,
+    "outer_wall_seconds": 4683.169975733006,
+    "load_after": [
+     10.41259765625,
+     11.08837890625,
+     11.2431640625
+    ],
+    "command_cpu_seconds": 44707.16,
+    "others_cpu": 0.0044782700838684845,
+    "contended": false
+   },
+   "log": "[Oct 23 22:26:31] Running TensorQTL v1.0.10: cis-QTL mapping\n  * WARNING: using CPU!\n  * using seed 20261016\n  * reading phenotypes (/mnt/pikachu/rapidglm/validation/work/eqtl/data/expression-genomewide/autosomes.expr_int.bed.gz)\n  * cis-window detected as position \u00b1 1,000,000\n  * reading covariates (/mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt)\n  * loading genotypes\ncis-QTL mapping: empirical p-values for phenotypes\n  * 462 samples\n  * 20427 phenotypes\n  * 42 covariates\n  * 6317351 variants\n  * cis-window: \u00b11,000,000\n  * using seed 20261016\n  * computing permutations\n  Time elapsed: 77.74 min\ndone.\n  * writing output\n[Oct 23 23:44:32] Finished mapping\n",
+   "version": "1.0.10 (CPU torch 2.14.1), validation/work/eqtl/venv-tensorqtl"
+  }
+ },
+ "reruns": [
+  {
+   "stage": "eqtl_tensorqtl",
+   "attempt": 1,
+   "exit": 143,
+   "void": true,
+   "reason": "The runner exported OMP_NUM_THREADS=1, so torch ran tensorQTL on one thread instead of the chr22 receipts' layout (OMP_NUM_THREADS unset, twelve CPUs); the idle reserved CPUs were then used by other processes (11% of CPUs 16-27 measured at 22:25 UTC, above the 5% contention threshold). Stopped with the user's approval and re-run in the supervised block tensorqtl_rerun.",
+   "archived_utc": "2026-10-23T22:26:06Z",
+   "host": {
+    "command": [
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/venv-tensorqtl/bin/python",
+     "-I",
+     "-m",
+     "tensorqtl",
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/data/genotypes/autosomes",
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/data/expression-genomewide/autosomes.expr_int.bed.gz",
+     "autosomes",
+     "--covariates",
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt",
+     "--mode",
+     "cis",
+     "--permutations",
+     "10000",
+     "--window",
+     "1000000",
+     "--seed",
+     "20261016",
+     "-o",
+     "/mnt/pikachu/rapidglm/validation/work/eqtl/runs-genomewide-v1.4.1/tensorqtl"
+    ],
+    "cpus": "16-27",
+    "load_before": [
+     2.99267578125,
+     10.111328125,
+     13.57421875
+    ],
+    "started_utc": "2026-10-23T21:42:52.391751+00:00",
+    "waited_for_idle_seconds": 0.0,
+    "waited_for_quiet_seconds": 160.15,
+    "commit": "64a8610d056767b5af8dfc72a94c817d366f69db",
+    "exit": 143,
+    "cpus_busy_seconds": 5013.770000000019,
+    "outer_wall_seconds": 2576.0107629350096,
+    "load_after": [
+     3.2119140625,
+     3.28662109375,
+     3.76318359375
+    ],
+    "command_cpu_seconds": 2566.31,
+    "others_cpu": 0.07917474683515022,
+    "contended": true
+   },
+   "archive": "validation/work/eqtl/runs-genomewide-v1.4.1/tensorqtl.void-omp1"
+  }
+ ],
+ "environment_notes": [
+  "tensorQTL (accepted attempt): OPENBLAS_NUM_THREADS=1 only, as in the chr22 receipts; torch used about 9.5 of the 12 CPUs (user time / wall in timed.tensorqtl).",
+  "RapidGLM qtl ran with OMP_NUM_THREADS=1 also set in its environment (the first runner exported it); its thread count comes from the configuration (threads 12) and it used 11.9 CPUs (1193%), as on chr22 (1151%). Its chromosome-22 rows are byte-identical to the chr22 receipt."
+ ],
+ "agreement": {
+  "compare_eqtl": {
+   "genes": 20427,
+   "valid": 20248,
+   "statuses": {
+    "ok": 20248,
+    "no_cis_variants": 179
+   },
+   "pi0": 0.350259,
+   "egenes": 9575,
+   "beta_vs_permutation_spearman": 0.990696055110943,
+   "wall_seconds": 3985.903026877,
+   "threads": 12,
+   "permutations": 10000,
+   "references": {
+    "tensorQTL_perm10000_beta": {
+     "egenes": 9581,
+     "shared": 9556,
+     "jaccard": 0.9954,
+     "spearman_p": 0.9999601509998525,
+     "same_lead": 0.9989134729355986
+    }
+   }
+  },
+  "definition": "scripts/compare_eqtl.py: gene-level p = Beta-approximated permutation p (RapidGLM beta_p, tensorQTL pval_beta); Storey q-values (qvalue defaults); eGenes at q < 0.05; same_lead = share of genes with the same lead variant",
+  "additional": {
+   "genes_both": 20248,
+   "valid_both": 20248,
+   "permutation_p_spearman": 0.9976016255353223,
+   "beta_p_spearman": 0.9999601509998525,
+   "max_abs_log10_beta_p_difference": 106.98876448903175,
+   "median_abs_log10_beta_p_difference": 0.009234751765647808,
+   "same_lead": 0.9989134729355986,
+   "lead_nominal_p_spearman": 0.9999999999566332,
+   "cis_variant_count_equal": 1.0,
+   "genes_log10_beta_p_difference_over_1": 1395,
+   "largest_p_among_those": 2.4311378631276906e-14,
+   "by_significance": {
+    "both_above_0.001": {
+     "genes": 14109,
+     "max_abs_log10_difference": 0.11133397162220993,
+     "median_abs_log10_difference": 0.004840876769086844
+    },
+    "both_above_1e-05": {
+     "genes": 15567,
+     "max_abs_log10_difference": 0.22102166889879893,
+     "median_abs_log10_difference": 0.005584877789526654
+    },
+    "both_above_1e-10": {
+     "genes": 17423,
+     "max_abs_log10_difference": 0.5849317294402478,
+     "median_abs_log10_difference": 0.006779780431133808
+    }
+   },
+   "tail_note": "Differences above one log10 unit occur only where both gene-level p-values are below 2.5e-14; there the nominal p of the same lead variant also differs (RapidGLM: efficient score z against the normal; tensorQTL: regression t with its true df), e.g. ENSG00000164308.12 nominal 7e-85 vs 3e-220. These are policy differences of the test statistic.",
+   "by_chromosome": {
+    "1": {
+     "genes": 2222,
+     "same_lead": 0.9991,
+     "beta_p_spearman": 0.99995
+    },
+    "2": {
+     "genes": 1440,
+     "same_lead": 0.9993,
+     "beta_p_spearman": 0.99995
+    },
+    "3": {
+     "genes": 1090,
+     "same_lead": 0.9982,
+     "beta_p_spearman": 0.99995
+    },
+    "4": {
+     "genes": 719,
+     "same_lead": 0.9972,
+     "beta_p_spearman": 0.99995
+    },
+    "5": {
+     "genes": 966,
+     "same_lead": 0.999,
+     "beta_p_spearman": 0.99995
+    },
+    "6": {
+     "genes": 1116,
+     "same_lead": 0.9982,
+     "beta_p_spearman": 0.99995
+    },
+    "7": {
+     "genes": 1040,
+     "same_lead": 0.9981,
+     "beta_p_spearman": 0.99995
+    },
+    "8": {
+     "genes": 758,
+     "same_lead": 0.9987,
+     "beta_p_spearman": 0.99993
+    },
+    "9": {
+     "genes": 902,
+     "same_lead": 0.9978,
+     "beta_p_spearman": 0.99995
+    },
+    "10": {
+     "genes": 839,
+     "same_lead": 1.0,
+     "beta_p_spearman": 0.99994
+    },
+    "11": {
+     "genes": 1135,
+     "same_lead": 0.9974,
+     "beta_p_spearman": 0.99995
+    },
+    "12": {
+     "genes": 1119,
+     "same_lead": 0.9982,
+     "beta_p_spearman": 0.99993
+    },
+    "13": {
+     "genes": 390,
+     "same_lead": 1.0,
+     "beta_p_spearman": 0.99991
+    },
+    "14": {
+     "genes": 801,
+     "same_lead": 1.0,
+     "beta_p_spearman": 0.99994
+    },
+    "15": {
+     "genes": 813,
+     "same_lead": 1.0,
+     "beta_p_spearman": 0.99994
+    },
+    "16": {
+     "genes": 1058,
+     "same_lead": 1.0,
+     "beta_p_spearman": 0.99995
+    },
+    "17": {
+     "genes": 1141,
+     "same_lead": 0.9982,
+     "beta_p_spearman": 0.99995
+    },
+    "18": {
+     "genes": 226,
+     "same_lead": 1.0,
+     "beta_p_spearman": 0.99989
+    },
+    "19": {
+     "genes": 1153,
+     "same_lead": 1.0,
+     "beta_p_spearman": 0.99994
+    },
+    "20": {
+     "genes": 494,
+     "same_lead": 1.0,
+     "beta_p_spearman": 0.99993
+    },
+    "21": {
+     "genes": 246,
+     "same_lead": 1.0,
+     "beta_p_spearman": 0.9999
+    },
+    "22": {
+     "genes": 580,
+     "same_lead": 1.0,
+     "beta_p_spearman": 0.99993
+    }
+   }
+  }
+ },
+ "chr22_check": {
+  "reference": "validation/work/benchmark/runs-v1.4.0-final/eqtl/rapidglm_gaussian10000/chr22.cis.tsv",
+  "reference_version": "1.4.0 (v1.4.0-dev.4, f0ecfbd)",
+  "header_identical": true,
+  "genes_reference": 580,
+  "genes_genome_wide_chr22": 580,
+  "rows_byte_identical": 580,
+  "rows_differing": [],
+  "stream": "Permutation k of a phenotype is drawn from a counter-based stream keyed by the seed and the phenotype ID (include/rapidglm/qtl.hpp: keyed_stream(seed, 7, 0, name_key(id)); CisQtlOptions documents that results do not depend on threads or on the other phenotypes of the run). The chr22 genes therefore get the same permutations in the genome-wide run, and their rows are expected to be identical, not merely within Monte Carlo error."
+ },
+ "tensorqtl_chr22_against_its_chr22_run": {
+  "genes": 580,
+  "same_lead": 1.0,
+  "pval_nominal_identical": 580,
+  "pval_beta_spearman": 1.0,
+  "max_abs_pval_beta_difference": 0.0
+ },
+ "files": {
+  "runs": "validation/work/eqtl/runs-genomewide-v1.4.1",
+  "reference_table": "validation/work/eqtl/runs-genomewide-v1.4.1/reference_gene_level.tsv.gz"
+ }
+}

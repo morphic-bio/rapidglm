@@ -143,7 +143,32 @@ for (case in cases) {
   # R's reference BLAS rounds differently from the CLI's OpenBLAS.
   same(table, frame, text = c("target", "guide", "kind", "status"), tolerance = 1e-10, floor = 1e-12)
   stopifnot(sum(frame$status == "ok") >= 5)
+  # hazard by default, thinned without AES instructions, as the CLI's run record says.
+  record <- paste(readLines(file.path(dir, "result.run.json")), collapse = "\n")
+  used <- attr(frame, "run")$crt_draw_used
+  stopifnot(used %in% c("hazard", "thinned"), grepl('"crt_draw": "hazard"', record, fixed = TRUE),
+            grepl(sprintf('"crt_draw_used": "%s"', used), record, fixed = TRUE))
 }
+# Low MOI: NT-control pair nulls refined from the response's reference (default) or cold.
+starts <- list()
+for (start in c("refine", "cold")) {
+  case <- list(moi = "low", budgets = c(199, 999), seed = 5, null_start = start)
+  table <- run_cli("sceptre", c(files, case))
+  table$kind <- c("discovery", "negative", "positive")[as.integer(table$kind) + 1]
+  table$response <- as.character(as.integer(table$response) + 1)
+  frame <- do.call(sceptre, c(list(responses, calls, ~ log_depth, guides, pairs, cell_data = covariates), case))
+  same(table, frame, text = c("target", "guide", "kind", "status"), tolerance = 1e-10, floor = 1e-12)
+  record <- paste(readLines(file.path(dir, "result.run.json")), collapse = "\n")
+  run <- attr(frame, "run")
+  stopifnot(identical(run$null_start_used, start),
+            grepl(sprintf('"null_start_used": "%s"', start), record, fixed = TRUE),
+            grepl(sprintf('"null_refined": %d,', as.integer(run$null_refined)), record, fixed = TRUE))
+  starts[[start]] <- frame
+}
+stopifnot(attr(starts$refine, "run")$null_refined > 0, attr(starts$cold, "run")$null_refined == 0,
+          identical(starts$refine$status, starts$cold$status))
+ok <- starts$cold$status == "ok"
+stopifnot(sum(ok) >= 3, isTRUE(all.equal(starts$refine$statistic[ok], starts$cold$statistic[ok], tolerance = 1e-6)))
 by_name <- sceptre(responses, calls, x, guides[, c("id", "target")],
                    transform(pairs, response = rownames(responses)[response]), moi = "high", budgets = 199)
 stopifnot(identical(by_name$response_id[1], "gene1"))
@@ -171,6 +196,8 @@ from_cli <- function(table) {
 }
 text <- c("target", "guide", "kind", "status")
 default <- run_r(sceptre, all_pairs)
+# Batch scoring (the default) gives the records of scoring pair by pair.
+stopifnot(identical(run_r(sceptre, all_pairs, batch_scoring = FALSE), default))
 failed <- default$status == "failed_pair_qc"
 run <- attr(default, "run")
 stopifnot(sum(failed) > 0, sum(!failed) > 20, is.na(default$adjusted_p[failed]), !is.na(default$adjusted_p[!failed]),
@@ -266,3 +293,14 @@ fails(run_r(sceptre_grid, c("A", "A")), "grid targets must be distinct known tar
 fails(run_r(sceptre_grid, "A", grid_responses = character()), "grid_responses is empty")
 fails(run_r(sceptre_grid, "A", grid_responses = "gene99"), "unknown response in grid_responses")
 cat("applications: ok\n")
+
+# Invalid option vectors must fail before crossing the C ABI.
+for (fn in list(bulk_de, edger_ql)) {
+  for (extra in list(list(coefficient=0),list(coefficient=3),list(contrast=1))) {
+    result <- try(do.call(fn,c(list(counts=matrix(10,20,8),
+                                    design=cbind(1,rep(0:1,4))),extra)),silent=TRUE)
+    stopifnot(inherits(result,"try-error"))
+  }
+}
+stopifnot(inherits(try(edger_ql(matrix(10,20,8),cbind(1,rep(0:1,4)),
+                              norm_factors=1),silent=TRUE),"try-error"))

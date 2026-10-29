@@ -207,6 +207,99 @@ BOOST_AUTO_TEST_CASE(c_api_scan_and_sceptre_match_cpp) {
         BOOST_TEST(same(p[k], sceptre_expected.tests[k].p_value));
     rapidglm_table_free(t);
 }
+BOOST_AUTO_TEST_CASE(crt_draw_defaults_to_hazard_and_tables_state_the_sampler_used) {
+    // hazard is the default sampler of CRT labels in C++ and in C. Without AES
+    // instructions (and with RAPIDGLM_FORCE_PORTABLE) it is thinned, stream and
+    // all; result tables state the sampler used.
+    BOOST_TEST((SceptreOptions().crt_draw == CrtDraw::hazard));
+    BOOST_TEST((ScanOptions().crt_draw == CrtDraw::hazard));
+    rapidglm_sceptre_options c;
+    for (int high_moi : {0, 1}) {
+        rapidglm_sceptre_options_init(&c, high_moi);
+        BOOST_TEST(c.crt_draw == RAPIDGLM_CRT_HAZARD);
+    }
+    rapidglm_scan_options so;
+    rapidglm_scan_options_init(&so);
+    BOOST_TEST(so.crt_draw == RAPIDGLM_CRT_HAZARD);
+    // Sparse calls (mean propensity below 1/16), where the samplers differ.
+    std::mt19937_64 rng(11);
+    const std::size_t n = 3000, genes = 4;
+    Matrix x(n, 2, 1);
+    std::vector<Vector> ys(genes, Vector(n)), calls(2, Vector(n));
+    for (std::size_t i = 0; i < n; ++i) {
+        x(i, 1) = std::normal_distribution<double>()(rng);
+        for (auto &call : calls)
+            call[i] = std::uniform_real_distribution<double>()(rng) < 0.03;
+        for (auto &y : ys)
+            y[i] = std::poisson_distribution<int>(std::exp(1 + 0.3 * x(i, 1)))(rng);
+    }
+    auto y = columns(ys), g = columns(calls);
+    const auto xv = view(x);
+    const auto yv = y.view(), gv = g.view();
+    const char *ids[] = {"a", "b"}, *targets[] = {"A", "B"};
+    const int nt[] = {0, 0};
+    std::vector<std::size_t> pair_responses;
+    std::vector<const char *> pair_targets;
+    for (std::size_t r = 0; r < genes; ++r)
+        for (const char *target : targets) {
+            pair_responses.push_back(r);
+            pair_targets.push_back(target);
+        }
+    const std::vector<int> kinds(pair_responses.size(), RAPIDGLM_PAIR_DISCOVERY);
+    const std::size_t budgets[] = {499};
+    // The p-values of a run, then the sampler it used; draw < 0: the default.
+    const auto run = [&](bool scan, int draw) {
+        rapidglm_table *t = nullptr;
+        if (scan) {
+            rapidglm_scan_options_init(&so);
+            so.model.family = RAPIDGLM_POISSON;
+            so.calibration = RAPIDGLM_CALIBRATION_CRT;
+            so.approximate = 0;
+            so.budgets = budgets;
+            so.n_budgets = 1;
+            if (draw >= 0)
+                so.crt_draw = draw;
+            BOOST_REQUIRE_EQUAL(rapidglm_scan(&xv, &yv, &gv, 0, nullptr, nullptr, nullptr, &so, &t),
+                                RAPIDGLM_OK);
+        } else {
+            rapidglm_sceptre_options_init(&c, 1);
+            c.cell_qc = 0;
+            c.approximate = 0;
+            c.budgets = budgets;
+            c.n_budgets = 1;
+            if (draw >= 0)
+                c.crt_draw = draw;
+            BOOST_REQUIRE_EQUAL(rapidglm_sceptre(&xv, &yv, &gv, 2, ids, targets, nt,
+                                                 pair_responses.size(), pair_responses.data(),
+                                                 pair_targets.data(), kinds.data(), &c, &t),
+                                RAPIDGLM_OK);
+        }
+        const double *p = rapidglm_table_numeric(t, "p_value");
+        std::vector<double> result(p, p + rapidglm_table_rows(t));
+        result.push_back(rapidglm_table_scalar(t, "crt_draw_used"));
+        rapidglm_table_free(t);
+        return result;
+    };
+    const auto same_p = [](const std::vector<double> &a, const std::vector<double> &b) {
+        return a.size() == b.size() && std::equal(a.begin(), a.end() - 1, b.begin(), same);
+    };
+    for (bool scan : {false, true}) {
+        BOOST_TEST_CONTEXT((scan ? "scan" : "sceptre")) {
+            const auto by_default = run(scan, -1), hazard = run(scan, RAPIDGLM_CRT_HAZARD),
+                       thinned = run(scan, RAPIDGLM_CRT_THINNED),
+                       direct = run(scan, RAPIDGLM_CRT_DIRECT);
+            BOOST_TEST(by_default.size() == pair_responses.size() + 1);
+            BOOST_TEST(same_p(by_default, hazard));
+            BOOST_TEST(by_default.back() == hazard.back());
+            BOOST_TEST(hazard.back() ==
+                       (aes_instructions() ? RAPIDGLM_CRT_HAZARD : RAPIDGLM_CRT_THINNED));
+            BOOST_TEST(thinned.back() == RAPIDGLM_CRT_THINNED);
+            BOOST_TEST(direct.back() == RAPIDGLM_CRT_DIRECT);
+            BOOST_TEST(same_p(hazard, thinned) == !aes_instructions());
+            BOOST_TEST(!same_p(thinned, direct));
+        }
+    }
+}
 namespace {
 // A screen at high MOI: targets A (two guides), B and C, one non-targeting
 // guide, and five responses. Response 0 falls in the cells of A; response 4
@@ -336,6 +429,9 @@ void check_sceptre_table(const rapidglm_table *t, const SceptreResult &r) {
     BOOST_TEST(scalar("power_rejections") == static_cast<double>(r.power_rejections));
     BOOST_TEST(scalar("discovery_rejections") == static_cast<double>(r.discovery_rejections));
     BOOST_TEST(scalar("null_fits") == static_cast<double>(r.null_fits));
+    // The default sampler, hazard, is thinned without AES instructions.
+    BOOST_TEST(scalar("crt_draw_used") ==
+               (aes_instructions() ? RAPIDGLM_CRT_HAZARD : RAPIDGLM_CRT_THINNED));
     const char *const kinds[] = {"discovery", "negative", "positive"};
     for (std::size_t k = 0; k < 3; ++k) {
         BOOST_TEST(scalar(std::string("pairs_listed_") + kinds[k]) ==
@@ -345,7 +441,13 @@ void check_sceptre_table(const rapidglm_table *t, const SceptreResult &r) {
         BOOST_TEST(scalar(std::string("family_size_") + kinds[k]) ==
                    static_cast<double>(r.family_size[k]));
     }
-    BOOST_TEST(rapidglm_table_scalars(t) == 14u);
+    BOOST_TEST(scalar("null_start_used") == (r.null_start_used == NullStart::refine
+                                                 ? RAPIDGLM_NULL_START_REFINE
+                                                 : RAPIDGLM_NULL_START_COLD));
+    BOOST_TEST(scalar("null_refined") == static_cast<double>(r.null_refined));
+    BOOST_TEST(scalar("null_cold_refits") == static_cast<double>(r.null_cold_refits));
+    BOOST_TEST(rapidglm_table_scalars(t) == 19u);
+    BOOST_TEST(scalar("division_mode") == rapidglm_division_mode());
 }
 } // namespace
 BOOST_AUTO_TEST_CASE(c_api_sceptre_stream_keys_and_families_match_cpp) {
@@ -670,5 +772,37 @@ BOOST_AUTO_TEST_CASE(c_api_nb_building_blocks_match_the_library) {
         BOOST_TEST(same(ml[j], expected_ml[j]));
         BOOST_TEST(std::abs(std::log(map[j] / disp[j])) <=
                    std::abs(std::log(ml[j] / disp[j])) + 1e-12);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(c_api_batch_scoring_defaults_on_and_keeps_the_records) {
+    // Batch scoring is on by default in C++ and in C; off, the pairs are scored
+    // one by one, with the same records.
+    BOOST_TEST(SceptreOptions().batch_scoring);
+    rapidglm_sceptre_options c;
+    for (int high_moi : {0, 1}) {
+        rapidglm_sceptre_options_init(&c, high_moi);
+        BOOST_TEST(c.batch_scoring == 1);
+    }
+    auto s = screen();
+    c_arrays(s);
+    const auto xv = view(s.x);
+    const auto yv = s.y.view(), gv = s.g.view();
+    SceptreOptions o;
+    screen_options(c, o);
+    const auto expected = sceptre(s.x, s.y.s, s.g.s, s.guides, s.pairs, {}, o);
+    for (int batch : {0, 1}) {
+        BOOST_TEST_CONTEXT("batch_scoring " << batch) {
+            screen_options(c, o);
+            c.batch_scoring = batch;
+            rapidglm_table *t = nullptr;
+            BOOST_REQUIRE_EQUAL(rapidglm_sceptre(&xv, &yv, &gv, s.guides.size(), s.ids.data(),
+                                                 s.targets.data(), s.non_targeting.data(),
+                                                 s.pairs.size(), s.pair_responses.data(),
+                                                 s.pair_targets.data(), s.kinds.data(), &c, &t),
+                                RAPIDGLM_OK);
+            check_sceptre_table(t, expected);
+            rapidglm_table_free(t);
+        }
     }
 }

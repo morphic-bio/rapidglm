@@ -1,0 +1,363 @@
+{
+  "version": "1.4.0",
+  "tag": "v1.4.0-dev.4",
+  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "branch": "feat/engine",
+  "worktree_dirty": false,
+  "binaries_sha256": {
+    "build/rapidglm": "bedeabde9a5f42fb4f7dc5f44980bde540de48871c3973d3ca622f341327a591",
+    "build/librapidglm_c.so": "53ba9191469c1bc6c4c01231660053e8e4e86d45e7fd3782c4f03c47a1bf58a7",
+    "build/rapidglm_glm_compare": "ce1b1b5586953fc429b7ea24e48aa3258c70d8546480cf8afacd7c165f62f987",
+    "build/rapidglm_glm_batch": "71aaac5b9bf58df8935575e6e10667271ff7cba5acaf77d029b48cbd8492eceb",
+    "bindings/rust/target/release/examples/deseq": "03644f023a1faeed0931e80c5b8ec9e4b24411f50dd4d2a55be143a944366bd5",
+    "validation/local-data/R_rapidglm/rapidglm/libs/rapidglm.so": "bf36936bf64a5d8646cdfa5eb472daa65f312fca26e64178db56e6192881c3cf",
+    "validation/work/benchmark/runs-v1.4.0-final/bin/glm_reference": "14ffd5cf248695ecdca186aab9c90a3f12bca47808607a759e481b3c91afd025",
+    "bindings/python/rapidglm/_rapidglm.cpython-310-x86_64-linux-gnu.so": "89215e422e1b0f3a24830f313a39b03072167286debda4b9a4efca53e339b3f3"
+  },
+  "container_images": {
+    "rapidglm:1.4.0": "sha256:fd2457c7f186a0a6fc82e0eb7663bcccf8223df1babd70c8c1e159ace2cfe9d0",
+    "rapidglm-solvers:1.4.0": "sha256:8988a4f299ce961be3e58f8b9e579a467962f73fefb66ebbf37a014eda4d2b02"
+  },
+  "timed_cpus": "16-31; one thread per identical efficiency core; subsets 16,16-19,16-23,16-27",
+  "untimed_cpus": "0-7 under nice 10 in this runner; 12-15 are also permitted. CPUs 8-11 are excluded.",
+  "timing_lock": "/mnt/pikachu/e2e_bench_20260926/pikachu_timed.lock",
+  "quiet_host_start": "Two consecutive ten-second samples: one-minute load <=4 and every selected CPU <20% busy; both samples retained.",
+  "r_install": {
+    "command": [
+      "R",
+      "CMD",
+      "INSTALL",
+      "--preclean",
+      "--library=validation/local-data/R_rapidglm",
+      "bindings/r"
+    ],
+    "exit": 0,
+    "started_utc": "2026-10-21T11:31:06.114376+00:00",
+    "wall_seconds": 23.23519802093506
+  },
+  "r_version_check": "\nAttaching package: \u2018rapidglm\u2019\n\nThe following object is masked from \u2018package:stats\u2019:\n\n    glm\n\n[1] \u20181.4.0\u2019\n[1] \"2026-10-21 11:31:29 UTC\"\n",
+  "full_screen_memory_gate": "At least 100 GiB available and no other process with RSS >=8 GiB; checked before every full-screen command.",
+  "receipt_scope": "All 18 stages must run fresh on this commit; status.txt records progress and run-complete.json records completion. Earlier collections are provenance only.",
+  "code_tree_hashes": {
+    "include": "63564bd99a0fc97db75c5cf5cb88c0c59e09dc28",
+    "src": "f520e7e96821df048c2026f4a8da63d60d098908",
+    "bindings/python/rapidglm": "6cbd2ff54a6b1d4bd7aad41fce40d995be30db91",
+    "bindings/r/R": "11a6233eec894a61da7ac6c17bebf72a8d7d3bd8",
+    "bindings/r/src": "4e2786d3029c00a274b42f9a47354f9d592571f7",
+    "bindings/rust/src": "88393ac8f4100c8439ba207feb37ed31dd0df238",
+    "CMakeLists.txt": "edc7dc7b33bd6d21adb7b17a814a308e902e4a98"
+  },
+  "runner_priority": 10,
+  "container_build_policy": {
+    "cpus": "0-7",
+    "cpu_shares": 128,
+    "host_client_nice": 10,
+    "test_container_nice": 10
+  },
+  "numpy_generator": {
+    "version": "1.26.4",
+    "installation": "original Python 3.10 user-site environment"
+  },
+  "unpublished_preliminary_attempts": [
+    {
+      "aborted_utc": "2026-10-21T11:29:55.465782+00:00",
+      "reason": "Global PYTHONPATH unintentionally selected NumPy 2.2.6 for input generation instead of the original 1.26.4. The runner is corrected and the complete final receipt run will restart. No measurement from this attempt is used in final tables.",
+      "commit": "5808f2438eb9231b92d1682d44dd2aa6bacd4174",
+      "tag_object": "ffa561e03fbd98fed3baf3de05dd298e2b254c15",
+      "runner_pid": 785721,
+      "published": false
+    }
+  ],
+  "invalidated_timing_runs": "INVALIDATED_RUNS.json",
+  "cpu_policy": {
+    "expected": {
+      "no_turbo": "0",
+      "cpus": {
+        "8": {
+          "scaling_max_freq": "2200000"
+        },
+        "9": {
+          "scaling_max_freq": "2200000"
+        },
+        "10": {
+          "scaling_max_freq": "2200000"
+        },
+        "11": {
+          "scaling_max_freq": "2200000"
+        },
+        "16": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "17": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "18": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "19": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "20": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "21": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "22": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "23": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "24": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "25": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "26": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "27": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "28": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "29": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "30": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        },
+        "31": {
+          "scaling_min_freq": "800000",
+          "scaling_max_freq": "4300000"
+        }
+      }
+    },
+    "supervisor": "supervise.py",
+    "supervisor_sha256": "73b7d4193483de9dee961aa3774e51f8410b830d7ff84f9dfb2f637fedcbbb5e",
+    "controller_files_sha256": {
+      "supervise.py": "73b7d4193483de9dee961aa3774e51f8410b830d7ff84f9dfb2f637fedcbbb5e",
+      "cpu_policy.py": "14d39c9d8ebbfe22d954c87a2960cee15547d2e49453280f4f7302122a828edd",
+      "policy_hook/sitecustomize.py": "e025549ac1301ee6962a96b3971b6cff88cbd5d07b0c158cdc9fe489dfedd90b"
+    },
+    "monitoring": "Check synchronously at each quiet start and once per second throughout the complete run; log every check; abort on a policy mismatch or monitoring gap over five seconds.",
+    "timing_scope": "Turbo on. Timed CPUs 16-31 use their stock 800000-4300000 kHz policy, one thread per identical efficiency core. Faulty P CPUs 8-11 are capped at 2200000 kHz and never used for timings.",
+    "instrumentation": "An isolated startup hook attaches policy checks to the frozen quiet_run.audit function in orchestration entry points. Profiling is removed at the first audit call, before a measurement starts. Library, fitter and reference-tool code are unchanged.",
+    "runtime_hook_symlinks": {
+      "bindings/python/sitecustomize.py": "../../validation/receipts/v1.4.0/policy_hook/sitecustomize.py"
+    },
+    "runtime_hook_note": "Temporary link to the same audited hook covers the frozen Rust recipe, which replaces PYTHONPATH with bindings/python. Created before that stage; remove after all timings, before packaging. No library source file is changed.",
+    "runtime_hook_prepared_utc": "2026-10-22T02:25:39.578363+00:00",
+    "supplemental_guard_files_sha256": {
+      "policy_hook/usercustomize.py": "bb401e3458b78733d13afa2f7448d05c8c283127140962ad8ddc01f5e98a0aad",
+      "supervise_rerun.py": "62752dbd3e0c08970bc758e852261fca1b878b557ccb9b234ecd72c43cabe40a"
+    },
+    "seed_memory_guard": {
+      "added_utc": "2026-10-22T07:57:01.529886+00:00",
+      "scope": "The unchanged untimed full-screen seed driver checks 100 GiB available and absence of other RSS >=8 GiB processes immediately before each native screen command. This startup hook leaves other commands and the existing CPU-policy hook unchanged.",
+      "preflight": {
+        "startup_hook": true,
+        "existing_cpu_hook_preserved": true,
+        "memory_gate_precedes_exec": true,
+        "blocked_gate_prevents_exec": true,
+        "version_call_untouched": true,
+        "profiling_disabled": true
+      },
+      "library_changed": false,
+      "added_before_seed_stage": true
+    },
+    "rerun_controller": {
+      "file": "supervise_rerun.py",
+      "sha256": "62752dbd3e0c08970bc758e852261fca1b878b557ccb9b234ecd72c43cabe40a",
+      "added_before_rerun": true,
+      "original_three_controller_files_unchanged": true
+    },
+    "runtime_hook_removed_utc": "2026-10-22T20:19:25.541821+00:00",
+    "runtime_hook_removed_after_all_timings": true
+  },
+  "full_run_restarted_utc": "2026-10-22T00:10:14.606660+00:00",
+  "qtl_environment_check": {
+    "utc": "2026-10-21T22:07:13.227625+00:00",
+    "reason": "Host reboot removed the temporary interpreter directory used by both QTL environments. Restored links to the existing matching Python 3.12.14 installation. No packages were reinstalled or upgraded.",
+    "interpreter_sha256": "fa67443527ed9647f760d807e2a38f26340757123e643c4639cf273ed15d5ea7",
+    "checks": [
+      {
+        "environment": "venv-tensorqtl",
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "packages": {
+          "tensorqtl": "1.0.10",
+          "torch": "2.14.1+cpu"
+        }
+      },
+      {
+        "environment": "venv",
+        "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "packages": {
+          "jaxqtl": "0.3.1",
+          "jax": "0.11.2",
+          "jaxlib": "0.11.2"
+        }
+      }
+    ],
+    "cli_help_exit_codes": {
+      "tensorqtl": 0,
+      "jaxqtl": 0
+    }
+  },
+  "host_configuration": {
+    "workstation": "Intel Core i9-13900KF",
+    "ram_gib": 125,
+    "bios_version": "1836",
+    "bios_date": "04/16/2026",
+    "microcode": "0x133",
+    "power_limits": {
+      "long_term": {
+        "power_limit_watts": 253.0,
+        "time_window_microseconds": 55967744
+      },
+      "short_term": {
+        "power_limit_watts": 253.0,
+        "time_window_microseconds": 2440
+      }
+    },
+    "memory": {
+      "modules": 4,
+      "module_gib": 32,
+      "configured_rate_mt_per_second": 4200,
+      "evidence": "Final host setting supplied by the user; BIOS/microcode and RAPL limits independently read at preflight."
+    },
+    "faulty_performance_cores": {
+      "physical_cores": 2,
+      "logical_cpus": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "maximum_khz": 2200000,
+      "thread_siblings": {
+        "8": "8-9",
+        "9": "8-9",
+        "10": "10-11",
+        "11": "10-11"
+      },
+      "timed": false
+    },
+    "cap_faulty_cores_service": {
+      "enabled": true,
+      "executable": "/usr/local/sbin/cap-faulty-cores"
+    },
+    "fixed_cpu_clock_service": {
+      "enabled": false
+    },
+    "reproducibility": "Every timed run is pinned to identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Absolute seconds from other host settings are not directly comparable; matched tool speed-up ratios are the comparison of interest.",
+    "verified_utc": "2026-10-22T00:08:31.141014+00:00"
+  },
+  "final_host_policy_request": "User request resuming the release after the final host setting was applied on 2026-10-21.",
+  "pythonpath_scope": "Only the frozen scripts directory and the isolated receipt policy hook; no numerical-dependency override.",
+  "cpu_policy_guard_preflight": {
+    "module_import_hook": "passed",
+    "direct_script_namespace_hook": "passed",
+    "pre_command_checks_per_case": 2,
+    "profiling_removed_before_measurement": true,
+    "simulated_policy_mismatch_aborted": true,
+    "host_settings_changed": false,
+    "numpy_version": "1.26.4",
+    "rust_pythonpath_override_system_python": "passed",
+    "rust_pythonpath_override_pydeseq2_venv": "passed"
+  },
+  "controller_launch": {
+    "command": [
+      "setsid",
+      "nohup",
+      "python3",
+      "validation/receipts/v1.4.0/supervise.py"
+    ],
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "nice": 10
+  },
+  "stage_reruns": [
+    {
+      "stage": "eqtl",
+      "invalidated_attempt": 1,
+      "reason": "Final jaxQTL 1000-permutation command exceeded the retained 5% selected-core contention threshold.",
+      "selected_core_other_cpu_fraction": 0.06508459911668629,
+      "threshold": 0.05,
+      "archive": "validation/work/release-1.4.0/contention-eqtl-20261022T183004Z",
+      "original_stage_exit": 0,
+      "rerun_scope": "All seven eQTL commands and the scientific comparison; other 17 stages retained.",
+      "measured_commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+      "invalidated_utc": "2026-10-22T18:33:00.917359+00:00",
+      "archived_command_timings": {
+        "fastqtl": {
+          "time.log": "2a9bba4c5756e70fff953adb61c209d510dc0ec3440136f7bff3a91e41def940",
+          "host.json": "2dda79634a33ee3b26458fc6f2b6c745ef08ad02ef3f0ae90b1bd958bdfce177"
+        },
+        "jaxqtl_nb_score_perm1000": {
+          "time.log": "9b254784070341fd9b8c54107cb6414f6814e0d93e6561a73acc2da5e35d3795",
+          "host.json": "4a9014ae0ae76dce0349c3f3bc5b0cb08f5cdf3ae4f3eceef0926c565f9b8485"
+        },
+        "jaxqtl_nb_score_spa_acat": {
+          "time.log": "0edca44e4b452c35cb9737b68221003c101efe359dcfdc27a981156aa25f0e51",
+          "host.json": "961a07fd200b592dfad3d7187f4e0bd478cc18ab489f9ef6988b2df7d5107806"
+        },
+        "rapidglm_gaussian": {
+          "time.log": "570532821c35a9f3358bc33f76ed7f4a3db5142d8696a851cc5e49bc88ddcd12",
+          "host.json": "9271e2b5ce06aa0bc3aa3f68ea06ff389d9f6d1085f1adf1dda7a6e7d20bf562"
+        },
+        "rapidglm_gaussian10000": {
+          "time.log": "3e6a7965497800091002e01e28621d1063d0bba91d663df689af846daecfe0d2",
+          "host.json": "50c4d330cb80e2f0ce15d40f231c1fff73484cac6cca1f6bfc9c6aefa5edfcb5"
+        },
+        "rapidglm_nb": {
+          "time.log": "31540cf1e9bcb528f0217258b16cf8e30670f0bd4dc14e879823c4574f286d79",
+          "host.json": "8bc2f76cd7497647da76eec33ac832568c4499c0d8415183927a616ee5f44e18"
+        },
+        "tensorqtl": {
+          "time.log": "ea539e9a2697d1f2776d612db20a3d23b7b2850f8acf6500a53d1d1da8a130e8",
+          "host.json": "d6abd0ce8b2085c8633729774e28166ac2e52925c917778c4da7768b296fc480"
+        }
+      }
+    }
+  ],
+  "final_run_review": {
+    "accepted_quiet_starts": 843,
+    "all_attempt_quiet_starts": 850,
+    "cpu_policy_checks": 71776,
+    "monitored_segments": 2,
+    "accepted_contention_flags": 0,
+    "stage_reruns": [
+      "eqtl"
+    ],
+    "input_arrays_identical": 308,
+    "dev3_raw_tables_byte_identical": 235,
+    "additional_qtl_reference_tables_exact": 21
+  }
+}

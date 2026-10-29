@@ -196,7 +196,8 @@ The output has one row per pair, in pair order, with these columns:
 
 Statuses are `ok`, `null_<fit status>`, `failed_pair_qc`, `invalid_score`,
 `propensity_<fit status>`, `ok_effect_boundary` and `ok_effect_fit_failed`.
-The run record adds `null_model`, `calibration` and `effect_fits`.
+The run record adds `null_model`, `calibration`, `effect_fits`, `crt_draw` and
+`crt_draw_used` (see `sceptre`).
 
 Configured like `sceptre` (union-of-guides predictors, the same pair order,
 `null_model=sceptre`, `calibration=crt`), a scan reproduces the complement-control
@@ -381,20 +382,25 @@ its staging. The screen reproduces what its outputs show; the random draws
 themselves differ, so borderline pairs can differ within Monte Carlo noise
 ([SCEPTRE_STAGING.md](SCEPTRE_STAGING.md)).
 
-`crt_draw` defaults to `thinned`, which draws the same independent Bernoulli
-labels as `direct` from a different random stream in O(expected treated
-cells) instead of O(cells) per draw. `direct` reproduces CRT p-values from
-releases before this option. `hazard` (opt-in) draws the same independent
-Bernoulli labels again, from a third stream, with one random gap per treated
-cell and no rejection, the gaps coming from an AES-based generator: generating
-a draw takes less than half the time of `thinned` (METHODS.md, Resampling).
-P-values differ from `thinned`'s within Monte Carlo error, as between two
-seeds. `hazard` needs the processor's AES instructions (x86 since about 2010,
-Apple and server Arm processors); on a processor without them it draws with
-the `thinned` sampler instead and the program says so. The run record states
-the sampler asked for (`crt_draw`) and the one used (`crt_draw_used`), so
-results of `hazard` depend on which kind of processor ran them. Permutation
-tests are unaffected.
+`crt_draw` (`hazard`, `thinned` or `direct`) chooses how CRT labels are drawn.
+All three draw the same independent Bernoulli labels, each from its own random
+stream, so their p-values differ within Monte Carlo error, as between two
+seeds. `hazard`, the default, draws with one random gap per treated cell and no
+rejection, the gaps coming from an AES-based generator (METHODS.md,
+Resampling). On 20 targets × 7,418 genes of the Gasperini panel at 16 threads,
+a run by default takes 370 s with `hazard` and 484 to 491 s with `thinned`
+(1.31 times as fast). With `reuse_draws` and `confirm_draws: 0` both take 179
+to 193 s: each target's draws are then generated once, and scoring them takes
+nearly all the time. `hazard` needs the processor's AES instructions (x86 since
+about 2010, Apple and server Arm processors); on a processor without them it
+draws with the `thinned` sampler, from thinned's stream, and a run that draws
+CRT labels says so on standard error. CRT p-values therefore depend on the kind
+of processor that ran them: the run record states the sampler asked for
+(`crt_draw`) and the one used (`crt_draw_used`), and a tiled run's plan
+includes the sampler used (below). `crt_draw: "thinned"`, the default of
+releases before 1.5.0, reproduces their CRT p-values and draws in O(expected
+treated cells) instead of O(cells) per draw; `direct` reproduces CRT p-values
+from releases before `thinned`. Permutation tests are unaffected.
 
 `parallel_draws` defaults true. With OpenMP 4.5 or later and `threads > 1`,
 draws are scheduled in batches of up to 256 across the existing worker team,
@@ -416,6 +422,22 @@ slow: the program then prints a warning, and the run record states how many
 targets were kept and rebuilt (`samplers`). A run with `checkpoint_dir` and no
 tile sizes avoids this by splitting the targets into blocks that fit (see
 below). Results do not depend on either setting.
+
+`batch_scoring` (default true from 1.6.0; CRT with complement controls, i.e.
+`moi: high`) scores each response's pairs together, one response per thread:
+each stage of all its pairs' draws is scored in one pass over the response's
+score records, in blocks of cells (METHODS.md, Resampling). The records are
+bit for bit those of scoring the pairs one by one in the pair pipeline
+(`false`), at any thread count. On 100 targets × 7,418 genes of the Gasperini
+screen at 8 threads it took 1.92 times less wall time with `reuse_draws` and
+`confirm_draws: 0` and 1.22 times less by default
+([BATCH_SCORING.json](../validation/BATCH_SCORING.json)). With
+`shared_screen`, `sequential_screen` or `early_stop_p` the pair pipeline is
+used whatever the setting, and `parallel_draws` and `parallel_pairs` apply to
+the pair pipeline only. With batch scoring every listed target's propensity
+model and sampler are prepared before the responses, including targets all of
+whose pairs fail pair QC. The run record states `batch_scoring`; tiles of one
+run may be computed with either setting.
 
 `reuse_draws` (default false; CRT with complement controls, i.e. `moi: high`)
 draws each target's CRT resamples once and scores every gene against them: the
@@ -506,8 +528,11 @@ tile size and thread count.
   fit exactly, and a response for which it does not keeps its full fit.
 - `plan.txt` fingerprints the inputs and the settings that change results
   (not `threads`, scheduling or cache sizes); a directory holding another
-  run is refused. Tiles are written through a temporary file and renamed, so a
-  tile file is always complete. The run record lists the tile count and the
+  run is refused. With the `hazard` CRT sampler (the default) the plan also
+  holds the sampler used, so the tasks of a run must run on processors of one
+  kind, with AES instructions or without them (`crt_draw`); a task on the
+  other kind is refused. Tiles are written through a temporary file and
+  renamed, so a tile file is always complete. The run record lists the tile count and the
   tiles computed by that process.
 - `inputs.tsv` records each input's SHA-1 with its size and modification time.
   A later phase or tile task takes the fingerprint from there when the file's
@@ -565,6 +590,29 @@ fields and potentially the resampling p-values. Full effect-model log2FC and
 SE still come from direct GLM fits, optionally warm-started from this null.
 The RNG and draw budgets remain RapidGLM's, and the staging follows `screen`;
 this flag does not claim p-value equivalence with SCEPTRE, whose draws differ.
+
+`null_start` (`refine` or `cold`) says how a pair's null is started with NT
+controls and `null_model=sceptre` (METHODS.md, Mergeable null start). With
+`refine`, the default from 1.6.0, each response's null is first fitted on all
+retained cells (its reference), as for complement controls. A pair then adds
+its target cells' sums of the Poisson score and information and of the theta
+score terms at the reference to the NT cells' sums, which are taken once per
+response, and takes one Fisher-scoring step and one Newton step in log theta
+from the reference. Exact Newton passes over the pair's cells, with step
+halving, refine that start to the convergence criteria of the cold fit, and
+theta follows by Newton in log theta (today's theta procedure takes over for a
+non-concave or large step). A pair that does not converge, or whose response's
+reference has a boundary, is fitted cold. `cold` fits every pair from scratch,
+as releases before 1.6.0 did. The two give the same nulls to the convergence
+tolerance, and the same empirical p-values unless a draw lies within rounding
+of the statistic; skew-normal tail p-values far in a tail can differ by more
+(on the Replogle pilot, 77 of 16,062, all below 3e-17). On that pilot the
+refined nulls took 5.1 thread-ms per pair against 20.9 ms cold and the
+`fit_check: "ks"` run 2.1 times less wall time (validation/MERGEABLE_NULL.json).
+The setting has no effect with complement controls or `null_model=direct`. The
+run record states `null_start`, the start used (`null_start_used`), the pairs
+refined (`null_refined`) and those fitted cold after refining failed
+(`null_cold_refits`); a tiled run's plan includes the default.
 
 Every perturbation `.run.json` explicitly records `null_model`,
 `null_fit_method`, `score_numerator`, `effect_fit_method`, `resampling_policy`
@@ -656,3 +704,80 @@ uses `find_package(rapidglm CONFIG REQUIRED)` and links `rapidglm::rapidglm`.
 Run `scripts/check_external.sh` for a complete example. The C++ header API is
 provisional and may change between minor versions; the CLI configuration and
 the C interface are the stable interfaces.
+
+## Cis-QTL mapping (`qtl`)
+
+Run `rapidglm qtl config.json`, for example:
+
+```json
+{"phenotypes":"chr22.counts.bed", "genotypes":"chr22",
+ "covariates":"covariates.txt", "library_sizes":"library_size.tsv",
+ "family":"nb", "output":"qtl", "window":1000000,
+ "permutations":1000, "min_maf":0.05, "seed":1, "threads":8}
+```
+
+`phenotypes` is a tab-delimited BED with header `#chr start end ID sample...`
+and one phenotype per row. Coordinates are zero-based half-open; output
+`start` is 1-based (`BED start+1`). Point records (`start=end`) use that supplied
+coordinate. `genotypes` names the prefix of variant-major PLINK 1 `.bed`,
+`.bim` and `.fam` files. Dosage counts A1, which is ALT in plink2 output;
+missing genotypes use the observed mean. Sample order comes from the BED and
+is matched by IDs in `.fam`. Chromosome names must match literally. Only
+chromosomes present in the BED are loaded, and their calls stay in memory as
+the two-bit `.bed` codes, a quarter of a byte per call (0.68 GiB for 6.3
+million variants in 462 samples); each phenotype's cis variants are decoded to
+dosages as it is tested.
+
+Optional `covariates` is a whitespace table headed `id sample...`, with a row
+per covariate; an intercept is added. `library_sizes` is a two-column
+`sample size` table, converted to log offsets for count models and rejected
+for `family:"gaussian"`. `family` defaults to `nb`; `poisson` and `gaussian`
+are supported. The generic model controls (dispersion, theta and convergence
+limits) also apply. `window` defaults to 1,000,000 bases, `permutations` to
+1,000 (zero requests nominal results only; otherwise at least ten), `min_maf`
+to zero and `nominal` to false. `seed` defaults to one and `threads` to one.
+`responses`, `design`, `pairs`, `offset` and `weights` are not QTL settings.
+
+`permutation_precision` (`single` by default, or `double`) sets the arithmetic
+of the Gaussian permutation scores, which are computed by projection without
+refits when the null has no ridge or robust covariance. With `single`, each
+permuted response is centred (or, when the covariates happen to fit it well,
+residualized) and scaled to unit residual variance in double precision, and its
+product with the projected genotypes is summed in single precision within
+128-sample panels and in double across them, each permutation's largest |z|
+being taken as the sums are formed; scales, maxima, the observed statistics,
+nominal output and the Beta calibration stay in double precision. Permutation
+maxima then agree with `double` to about 1e-6 of max(1, |z|) (relative for
+maxima of at least 1).
+
+A permutation maximum counts as extreme for the empirical p-value when it is at
+least |z|(1 − τ), with τ = 1e-5 for single-precision scores and 1e-9 otherwise,
+because some designs make maxima equal to the observed statistic in exact
+arithmetic (for example an intercept only and a private variant in every
+sample), and rounding would otherwise decide such ties. The empirical p-values
+of `single` and `double` are therefore the same except where a maximum lies
+between 1e-9 and about 1e-5 relative below the observed statistic. `double`
+reproduces 1.4.1 except where a maximum lies within 1e-9 relative below it.
+Count models refit every permutation in double precision whatever the setting.
+The run record's `permutation_precision` is the precision that the permutation
+scores used, or null without permutations. See METHODS.md for the accuracy
+design.
+
+Outputs are `PREFIX.cis.tsv`, optional `PREFIX.nominal.tsv`, and
+`PREFIX.run.json`. The cis columns are phenotype ID, chromosome, inclusive
+start/end, cis-variant count, status, lead ID/position, allele1/allele2,
+statistic (score z), nominal p-value, one-step estimate/SE, null theta,
+successful permutations, `permutations_failed`, empirical p, Beta p,
+`beta_k`, `beta_n` and `reference_ncp`. Nominal columns are phenotype ID,
+variant, position, distance from output start, z, p, estimate and SE. Missing
+statistics print `NA`. `ok_beta_failed` preserves nominal and empirical
+results; `permutations_failed` preserves the observed lead but has no
+calibrated p-value. Other statuses include `no_cis_variants`, `null_*`, and
+`no_valid_score`. The JSON records settings (including the permutation
+precision used), version, dimensions, input SHA-1 fingerprints and workflow
+wall time. See METHODS.md for calibration
+and memory limits.
+
+The optional top-level `"division": "slow"` or `"fast"` selects the numerical
+backend policy and overrides `RAPIDGLM_DIVISION`. The default is `slow` unless
+changed at build time. Every `.run.json` records the resolved `division`.

@@ -1,0 +1,1820 @@
+{
+ "receipt": "MERGEABLE_NULL",
+ "date": "2026-10-29",
+ "question": "With non-targeting (NT) controls each pair's SCEPTRE null (Poisson coefficients, then conditional NB theta) is fitted on its target's and the NT cells, from scratch for every pair. Can its cost be cut without changing the null, and which of the measured alternatives should be the default?",
+ "data": {
+  "panel": "Replogle et al. 2022 K562 essential screen, pilot of 20 perturbations (figshare 35773219, CC BY 4.0), prepared by scripts/replogle_pilot.py",
+  "cells": 13618,
+  "nt_cells": 10691,
+  "genes": 8563,
+  "pairs": {
+   "discovery": 171260,
+   "negative": 10000,
+   "positive": 20,
+   "passing_qc": 174761
+  },
+  "design": "~ log_umi + log_detected + mito + factor(batch) (51 columns, 48 lanes)",
+  "settings": "moi low, cell_qc false, seed 20261016, threads 8, fit_check ks or strict, effect_fits significant",
+  "input_sha256": {
+   "responses.mtx": "a4c09d30e6e578e59e6657c90aa9a092a0b51760726c1a604ee5eef926ee68aa",
+   "assignments.mtx": "7df276622394dbd0008fc32e6d285162204962a25b951a72c6dbf0124a521588",
+   "covariates.tsv": "1a7f2bc5874e65fcf94e8753b48b36e77edb44c60ab38c33403964f4d8e95717",
+   "guides.tsv": "79262d81ec223630ad137093bdecfbefcb67172d9d16bfe0448f5e6924ffa67c",
+   "pairs.tsv": "1fbf20bfc44cc3462bdf4c7f73d92adf6f8341b44153668fd45e71fab0baafdd",
+   "responses.txt": "9182efe0304204a30418c55d364de3178557d6b0813748436d9fa81b54da4d79"
+  }
+ },
+ "host": {
+  "name": "uwt-biocloud2",
+  "processor": "Intel Xeon E5-2640 v4 (Broadwell, 10 cores / 20 threads), 70 GB RAM, Ubuntu 24.04, ondemand governor (not changed)",
+  "pinning": "8 threads on cores 1-8 (taskset); their SMT siblings 11-18 idle; cores 0 and 10 left to the system",
+  "compiler": "GCC 13.3.0, CMake Release (-O3), system OpenBLAS 0.3.26 pthread with OPENBLAS_NUM_THREADS=1",
+  "concurrent_work": "Runs from int_refine_ks_r1 on shared the machine with builds and test suites on cores 9 and 19 (nice 10-19); earlier runs had cores 9-19 idle except brief single-thread analysis on core 9."
+ },
+ "binaries": {
+  "prototype_v2": "proto/block-null 61658d9 (exact, one-step, block, shared, batched paths; stage timers), sha256 5fac654d8606dcf2780266ba61614905f3473aa6611bb9ef9e3416fbc2d7ba4e",
+  "prototype_v3": "proto/block-null a562a3a (adds refine and index-mapped records), see bin_v3.sha256",
+  "integration": "feat/mergeable-null (this change): bin_int_1 before, bin_int_2 after the step-halving tolerance fix"
+ },
+ "stage_timers": "Prototype builds charge thread time to stages of sceptre(): base_fit (per-response references), gather, null_fit, score (score records and information), sampler, draws, finish, effects. null thread-ms per pair = (base_fit + gather + null_fit + score) / pairs.",
+ "exact_profile": "Exact (cold) ks: null fit 2,001 thread-s (11.4 ms/pair), score set-up 1,351 (7.7 ms/pair, a dense 51 x 51 X'WX per pair), gather 286, draws 2,791, effects 255; the threads were busy 66% of the loop. Strict: the same null costs, draws 18,662 thread-s (83% of busy time).",
+ "strict_note": "Strict runs: exact 3,677, 3,685 and 3,637 s; their draws (18,367-18,674 thread-s) are the same work in every variant, so the null start changes strict wall time by about a fifth.",
+ "alternatives": [
+  {
+   "name": "exact (cold)",
+   "null_start": "cold",
+   "description": "Today's per-pair fit from scratch: Poisson IRLS (least-squares start, about 4.6 iterations) and two theta rounds, about 55 sparse passes over the pair's ~10,870 cells, plus a dense information for the score denominator.",
+   "ks": {
+    "repeats": [
+     {
+      "run": "p0_exact_ks",
+      "wall_seconds": 1256.45,
+      "loop_wall_seconds": 1220.74,
+      "stage_thread_seconds": {
+       "response": 1.09,
+       "base_fit": 0,
+       "gather": 286.17,
+       "null_fit": 2000.6,
+       "sampler": 13.67,
+       "score": 1350.55,
+       "draws": 2791.07,
+       "finish": 1.4,
+       "effects": 255.37
+      },
+      "null_thread_ms_per_pair": 20.813,
+      "loop_thread_utilization": 0.66,
+      "cpu_percent": 775,
+      "peak_rss_kib": 1534620
+     },
+     {
+      "run": "d1_exact_ks_r1",
+      "wall_seconds": 1261.46,
+      "loop_wall_seconds": 1222.36,
+      "stage_thread_seconds": {
+       "response": 1.09,
+       "base_fit": 0,
+       "gather": 286.37,
+       "null_fit": 2002.06,
+       "sampler": 13.66,
+       "score": 1355.41,
+       "draws": 2796.14,
+       "finish": 1.42,
+       "effects": 248.12
+      },
+      "null_thread_ms_per_pair": 20.85,
+      "loop_thread_utilization": 0.66,
+      "cpu_percent": 772,
+      "peak_rss_kib": 1737032
+     },
+     {
+      "run": "d1_exact_ks_r2",
+      "wall_seconds": 1262.63,
+      "loop_wall_seconds": 1227.72,
+      "stage_thread_seconds": {
+       "response": 1.09,
+       "base_fit": 0,
+       "gather": 287.84,
+       "null_fit": 2002.3,
+       "sampler": 13.75,
+       "score": 1365.47,
+       "draws": 2800.81,
+       "finish": 1.34,
+       "effects": 248.79
+      },
+      "null_thread_ms_per_pair": 20.918,
+      "loop_thread_utilization": 0.659,
+      "cpu_percent": 775,
+      "peak_rss_kib": 1535720
+     },
+     {
+      "run": "e_exact_ks_r3",
+      "wall_seconds": 1255.8,
+      "loop_wall_seconds": 1221.24,
+      "stage_thread_seconds": {
+       "response": 1.09,
+       "base_fit": 0,
+       "gather": 285.58,
+       "null_fit": 2007.28,
+       "sampler": 14.65,
+       "score": 1357.12,
+       "draws": 2755.52,
+       "finish": 1.42,
+       "effects": 246.31
+      },
+      "null_thread_ms_per_pair": 20.886,
+      "loop_thread_utilization": 0.657,
+      "cpu_percent": 775,
+      "peak_rss_kib": 1638224
+     }
+    ],
+    "wall_seconds_mean": 1259.09,
+    "null_thread_ms_per_pair_mean": 20.867
+   },
+   "strict": {
+    "repeats": [
+     {
+      "run": "p0_exact_strict",
+      "wall_seconds": 3677.24,
+      "loop_wall_seconds": 3642.29,
+      "stage_thread_seconds": {
+       "response": 1.09,
+       "base_fit": 0,
+       "gather": 293.58,
+       "null_fit": 2001.44,
+       "sampler": 13.83,
+       "score": 1364.78,
+       "draws": 18662.03,
+       "finish": 1.35,
+       "effects": 248.88
+      },
+      "null_thread_ms_per_pair": 20.942,
+      "loop_thread_utilization": 0.767,
+      "cpu_percent": 703,
+      "peak_rss_kib": 1542336
+     },
+     {
+      "run": "d1_exact_strict_r1",
+      "wall_seconds": 3684.96,
+      "loop_wall_seconds": 3649.39,
+      "stage_thread_seconds": {
+       "response": 1.1,
+       "base_fit": 0,
+       "gather": 294.89,
+       "null_fit": 2001.44,
+       "sampler": 13.84,
+       "score": 1374.99,
+       "draws": 18674.36,
+       "finish": 1.39,
+       "effects": 254.19
+      },
+      "null_thread_ms_per_pair": 21.008,
+      "loop_thread_utilization": 0.766,
+      "cpu_percent": 703,
+      "peak_rss_kib": 1616200
+     },
+     {
+      "run": "e_exact_strict_r2",
+      "wall_seconds": 3636.58,
+      "loop_wall_seconds": 3602.21,
+      "stage_thread_seconds": {
+       "response": 1.09,
+       "base_fit": 0,
+       "gather": 288.23,
+       "null_fit": 2003.68,
+       "sampler": 14.7,
+       "score": 1351.59,
+       "draws": 18367.2,
+       "finish": 1.39,
+       "effects": 244.88
+      },
+      "null_thread_ms_per_pair": 20.848,
+      "loop_thread_utilization": 0.764,
+      "cpu_percent": 703,
+      "peak_rss_kib": 1560840
+     }
+    ],
+    "wall_seconds_mean": 3666.26,
+    "null_thread_ms_per_pair_mean": 20.933
+   },
+   "calibration_power_sceptre": {
+    "run": "out",
+    "calibration": {
+     "pairs": 9713,
+     "frac_p_lt_0.05": 0.048800576546895916,
+     "frac_p_lt_0.01": 0.011119118706887676,
+     "frac_p_lt_0.001": 0.0014413672397817357,
+     "bh_rejections": 1,
+     "median_p": 0.5,
+     "qq_-log10p_obs_vs_exp": {
+      "0.5": [
+       0.3010299956639812,
+       0.3010299956639812
+      ],
+      "0.9": [
+       0.9999105837999923,
+       0.9829666607012196
+      ],
+      "0.99": [
+       1.9983487730372569,
+       2.0473042915498287
+      ],
+      "0.999": [
+       3.009629783446946,
+       3.1006222559437866
+      ]
+     }
+    },
+    "power": {
+     "pairs": 20,
+     "ok": 14,
+     "significant": 14,
+     "median_-log10p": 20.98105455264264,
+     "p_values": {
+      "AARS2": null,
+      "EIF6": 1.7332069894980443e-60,
+      "EXOC1": 4.1066908982673525e-14,
+      "FAM136A": 1.3110234611625968e-13,
+      "GATA1": 1.061696367919522e-05,
+      "HIST1H2AE": null,
+      "HNRNPR": 1.0246354558995614e-104,
+      "ISCA2": 2.65405907857754e-21,
+      "KANSL3": null,
+      "MRPL16": 1.4637067577342992e-32,
+      "MRPL27": 5.246461450432116e-42,
+      "MRPS31": 4.111310797361417e-22,
+      "NEPRO": null,
+      "NUP98": 5.4717803607740496e-14,
+      "RPS20": 2.295730684458239e-159,
+      "RRN3": null,
+      "SAP18": 3.469547161976768e-20,
+      "TAF1B": null,
+      "TRNT1": 1.4637067577342992e-32,
+      "USP8": 5.955426215102644e-05
+     }
+    },
+    "discoveries": 10982,
+    "sceptre_discovery": {
+     "common_pairs": 165034,
+     "spearman_-log10p": 0.9887568100869121,
+     "pearson_statistic_z": 0.9993970433613153,
+     "rapidglm_hits": 10982,
+     "sceptre_hits": 10972,
+     "both": 10691,
+     "jaccard": 0.94921424132114
+    },
+    "sceptre_power": {
+     "common": 20,
+     "median_-log10p_sceptre": null
+    },
+    "sceptre_calibration_common": {
+     "pairs": 132,
+     "spearman_-log10p": 0.9784564407125824,
+     "pearson_statistic_z": 0.9984452934759946
+    },
+    "sceptre_calibration_own": {
+     "pairs": 10000,
+     "frac_p_lt_0.05": 0.0489,
+     "frac_p_lt_0.01": 0.0089,
+     "significant": 0
+    },
+    "power_by_moved": [
+     {
+      "moved_by": "0-0",
+      "pairs": 63127,
+      "genes": 3345,
+      "hits_exact": 0,
+      "hits_alt": 0,
+      "both": 0,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": null
+     },
+     {
+      "moved_by": "1-2",
+      "pairs": 74169,
+      "genes": 3819,
+      "hits_exact": 5110,
+      "hits_alt": 5110,
+      "both": 5110,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": 0.0
+     },
+     {
+      "moved_by": "3-5",
+      "pairs": 23469,
+      "genes": 1185,
+      "hits_exact": 4284,
+      "hits_alt": 4284,
+      "both": 4284,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": null
+     },
+     {
+      "moved_by": "6-10",
+      "pairs": 3969,
+      "genes": 199,
+      "hits_exact": 1404,
+      "hits_alt": 1404,
+      "both": 1404,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": null
+     },
+     {
+      "moved_by": "11-20",
+      "pairs": 300,
+      "genes": 15,
+      "hits_exact": 184,
+      "hits_alt": 184,
+      "both": 184,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": 0.0
+     }
+    ]
+   }
+  },
+  {
+   "name": "one-step, all-cells reference (variant d)",
+   "null_start": "not offered",
+   "description": "Per response, the null fitted on all retained cells and the NT cells' additive totals at it; per pair, one Fisher-scoring step and one linearized log-theta Newton step from the totals; residuals at the stepped means, weights and information at the reference.",
+   "decision": "Not the null: the reference holds the other targets' cells (21% of cells), so one step leaves an O(delta^2) error: statistics differ by a median 1.5% and 33% of empirical p-values change. Kept as the start of refine.",
+   "code_size": "prototype: 139 lines on top of 187 shared",
+   "ks": {
+    "repeats": [
+     {
+      "run": "d1_onestep_all_ks_r1",
+      "wall_seconds": 529.04,
+      "loop_wall_seconds": 491.19,
+      "stage_thread_seconds": {
+       "response": 1.12,
+       "base_fit": 118.85,
+       "gather": 18.9,
+       "null_fit": 366.41,
+       "sampler": 14.58,
+       "score": 4.67,
+       "draws": 2844.76,
+       "finish": 1.07,
+       "effects": 242.16
+      },
+      "null_thread_ms_per_pair": 2.912,
+      "loop_thread_utilization": 0.858,
+      "cpu_percent": 740,
+      "peak_rss_kib": 1534644,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 2108,
+       "check_passes": 0,
+       "checks_first": 0,
+       "hessian_passes": 0,
+       "theta_passes": 0,
+       "model_iterations": 0,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     },
+     {
+      "run": "d1_onestep_all_ks_r2",
+      "wall_seconds": 530.19,
+      "loop_wall_seconds": 495.44,
+      "stage_thread_seconds": {
+       "response": 1.12,
+       "base_fit": 117.54,
+       "gather": 19.02,
+       "null_fit": 371.71,
+       "sampler": 14.74,
+       "score": 3.17,
+       "draws": 2867.72,
+       "finish": 1.14,
+       "effects": 251.31
+      },
+      "null_thread_ms_per_pair": 2.926,
+      "loop_thread_utilization": 0.857,
+      "cpu_percent": 745,
+      "peak_rss_kib": 1534844,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 2108,
+       "check_passes": 0,
+       "checks_first": 0,
+       "hessian_passes": 0,
+       "theta_passes": 0,
+       "model_iterations": 0,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     },
+     {
+      "run": "d_onestep_v3_ks_r1",
+      "wall_seconds": 519.23,
+      "loop_wall_seconds": 485.83,
+      "stage_thread_seconds": {
+       "response": 1.11,
+       "base_fit": 118.39,
+       "gather": 18.99,
+       "null_fit": 362.03,
+       "sampler": 15.81,
+       "score": 2.95,
+       "draws": 2808.12,
+       "finish": 1.09,
+       "effects": 240.39
+      },
+      "null_thread_ms_per_pair": 2.875,
+      "loop_thread_utilization": 0.856,
+      "cpu_percent": 744,
+      "peak_rss_kib": 1535304,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 2108,
+       "check_passes": 0,
+       "checks_first": 0,
+       "hessian_passes": 0,
+       "theta_passes": 0,
+       "model_iterations": 0,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     }
+    ],
+    "wall_seconds_mean": 526.15,
+    "null_thread_ms_per_pair_mean": 2.904
+   },
+   "strict": null,
+   "agreement_with_exact": {
+    "ref": "d1_exact_ks_r1/out",
+    "alt": "d1_onestep_all_ks_r1/out",
+    "rows": 181280,
+    "status_differences": 0,
+    "status_table": {
+     "failed_pair_qc->failed_pair_qc": 6519,
+     "ok->ok": 174761
+    },
+    "statistic": {
+     "max_rel": 367.97718347623265,
+     "median_rel": 0.015268157802796391,
+     "max_abs": 6.525607235180026,
+     "pearson": 0.9993839646744396,
+     "spearman": 0.9993204302508812
+    },
+    "p_value": {
+     "identical": 105771,
+     "different": 68990,
+     "max_abs_log10_ratio": null,
+     "spearman": 0.9995897643079915,
+     "empirical_pairs": 158597,
+     "empirical_different": 52827,
+     "approximation_flag_different": 244,
+     "approximated_pairs": 15920,
+     "approximated_max_rel": null,
+     "approximated_rel_gt_1e-4": 15890
+    },
+    "draws_differences": 252,
+    "discoveries_discovery": {
+     "ref": 10982,
+     "alt": 10949,
+     "both": 10875,
+     "only_ref": 107,
+     "only_alt": 74,
+     "jaccard": 0.9836287988422576
+    },
+    "discoveries_negative": {
+     "ref": 1,
+     "alt": 1,
+     "both": 1,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "discoveries_positive": {
+     "ref": 14,
+     "alt": 14,
+     "both": 14,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "log2fc_max_abs": 1.2265966020663654e-11,
+    "nulls": {
+     "pairs": 174761,
+     "coef_max_abs": 11.733609057892584,
+     "coef_max_rel_1p": 1.3425788792114204,
+     "coef_median_rel_1p": 0.005739201642451955,
+     "theta_max_rel": 9852433.464574544,
+     "theta_median_rel": 0.019639951241446598,
+     "u_max_abs": 48.62273444525071,
+     "u_max_rel": 367.7540034497973,
+     "info_max_rel": 0.480989219260342,
+     "info_median_rel": 0.011523512396098905,
+     "coef_rel_1p_q0.5": 0.005739201642451955,
+     "theta_rel_q0.5": 0.019639951241446598,
+     "coef_rel_1p_q0.9": 0.020376672940004534,
+     "theta_rel_q0.9": 0.2604193957090621,
+     "coef_rel_1p_q0.99": 0.053290176538872504,
+     "theta_rel_q0.99": 2.592729701257095
+    }
+   },
+   "calibration_power_sceptre": {
+    "run": "d1_onestep_all_ks_r1/out",
+    "calibration": {
+     "pairs": 9713,
+     "frac_p_lt_0.05": 0.04890353134973747,
+     "frac_p_lt_0.01": 0.011119118706887676,
+     "frac_p_lt_0.001": 0.0014413672397817357,
+     "bh_rejections": 1,
+     "median_p": 0.5,
+     "qq_-log10p_obs_vs_exp": {
+      "0.5": [
+       0.3010299956639812,
+       0.3010299956639812
+      ],
+      "0.9": [
+       0.9999105837999923,
+       0.9829666607012196
+      ],
+      "0.99": [
+       1.9983487730372569,
+       2.0594178200274422
+      ],
+      "0.999": [
+       3.009629783446946,
+       3.0908328944440964
+      ]
+     }
+    },
+    "power": {
+     "pairs": 20,
+     "ok": 14,
+     "significant": 14,
+     "median_-log10p": 20.83251718059339,
+     "p_values": {
+      "AARS2": null,
+      "EIF6": 4.42660578944732e-60,
+      "EXOC1": 4.6344174625503236e-14,
+      "FAM136A": 1.0986939000967029e-13,
+      "GATA1": 1.2123362095549891e-05,
+      "HIST1H2AE": null,
+      "HNRNPR": 2.485285999415957e-104,
+      "ISCA2": 3.3938784324524574e-21,
+      "KANSL3": null,
+      "MRPL16": 6.162975822039154e-32,
+      "MRPL27": 6.277817120175182e-42,
+      "MRPS31": 6.371905948331302e-22,
+      "NEPRO": null,
+      "NUP98": 6.445727739758255e-14,
+      "RPS20": 1.123167116002985e-157,
+      "RRN3": null,
+      "SAP18": 5.738176789322215e-20,
+      "TAF1B": null,
+      "TRNT1": 3.081487911019577e-32,
+      "USP8": 5.888684013489673e-05
+     }
+    },
+    "discoveries": 10949,
+    "sceptre_discovery": {
+     "common_pairs": 165034,
+     "spearman_-log10p": 0.9883908408214251,
+     "pearson_statistic_z": 0.9988087733342934,
+     "rapidglm_hits": 10949,
+     "sceptre_hits": 10972,
+     "both": 10640,
+     "jaccard": 0.9431787962060101
+    },
+    "sceptre_power": {
+     "common": 20,
+     "median_-log10p_sceptre": 21.568722825673394
+    },
+    "sceptre_calibration_common": {
+     "pairs": 132,
+     "spearman_-log10p": 0.9783011976724147,
+     "pearson_statistic_z": 0.9981717816351575
+    },
+    "sceptre_calibration_own": {
+     "pairs": 10000,
+     "frac_p_lt_0.05": 0.0489,
+     "frac_p_lt_0.01": 0.0089,
+     "significant": 0
+    },
+    "power_by_moved": [
+     {
+      "moved_by": "0-0",
+      "pairs": 63127,
+      "genes": 3345,
+      "hits_exact": 0,
+      "hits_alt": 27,
+      "both": 0,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": null
+     },
+     {
+      "moved_by": "1-2",
+      "pairs": 74169,
+      "genes": 3819,
+      "hits_exact": 5110,
+      "hits_alt": 5074,
+      "both": 5048,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": 0.0009430719848186886
+     },
+     {
+      "moved_by": "3-5",
+      "pairs": 23469,
+      "genes": 1185,
+      "hits_exact": 4284,
+      "hits_alt": 4270,
+      "both": 4252,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": 0.004431546577493339
+     },
+     {
+      "moved_by": "6-10",
+      "pairs": 3969,
+      "genes": 199,
+      "hits_exact": 1404,
+      "hits_alt": 1394,
+      "both": 1391,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": 0.00038459621057729265
+     },
+     {
+      "moved_by": "11-20",
+      "pairs": 300,
+      "genes": 15,
+      "hits_exact": 184,
+      "hits_alt": 184,
+      "both": 184,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": 0.004017980716876757
+     }
+    ]
+   }
+  },
+  {
+   "name": "one-step, NT-cells reference (variant d')",
+   "null_start": "not offered",
+   "description": "As variant d with the reference fitted on the NT cells.",
+   "decision": "Diagnostic only: closer (median coefficient error 4e-4) but its reference depends on which cells are NT, and strongly perturbed pairs overshoot in one step.",
+   "ks": {
+    "repeats": [
+     {
+      "run": "d1_onestep_nt_ks_r1",
+      "wall_seconds": 528.25,
+      "loop_wall_seconds": 489.7,
+      "stage_thread_seconds": {
+       "response": 1.12,
+       "base_fit": 101.29,
+       "gather": 18.88,
+       "null_fit": 362.85,
+       "sampler": 14.64,
+       "score": 4.67,
+       "draws": 2848.01,
+       "finish": 1.06,
+       "effects": 248.98
+      },
+      "null_thread_ms_per_pair": 2.791,
+      "loop_thread_utilization": 0.856,
+      "cpu_percent": 739,
+      "peak_rss_kib": 1535184,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 920,
+       "check_passes": 0,
+       "checks_first": 0,
+       "hessian_passes": 0,
+       "theta_passes": 0,
+       "model_iterations": 0,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     },
+     {
+      "run": "d1_onestep_nt_ks_r2",
+      "wall_seconds": 522.26,
+      "loop_wall_seconds": 487.97,
+      "stage_thread_seconds": {
+       "response": 1.12,
+       "base_fit": 101.5,
+       "gather": 18.87,
+       "null_fit": 360.14,
+       "sampler": 14.69,
+       "score": 2.96,
+       "draws": 2839.48,
+       "finish": 1.06,
+       "effects": 247.92
+      },
+      "null_thread_ms_per_pair": 2.766,
+      "loop_thread_utilization": 0.856,
+      "cpu_percent": 744,
+      "peak_rss_kib": 1535580,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 920,
+       "check_passes": 0,
+       "checks_first": 0,
+       "hessian_passes": 0,
+       "theta_passes": 0,
+       "model_iterations": 0,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     }
+    ],
+    "wall_seconds_mean": 525.25,
+    "null_thread_ms_per_pair_mean": 2.779
+   },
+   "strict": null,
+   "agreement_with_exact": {
+    "ref": "d1_exact_ks_r1/out",
+    "alt": "d1_onestep_nt_ks_r1/out",
+    "rows": 181280,
+    "status_differences": 0,
+    "status_table": {
+     "failed_pair_qc->failed_pair_qc": 6519,
+     "ok->ok": 174761
+    },
+    "statistic": {
+     "max_rel": 38.623227940730196,
+     "median_rel": 0.0016737886516150079,
+     "max_abs": 56.534504468742696,
+     "pearson": 0.9929729387187161,
+     "spearman": 0.9994788935608452
+    },
+    "p_value": {
+     "identical": 143403,
+     "different": 31358,
+     "max_abs_log10_ratio": null,
+     "spearman": 0.9998308904255147,
+     "empirical_pairs": 158619,
+     "empirical_different": 15223,
+     "approximation_flag_different": 136,
+     "approximated_pairs": 16006,
+     "approximated_max_rel": null,
+     "approximated_rel_gt_1e-4": 15752
+    },
+    "draws_differences": 141,
+    "discoveries_discovery": {
+     "ref": 10982,
+     "alt": 11034,
+     "both": 10949,
+     "only_ref": 33,
+     "only_alt": 85,
+     "jaccard": 0.9893376705520918
+    },
+    "discoveries_negative": {
+     "ref": 1,
+     "alt": 1,
+     "both": 1,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "discoveries_positive": {
+     "ref": 14,
+     "alt": 14,
+     "both": 14,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "log2fc_max_abs": 1.2322587394919537e-11,
+    "nulls": {
+     "pairs": 174761,
+     "coef_max_abs": 28.03205322160417,
+     "coef_max_rel_1p": 12.186615559600625,
+     "coef_median_rel_1p": 0.0003808754954714114,
+     "theta_max_rel": 7163160.928852794,
+     "theta_median_rel": 0.0008194141682439056,
+     "u_max_abs": 574.5256008491377,
+     "u_max_rel": 38.64637770464675,
+     "info_max_rel": 0.6088860204957202,
+     "info_median_rel": 0.002691448626386226,
+     "coef_rel_1p_q0.5": 0.0003808754954714114,
+     "theta_rel_q0.5": 0.0008194141682439056,
+     "coef_rel_1p_q0.9": 0.002484191312464409,
+     "theta_rel_q0.9": 0.014127788577529787,
+     "coef_rel_1p_q0.99": 0.010406259811249277,
+     "theta_rel_q0.99": 0.999995135256062
+    }
+   },
+   "calibration_power_sceptre": {
+    "run": "d1_onestep_nt_ks_r1/out",
+    "calibration": {
+     "pairs": 9713,
+     "frac_p_lt_0.05": 0.048800576546895916,
+     "frac_p_lt_0.01": 0.011119118706887676,
+     "frac_p_lt_0.001": 0.0014413672397817357,
+     "bh_rejections": 1,
+     "median_p": 0.5,
+     "qq_-log10p_obs_vs_exp": {
+      "0.5": [
+       0.3010299956639812,
+       0.3010299956639812
+      ],
+      "0.9": [
+       0.9999105837999923,
+       0.9829666607012196
+      ],
+      "0.99": [
+       1.9983487730372569,
+       2.047304291549737
+      ],
+      "0.999": [
+       3.009629783446946,
+       3.1006222559437866
+      ]
+     }
+    },
+    "power": {
+     "pairs": 20,
+     "ok": 14,
+     "significant": 14,
+     "median_-log10p": 20.861974037217493,
+     "p_values": {
+      "AARS2": null,
+      "EIF6": 7.693202637255838e-58,
+      "EXOC1": 4.9198939465664696e-14,
+      "FAM136A": 1.496553924157835e-13,
+      "GATA1": 1.2984188475622868e-05,
+      "HIST1H2AE": null,
+      "HNRNPR": 2.681492788843533e-104,
+      "ISCA2": 3.29476862413668e-21,
+      "KANSL3": null,
+      "MRPL16": 3.081487911019577e-32,
+      "MRPL27": 5.201619899573721e-42,
+      "MRPS31": 5.7309550744440365e-22,
+      "NEPRO": null,
+      "NUP98": 2.8211848442340344e-14,
+      "RPS20": 3.9268227538625176e-160,
+      "RRN3": null,
+      "SAP18": 4.420885544795249e-20,
+      "TAF1B": null,
+      "TRNT1": 7.703719777548943e-33,
+      "USP8": 6.110232380038097e-05
+     }
+    },
+    "discoveries": 11034,
+    "sceptre_discovery": {
+     "common_pairs": 165034,
+     "spearman_-log10p": 0.9886196560551966,
+     "pearson_statistic_z": 0.9921940678239015,
+     "rapidglm_hits": 11034,
+     "sceptre_hits": 10972,
+     "both": 10707,
+     "jaccard": 0.9476059828303389
+    },
+    "sceptre_power": {
+     "common": 20,
+     "median_-log10p_sceptre": 21.568722825673394
+    },
+    "sceptre_calibration_common": {
+     "pairs": 132,
+     "spearman_-log10p": 0.9784564407125824,
+     "pearson_statistic_z": 0.9984452934759951
+    },
+    "sceptre_calibration_own": {
+     "pairs": 10000,
+     "frac_p_lt_0.05": 0.0489,
+     "frac_p_lt_0.01": 0.0089,
+     "significant": 0
+    },
+    "power_by_moved": [
+     {
+      "moved_by": "0-0",
+      "pairs": 63127,
+      "genes": 3345,
+      "hits_exact": 0,
+      "hits_alt": 41,
+      "both": 0,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": null
+     },
+     {
+      "moved_by": "1-2",
+      "pairs": 74169,
+      "genes": 3819,
+      "hits_exact": 5110,
+      "hits_alt": 5123,
+      "both": 5086,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": -0.016066257824471686
+     },
+     {
+      "moved_by": "3-5",
+      "pairs": 23469,
+      "genes": 1185,
+      "hits_exact": 4284,
+      "hits_alt": 4281,
+      "both": 4275,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": -0.005135965010627741
+     },
+     {
+      "moved_by": "6-10",
+      "pairs": 3969,
+      "genes": 199,
+      "hits_exact": 1404,
+      "hits_alt": 1405,
+      "both": 1404,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": null
+     },
+     {
+      "moved_by": "11-20",
+      "pairs": 300,
+      "genes": 15,
+      "hits_exact": 184,
+      "hits_alt": 184,
+      "both": 184,
+      "median_log10_p_ratio_alt_over_exact_on_exact_hits": 0.002159484565029457
+     }
+    ]
+   }
+  },
+  {
+   "name": "one-step with index-mapped score records",
+   "null_start": "not offered",
+   "description": "Variant d whose draws read the response's records in place (an index map and the pair's residuals) instead of copying 4.6 MB of records per pair.",
+   "decision": "Outputs identical to the copied records. In the ks run it saved 6% of variant d's wall time (488 s against 519 s on the same binary), but each draw then follows an index map: in the strict run the draws took 8% more thread time (19,823 s against 18,358 s for refine), and the run was slower than refine (3,095 s against 3,028 s). It cannot apply to refine, whose weights are the pair's own. Left out.",
+   "ks": {
+    "repeats": [
+     {
+      "run": "d_onestep_mapped_ks_r1",
+      "wall_seconds": 488.38,
+      "loop_wall_seconds": 454.06,
+      "stage_thread_seconds": {
+       "response": 1.05,
+       "base_fit": 116.23,
+       "gather": 17.63,
+       "null_fit": 145.42,
+       "sampler": 14.91,
+       "score": 2.8,
+       "draws": 2920.98,
+       "finish": 0.58,
+       "effects": 244.16
+      },
+      "null_thread_ms_per_pair": 1.614,
+      "loop_thread_utilization": 0.886,
+      "cpu_percent": 742,
+      "peak_rss_kib": 1534960,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 2108,
+       "check_passes": 0,
+       "checks_first": 0,
+       "hessian_passes": 0,
+       "theta_passes": 0,
+       "model_iterations": 0,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     }
+    ],
+    "wall_seconds_mean": 488.38,
+    "null_thread_ms_per_pair_mean": 1.614
+   },
+   "strict": {
+    "repeats": [
+     {
+      "run": "d_onestep_mapped_strict_r1",
+      "wall_seconds": 3094.83,
+      "loop_wall_seconds": 3061.09,
+      "stage_thread_seconds": {
+       "response": 1.05,
+       "base_fit": 115.94,
+       "gather": 17.67,
+       "null_fit": 145.11,
+       "sampler": 14.81,
+       "score": 2.8,
+       "draws": 19823.45,
+       "finish": 0.58,
+       "effects": 244.28
+      },
+      "null_thread_ms_per_pair": 1.611,
+      "loop_thread_utilization": 0.822,
+      "cpu_percent": 682,
+      "peak_rss_kib": 1535172,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 2108,
+       "check_passes": 0,
+       "checks_first": 0,
+       "hessian_passes": 0,
+       "theta_passes": 0,
+       "model_iterations": 0,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     }
+    ],
+    "wall_seconds_mean": 3094.83,
+    "null_thread_ms_per_pair_mean": 1.611
+   }
+  },
+  {
+   "name": "refine: one-step start (variant d) refined to the cold criteria (chosen)",
+   "null_start": "refine",
+   "description": "Variant d's label-invariant start, then exact Newton passes over the pair's cells (gradient, deviance and, for large steps, information in one pass) to the cold IRLS chord criteria with step halving; theta by Newton in log theta from the start (the cold theta procedure takes over for non-concave or large steps); cold fit for pairs that do not converge.",
+   "decision": "Chosen: the default null_start=refine. The same nulls as cold to the convergence tolerance (all empirical p-values, statuses and discoveries identical), a start that is label-invariant at every iteration, 4.1x less null work and about half the ks wall time.",
+   "code_size": "integration: include/rapidglm/mergeable_null.hpp 415 lines with comments, workflows.hpp +155/-23",
+   "ks": {
+    "repeats": [
+     {
+      "run": "a_refine_ks_r1",
+      "wall_seconds": 592.48,
+      "loop_wall_seconds": 552.94,
+      "stage_thread_seconds": {
+       "response": 1.09,
+       "base_fit": 102.9,
+       "gather": 18.34,
+       "null_fit": 556.63,
+       "sampler": 15.66,
+       "score": 206.98,
+       "draws": 2760.01,
+       "finish": 0.87,
+       "effects": 251.21
+      },
+      "null_thread_ms_per_pair": 5.063,
+      "loop_thread_utilization": 0.828,
+      "cpu_percent": 748,
+      "peak_rss_kib": 1535192,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 12870,
+       "check_passes": 592526,
+       "checks_first": 0,
+       "hessian_passes": 509946,
+       "theta_passes": 740435,
+       "model_iterations": 0,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     },
+     {
+      "run": "a_refine_ks_r2",
+      "wall_seconds": 586.99,
+      "loop_wall_seconds": 552.61,
+      "stage_thread_seconds": {
+       "response": 1.09,
+       "base_fit": 102.03,
+       "gather": 18.3,
+       "null_fit": 557.53,
+       "sampler": 15.68,
+       "score": 204.09,
+       "draws": 2759.06,
+       "finish": 0.87,
+       "effects": 244.87
+      },
+      "null_thread_ms_per_pair": 5.047,
+      "loop_thread_utilization": 0.828,
+      "cpu_percent": 753,
+      "peak_rss_kib": 1534640,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 12870,
+       "check_passes": 592526,
+       "checks_first": 0,
+       "hessian_passes": 509946,
+       "theta_passes": 740435,
+       "model_iterations": 0,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     }
+    ],
+    "wall_seconds_mean": 589.74,
+    "null_thread_ms_per_pair_mean": 5.055
+   },
+   "strict": {
+    "repeats": [
+     {
+      "run": "a_refine_strict_r1",
+      "wall_seconds": 3028.1,
+      "loop_wall_seconds": 2994.36,
+      "stage_thread_seconds": {
+       "response": 1.09,
+       "base_fit": 101.63,
+       "gather": 18.56,
+       "null_fit": 557.88,
+       "sampler": 15.81,
+       "score": 204.11,
+       "draws": 18357.66,
+       "finish": 0.91,
+       "effects": 243.48
+      },
+      "null_thread_ms_per_pair": 5.048,
+      "loop_thread_utilization": 0.804,
+      "cpu_percent": 679,
+      "peak_rss_kib": 1535144,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 12870,
+       "check_passes": 592526,
+       "checks_first": 0,
+       "hessian_passes": 509946,
+       "theta_passes": 740435,
+       "model_iterations": 0,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     }
+    ],
+    "wall_seconds_mean": 3028.1,
+    "null_thread_ms_per_pair_mean": 5.048
+   },
+   "agreement_with_exact": {
+    "ref": "d1_exact_ks_r1/out",
+    "alt": "a_refine_ks_r1/out",
+    "rows": 181280,
+    "status_differences": 0,
+    "status_table": {
+     "failed_pair_qc->failed_pair_qc": 6519,
+     "ok->ok": 174761
+    },
+    "statistic": {
+     "max_rel": 4.763842118784877e-08,
+     "median_rel": 1.894815686710776e-13,
+     "max_abs": 2.085833727960562e-09,
+     "pearson": 1.0,
+     "spearman": 1.0
+    },
+    "p_value": {
+     "identical": 158886,
+     "different": 15875,
+     "max_abs_log10_ratio": null,
+     "spearman": 0.9999999998771845,
+     "empirical_pairs": 158699,
+     "empirical_different": 0,
+     "approximation_flag_different": 0,
+     "approximated_pairs": 16062,
+     "approximated_max_rel": null,
+     "approximated_rel_gt_1e-4": 77
+    },
+    "draws_differences": 0,
+    "discoveries_discovery": {
+     "ref": 10982,
+     "alt": 10982,
+     "both": 10982,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "discoveries_negative": {
+     "ref": 1,
+     "alt": 1,
+     "both": 1,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "discoveries_positive": {
+     "ref": 14,
+     "alt": 14,
+     "both": 14,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "log2fc_max_abs": 1.3788969965844444e-13,
+    "nulls": {
+     "pairs": 174761,
+     "coef_max_abs": 1.2466472298910958e-11,
+     "coef_max_rel_1p": 3.2312766581465517e-12,
+     "coef_median_rel_1p": 7.170979485612962e-14,
+     "theta_max_rel": 0.0006415878676744862,
+     "theta_median_rel": 1.0955931402493615e-12,
+     "u_max_abs": 2.7630967736058665e-08,
+     "u_max_rel": 4.667294027282097e-08,
+     "info_max_rel": 1.930955489891464e-09,
+     "info_median_rel": 3.1488346293421554e-13,
+     "coef_rel_1p_q0.5": 7.170979485612962e-14,
+     "theta_rel_q0.5": 1.0955931402493615e-12,
+     "coef_rel_1p_q0.9": 2.3757946778512616e-13,
+     "theta_rel_q0.9": 1.4970968935036063e-11,
+     "coef_rel_1p_q0.99": 5.527865467362552e-13,
+     "theta_rel_q0.99": 5.788656610912586e-10
+    }
+   },
+   "passes_per_pair": {
+    "pairs": 174761,
+    "checks": {
+     "median": 3.0,
+     "p90": 4.0,
+     "p99": 4.0,
+     "max": 6,
+     "mean": 3.3904933022814014
+    },
+    "hessian_checks": {
+     "median": 3.0,
+     "p90": 3.0,
+     "p99": 4.0,
+     "max": 6,
+     "mean": 2.917962245581108
+    },
+    "theta_passes": {
+     "median": 4.0,
+     "p90": 5.0,
+     "p99": 10.0,
+     "max": 20,
+     "mean": 4.23684346049748
+    },
+    "theta_fallback_frac": 0.07364343303139717,
+    "passes_excluding_fallback_theta": {
+     "median": 9.0,
+     "p90": 11.0,
+     "p99": 16.0,
+     "max": 26,
+     "mean": 9.627336762778882
+    }
+   }
+  },
+  {
+   "name": "block: NT-only base, quadratic model, exact passes (variant a)",
+   "null_start": "not offered",
+   "description": "Per response, the null fitted on the NT cells and its Poisson information; per pair, Newton on the base's quadratic model plus the target cells' exact terms, then the same exact passes and theta Newton as refine.",
+   "decision": "Same accuracy and speed as refine, but its start depends on the NT labels until it converges; refine's start is label-invariant at every iteration.",
+   "code_size": "prototype: 224 lines (non-blank, non-comment) on top of 187 shared",
+   "ks": {
+    "repeats": [
+     {
+      "run": "a_block_ks_r1",
+      "wall_seconds": 591.07,
+      "loop_wall_seconds": 551.78,
+      "stage_thread_seconds": {
+       "response": 1.12,
+       "base_fit": 81.64,
+       "gather": 18.41,
+       "null_fit": 573.55,
+       "sampler": 15.45,
+       "score": 219.94,
+       "draws": 2753.79,
+       "finish": 0.86,
+       "effects": 249.23
+      },
+      "null_thread_ms_per_pair": 5.113,
+      "loop_thread_utilization": 0.83,
+      "cpu_percent": 748,
+      "peak_rss_kib": 1535184,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 9713,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 11043,
+       "check_passes": 488099,
+       "checks_first": 0,
+       "hessian_passes": 366168,
+       "theta_passes": 656013,
+       "model_iterations": 522587,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     },
+     {
+      "run": "a_block_ks_r2",
+      "wall_seconds": 589.76,
+      "loop_wall_seconds": 554.23,
+      "stage_thread_seconds": {
+       "response": 1.11,
+       "base_fit": 81.82,
+       "gather": 18.56,
+       "null_fit": 574.91,
+       "sampler": 15.63,
+       "score": 206.85,
+       "draws": 2784.3,
+       "finish": 0.95,
+       "effects": 254.21
+      },
+      "null_thread_ms_per_pair": 5.048,
+      "loop_thread_utilization": 0.831,
+      "cpu_percent": 753,
+      "peak_rss_kib": 1535228,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 9713,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 11043,
+       "check_passes": 488099,
+       "checks_first": 0,
+       "hessian_passes": 366168,
+       "theta_passes": 656013,
+       "model_iterations": 522587,
+       "lockstep_rounds": 0,
+       "lockstep_theta_rounds": 0,
+       "lockstep_columns": 0
+      }
+     }
+    ],
+    "wall_seconds_mean": 590.41,
+    "null_thread_ms_per_pair_mean": 5.081
+   },
+   "strict": null,
+   "agreement_with_exact": {
+    "ref": "d1_exact_ks_r1/out",
+    "alt": "a_block_ks_r1/out",
+    "rows": 181280,
+    "status_differences": 0,
+    "status_table": {
+     "failed_pair_qc->failed_pair_qc": 6519,
+     "ok->ok": 174761
+    },
+    "statistic": {
+     "max_rel": 2.5308474515436657e-09,
+     "median_rel": 1.8295492885233428e-13,
+     "max_abs": 2.365582174590486e-09,
+     "pearson": 0.9999999999999989,
+     "spearman": 1.0
+    },
+    "p_value": {
+     "identical": 158885,
+     "different": 15876,
+     "max_abs_log10_ratio": null,
+     "spearman": 0.9999999997687611,
+     "empirical_pairs": 158699,
+     "empirical_different": 0,
+     "approximation_flag_different": 0,
+     "approximated_pairs": 16062,
+     "approximated_max_rel": null,
+     "approximated_rel_gt_1e-4": 75
+    },
+    "draws_differences": 0,
+    "discoveries_discovery": {
+     "ref": 10982,
+     "alt": 10982,
+     "both": 10982,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "discoveries_negative": {
+     "ref": 1,
+     "alt": 1,
+     "both": 1,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "discoveries_positive": {
+     "ref": 14,
+     "alt": 14,
+     "both": 14,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "log2fc_max_abs": 1.4299672557172016e-13,
+    "nulls": {
+     "pairs": 174761,
+     "coef_max_abs": 1.4136247727947193e-11,
+     "coef_max_rel_1p": 3.455130798474432e-12,
+     "coef_median_rel_1p": 6.516342016003595e-14,
+     "theta_max_rel": 0.0021589349758041345,
+     "theta_median_rel": 9.735595005181116e-13,
+     "u_max_abs": 3.051935593134658e-08,
+     "u_max_rel": 5.687273151194481e-09,
+     "info_max_rel": 6.312851024121342e-09,
+     "info_median_rel": 3.076235615455665e-13,
+     "coef_rel_1p_q0.5": 6.516342016003595e-14,
+     "theta_rel_q0.5": 9.735595005181116e-13,
+     "coef_rel_1p_q0.9": 2.2524883276039987e-13,
+     "theta_rel_q0.9": 1.4307733185331216e-11,
+     "coef_rel_1p_q0.99": 5.378352701150934e-13,
+     "theta_rel_q0.99": 4.844164592076379e-10
+    }
+   },
+   "passes_per_pair": {
+    "pairs": 174761,
+    "checks": {
+     "median": 3.0,
+     "p90": 3.0,
+     "p99": 5.0,
+     "max": 7,
+     "mean": 3.0457253048449027
+    },
+    "hessian_checks": {
+     "median": 2.0,
+     "p90": 3.0,
+     "p99": 3.0,
+     "max": 6,
+     "mean": 2.095250084400982
+    },
+    "theta_passes": {
+     "median": 4.0,
+     "p90": 5.0,
+     "p99": 7.0,
+     "max": 17,
+     "mean": 3.862074490303901
+    },
+    "theta_fallback_frac": 0.06318915547519183,
+    "passes_excluding_fallback_theta": {
+     "median": 9.0,
+     "p90": 10.0,
+     "p99": 12.0,
+     "max": 22,
+     "mean": 8.907799795148803
+    }
+   }
+  },
+  {
+   "name": "batched lockstep cold fit (variant c)",
+   "null_start": "not offered",
+   "description": "Today's cold algorithm (same start, steps, step halving and convergence rules; today's theta procedure) for all pairs of a response in lockstep, the NT cells' sums of every pair as dense products over cells grouped by design pattern (AVX2 register tiles); per-column control and a cold fallback outside the regular path.",
+   "decision": "Exact to the convergence tolerance (no fallback; all empirical p-values and discoveries identical) but slower than refine: lockstep runs the cold algorithm (about 4.6 IRLS iterations and 11 theta rounds) over all NT cells for every pair, while refine needs about 9 passes over the pair's cells, and per pass the batched products are not faster than refine's sparse passes because exp, log and division per cell dominate. Batching refine's passes across a gene's pairs would at most save the Gram part of its Hessian passes, so the two do not stack usefully; about 840 lines. Not adopted.",
+   "code_size": "prototype: 836 lines (pattern-grouped AVX2 products, lockstep IRLS and theta)",
+   "ks": {
+    "repeats": [
+     {
+      "run": "c_batched_ks_r1",
+      "wall_seconds": 644.55,
+      "loop_wall_seconds": 604.69,
+      "stage_thread_seconds": {
+       "response": 1.2,
+       "base_fit": 1125.3,
+       "gather": 19.74,
+       "null_fit": 6.11,
+       "sampler": 17.53,
+       "score": 252.86,
+       "draws": 3029.28,
+       "finish": 1.48,
+       "effects": 253.5
+      },
+      "null_thread_ms_per_pair": 8.034,
+      "loop_thread_utilization": 0.921,
+      "cpu_percent": 762,
+      "peak_rss_kib": 1535512,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 0,
+       "check_passes": 0,
+       "checks_first": 0,
+       "hessian_passes": 0,
+       "theta_passes": 0,
+       "model_iterations": 0,
+       "lockstep_rounds": 39317,
+       "lockstep_theta_rounds": 96281,
+       "lockstep_columns": 170894
+      }
+     },
+     {
+      "run": "c_batched_ks_r2",
+      "wall_seconds": 642.42,
+      "loop_wall_seconds": 606.88,
+      "stage_thread_seconds": {
+       "response": 1.2,
+       "base_fit": 1126.87,
+       "gather": 19.82,
+       "null_fit": 6.13,
+       "sampler": 17.63,
+       "score": 251.62,
+       "draws": 3046.98,
+       "finish": 1.49,
+       "effects": 254.37
+      },
+      "null_thread_ms_per_pair": 8.036,
+      "loop_thread_utilization": 0.921,
+      "cpu_percent": 767,
+      "peak_rss_kib": 1535548,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 0,
+       "check_passes": 0,
+       "checks_first": 0,
+       "hessian_passes": 0,
+       "theta_passes": 0,
+       "model_iterations": 0,
+       "lockstep_rounds": 39317,
+       "lockstep_theta_rounds": 96281,
+       "lockstep_columns": 170894
+      }
+     }
+    ],
+    "wall_seconds_mean": 643.48,
+    "null_thread_ms_per_pair_mean": 8.035
+   },
+   "strict": {
+    "repeats": [
+     {
+      "run": "c_batched_strict_r1",
+      "wall_seconds": 3051.9,
+      "loop_wall_seconds": 3017.73,
+      "stage_thread_seconds": {
+       "response": 1.18,
+       "base_fit": 1078.55,
+       "gather": 19.33,
+       "null_fit": 5.92,
+       "sampler": 17.09,
+       "score": 234.46,
+       "draws": 18476.47,
+       "finish": 1.29,
+       "effects": 246.86
+      },
+      "null_thread_ms_per_pair": 7.658,
+      "loop_thread_utilization": 0.822,
+      "cpu_percent": 683,
+      "peak_rss_kib": 1535048,
+      "counts": {
+       "base_fits": 8563,
+       "base_unusable": 0,
+       "fast_pairs": 174761,
+       "base_reuse": 0,
+       "fallbacks": 0,
+       "fallback_base": 0,
+       "fallback_model": 0,
+       "fallback_check": 0,
+       "fallback_score": 0,
+       "fallback_lockstep": 0,
+       "theta_fallbacks": 0,
+       "check_passes": 0,
+       "checks_first": 0,
+       "hessian_passes": 0,
+       "theta_passes": 0,
+       "model_iterations": 0,
+       "lockstep_rounds": 39317,
+       "lockstep_theta_rounds": 96281,
+       "lockstep_columns": 170894
+      }
+     }
+    ],
+    "wall_seconds_mean": 3051.9,
+    "null_thread_ms_per_pair_mean": 7.658
+   },
+   "agreement_with_exact": {
+    "ref": "d1_exact_ks_r1/out",
+    "alt": "c_batched_ks_r1/out",
+    "rows": 181280,
+    "status_differences": 0,
+    "status_table": {
+     "failed_pair_qc->failed_pair_qc": 6519,
+     "ok->ok": 174761
+    },
+    "statistic": {
+     "max_rel": 3.1016258460077436e-06,
+     "median_rel": 1.7265862841448823e-13,
+     "max_abs": 1.3871405747378773e-06,
+     "pearson": 1.0,
+     "spearman": 0.9999999999999977
+    },
+    "p_value": {
+     "identical": 158898,
+     "different": 15863,
+     "max_abs_log10_ratio": null,
+     "spearman": 0.9999999999868323,
+     "empirical_pairs": 158699,
+     "empirical_different": 0,
+     "approximation_flag_different": 0,
+     "approximated_pairs": 16062,
+     "approximated_max_rel": null,
+     "approximated_rel_gt_1e-4": 75
+    },
+    "draws_differences": 0,
+    "discoveries_discovery": {
+     "ref": 10982,
+     "alt": 10982,
+     "both": 10982,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "discoveries_negative": {
+     "ref": 1,
+     "alt": 1,
+     "both": 1,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "discoveries_positive": {
+     "ref": 14,
+     "alt": 14,
+     "both": 14,
+     "only_ref": 0,
+     "only_alt": 0,
+     "jaccard": 1.0
+    },
+    "log2fc_max_abs": 2.1538326677728037e-13,
+    "nulls": {
+     "pairs": 174761,
+     "coef_max_abs": 1.0164313835048233e-11,
+     "coef_max_rel_1p": 2.6026917651295978e-12,
+     "coef_median_rel_1p": 5.254821022825874e-14,
+     "theta_max_rel": 0.4082893056895051,
+     "theta_median_rel": 8.821132198514646e-13,
+     "u_max_abs": 1.0924668361056433e-05,
+     "u_max_rel": 4.084542050281699e-06,
+     "info_max_rel": 2.094741492396953e-06,
+     "info_median_rel": 2.92590771738089e-13,
+     "coef_rel_1p_q0.5": 5.254821022825874e-14,
+     "theta_rel_q0.5": 8.821132198514646e-13,
+     "coef_rel_1p_q0.9": 1.7431583443022352e-13,
+     "theta_rel_q0.9": 1.0390726822439084e-11,
+     "coef_rel_1p_q0.99": 4.08413640635679e-13,
+     "theta_rel_q0.99": 4.6181121623854783e-10
+    }
+   }
+  },
+  {
+   "name": "shared nulls (variants b0, b1)",
+   "null_start": "not offered",
+   "description": "b0: one null per response on all cells, no per-pair refit; b1: plus a closed-form per-pair intercept shift.",
+   "decision": "Not run on the full pilot after the decision: they change the null model (on a 2,200-pair subset statistics differed by up to 136x relative for b0 and 34x for b1, and 2,023 and 2,035 of 2,193 p-values changed).",
+   "code_size": "prototype: 60 lines",
+   "ks": null,
+   "strict": null
+  }
+ ],
+ "choice": "null_start=refine is the default for NT-control pairs with the SCEPTRE null; null_start=cold keeps the cold fit of releases before 1.5.0.",
+ "reasons": [
+  "It reproduces the cold null to the convergence tolerance, so p-values and discoveries do not change; the one-step and shared variants change the null.",
+  "Its start is a fixed function of the pair's cells (the NT totals plus the target's, at a reference fitted on all cells), so the null stays label-invariant at every iteration and permutation calibration is unaffected.",
+  "It does about 9 passes over a pair's cells (99th percentile 16) instead of about 55 plus a dense information, and needs no per-pair design copy.",
+  "It is the fastest exact variant measured: 5.1 null thread-ms per pair against 8.0 for the batched cold fit and 20.9 for cold.",
+  "Its safeguards (step halving, cold fallback, today's theta procedure) keep the cold statuses for boundaries and rank deficiency."
+ ],
+ "prior_art": "One-step estimator (Le Cam 1956; Bickel 1975, JASA 70:428-434) and warm starts for GLM fits (Friedman, Hastie and Tibshirani 2010, J Stat Softw 33(1)); no novelty is claimed.",
+ "integration": {
+  "branch": "feat/mergeable-null from origin/feat/engine 67f5adc",
+  "cold_identity": "null_start=cold gives the default tables of 67f5adc byte for byte on the full pilot (int_cold_ks_r1 against d1_exact_ks_r1, TSV and QQ) and on a 2,100-pair subset.",
+  "refine_check": "int_refine_ks_r2: 174,761 pairs refined, 0 cold refits, 592.8 s wall; agreement with exact as for the prototype (statistics within 4.8e-8 relative, all 158,699 empirical p-values and every discovery identical, 77 of 16,062 tail p-values below 3e-17 differ by more than 1e-4).",
+  "fix_during_integration": "The first build (int_refine_ks_r1) refitted 27 pairs cold: its step-halving test compared deviances to 1e-12 of the deviance, below the rounding of the summed terms of highly expressed genes. The test now allows 2e-12 of those sums (the cold fit's acceptance of 1e-12 of the log likelihood); 0 cold refits.",
+  "cross_platform": "tests/test_mergeable_null.cpp prints FNV digests: native AVX2 and RAPIDGLM_FORCE_PORTABLE builds give identical bits for both starts; ARM64 under QEMU (scripts/test_arm64.sh) rounds statistics differently for both starts, as METHODS.md documents, with the same statuses, draws, approximation flags and empirical p-values (identical discrete digests) on all three and between refine and cold."
+ },
+ "extrapolation_full_screen": {
+  "assumptions": "2,057 perturbations x 8,563 genes = 102.85 times the pilot's discovery pairs; per-pair costs, pair-QC pass rate, draw stages and discovery rate (deferred effect fits) as in the pilot; per-gene reference fits once per gene (the batched variant's lockstep fits scale with the pairs); the loop's thread utilization of the pilot run; input reading excluded.",
+  "runs": {
+   "d1_exact_ks_r1": {
+    "run": "d1_exact_ks_r1",
+    "loop_thread_seconds": 664016,
+    "loop_utilization": 0.66,
+    "wall_hours_8_threads": 35.81
+   },
+   "d1_exact_strict_r1": {
+    "run": "d1_exact_strict_r1",
+    "loop_thread_seconds": 2299932,
+    "loop_utilization": 0.766,
+    "wall_hours_8_threads": 105.17
+   },
+   "a_refine_ks_r1": {
+    "run": "a_refine_ks_r1",
+    "loop_thread_seconds": 366206,
+    "loop_utilization": 0.828,
+    "wall_hours_8_threads": 16.26
+   },
+   "a_refine_strict_r1": {
+    "run": "a_refine_strict_r1",
+    "loop_thread_seconds": 1970299,
+    "loop_utilization": 0.804,
+    "wall_hours_8_threads": 85.97
+   },
+   "a_block_ks_r1": {
+    "run": "a_block_ks_r1",
+    "loop_thread_seconds": 368606,
+    "loop_utilization": 0.83,
+    "wall_hours_8_threads": 16.31
+   },
+   "d1_onestep_all_ks_r1": {
+    "run": "d1_onestep_all_ks_r1",
+    "loop_thread_seconds": 334538,
+    "loop_utilization": 0.858,
+    "wall_hours_8_threads": 14.41
+   },
+   "d_onestep_mapped_ks_r1": {
+    "run": "d_onestep_mapped_ks_r1",
+    "loop_thread_seconds": 319298,
+    "loop_utilization": 0.886,
+    "wall_hours_8_threads": 13.38
+   },
+   "d_onestep_mapped_strict_r1": {
+    "run": "d_onestep_mapped_strict_r1",
+    "loop_thread_seconds": 2057680,
+    "loop_utilization": 0.822,
+    "wall_hours_8_threads": 87.83
+   },
+   "c_batched_ks_r1": {
+    "run": "c_batched_ks_r1",
+    "loop_thread_seconds": 458044,
+    "loop_utilization": 0.921,
+    "wall_hours_8_threads": 18.18
+   },
+   "c_batched_strict_r1": {
+    "run": "c_batched_strict_r1",
+    "loop_thread_seconds": 2039956,
+    "loop_utilization": 0.822,
+    "wall_hours_8_threads": 87.1
+   }
+  }
+ },
+ "json_note": "Non-finite values (an infinite log ratio where one p-value is 0, NaN for no pairs) are written as null."
+}

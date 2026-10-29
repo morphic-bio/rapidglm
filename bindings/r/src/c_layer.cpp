@@ -5,6 +5,7 @@
 #include <cpp11.hpp>
 #include <rapidglm/rapidglm_c.h>
 
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -151,6 +152,8 @@ run_sceptre(const cpp11::doubles_matrix<> &design, const cpp11::integers &yp,
     integer("threads", s.threads);
     integer("stream_keys", s.stream_keys);
     integer("adjustment_family", s.family);
+    integer("null_start", s.null_start);
+    integer("batch_scoring", s.batch_scoring);
     real("screen", s.screen);
     real("alpha", s.alpha);
     real("lower_quantile", s.lower_quantile);
@@ -219,10 +222,17 @@ run_sceptre(const cpp11::doubles_matrix<> &design, const cpp11::integers &yp,
     rapidglm_bulk_options b;
     rapidglm_bulk_options_init(&b);
     std::vector<double> contrasts, size_factors;
-    if (has(o, "coefficient"))
-        b.coefficient = static_cast<size_t>(number(o, "coefficient"));
+    if (has(o, "coefficient")) {
+        const double index = number(o, "coefficient");
+        if (!std::isfinite(index) || index < 0 || index >= design.ncol() ||
+            std::floor(index) != index)
+            cpp11::stop("coefficient outside the design");
+        b.coefficient = static_cast<size_t>(index);
+    }
     if (has(o, "contrasts")) {
         cpp11::doubles_matrix<> c(o["contrasts"]); // rows x design columns
+        if (c.ncol() != design.ncol())
+            cpp11::stop("contrast length differs from design");
         for (int r = 0; r < c.nrow(); ++r)
             for (int k = 0; k < c.ncol(); ++k)
                 contrasts.push_back(c(r, k));
@@ -231,6 +241,8 @@ run_sceptre(const cpp11::doubles_matrix<> &design, const cpp11::integers &yp,
     }
     if (has(o, "size_factor_values")) {
         cpp11::doubles s(o["size_factor_values"]);
+        if (s.size() != samples)
+            cpp11::stop("size_factor_values needs one value per sample");
         size_factors.assign(s.begin(), s.end());
         b.size_factors = size_factors.data();
     }
@@ -275,10 +287,17 @@ run_sceptre(const cpp11::doubles_matrix<> &design, const cpp11::integers &yp,
     rapidglm_ql_options q;
     rapidglm_ql_options_init(&q);
     std::vector<double> contrasts, factors;
-    if (has(o, "coefficient"))
-        q.coefficient = static_cast<size_t>(number(o, "coefficient"));
+    if (has(o, "coefficient")) {
+        const double index = number(o, "coefficient");
+        if (!std::isfinite(index) || index < 0 || index >= design.ncol() ||
+            std::floor(index) != index)
+            cpp11::stop("coefficient outside the design");
+        q.coefficient = static_cast<size_t>(index);
+    }
     if (has(o, "contrasts")) {
         cpp11::doubles_matrix<> c(o["contrasts"]); // rows x design columns
+        if (c.ncol() != design.ncol())
+            cpp11::stop("contrast length differs from design");
         for (int r = 0; r < c.nrow(); ++r)
             for (int k = 0; k < c.ncol(); ++k)
                 contrasts.push_back(c(r, k));
@@ -287,6 +306,8 @@ run_sceptre(const cpp11::doubles_matrix<> &design, const cpp11::integers &yp,
     }
     if (has(o, "norm_factors")) {
         cpp11::doubles f(o["norm_factors"]);
+        if (f.size() != samples)
+            cpp11::stop("norm_factors needs one value per sample");
         factors.assign(f.begin(), f.end());
         q.norm_factors = factors.data();
     }
