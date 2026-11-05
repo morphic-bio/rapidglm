@@ -18,6 +18,13 @@ let res = DeseqStats::new(&dds, contrast, StatsOptions::default())?.summary()?;
 `bulk-de`) and returns its result table; `nb_fixed_fits` and `nb_dispersions`
 are the batch fitters the port is built on.
 
+Division policy defaults to `RAPIDGLM_DIVISION=slow`. Set
+`BulkOptions.division` to `DivisionMode::Slow` or `DivisionMode::Fast`,
+or use `with_division(mode, || ...)` around synchronous binding calls.
+`DivisionMode::Inherit` follows the calling thread's policy, then the
+environment or build default. The scope restores the previous policy on
+return, error or panic; it does not affect other Rust threads.
+
 ## Building
 
 Build the C library, then point Cargo at it:

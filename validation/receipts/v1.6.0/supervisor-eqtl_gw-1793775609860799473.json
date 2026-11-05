@@ -1,0 +1,14 @@
+{
+  "label": "eqtl_gw-1793775609860799473",
+  "stages": [
+    "eqtl_gw"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-04T07:00:09.972316+00:00",
+  "finished_utc": "2026-11-04T08:14:25.322978+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 4383,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0641394089907408,
+  "cpu_policy_observed_quiet_starts": 2,
+  "error": null
+}

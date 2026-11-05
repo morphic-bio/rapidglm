@@ -160,6 +160,9 @@ def main(args):
                         from quiet_run import wait_quiet
                         wait_quiet(os.sched_getaffinity(0), label=f"GLM {p.name} {t}")
                     run_tool(t, p, args.budget, args.timeout, args.label)
+                    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+                        from quiet_run import finish_measurement
+                        finish_measurement()
                     print("speed", p.name, t, os.getloadavg()[0], flush=True)
 
 

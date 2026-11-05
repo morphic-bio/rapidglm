@@ -502,5 +502,421 @@
    "generator_and_sampler_tests": "9 test cases pass; the Arm AES instructions are used and reproduce the Random123 known-answer vectors and the table-lookup words",
    "compiles": "GCC 13 and clang 18 for aarch64, with and without -march=armv8-a+aes"
   }
+ },
+ "hazard_default_2026_10_24": {
+  "note": "crt_draw hazard made the default (1.5.0, unreleased). Measured before the change with one binary (4e2b39a, 1.4.1 plus single-precision QTL work; sha256 of the binary 6864f5159b26da71fcbe9cbf5f3e13d79a16c7f0f369a17785a531e3a840dbcf), crt_draw set explicitly. 16 threads on efficiency CPUs 16-31 under the shared timing lock (receipts/v1.4.0/guarded.py: per-CPU idle check on 16-31, quiet host check). The first run used load threshold 4; the others 16, because other agents kept the load average at 8-20 with untimed work on CPUs 0-15. Turbo on. Runs alternated between the samplers; the planned hazard runs at the second seed were dropped to free the lock (the yardstick is thinned at two seeds).",
+  "date": "2026-10-24",
+  "point": {
+   "cells": 207324,
+   "genes": 7418,
+   "pairs": 148360,
+   "discovery_targets": [
+    "chr15.2327_top_two",
+    "chr1.11567_top_two",
+    "chr11.1726_top_two",
+    "chr1.8792_top_two",
+    "chr20.1393_top_two",
+    "chr10.3364_top_two",
+    "chr13.839_top_two",
+    "chr1.11841_top_two",
+    "chr1.6127_top_two",
+    "chr5.3159_top_two",
+    "chr9.2436_top_two",
+    "chr11.2770_top_two",
+    "chr1.10125_top_two",
+    "chr5.980_top_two",
+    "chr4.2491_second_two"
+   ],
+   "negative_targets": [
+    "random_24",
+    "random_7",
+    "random_13",
+    "random_19",
+    "random_10"
+   ],
+   "rule": "discovery: the 5 targets with BH 0.1 discoveries in the v1.4.0 t100_g7418 default receipt run, then the first 10 other targets of the panel selection order (selection.json seed 20261001); negative: the first 5 non-targeting targets in guides.tsv order",
+   "settings": "moi high, complement controls, CRT, cell_qc false, budgets 499/4999/19999, fit_check strict, seed 20260930 (second seed 20261024)"
+  },
+  "modes": {
+   "default": "independent draws, confirm_draws 199999",
+   "legacy": "reuse_draws true, confirm_draws 0 (SCEPTRE practice)"
+  },
+  "timing": {
+   "default": {
+    "thinned": {
+     "wall_s": [
+      483.83,
+      490.72
+     ],
+     "cpu_s": [
+      6857.6,
+      6921.0
+     ],
+     "draws": [
+      95720913
+     ],
+     "outputs_identical": true
+    },
+    "hazard": {
+     "wall_s": [
+      369.54,
+      370.94
+     ],
+     "cpu_s": [
+      5116.9,
+      5073.6
+     ],
+     "draws": [
+      95455413
+     ],
+     "outputs_identical": true
+    },
+    "speedup_wall_min": 1.309,
+    "speedup_cpu_min": 1.352,
+    "speedup_wall_mean": 1.316
+   },
+   "legacy": {
+    "thinned": {
+     "wall_s": [
+      192.95,
+      183.19
+     ],
+     "cpu_s": [
+      2453.3,
+      2391.1
+     ],
+     "draws": [
+      90562413
+     ],
+     "outputs_identical": true
+    },
+    "hazard": {
+     "wall_s": [
+      191.16,
+      187.18
+     ],
+     "cpu_s": [
+      2416.8,
+      2400.0
+     ],
+     "draws": [
+      90329913
+     ],
+     "outputs_identical": true
+    },
+    "speedup_wall_min": 0.979,
+    "speedup_cpu_min": 0.996,
+    "speedup_wall_mean": 0.994
+   }
+  },
+  "runs": {
+   "hazard_default_1": {
+    "wall_s": 369.54,
+    "cpu_s": 5116.9,
+    "draws": 95455413,
+    "discoveries_bh_0_1": 19,
+    "negative_controls_below_0_05": 0.047,
+    "negative_controls_below_0_01": 0.00962,
+    "others_cpu": 0.0439,
+    "seed": 20260930,
+    "crt_draw_used": "hazard",
+    "output_sha256": "73a83e4d45f6b3875785abcdc9164ee4f0f3c7b38366407db9b1d5c8b551849f"
+   },
+   "hazard_default_2": {
+    "wall_s": 370.94,
+    "cpu_s": 5073.6,
+    "draws": 95455413,
+    "discoveries_bh_0_1": 19,
+    "negative_controls_below_0_05": 0.047,
+    "negative_controls_below_0_01": 0.00962,
+    "others_cpu": 0.0595,
+    "seed": 20260930,
+    "crt_draw_used": "hazard",
+    "output_sha256": "73a83e4d45f6b3875785abcdc9164ee4f0f3c7b38366407db9b1d5c8b551849f"
+   },
+   "hazard_legacy_1": {
+    "wall_s": 191.16,
+    "cpu_s": 2416.8,
+    "draws": 90329913,
+    "discoveries_bh_0_1": 20,
+    "negative_controls_below_0_05": 0.04698,
+    "negative_controls_below_0_01": 0.0094,
+    "others_cpu": 0.0714,
+    "seed": 20260930,
+    "crt_draw_used": "hazard",
+    "output_sha256": "7e0216788a154c94f81d0b375ad10035469bdd58d322bb7166d97e77b30b4f98"
+   },
+   "hazard_legacy_2": {
+    "wall_s": 187.18,
+    "cpu_s": 2400.0,
+    "draws": 90329913,
+    "discoveries_bh_0_1": 20,
+    "negative_controls_below_0_05": 0.04698,
+    "negative_controls_below_0_01": 0.0094,
+    "others_cpu": 0.0385,
+    "seed": 20260930,
+    "crt_draw_used": "hazard",
+    "output_sha256": "7e0216788a154c94f81d0b375ad10035469bdd58d322bb7166d97e77b30b4f98"
+   },
+   "thinned_default_1": {
+    "wall_s": 483.83,
+    "cpu_s": 6857.6,
+    "draws": 95720913,
+    "discoveries_bh_0_1": 20,
+    "negative_controls_below_0_05": 0.04709,
+    "negative_controls_below_0_01": 0.00953,
+    "others_cpu": 0.0296,
+    "seed": 20260930,
+    "crt_draw_used": "thinned",
+    "output_sha256": "73687b9085c4b63ab42bdd0d7d39bf9d93ee1d4deb8c98c2520e8595afeced43"
+   },
+   "thinned_default_2": {
+    "wall_s": 490.72,
+    "cpu_s": 6921.0,
+    "draws": 95720913,
+    "discoveries_bh_0_1": 20,
+    "negative_controls_below_0_05": 0.04709,
+    "negative_controls_below_0_01": 0.00953,
+    "others_cpu": 0.0564,
+    "seed": 20260930,
+    "crt_draw_used": "thinned",
+    "output_sha256": "73687b9085c4b63ab42bdd0d7d39bf9d93ee1d4deb8c98c2520e8595afeced43"
+   },
+   "thinned_default_s2": {
+    "wall_s": 472.89,
+    "cpu_s": 6767.9,
+    "draws": 95756913,
+    "discoveries_bh_0_1": 20,
+    "negative_controls_below_0_05": 0.04622,
+    "negative_controls_below_0_01": 0.0099,
+    "others_cpu": 0.0398,
+    "seed": 20261024,
+    "crt_draw_used": "thinned",
+    "output_sha256": "4fe79ec55798764213455d62e3e8b7512458cccf4c7691443d211a9d45597504"
+   },
+   "thinned_legacy_1": {
+    "wall_s": 192.95,
+    "cpu_s": 2453.3,
+    "draws": 90562413,
+    "discoveries_bh_0_1": 19,
+    "negative_controls_below_0_05": 0.04625,
+    "negative_controls_below_0_01": 0.00951,
+    "others_cpu": 0.0585,
+    "seed": 20260930,
+    "crt_draw_used": "thinned",
+    "output_sha256": "0823d989c98fa80ada5903741bbb65c8c59b320a33bca5ef066efee7761a42f9"
+   },
+   "thinned_legacy_2": {
+    "wall_s": 183.19,
+    "cpu_s": 2391.1,
+    "draws": 90562413,
+    "discoveries_bh_0_1": 19,
+    "negative_controls_below_0_05": 0.04625,
+    "negative_controls_below_0_01": 0.00951,
+    "others_cpu": 0.0064,
+    "seed": 20260930,
+    "crt_draw_used": "thinned",
+    "output_sha256": "0823d989c98fa80ada5903741bbb65c8c59b320a33bca5ef066efee7761a42f9"
+   },
+   "thinned_legacy_s2": {
+    "wall_s": 179.35,
+    "cpu_s": 2334.2,
+    "draws": 90724413,
+    "discoveries_bh_0_1": 19,
+    "negative_controls_below_0_05": 0.0463,
+    "negative_controls_below_0_01": 0.0097,
+    "others_cpu": 0.0041,
+    "seed": 20261024,
+    "crt_draw_used": "thinned",
+    "output_sha256": "3a00d2bd899120a5a3aa73898e176ad8aaa4cd1d5d7d36cf216ad4d908090a6c"
+   }
+  },
+  "agreement_default": {
+   "hazard_default_1 vs thinned_default_1": {
+    "label": "hazard vs thinned, seed 20260930",
+    "status_mismatches": 0,
+    "statistic_identical": true,
+    "ok_pairs": 144087,
+    "corr_log10_p": 0.9883,
+    "spearman_p": 0.9852,
+    "corr_log10_p_either_below_0_01": 0.9937,
+    "pairs_either_below_0_01": 1741,
+    "median_abs_log10_ratio": 0.0328,
+    "discoveries_a": 19,
+    "discoveries_b": 20,
+    "discoveries_common": 19,
+    "discoveries_jaccard": 0.95,
+    "differing_discoveries": [
+     {
+      "response": 4952,
+      "target": "chr1.6127_top_two",
+      "p_a": 0.0002999999999999,
+      "p_b": 1.1840448732977608e-05,
+      "q_a": 0.4585960020295715,
+      "q_b": 0.0641302384275533,
+      "draws_a": 19999,
+      "draws_b": 199999
+     }
+    ]
+   },
+   "thinned_default_1 vs thinned_default_s2": {
+    "label": "yardstick: thinned at two seeds",
+    "status_mismatches": 0,
+    "statistic_identical": true,
+    "ok_pairs": 144087,
+    "corr_log10_p": 0.9883,
+    "spearman_p": 0.9851,
+    "corr_log10_p_either_below_0_01": 0.9936,
+    "pairs_either_below_0_01": 1760,
+    "median_abs_log10_ratio": 0.0329,
+    "discoveries_a": 20,
+    "discoveries_b": 20,
+    "discoveries_common": 19,
+    "discoveries_jaccard": 0.905,
+    "differing_discoveries": [
+     {
+      "response": 4505,
+      "target": "chr15.2327_top_two",
+      "p_a": 3e-05,
+      "p_b": 1e-05,
+      "q_a": 0.1547485714285714,
+      "q_b": 0.0570126315789473,
+      "draws_a": 199999,
+      "draws_b": 199999
+     },
+     {
+      "response": 4952,
+      "target": "chr1.6127_top_two",
+      "p_a": 1.1840448732977608e-05,
+      "p_b": 7e-05,
+      "q_a": 0.0641302384275533,
+      "q_b": 0.2527559999999999,
+      "draws_a": 199999,
+      "draws_b": 199999
+     }
+    ]
+   },
+   "hazard_default_1 vs thinned_default_s2": {
+    "label": "hazard seed 20260930 vs thinned seed 20261024",
+    "status_mismatches": 0,
+    "statistic_identical": true,
+    "ok_pairs": 144087,
+    "corr_log10_p": 0.9883,
+    "spearman_p": 0.985,
+    "corr_log10_p_either_below_0_01": 0.9939,
+    "pairs_either_below_0_01": 1751,
+    "median_abs_log10_ratio": 0.0328,
+    "discoveries_a": 19,
+    "discoveries_b": 20,
+    "discoveries_common": 19,
+    "discoveries_jaccard": 0.95,
+    "differing_discoveries": [
+     {
+      "response": 4505,
+      "target": "chr15.2327_top_two",
+      "p_a": 7e-05,
+      "p_b": 1e-05,
+      "q_a": 0.2464542143372741,
+      "q_b": 0.0570126315789473,
+      "draws_a": 199999,
+      "draws_b": 199999
+     }
+    ]
+   }
+  },
+  "agreement_legacy": {
+   "hazard_legacy_1 vs thinned_legacy_1": {
+    "label": "hazard vs thinned, seed 20260930",
+    "status_mismatches": 0,
+    "statistic_identical": true,
+    "ok_pairs": 144087,
+    "corr_log10_p": 0.988,
+    "spearman_p": 0.9852,
+    "corr_log10_p_either_below_0_01": 0.992,
+    "pairs_either_below_0_01": 1761,
+    "median_abs_log10_ratio": 0.0328,
+    "discoveries_a": 20,
+    "discoveries_b": 19,
+    "discoveries_common": 19,
+    "discoveries_jaccard": 0.95,
+    "differing_discoveries": [
+     {
+      "response": 2689,
+      "target": "chr15.2327_top_two",
+      "p_a": 1.687310872754797e-05,
+      "p_b": 2.0272082076607363e-05,
+      "q_a": 0.0913881314901453,
+      "q_b": 0.1097976509433207,
+      "draws_a": 19999,
+      "draws_b": 19999
+     }
+    ]
+   },
+   "thinned_legacy_1 vs thinned_legacy_s2": {
+    "label": "yardstick: thinned at two seeds",
+    "status_mismatches": 0,
+    "statistic_identical": true,
+    "ok_pairs": 144087,
+    "corr_log10_p": 0.9881,
+    "spearman_p": 0.9851,
+    "corr_log10_p_either_below_0_01": 0.9913,
+    "pairs_either_below_0_01": 1768,
+    "median_abs_log10_ratio": 0.0328,
+    "discoveries_a": 19,
+    "discoveries_b": 19,
+    "discoveries_common": 18,
+    "discoveries_jaccard": 0.9,
+    "differing_discoveries": [
+     {
+      "response": 2689,
+      "target": "chr15.2327_top_two",
+      "p_a": 2.0272082076607363e-05,
+      "p_b": 1.4324353429343756e-05,
+      "q_a": 0.1097976509433207,
+      "q_b": 0.0824585766274493,
+      "draws_a": 19999,
+      "draws_b": 19999
+     },
+     {
+      "response": 6966,
+      "target": "chr1.11567_top_two",
+      "p_a": 7.31189401748046e-08,
+      "p_b": 0.0001,
+      "q_a": 0.0009900670094369,
+      "q_b": 0.2850631578947368,
+      "draws_a": 19999,
+      "draws_b": 19999
+     }
+    ]
+   },
+   "hazard_legacy_1 vs thinned_legacy_s2": {
+    "label": "hazard seed 20260930 vs thinned seed 20261024",
+    "status_mismatches": 0,
+    "statistic_identical": true,
+    "ok_pairs": 144087,
+    "corr_log10_p": 0.988,
+    "spearman_p": 0.9851,
+    "corr_log10_p_either_below_0_01": 0.9916,
+    "pairs_either_below_0_01": 1755,
+    "median_abs_log10_ratio": 0.0329,
+    "discoveries_a": 20,
+    "discoveries_b": 19,
+    "discoveries_common": 19,
+    "discoveries_jaccard": 0.95,
+    "differing_discoveries": [
+     {
+      "response": 6966,
+      "target": "chr1.11567_top_two",
+      "p_a": 5.647737821410124e-08,
+      "p_b": 0.0001,
+      "q_a": 0.000764731939708,
+      "q_b": 0.2850631578947368,
+      "draws_a": 19999,
+      "draws_b": 19999
+     }
+    ]
+   }
+  },
+  "finding": "By default hazard is 1.31 times as fast in wall time (1.35 in CPU time). With reuse_draws and confirm_draws 0 there is no measurable difference (thinned 179-193 s, hazard 187-191 s): each target's draws are generated once and scoring takes nearly all the time. Agreement with thinned equals thinned's own seed-to-seed agreement."
  }
 }

@@ -1,0 +1,475 @@
+{
+  "version": "1.6.0",
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "prepared_utc": "2026-10-31T19:16:45.384510+00:00",
+  "stage_order": [
+    "preprint_qtl",
+    "preprint_crt",
+    "preprint_replogle"
+  ],
+  "commands": [
+    {
+      "name": "rapidglm_gaussian",
+      "stage": "preprint_qtl",
+      "command": [
+        "build/rapidglm",
+        "qtl",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian/config.json",
+      "config_sha256": "157d6799e2f64f80ceacc63bcee20d331e5b336c8a5941d34ef2067b4f987f83",
+      "original_config": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/eqtl/rapidglm_gaussian/config.json",
+      "original_config_sha256": "0da01f5f112936097306786230b4e1013c2d22613013885951fd2399d4b6a7fb",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian/result",
+      "cpus": "6-17",
+      "threads": 12,
+      "references": {
+        ".cis.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/eqtl/rapidglm_gaussian/chr22.cis.tsv",
+          "sha256": "5672e7bc18e4c53fd77610785f7116233860d54a7598ef1b9ee503d96d42cbc5"
+        }
+      },
+      "pair": null,
+      "role": "default"
+    },
+    {
+      "name": "rapidglm_gaussian10000",
+      "stage": "preprint_qtl",
+      "command": [
+        "build/rapidglm",
+        "qtl",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/config.json",
+      "config_sha256": "79bd82b7b8e6541fd143e3824867e9ebaed850b2d9b96577cd7a0e08e0f7b6a3",
+      "original_config": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/eqtl/rapidglm_gaussian10000/config.json",
+      "original_config_sha256": "60a87eda4488500d03a609741a6ae70e6e9e76db3ce79b2d44cb55ba46982bdb",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/result",
+      "cpus": "6-17",
+      "threads": 12,
+      "references": {
+        ".cis.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/eqtl/rapidglm_gaussian10000/chr22.cis.tsv",
+          "sha256": "1711ddaee4ca140f6edd4e2ab4fc2cd63eb267b7172724cb8a7e51e171852508"
+        }
+      },
+      "pair": null,
+      "role": "default"
+    },
+    {
+      "name": "rapidglm_gaussian10000_double",
+      "stage": "preprint_qtl",
+      "command": [
+        "build/rapidglm",
+        "qtl",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000_double/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000_double/config.json",
+      "config_sha256": "57c476198d082a327eecf775811081da7eebc43fd58abc21399ccb089b833575",
+      "original_config": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/eqtl/rapidglm_gaussian10000_double/config.json",
+      "original_config_sha256": "c97c5382b456a610716257506877b91b82445c250bd0e32fe4a2b8386f7cea94",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000_double",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000_double/result",
+      "cpus": "6-17",
+      "threads": 12,
+      "references": {
+        ".cis.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/eqtl/rapidglm_gaussian10000_double/chr22.cis.tsv",
+          "sha256": "7810433f3551e85a0a8e1647a2873a3b599c3e21d559b34ce58dc4b2e4de06c9"
+        }
+      },
+      "pair": null,
+      "role": "default"
+    },
+    {
+      "name": "rapidglm_nb",
+      "stage": "preprint_qtl",
+      "command": [
+        "build/rapidglm",
+        "qtl",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_nb/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_nb/config.json",
+      "config_sha256": "aed8e7f5a50b4ab1859af7535df03d4792beaea0093618ac0fb17f09c361ac6d",
+      "original_config": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/eqtl/rapidglm_nb/config.json",
+      "original_config_sha256": "cd51bd69b573b04dad55bce77acedef194d93d7ef75e4ce790d8cae53acd60c8",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_nb",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_nb/result",
+      "cpus": "6-17",
+      "threads": 12,
+      "references": {
+        ".cis.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/eqtl/rapidglm_nb/chr22.cis.tsv",
+          "sha256": "75618e203ca9223eee7c47d49cc38ad3101771d2544279713c82ec90d6b7071f"
+        }
+      },
+      "pair": "qtl_nb_chr22",
+      "role": "default"
+    },
+    {
+      "name": "qtl_nb_separate",
+      "stage": "preprint_qtl",
+      "command": [
+        "build/rapidglm",
+        "qtl",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/qtl_nb_separate/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/qtl_nb_separate/config.json",
+      "config_sha256": "5bfd960028565b0a5d170583c9135ca36a6f9591749f2721f8cae1cb6e86f6e0",
+      "original_config": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/eqtl/rapidglm_nb/config.json",
+      "original_config_sha256": "cd51bd69b573b04dad55bce77acedef194d93d7ef75e4ce790d8cae53acd60c8",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/qtl_nb_separate",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/qtl_nb_separate/result",
+      "cpus": "6-17",
+      "threads": 12,
+      "references": {
+        ".cis.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/eqtl/rapidglm_nb/chr22.cis.tsv",
+          "sha256": "75618e203ca9223eee7c47d49cc38ad3101771d2544279713c82ec90d6b7071f"
+        }
+      },
+      "pair": "qtl_nb_chr22",
+      "role": "opt_out"
+    },
+    {
+      "name": "crt_ks_default",
+      "stage": "preprint_crt",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/config.json",
+      "config_sha256": "112bed3e3cbb813a1fe5b391041b797abed5b56c8d760fbba9f5eb510de07454",
+      "original_config": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_ks/config.json",
+      "original_config_sha256": "6399efafc4414646ba6b2ba05d66894898a0ade8b908382cde904f1593e1b18d",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/result",
+      "cpus": "6-21",
+      "threads": 16,
+      "references": {
+        ".tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_ks/rapid.tsv",
+          "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+        },
+        ".qq.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_ks/rapid.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        }
+      },
+      "pair": "crt_t100_g7418_ks",
+      "role": "default"
+    },
+    {
+      "name": "crt_ks_opt_out",
+      "stage": "preprint_crt",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+      "config_sha256": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7",
+      "original_config": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_ks/config.json",
+      "original_config_sha256": "6399efafc4414646ba6b2ba05d66894898a0ade8b908382cde904f1593e1b18d",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result",
+      "cpus": "6-21",
+      "threads": 16,
+      "references": {
+        ".tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_ks/rapid.tsv",
+          "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+        },
+        ".qq.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_ks/rapid.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        }
+      },
+      "pair": "crt_t100_g7418_ks",
+      "role": "opt_out"
+    },
+    {
+      "name": "crt_default_default",
+      "stage": "preprint_crt",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_default/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_default/config.json",
+      "config_sha256": "b8a051ff8d5f9e6834fd0b1eb273afb0db850bbba726d941e367798846d9dd36",
+      "original_config": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_default/config.json",
+      "original_config_sha256": "83406c135b4aed3f9f591df42055e9bd587ef02a191abeac50d370100b4dbf90",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_default",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_default/result",
+      "cpus": "6-21",
+      "threads": 16,
+      "references": {
+        ".tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_default/rapid.tsv",
+          "sha256": "b75ca2be47f55d03d19ef42286046311415d670108fe71c709c06883aa11132a"
+        },
+        ".qq.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_default/rapid.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        }
+      },
+      "pair": "crt_t100_g7418_default",
+      "role": "default"
+    },
+    {
+      "name": "crt_default_opt_out",
+      "stage": "preprint_crt",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_opt_out/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_opt_out/config.json",
+      "config_sha256": "55b021103fcc75a298ef4adbbab523c3a38de146a38b618599f97eea28c839bd",
+      "original_config": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_default/config.json",
+      "original_config_sha256": "83406c135b4aed3f9f591df42055e9bd587ef02a191abeac50d370100b4dbf90",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_opt_out",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_opt_out/result",
+      "cpus": "6-21",
+      "threads": 16,
+      "references": {
+        ".tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_default/rapid.tsv",
+          "sha256": "b75ca2be47f55d03d19ef42286046311415d670108fe71c709c06883aa11132a"
+        },
+        ".qq.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.5.0-gpu/crt/t100_g7418_default/rapid.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        }
+      },
+      "pair": "crt_t100_g7418_default",
+      "role": "opt_out"
+    },
+    {
+      "name": "replogle_strict_default",
+      "stage": "preprint_replogle",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_strict_default/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_strict_default/config.json",
+      "config_sha256": "acadb3989f63ff08ed23883b72e8367a198b1139aeca290539c4b6aea2766193",
+      "original_config": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16.json",
+      "original_config_sha256": "d546b615d1a9ea4bc07609b08cc6986304bf5a9bb96f432ed584a2684dbb61bc",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_strict_default",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_strict_default/result",
+      "cpus": "6-21",
+      "threads": 16,
+      "references": {
+        ".tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16.tsv",
+          "sha256": "49a4b906c9bc5035f4b4e05dd217518701d746b7de3b83b81d9e75b477541144"
+        },
+        ".qq.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16.qq.tsv",
+          "sha256": "c07bbd90a2ad03ae29b1504dcd15eb547f9cd72bf7642385c6984132adfd83e1"
+        }
+      },
+      "pair": "replogle_strict",
+      "role": "default"
+    },
+    {
+      "name": "replogle_strict_opt_out",
+      "stage": "preprint_replogle",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_strict_opt_out/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_strict_opt_out/config.json",
+      "config_sha256": "2732b42a4a6e5afbf085e6da500f11dc7bc0a88f6c72d2cde2669fd715df29a0",
+      "original_config": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16.json",
+      "original_config_sha256": "d546b615d1a9ea4bc07609b08cc6986304bf5a9bb96f432ed584a2684dbb61bc",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_strict_opt_out",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_strict_opt_out/result",
+      "cpus": "6-21",
+      "threads": 16,
+      "references": {
+        ".tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16.tsv",
+          "sha256": "49a4b906c9bc5035f4b4e05dd217518701d746b7de3b83b81d9e75b477541144"
+        },
+        ".qq.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16.qq.tsv",
+          "sha256": "c07bbd90a2ad03ae29b1504dcd15eb547f9cd72bf7642385c6984132adfd83e1"
+        }
+      },
+      "pair": "replogle_strict",
+      "role": "opt_out"
+    },
+    {
+      "name": "replogle_ks_default",
+      "stage": "preprint_replogle",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_ks_default/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_ks_default/config.json",
+      "config_sha256": "c69e0bc38df6406191ef261935893c9b6002a196a7198cc02f221bac8dbad38c",
+      "original_config": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16_ks.json",
+      "original_config_sha256": "f81ea9b38d0cbddc12d3797d169fc0576338051856d6050f37f656cb2ce82990",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_ks_default",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_ks_default/result",
+      "cpus": "6-21",
+      "threads": 16,
+      "references": {
+        ".tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16_ks.tsv",
+          "sha256": "33945d227639cdebda497b35fef426666481de142178a414a801d6a61b56aa05"
+        },
+        ".qq.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16_ks.qq.tsv",
+          "sha256": "7331a2fafd9a0c4f3efa21d8e6b6c785e7edb27da9502ecd2c413d3d75e66b0d"
+        }
+      },
+      "pair": "replogle_ks",
+      "role": "default"
+    },
+    {
+      "name": "replogle_ks_opt_out",
+      "stage": "preprint_replogle",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_ks_opt_out/config.json"
+      ],
+      "config": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_ks_opt_out/config.json",
+      "config_sha256": "4b38993f86319e73f8b211ad8f10c3a706400f8bef2c1c748cefe74e48b8f0fb",
+      "original_config": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16_ks.json",
+      "original_config_sha256": "f81ea9b38d0cbddc12d3797d169fc0576338051856d6050f37f656cb2ce82990",
+      "directory": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_ks_opt_out",
+      "prefix": "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_ks_opt_out/result",
+      "cpus": "6-21",
+      "threads": 16,
+      "references": {
+        ".tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16_ks.tsv",
+          "sha256": "33945d227639cdebda497b35fef426666481de142178a414a801d6a61b56aa05"
+        },
+        ".qq.tsv": {
+          "path": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/runs/rapidglm_t16_ks.qq.tsv",
+          "sha256": "7331a2fafd9a0c4f3efa21d8e6b6c785e7edb27da9502ecd2c413d3d75e66b0d"
+        }
+      },
+      "pair": "replogle_ks",
+      "role": "opt_out"
+    }
+  ],
+  "inputs": {
+    "/data/lhhung/rapidglm-1.6.0/validation/work/eqtl/runs/rapidglm/inputs/chr22.expr_int.bed": {
+      "reference": "/data/lhhung/rapidglm/validation/work/eqtl/runs/rapidglm/inputs/chr22.expr_int.bed",
+      "sha256": "7e6d583490e70bab10362dddc5f9219a654b2884a33e102f417672d52bde8bb3"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/eqtl/data/genotypes/chr22.bed": {
+      "reference": "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.bed",
+      "sha256": "3026db5139cecdb8c7225a0969b5eaa34c514ffe894a38f563cfa6a46cf4e1aa"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/eqtl/data/genotypes/chr22.bim": {
+      "reference": "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.bim",
+      "sha256": "15322620fbbf718df4660f48756304d1b99e05b9713adcb85f6d353df1d5d6d7"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/eqtl/data/genotypes/chr22.fam": {
+      "reference": "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.fam",
+      "sha256": "99abcb5c20ac7e76726990b13afdaebd7d29a7798ba70987e21f247d22e97a94"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/eqtl/data/covariates/covariates.fastqtl.txt": {
+      "reference": "/data/lhhung/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt",
+      "sha256": "3cb400dba06421204a5246fe63ca69ceb888aa166f8fc263f245352d5b81ab93"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/eqtl/runs/rapidglm/inputs/chr22.counts.bed": {
+      "reference": "/data/lhhung/rapidglm/validation/work/eqtl/runs/rapidglm/inputs/chr22.counts.bed",
+      "sha256": "65d870492b7958033fe4af1eb0a3a944554f3bc3f947458b20195fe9f9ab3455"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/eqtl/runs/rapidglm/inputs/library_sizes.tsv": {
+      "reference": "/data/lhhung/rapidglm/validation/work/eqtl/runs/rapidglm/inputs/library_sizes.tsv",
+      "sha256": "580ffd6ef98a8ff853f6b3e85f64eca48f7fd8136311aac6f687b8897d00d7d3"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/gasperini/responses.mtx": {
+      "reference": "/data/lhhung/rapidglm/validation/work/benchmark/gasperini/responses.mtx",
+      "sha256": "5c82ff3f54cc609c55f9042118d4423a7bdbe8ecbd5b15503aa5c3b29a3af6f5"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/gasperini/assignments.mtx": {
+      "reference": "/data/lhhung/rapidglm/validation/work/benchmark/gasperini/assignments.mtx",
+      "sha256": "269ff0977046281e17ddb78190d7970e6535441a2d460408d8c3106b1cf3100b"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/gasperini/design.tsv": {
+      "reference": "/data/lhhung/rapidglm/validation/work/benchmark/gasperini/design.tsv",
+      "sha256": "424623964e504aae85b7c34155ed712475494faf6591b3ea1dfab533ed2b936c"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/gasperini/guides.tsv": {
+      "reference": "/data/lhhung/rapidglm/validation/work/benchmark/gasperini/guides.tsv",
+      "sha256": "357c9a7235adad31a2ebb80fe13cef2fbb782f7fe5838ff35fd2cbc2f1285570"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/scaling-preview/inputs/pairs_t100_g7418.tsv": {
+      "reference": "/data/lhhung/rapidglm/validation/work/scaling-preview/inputs/pairs_t100_g7418.tsv",
+      "sha256": "a14a64f02819d35c8c2c7bc06e25effc6a9a6a3cf702f1ff6825d9e0d8452a11"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/sc/responses.mtx": {
+      "reference": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/sc/responses.mtx",
+      "sha256": "a4c09d30e6e578e59e6657c90aa9a092a0b51760726c1a604ee5eef926ee68aa"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/sc/assignments.mtx": {
+      "reference": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/sc/assignments.mtx",
+      "sha256": "7df276622394dbd0008fc32e6d285162204962a25b951a72c6dbf0124a521588"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/sc/guides.tsv": {
+      "reference": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/sc/guides.tsv",
+      "sha256": "79262d81ec223630ad137093bdecfbefcb67172d9d16bfe0448f5e6924ffa67c"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/sc/pairs.tsv": {
+      "reference": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/sc/pairs.tsv",
+      "sha256": "1fbf20bfc44cc3462bdf4c7f73d92adf6f8341b44153668fd45e71fab0baafdd"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/sc/covariates.tsv": {
+      "reference": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/sc/covariates.tsv",
+      "sha256": "1a7f2bc5874e65fcf94e8753b48b36e77edb44c60ab38c33403964f4d8e95717"
+    },
+    "/data/lhhung/rapidglm-1.6.0/validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/sc/responses.txt": {
+      "reference": "/data/lhhung/rapidglm/validation/work/replogle/k562-essential/pilot-v1.5.0-gpu/sc/responses.txt",
+      "sha256": "9182efe0304204a30418c55d364de3178557d6b0813748436d9fa81b54da4d79"
+    }
+  },
+  "protected_receipts_sha256": {
+    "NB_QTL_BATCH": "bbb050b34ba71b079e749ed6172179cd09291e694773d5ced27453f2d1f796cd",
+    "MERGEABLE_NULL": "92ab2ec9e0a44b0d6e298fe0350aa010b4be53bfe81aa637f9b3e81d128ea907",
+    "BATCH_SCORING": "04a2d9b619711870164e0e9e79dea16df3d4c27fd976fbabbd2f158c746a491c",
+    "BATCH_SCORING_DEV2": "72604ae9c8773f0ce4e1d91da93dd65598e684c46317ea05e6946caba6fc8db2",
+    "GASPERINI_FULL_CLOUD": "55a9b7d6fd45b0b89e5bf3ca68ef3eaed5905bfb35db5e649b444ab61afac7e3"
+  },
+  "gaussian_double_1_4_reference": {
+    "path": "/data/lhhung/rapidglm/validation/work/benchmark/runs-v1.4.0-final/eqtl/rapidglm_gaussian10000/chr22.cis.tsv",
+    "sha256": "7810433f3551e85a0a8e1647a2873a3b599c3e21d559b34ce58dc4b2e4de06c9"
+  },
+  "scope": "Focused changed-path agreement and five paired ablations. This is not a complete performance run.",
+  "deferred": [
+    "remaining bulk timing",
+    "cooks",
+    "rust",
+    "staging",
+    "pert50k",
+    "pertfull",
+    "seeds",
+    "untestable",
+    "reference-tool reruns",
+    "other CRT panels",
+    "Replogle pseudobulk",
+    "special",
+    "vmath_e2e",
+    "replogle_full",
+    "eqtl_gw",
+    "compress"
+  ],
+  "poisson_evidence": "Existing NB_QTL_BATCH.json development receipt and coordinator functional checks, with its documented Beta-fit differences; no new Poisson timing claim.",
+  "publication_authorized": false
+}

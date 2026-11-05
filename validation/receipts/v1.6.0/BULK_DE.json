@@ -1,0 +1,523 @@
+{
+  "purpose": "Validation of the bulk DE module (rapidglm bulk-de) against DESeq2 1.48.2.",
+  "commit": "ecc1334772356b99a36dca754d934c744a15773b",
+  "worktree_dirty": false,
+  "command": "python3 scripts/validate_bulk.py --work DIR --output validation/BULK_DE.json",
+  "datasets": {
+    "airway": {
+      "genes": 22369,
+      "size_factor_max_rel_diff": 3.1086244689504383e-15,
+      "trend": [
+        0.009821411197719548,
+        3.3494076147915357
+      ],
+      "trend_deseq2": [
+        0.00971745145105698,
+        3.47432427133504
+      ],
+      "prior_variance": [
+        0.4974974974974975,
+        0.528528528528528
+      ],
+      "median_rel_diff": {
+        "dispGeneEst": 0.0,
+        "dispersion": 0.010235569480131533,
+        "log2FoldChange": 0.000148753103855217,
+        "pvalue": 0.004337693162218219
+      },
+      "pvalue_spearman": 0.9998132796511495,
+      "discoveries": [
+        4833,
+        4834
+      ],
+      "jaccard": 0.9862338196013971,
+      "filter_threshold": [
+        5.250850615081963,
+        4.50051335737352
+      ],
+      "statuses": {
+        "ok": 22369
+      },
+      "rapidglm_seconds": {
+        "1": 0.8919939957559109,
+        "8": 0.25149334222078323
+      },
+      "deseq2_seconds": 5.129,
+      "shrinkage": {
+        "prior_variance": [
+          [
+            1000000,
+            0.10075310032063467,
+            0.21316325386821988,
+            0.18076416878667087,
+            0.27799692624288197
+          ],
+          [
+            1000000,
+            0.0985891511204749,
+            0.21072629334329,
+            0.179888709071967,
+            0.277772628465966
+          ]
+        ],
+        "genes_compared": 22369,
+        "genes_replaced": 0,
+        "missing": [
+          0,
+          0
+        ],
+        "lfc_pearson": 0.9998944797824405,
+        "lfc_abs_diff": {
+          "median": 0.00016244150189959755,
+          "p99": 0.013634540142026516
+        },
+        "se_rel_diff_median": 0.0024943054301551637,
+        "formula_from_deseq2_estimates": {
+          "prior_variance_rel_diff": 5.551115123125783e-16,
+          "genes": 2000,
+          "lfc_abs_diff": {
+            "median": 2.4915733226604786e-09,
+            "p99": 1.0049155673963118e-07,
+            "max": 6.445539730837169e-07
+          },
+          "se_rel_diff": {
+            "median": 2.782862829064925e-11,
+            "p99": 3.1514813114696946e-09,
+            "max": 1.743515698482412e-08
+          }
+        },
+        "seconds": {
+          "rapidglm_extra": 0.16226156428456306,
+          "deseq2_lfcshrink": 2.366
+        }
+      },
+      "identical_1_and_8_threads": true
+    },
+    "kang": {
+      "genes": 1000,
+      "size_factor_max_rel_diff": 3.774758283725532e-15,
+      "trend": [
+        0.057712232327893014,
+        0.45413678730795737
+      ],
+      "trend_deseq2": [
+        0.0577333165888217,
+        0.454168207886183
+      ],
+      "prior_variance": [
+        0.8798796469057446,
+        0.878151255741531
+      ],
+      "median_rel_diff": {
+        "dispGeneEst": 0.0,
+        "dispersion": 0.0008224804410755697,
+        "log2FoldChange": 2.179510058079041e-05,
+        "pvalue": 0.0005975742572109459
+      },
+      "pvalue_spearman": 0.999999291999292,
+      "discoveries": [
+        635,
+        635
+      ],
+      "jaccard": 1.0,
+      "filter_threshold": [
+        3.919121797927287,
+        3.91912179792729
+      ],
+      "statuses": {
+        "ok": 1000
+      },
+      "rapidglm_seconds": {
+        "1": 0.0783118437975645,
+        "8": 0.025862155482172966
+      },
+      "deseq2_seconds": 0.979,
+      "shrinkage": {
+        "prior_variance": [
+          [
+            1000000,
+            0.3126479166400078,
+            0.28512077603987473,
+            0.3312413469990979,
+            0.4560562067718683,
+            0.2263538729780838,
+            0.3190070739727382,
+            0.37402109527412575,
+            3.2354509050656435
+          ],
+          [
+            1000000,
+            0.312656246538951,
+            0.285122588396876,
+            0.331232622279438,
+            0.456065525727773,
+            0.226356040700292,
+            0.319007805494747,
+            0.374030478881609,
+            3.23535751552928
+          ]
+        ],
+        "genes_compared": 1000,
+        "genes_replaced": 0,
+        "missing": [
+          0,
+          0
+        ],
+        "lfc_pearson": 0.999999295370608,
+        "lfc_abs_diff": {
+          "median": 8.654591798495925e-06,
+          "p99": 0.0004988303059411659
+        },
+        "se_rel_diff_median": 0.0001801371319425371,
+        "formula_from_deseq2_estimates": {
+          "prior_variance_rel_diff": 2.220446049250313e-15,
+          "genes": 1000,
+          "lfc_abs_diff": {
+            "median": 6.408118813361341e-09,
+            "p99": 1.7538646861836233e-06,
+            "max": 0.05062232199487404
+          },
+          "se_rel_diff": {
+            "median": 1.3299783496734108e-10,
+            "p99": 2.8408189198802616e-08,
+            "max": 0.0059350141197302975
+          }
+        },
+        "seconds": {
+          "rapidglm_extra": 0.014438072219491005,
+          "deseq2_lfcshrink": 0.495
+        }
+      },
+      "identical_1_and_8_threads": true
+    },
+    "sim3": {
+      "genes": 4000,
+      "size_factor_max_rel_diff": 1.887379141862766e-15,
+      "trend": [
+        0.04744347833331786,
+        3.2135166519492935
+      ],
+      "trend_deseq2": [
+        0.0471578007774133,
+        3.21955820558183
+      ],
+      "prior_variance": [
+        0.25,
+        0.25
+      ],
+      "median_rel_diff": {
+        "dispGeneEst": 0.00010681618258139041,
+        "dispersion": 0.0020382948467076783,
+        "log2FoldChange": 3.197896930224827e-05,
+        "pvalue": 0.0005733885805334118
+      },
+      "pvalue_spearman": 0.9999989738927951,
+      "discoveries": [
+        239,
+        239
+      ],
+      "jaccard": 0.983402489626556,
+      "filter_threshold": [
+        3.784014333295168,
+        2.59007716836249
+      ],
+      "statuses": {
+        "ok": 3939,
+        "cooks_outlier": 61
+      },
+      "fdr_rapidglm": 0.12133891213389121,
+      "power_rapidglm": 0.5060240963855421,
+      "fdr_deseq2": 0.11715481171548117,
+      "power_deseq2": 0.5084337349397591,
+      "cooks_flags": {
+        "rapidglm": 61,
+        "deseq2": 61,
+        "both": 61,
+        "injected_outliers": 69,
+        "caught_rapidglm": 61,
+        "caught_deseq2": 61,
+        "replaced_rapidglm": 0,
+        "replaced_deseq2": 0
+      },
+      "rapidglm_seconds": {
+        "1": 0.09660950861871243,
+        "8": 0.07124022208154202
+      },
+      "deseq2_seconds": 1.148,
+      "shrinkage": {
+        "prior_variance": [
+          [
+            1000000,
+            1.2784492699329855
+          ],
+          [
+            1000000,
+            1.27841350798688
+          ]
+        ],
+        "genes_compared": 4000,
+        "genes_replaced": 0,
+        "missing": [
+          0,
+          0
+        ],
+        "lfc_pearson": 0.9999816668000402,
+        "lfc_abs_diff": {
+          "median": 4.155536522415515e-05,
+          "p99": 0.00689807329263882
+        },
+        "se_rel_diff_median": 0.0007223963261591138,
+        "formula_from_deseq2_estimates": {
+          "prior_variance_rel_diff": 5.329070518200751e-15,
+          "genes": 2000,
+          "lfc_abs_diff": {
+            "median": 2.5326388536275196e-09,
+            "p99": 5.985940595323864e-07,
+            "max": 0.03496462317760736
+          },
+          "se_rel_diff": {
+            "median": 2.286110190041768e-11,
+            "p99": 8.114220546584504e-09,
+            "max": 0.0026939268303789454
+          }
+        },
+        "seconds": {
+          "rapidglm_extra": 0.011666718870401382,
+          "deseq2_lfcshrink": 1.082
+        }
+      },
+      "identical_1_and_8_threads": true
+    },
+    "sim3b": {
+      "genes": 4000,
+      "size_factor_max_rel_diff": 2.3314683517128287e-15,
+      "trend": [
+        0.04822507568979723,
+        3.434460058089074
+      ],
+      "trend_deseq2": [
+        0.0479264921338429,
+        3.43915408249632
+      ],
+      "prior_variance": [
+        0.25,
+        0.25
+      ],
+      "median_rel_diff": {
+        "dispGeneEst": 0.00010982813908272435,
+        "dispersion": 0.0021773393699715616,
+        "log2FoldChange": 1.8220355679062258e-05,
+        "pvalue": 0.0005062301107441468
+      },
+      "pvalue_spearman": 0.9999989596990232,
+      "discoveries": [
+        201,
+        201
+      ],
+      "jaccard": 1.0,
+      "filter_threshold": [
+        2.310574940129906,
+        2.31057494012991
+      ],
+      "statuses": {
+        "ok": 3918,
+        "cooks_outlier": 82
+      },
+      "fdr_rapidglm": 0.0845771144278607,
+      "power_rapidglm": 0.43705463182897863,
+      "fdr_deseq2": 0.0845771144278607,
+      "power_deseq2": 0.43705463182897863,
+      "cooks_flags": {
+        "rapidglm": 82,
+        "deseq2": 82,
+        "both": 82,
+        "injected_outliers": 97,
+        "caught_rapidglm": 82,
+        "caught_deseq2": 82,
+        "replaced_rapidglm": 0,
+        "replaced_deseq2": 0
+      },
+      "rapidglm_seconds": {
+        "1": 0.09695623442530632,
+        "8": 0.05561104230582714
+      },
+      "deseq2_seconds": 1.139,
+      "shrinkage": {
+        "prior_variance": [
+          [
+            1000000,
+            1.3409481407789394
+          ],
+          [
+            1000000,
+            1.3438462565936
+          ]
+        ],
+        "genes_compared": 4000,
+        "genes_replaced": 0,
+        "missing": [
+          0,
+          0
+        ],
+        "lfc_pearson": 0.9999750883725946,
+        "lfc_abs_diff": {
+          "median": 9.416397364070406e-05,
+          "p99": 0.0027110704145353556
+        },
+        "se_rel_diff_median": 0.0011057256048881414,
+        "formula_from_deseq2_estimates": {
+          "prior_variance_rel_diff": 1.7763568394002505e-15,
+          "genes": 2000,
+          "lfc_abs_diff": {
+            "median": 2.1215788032630245e-09,
+            "p99": 5.782477392033723e-07,
+            "max": 0.07108872880052683
+          },
+          "se_rel_diff": {
+            "median": 1.5792311902629308e-11,
+            "p99": 4.28791807283168e-09,
+            "max": 0.0019305563631446532
+          }
+        },
+        "seconds": {
+          "rapidglm_extra": 0.010823337361216545,
+          "deseq2_lfcshrink": 1.081
+        }
+      },
+      "identical_1_and_8_threads": true
+    },
+    "sim8": {
+      "genes": 4000,
+      "size_factor_max_rel_diff": 4.107825191113079e-15,
+      "trend": [
+        0.07044834606957458,
+        2.056630878994212
+      ],
+      "trend_deseq2": [
+        0.0701449429664378,
+        2.06089142265851
+      ],
+      "prior_variance": [
+        0.25,
+        0.25
+      ],
+      "median_rel_diff": {
+        "dispGeneEst": 0.00013170011335068656,
+        "dispersion": 0.001248420039100653,
+        "log2FoldChange": 1.1956535922026431e-05,
+        "pvalue": 0.0003156184184568307
+      },
+      "pvalue_spearman": 0.9999486090592878,
+      "discoveries": [
+        253,
+        253
+      ],
+      "jaccard": 1.0,
+      "filter_threshold": [
+        0.8879425522696802,
+        0.88794255226968
+      ],
+      "statuses": {
+        "ok": 4000
+      },
+      "fdr_rapidglm": 0.05928853754940711,
+      "power_rapidglm": 0.6520547945205479,
+      "fdr_deseq2": 0.05928853754940711,
+      "power_deseq2": 0.6520547945205479,
+      "cooks_flags": {
+        "rapidglm": 0,
+        "deseq2": 0,
+        "both": 0,
+        "injected_outliers": 79,
+        "caught_rapidglm": 0,
+        "caught_deseq2": 0,
+        "replaced_rapidglm": 79,
+        "replaced_deseq2": 79
+      },
+      "rapidglm_seconds": {
+        "1": 0.13904457353055477,
+        "8": 0.046592310070991516
+      },
+      "deseq2_seconds": 2.458,
+      "shrinkage": {
+        "prior_variance": [
+          [
+            1000000,
+            0.29541880039713575
+          ],
+          [
+            1000000,
+            0.295544362759819
+          ]
+        ],
+        "genes_compared": 3921,
+        "genes_replaced": 79,
+        "missing": [
+          0,
+          0
+        ],
+        "lfc_pearson": 0.999999986240214,
+        "lfc_abs_diff": {
+          "median": 2.127922769790125e-05,
+          "p99": 0.00043221737769814195
+        },
+        "se_rel_diff_median": 0.00032273740243171645,
+        "replaced_lfc_abs_diff_median": 1.3780224458980397,
+        "formula_from_deseq2_estimates": {
+          "prior_variance_rel_diff": 1.0325074129013956e-14,
+          "genes": 2000,
+          "lfc_abs_diff": {
+            "median": 1.5276791302245782e-09,
+            "p99": 2.234992466337412e-07,
+            "max": 6.886763260327555e-06
+          },
+          "se_rel_diff": {
+            "median": 1.3198553361348786e-11,
+            "p99": 1.8251820210757329e-09,
+            "max": 6.748591641070334e-08
+          }
+        },
+        "seconds": {
+          "rapidglm_extra": 0.018009398132562637,
+          "deseq2_lfcshrink": 0.839
+        }
+      },
+      "identical_1_and_8_threads": true
+    }
+  },
+  "mock_null": {
+    "rapidglm": {
+      "tests": 70000,
+      "valid": 69995,
+      "rate_0_05": 0.023673119508536324,
+      "rate_0_01": 0.005357525537538396,
+      "rate_0_001": 0.0014572469462104437,
+      "bh_0_05_per_split": 0.4714285714285714
+    },
+    "deseq2": {
+      "tests": 70000,
+      "valid": 69995,
+      "rate_0_05": 0.023915993999571398,
+      "rate_0_01": 0.005371812272305165,
+      "rate_0_001": 0.0014572469462104437,
+      "bh_0_05_per_split": 0.4714285714285714
+    }
+  },
+  "gates": {
+    "G1_agreement": true,
+    "G2_calibration": true,
+    "G3_threads": true,
+    "G4_shrinkage": true
+  },
+  "passed": true,
+  "load_average": [
+    0.73046875,
+    0.33837890625,
+    1.0498046875
+  ],
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "ecc1334772356b99a36dca754d934c744a15773b",
+    "worktree_dirty": false
+  }
+}

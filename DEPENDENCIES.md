@@ -3,7 +3,7 @@
 | Component | Use | Licence | Distribution |
 |---|---|---|---|
 | RapidGLM code | engine, CLI, harness | MIT | this repository |
-| Boost headers (>=1.65) | probability functions, packed DynamicBitset membership, Boost.Test | BSL-1.0 | system dependency, no vendored source |
+| Boost headers (>=1.65) | probability functions, scalar digamma and trigamma with the double-precision policy, packed DynamicBitset membership, Boost.Test; Boost-derived fast-policy digamma and the measured trigamma alternative in `vmath.hpp` | BSL-1.0 | system dependency; the adapted polygamma kernels retain their copyright and full licence in the header and `LICENSES/Boost-1.0.txt` |
 | LAPACK / LAPACKE | Householder QR, condition estimates and SVD through the C interface; Cholesky factorizations above 16 columns and triangular solves only with `RAPIDGLM_LAPACK_SOLVES` | BSD-3-Clause | linked dependency, no vendored source |
 | OpenBLAS (or compatible BLAS/LAPACK) | optimized matrix kernels under LAPACK | BSD-3-Clause for OpenBLAS | linked dependency; thread-safe build with one internal worker for outer OpenMP |
 | C++17 standard library (host GCC libstdc++) | language runtime | GPL-3 with GCC Runtime Library Exception 3.1 | dynamically linked; exception permits MIT applications |
@@ -101,6 +101,14 @@ non-centrality is solved so that the moment estimate of the first Beta shape is
 
 edgeR and limma (GPL) were not read: `edger_ql` follows their papers, their
 documentation and black-box runs of edgeR 4.6.2 (METHODS.md).
+
+The fast-policy polygamma section of `include/rapidglm/vmath.hpp` adapts
+Boost.Math's double-precision rational approximations and recurrences
+(Copyright John Maddock 2006), with explicit FMA operations and AVX2 lanes.
+Its ordinary-recurrence digamma is selected for fast arrays; the trigamma
+candidate is retained as a measured alternative. These sections use the
+[Boost Software License 1.0](LICENSES/Boost-1.0.txt), reproduced in the header.
+The own log1p and positive-lgamma kernels retain RapidGLM's MIT licence.
 
 Boost licence: https://www.boost.org/LICENSE_1_0.txt
 GCC exception: https://www.gnu.org/licenses/gcc-exception-3.1.html

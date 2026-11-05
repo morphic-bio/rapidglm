@@ -1,0 +1,353 @@
+{
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "stages": {
+    "preprint_qtl": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "rapidglm_gaussian",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian/result.cis.tsv",
+              "sha256": "5672e7bc18e4c53fd77610785f7116233860d54a7598ef1b9ee503d96d42cbc5",
+              "reference_sha256": "5672e7bc18e4c53fd77610785f7116233860d54a7598ef1b9ee503d96d42cbc5",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            }
+          ],
+          "record_sha256": "8f10d17531aa8a04c8b9a53395eff7a7b5db204b66a500286bacd45c32215a00",
+          "fields": {
+            "permutation_fits": null,
+            "permutations_refitted": 0
+          }
+        },
+        {
+          "name": "rapidglm_gaussian10000",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/result.cis.tsv",
+              "sha256": "1711ddaee4ca140f6edd4e2ab4fc2cd63eb267b7172724cb8a7e51e171852508",
+              "reference_sha256": "1711ddaee4ca140f6edd4e2ab4fc2cd63eb267b7172724cb8a7e51e171852508",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            }
+          ],
+          "record_sha256": "c8e67239042b9defa25cbd0b0397a8f519de8ca23ebec497a457b191fdea2da5",
+          "fields": {
+            "permutation_fits": null,
+            "permutations_refitted": 0
+          }
+        },
+        {
+          "name": "rapidglm_gaussian10000_double",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000_double/result.cis.tsv",
+              "sha256": "7810433f3551e85a0a8e1647a2873a3b599c3e21d559b34ce58dc4b2e4de06c9",
+              "reference_sha256": "7810433f3551e85a0a8e1647a2873a3b599c3e21d559b34ce58dc4b2e4de06c9",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            }
+          ],
+          "record_sha256": "25a371ed0fb666f1c6fe9b5084d636bb8acb2f33b0f2145b9a9ba020c1ad3dc8",
+          "fields": {
+            "permutation_fits": null,
+            "permutations_refitted": 0
+          }
+        },
+        {
+          "name": "rapidglm_nb",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_nb/result.cis.tsv",
+              "sha256": "43a04d88969e723837a4824cffe13f2ea692450f6afe61c7c46e1f5dff55f053",
+              "reference_sha256": "75618e203ca9223eee7c47d49cc38ad3101771d2544279713c82ec90d6b7071f",
+              "agreement": {
+                "passed": true,
+                "rows": 580,
+                "required_columns_identical": true,
+                "max_beta_p_relative_difference": 7.888437513699684e-11,
+                "beta_p_relative_bound": 7.9e-11
+              }
+            }
+          ],
+          "record_sha256": "5a7c7aa4ad8d0c4de35fea63e50138c546da621fbd961c6f2631fcef5e76b300",
+          "fields": {
+            "permutation_fits": "lockstep",
+            "permutations_refitted": 0
+          }
+        },
+        {
+          "name": "qtl_nb_separate",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/qtl_nb_separate/result.cis.tsv",
+              "sha256": "75618e203ca9223eee7c47d49cc38ad3101771d2544279713c82ec90d6b7071f",
+              "reference_sha256": "75618e203ca9223eee7c47d49cc38ad3101771d2544279713c82ec90d6b7071f",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            }
+          ],
+          "record_sha256": "c8a03d8f52de6aa11b8d79d557c8b0ac19f7160a6c3f2bcf67d6d817cb88acac",
+          "fields": {
+            "permutation_fits": "separate",
+            "permutations_refitted": 0
+          }
+        }
+      ],
+      "checked_utc": "2026-11-01T02:12:16.538186+00:00"
+    },
+    "preprint_crt": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "crt_ks_default",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/result.tsv",
+              "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89",
+              "reference_sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            },
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/result.qq.tsv",
+              "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691",
+              "reference_sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            }
+          ],
+          "record_sha256": "d72d4117a6b675dbedbdf0595b0f9b59285e8a8a83be39d5b6ac019778fa424b",
+          "fields": {
+            "null_start_used": "cold",
+            "null_refined": 0,
+            "null_cold_refits": 0,
+            "batch_scoring": true,
+            "crt_draw_used": "hazard"
+          }
+        },
+        {
+          "name": "crt_ks_opt_out",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.tsv",
+              "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89",
+              "reference_sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            },
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.qq.tsv",
+              "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691",
+              "reference_sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            }
+          ],
+          "record_sha256": "db7f397068e2126d39e1c3da759fb7d33b45fe66c67fe519564b995292ec6e12",
+          "fields": {
+            "null_start_used": "cold",
+            "null_refined": 0,
+            "null_cold_refits": 0,
+            "batch_scoring": false,
+            "crt_draw_used": "hazard"
+          }
+        },
+        {
+          "name": "crt_default_default",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_default/result.tsv",
+              "sha256": "b75ca2be47f55d03d19ef42286046311415d670108fe71c709c06883aa11132a",
+              "reference_sha256": "b75ca2be47f55d03d19ef42286046311415d670108fe71c709c06883aa11132a",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            },
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_default/result.qq.tsv",
+              "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691",
+              "reference_sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            }
+          ],
+          "record_sha256": "05fb794258e86182aa48bf87cce625967f1405e8fc9ebfa5b5e7219a027f2996",
+          "fields": {
+            "null_start_used": "cold",
+            "null_refined": 0,
+            "null_cold_refits": 0,
+            "batch_scoring": true,
+            "crt_draw_used": "hazard"
+          }
+        },
+        {
+          "name": "crt_default_opt_out",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_opt_out/result.tsv",
+              "sha256": "b75ca2be47f55d03d19ef42286046311415d670108fe71c709c06883aa11132a",
+              "reference_sha256": "b75ca2be47f55d03d19ef42286046311415d670108fe71c709c06883aa11132a",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            },
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_default_opt_out/result.qq.tsv",
+              "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691",
+              "reference_sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691",
+              "agreement": {
+                "passed": true,
+                "byte_identical": true
+              }
+            }
+          ],
+          "record_sha256": "3948e9f740ec1ed705ca106b4a2f5ef6683b2ed5f7ddc1ef6140e6e4acc2800c",
+          "fields": {
+            "null_start_used": "cold",
+            "null_refined": 0,
+            "null_cold_refits": 0,
+            "batch_scoring": false,
+            "crt_draw_used": "hazard"
+          }
+        }
+      ],
+      "checked_utc": "2026-11-01T02:12:17.281746+00:00"
+    },
+    "preprint_replogle": {
+      "passed": true,
+      "commands": [
+        {
+          "name": "replogle_strict_default",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_strict_default/result.tsv",
+              "sha256": "5a43a46bd78af4aa9dcbddc4e35dde160b2f3069be76952148136acf4d564f35",
+              "reference_sha256": "49a4b906c9bc5035f4b4e05dd217518701d746b7de3b83b81d9e75b477541144",
+              "agreement": {
+                "passed": true,
+                "rows": 181280,
+                "statuses_identical": true,
+                "empirical_p_identical": true,
+                "empirical_rows": 165909,
+                "discoveries_identical": true,
+                "discoveries": 10979
+              }
+            }
+          ],
+          "record_sha256": "c141ac98be70529b646acd8104c76fab5ff6d867de7a638a2db65346debd69ec",
+          "fields": {
+            "null_start_used": "refine",
+            "null_refined": 174761,
+            "null_cold_refits": 0,
+            "batch_scoring": true,
+            "crt_draw_used": "hazard"
+          }
+        },
+        {
+          "name": "replogle_strict_opt_out",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_strict_opt_out/result.tsv",
+              "sha256": "49a4b906c9bc5035f4b4e05dd217518701d746b7de3b83b81d9e75b477541144",
+              "reference_sha256": "49a4b906c9bc5035f4b4e05dd217518701d746b7de3b83b81d9e75b477541144",
+              "agreement": {
+                "passed": true,
+                "rows": 181280,
+                "statuses_identical": true,
+                "empirical_p_identical": true,
+                "empirical_rows": 165909,
+                "discoveries_identical": true,
+                "discoveries": 10979
+              }
+            }
+          ],
+          "record_sha256": "c64374d5f8c41cc574623d99f111f1dc0815e9d0506692d4b0d26af63ef29b55",
+          "fields": {
+            "null_start_used": "cold",
+            "null_refined": 0,
+            "null_cold_refits": 0,
+            "batch_scoring": true,
+            "crt_draw_used": "hazard"
+          }
+        },
+        {
+          "name": "replogle_ks_default",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_ks_default/result.tsv",
+              "sha256": "372362b2bf6a86a929e16a51f55c155d13db7ec90a098bb5d9f3a981042b8000",
+              "reference_sha256": "33945d227639cdebda497b35fef426666481de142178a414a801d6a61b56aa05",
+              "agreement": {
+                "passed": true,
+                "rows": 181280,
+                "statuses_identical": true,
+                "empirical_p_identical": true,
+                "empirical_rows": 165218,
+                "discoveries_identical": true,
+                "discoveries": 10982
+              }
+            }
+          ],
+          "record_sha256": "c493e76a04e2357a9c4de661269d36cb86c1ac392e43ae3f49e01e5470a9ee7b",
+          "fields": {
+            "null_start_used": "refine",
+            "null_refined": 174761,
+            "null_cold_refits": 0,
+            "batch_scoring": true,
+            "crt_draw_used": "hazard"
+          }
+        },
+        {
+          "name": "replogle_ks_opt_out",
+          "checks": [
+            {
+              "file": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/replogle_ks_opt_out/result.tsv",
+              "sha256": "33945d227639cdebda497b35fef426666481de142178a414a801d6a61b56aa05",
+              "reference_sha256": "33945d227639cdebda497b35fef426666481de142178a414a801d6a61b56aa05",
+              "agreement": {
+                "passed": true,
+                "rows": 181280,
+                "statuses_identical": true,
+                "empirical_p_identical": true,
+                "empirical_rows": 165218,
+                "discoveries_identical": true,
+                "discoveries": 10982
+              }
+            }
+          ],
+          "record_sha256": "9575f5e1a347b390176c2ea38e7f0017d869953cc49799ef80bd7e51deb66ce8",
+          "fields": {
+            "null_start_used": "cold",
+            "null_refined": 0,
+            "null_cold_refits": 0,
+            "batch_scoring": true,
+            "crt_draw_used": "hazard"
+          }
+        }
+      ],
+      "checked_utc": "2026-11-01T02:12:21.464490+00:00"
+    }
+  }
+}

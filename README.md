@@ -25,58 +25,43 @@ One library serves several interfaces:
 
 ## Benchmarks
 
-The current release is **1.4.1**, which fixes undefined behavior for a
-zero-column weighted cross-product. The benchmark tables and receipts below
-remain **1.4.0 measurements** on `f0ecfbd` (`v1.4.0-dev.4`); they have not been
-remeasured for 1.4.1. [Patch validation](validation/receipts/v1.4.1/README.md).
+The current released version is **1.6.0**. The tables below report the completed 1.6.0 measurements.
 
-Version 1.4.0 uses the library code of `v1.4.0-dev.4`. All figures below come
-from the complete final release run, completed 2026-10-22; the
-[release receipts](validation/receipts/v1.4.0/README.md) retain source hashes,
-tests, all 18 stages and quiet-start evidence.
+RapidGLM **1.6.0** measurements on development tag `v1.6.0-dev.2` (`4505ef6afaa00a38c5c871ae0e12d531c91ec1cf`). All 24 stages passed the timing audit; the release library is unchanged from the measured dev.2 source.
 
-One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional.
-[Host details](docs/BENCHMARK.md#host). The table gives wall seconds at one /
-eight threads. RapidGLM uses its R interface here. Jaccard measures discovery
-overlap at FDR 0.1. The SCEPTRE rows use matched skew-normal acceptance
-(`fit_check: "ks"`); the stricter RapidGLM default adds confirmation draws.
-The R rows time API calls after input loading; SCEPTRE rows sum calibration,
-power and discovery calls, excluding setup.
+One AMD Threadripper PRO 5965WX workstation (Zen 3). Timed work uses one thread per physical core on CPUs 6-21, with SMT siblings 30-45 idle; one thread uses CPU 6, eight use 6-13, twelve use 6-17. Drivers and untimed checks use CPUs 0-5. Exclusive Slurm allocation; schedutil governor, boost enabled and SMT enabled, unchanged. Each timed command starts after two ten-second quiet samples. More than 5% other CPU activity on selected cores or any sibling invalidates the command. Host load, other-user processes and vLLM CPU use are retained per command. From the resumed bulk stage on 2026-11-03, a user-authorized runtime service cpuset confines vLLM to CPUs 0-5,22-29,46-47; the reservation receipt records its application and restoration. Earlier accepted measurements retain their original guarded host conditions.
 
-| Analysis | Reference (1 / 8) | RapidGLM (1 / 8) | Speedup | Jaccard |
-|---|---|---|---|---|
-| DESeq2 1.48.2, airway (8 samples) | 6.07 / 2.63 | 0.966 / 0.238 | 6.3× (1 thread) | 0.986 |
-| DESeq2, thyroid (128 samples) | 118 / 31.3 | 9.87 / 1.75 | 12.0× (1 thread) | 0.997 |
-| DESeq2, thyroid (647 samples) | 483 / 83.7 | 35.1 / 6.51 | 13.8× (1 thread) | 1.000 |
-| SCEPTRE 0.99.0, high MOI (50,000 cells) | 1,524 / 251 | 333 / 59.6 | 4.6× (1 thread) | 0.79 |
-| SCEPTRE, high MOI (207,324 cells) | – / 1,472 | – / 323 | 4.6× (8 threads) | 0.89 |
+The table gives wall seconds at one / eight threads through the R interface. Jaccard is discovery overlap at FDR 0.1. SCEPTRE comparisons use matched skew-normal acceptance (`fit_check: "ks"`); the stricter default is reported separately. API timings exclude input loading; CLI measurements are in the benchmark report.
 
-The speedup depends on the workload and acceptance rule. On the low-MOI
-Replogle pilot at 16 threads, whole-command speedups over SCEPTRE are
-4.38× with `ks` and
-1.63× with the strict default.
-[The benchmark](docs/BENCHMARK.md) reports both rules and interfaces separately.
-Across six high-MOI seeds, Jaccard with SCEPTRE ranges from
-0.89 to 0.96.
+| Analysis | Reference (1 / 8) | RapidGLM R (1 / 8) | Speedup | Jaccard |
+| --- | --- | --- | --- | --- |
+| DESeq2, airway (8 samples) | 5.12 / 2.48 | 0.847 / 0.244 | 6.05× (1 thread) | 0.9862 |
+| DESeq2, thyroid (128 samples) | 95.9 / 26.3 | 8.27 / 1.51 | 11.6× (1 thread) | 0.9975 |
+| DESeq2, thyroid (647 samples) | 401 / 70.2 | 30 / 5.54 | 13.4× (1 thread) | 0.9999 |
+| SCEPTRE, high MOI (50,000 cells) | 1.38e+03 / 207 | 246 / 35.9 | 5.6× (1 thread) | 0.8462 |
+| SCEPTRE, high MOI (207,324 cells) | — / 1.11e+03 | — / 182 | 6.1× (8 threads) | 0.8952 |
 
-- **GLM engine:** with R-compatible aliasing, all 39
-  identifiable accuracy problems fit;
-  maximum coefficient error 6.6e-07 in units of the reference standard error.
-  Median single-fit speedups are 5.4× over R `glm.fit`,
-  8.3× over statsmodels and 3.2× over fastglm
-  (one thread, n ≥ 100,000; [GLM comparison](docs/GLM_COMPARISON.md)).
-- **NB solvers:** 2.2–2.8× over tight Levenberg–Marquardt with fixed
-  dispersion and 1.7–5.8× over tight BFGS with estimated dispersion
-  on identical problems ([solver comparison](docs/SOLVERS.md)).
-- **Bulk agreement:** Jaccard 0.983–1.000
-  with DESeq2 on five validation datasets ([bulk DE](docs/BULK_DE.md)).
-- **Gaussian cis-QTL:** 1.29× over tensorQTL at
-  10,000 permutations on Geuvadis chromosome 22, with the agreement and scope in
-  [the QTL report](docs/QTL_GAUSSIAN_SPEED.md).
+With R-compatible aliasing, the engine fits 39 of 39 identifiable binary128-reference problems; maximum coefficient error is 1.729e-06 reference standard errors. See the [GLM comparison](docs/GLM_COMPARISON.md) and [NB solvers](docs/SOLVERS.md).
 
-Datasets, tool versions, timing scopes and all current tables are in
-[the benchmark](docs/BENCHMARK.md). Every current figure comes from a final
-receipt under [validation/](validation).
+Gaussian cis-QTL, both tools at 10,000 permutations on twelve cores:
+
+| Scope | RapidGLM seconds | tensorQTL seconds | tensorQTL / RapidGLM |
+| --- | --- | --- | --- |
+| Chromosome 22 | 35.86 | 107 | 2.983× |
+| Genome-wide | 1212 | 3069 | 2.531× |
+
+
+The full Replogle pseudobulk screen, sixteen single-thread workers per tool:
+
+| Workflow | Reference / RapidGLM screen time | Median discovery Jaccard |
+| --- | --- | --- |
+| DESeq2-style bulk DE | 5.123× | 1 |
+| edgeR-style quasi-likelihood | 7.544× | 1 |
+
+
+[Application benchmarks](docs/BENCHMARK.md), [bulk agreement](docs/BULK_DE.md) and [QTL details](docs/QTL_GAUSSIAN_SPEED.md) give timing scopes, agreements and limitations. The [receipt collection](validation/receipts/v1.6.0/README.md) retains tests, hashes, exits, quiet starts, CPU-policy checks and reruns.
+
+The previous 1.4.0/1.4.1 receipts used a different workstation. Compare reference/tool ratios measured on the same host; changes in absolute seconds do not isolate code changes.
 
 ## Quick start
 
@@ -139,6 +124,19 @@ expose the same functions.
   can bind to it the same way ([docs/C_API.md](docs/C_API.md#language-bindings)).
 - *Rust* ([bindings/rust](bindings/rust)): bindings over the C interface and a
   port of PyDESeq2's workflow whose per-gene fits run in RapidGLM.
+- *Special functions* (`include/rapidglm/vmath.hpp`, a standalone header):
+  RapidGLM's vectorized `log`, `log1p`, `exp`, `digamma` and `trigamma`, the
+  same bits on every processor within each division policy. `lgamma` uses
+  the C library in slow mode and RapidGLM's positive-argument kernel in fast
+  mode (negative arguments keep libm); also
+  `rapidglm_<f>_array` in the C interface, `rapidglm.special` in Python and
+  `special_<f>()` in R ([METHODS.md](METHODS.md#numerical-backend-special-functions)).
+
+The numerical policy defaults to `slow`. Set `RAPIDGLM_DIVISION=fast` before
+first use or pass an explicit `division="fast"` option for chips with fast
+division. [Backend choices](METHODS.md#division-policy) records the alternatives
+and accuracy checks; [CLI](docs/CLI.md) and [C API](docs/C_API.md) document the
+per-call options.
 
 ## Continuous integration and releases
 

@@ -1,0 +1,14 @@
+{
+  "label": "qtl-1793735089654604392",
+  "stages": [
+    "qtl"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T19:44:49.764511+00:00",
+  "finished_utc": "2026-11-03T20:49:57.830018+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 3845,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0656054355204105,
+  "cpu_policy_observed_quiet_starts": 8,
+  "error": null
+}

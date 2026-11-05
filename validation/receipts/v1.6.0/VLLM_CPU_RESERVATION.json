@@ -1,0 +1,56 @@
+{
+  "recorded_utc": "2026-11-03T10:47:11.400922+00:00",
+  "user_authorization": "You may adjust the vLLM to reserve those cores",
+  "service": "vllm-qwen36-27b.service",
+  "method": "systemd runtime AllowedCPUs cgroup v2 cpuset; no restart",
+  "allowed_cpus": "0-5,22-29,46-47",
+  "reserved_timed_cpus": "6-21",
+  "reserved_smt_siblings": "30-45",
+  "original_allowed_cpus": "",
+  "main_pid_unchanged": true,
+  "service_active": true,
+  "thread_count_verified": 369,
+  "all_service_threads_excluded_from_reserved_cpus": true,
+  "cpu_frequency_boost_smt_policy_unchanged": true,
+  "health_check": {
+    "exit": 0,
+    "http_status": "200",
+    "stderr": ""
+  },
+  "before_sha256": "adbc2a185f545e181638f14c8d44e44f81a37061ddb9b5d123e7012ac9ce6f46",
+  "after_sha256": "6a2a967a447648e2b80a32c035de4eb35823351823a9d09284d0caee2227e2fd",
+  "source_library_and_timing_guards_unchanged": true,
+  "restoration_scope": "Restore the original AllowedCPUs only after the complete 24-stage timed chain succeeds; leave the restriction in place for a failed-stage rerun.",
+  "restoration_command": [
+    "sudo",
+    "-n",
+    "systemctl",
+    "set-property",
+    "--runtime",
+    "vllm-qwen36-27b.service",
+    "AllowedCPUs="
+  ],
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  },
+  "restoration": {
+    "recorded_utc": "2026-11-04T08:21:10.004595+00:00",
+    "all_24_timed_stages_passed": true,
+    "original_allowed_cpus_restored": true,
+    "before": {
+      "MainPID": "2003847",
+      "EffectiveCPUs": "0-5 22-29 46-47",
+      "AllowedCPUs": "0-5 22-29 46-47",
+      "ActiveState": "active"
+    },
+    "after": {
+      "MainPID": "2003847",
+      "EffectiveCPUs": "0-5 22-29 46-47",
+      "AllowedCPUs": "",
+      "ActiveState": "active"
+    },
+    "service_restart_requested": false
+  }
+}

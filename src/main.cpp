@@ -40,6 +40,9 @@ int main(int argc, char **argv) {
                                 std::istreambuf_iterator<char>());
         std::istringstream config_stream(config_text);
         boost::property_tree::read_json(config_stream, config);
+        const vmath::DivisionScope division(
+            config.count("division") ? vmath::parse_division(config.get<std::string>("division"))
+                                     : DivisionMode::inherit);
         std::map<std::string, std::string> hashes;
         hashes[argv[2]] = io::file_sha1(argv[2]);
         if (command == "qtl")
@@ -141,7 +144,10 @@ int main(int argc, char **argv) {
         require(static_cast<bool>(out), "cannot create result table");
         std::size_t failures = 0, retained = responses.rows, calibration = 0, power = 0,
                     discoveries = 0, samplers_cached = 0, samplers_rebuilt = 0,
-                    sampler_cache_mb = 0, null_fits = 0;
+                    sampler_cache_mb = 0, null_fits = 0, null_refined = 0, null_cold_refits = 0;
+        // The null start of NT-control pairs (sceptre): asked for and used.
+        const auto null_start = config.get<std::string>("null_start", "refine");
+        bool null_start_refine_used = false;
         // By kind (discovery, negative control, positive control).
         std::array<std::size_t, 3> pairs_listed{}, pairs_passing_qc{}, family_sizes{};
         std::uint64_t seed = config.get<std::uint64_t>("seed", 1);
@@ -160,8 +166,9 @@ int main(int argc, char **argv) {
                                             : options.family == Family::negative_binomial ? "ql"
                                                                                           : "lr");
         const auto effect_fits = config.get<std::string>("effect_fits", "significant");
-        const auto crt_draw = config.get<std::string>("crt_draw", "thinned");
+        const auto crt_draw = config.get<std::string>("crt_draw", "hazard");
         const bool reuse_draws = config.get<bool>("reuse_draws", false);
+        const bool batch_scoring = config.get<bool>("batch_scoring", true);
         const bool shared_screen = config.get<bool>("shared_screen", false);
         const bool sequential_screen = config.get<bool>("sequential_screen", false);
         const double early_stop_p = config.get<double>("early_stop_p", 0.0);
@@ -172,6 +179,8 @@ int main(int argc, char **argv) {
         const bool grid_request = !targets_path.empty();
         const auto response_ids_path = config.get<std::string>("response_ids", "");
         for (const char *key : {"reuse_draws",
+                                "null_start",
+                                "batch_scoring",
                                 "shared_screen",
                                 "shared_screen_p",
                                 "sequential_screen",
@@ -196,9 +205,16 @@ int main(int argc, char **argv) {
         for (const char *key : {"effect_fits", "crt_draw", "fit_check", "confirm_draws"})
             io::require(command == "sceptre" || command == "scan" || !config.count(key),
                         std::string(key) + " is a scan or sceptre setting");
-        if (crt_draw == "hazard" && !aes_instructions())
-            std::cerr << "warning: this processor has no AES instructions, so crt_draw hazard "
-                         "draws with the thinned sampler (the same law, from thinned's stream)\n";
+        // hazard needs the processor's AES instructions; without them it draws
+        // with the thinned sampler. Runs that draw CRT labels warn of it, and the
+        // run record states the sampler used (crt_draw_used).
+        const bool hazard_fallback = crt_draw == "hazard" && !aes_instructions();
+        const auto warn_hazard_fallback = [&] {
+            if (hazard_fallback)
+                std::cerr
+                    << "warning: this processor has no AES instructions, so crt_draw hazard "
+                       "draws with the thinned sampler (the same law, from thinned's stream)\n";
+        };
         const auto calibration_name = config.get<std::string>("calibration", "permutation");
         for (const char *key : {"calibration", "predictors", "strata"})
             require(command == "scan" || !config.count(key),
@@ -240,6 +256,8 @@ int main(int argc, char **argv) {
             o.crt_draw = crt_draw == "direct"   ? CrtDraw::direct
                          : crt_draw == "hazard" ? CrtDraw::hazard
                                                 : CrtDraw::thinned;
+            if (o.calibration == Calibration::crt)
+                warn_hazard_fallback();
             o.effect_fits = effect_fits == "all"           ? EffectFits::all
                             : effect_fits == "significant" ? EffectFits::significant
                                                            : EffectFits::none;
@@ -392,6 +410,8 @@ int main(int argc, char **argv) {
             o.crt_draw = crt_draw == "direct"   ? CrtDraw::direct
                          : crt_draw == "hazard" ? CrtDraw::hazard
                                                 : CrtDraw::thinned;
+            if (o.crt)
+                warn_hazard_fallback();
             auto integration = config.get<std::string>("integration", "union");
             require(integration == "union" || integration == "singleton" ||
                         integration == "bonferroni",
@@ -441,7 +461,11 @@ int main(int argc, char **argv) {
                                  "which splits the targets into blocks that fit\n";
             };
             o.reuse_draws = reuse_draws;
+            o.batch_scoring = batch_scoring;
             o.shared_screen = shared_screen;
+            require(null_start == "refine" || null_start == "cold",
+                    "null_start must be refine/cold");
+            o.null_start = null_start == "cold" ? NullStart::cold : NullStart::refine;
             o.resampling.sequential_screen = sequential_screen;
             io::require(std::isfinite(early_stop_p) && early_stop_p >= 0 && early_stop_p < 1,
                         "early_stop_p must be in [0, 1); 0 turns it off");
@@ -536,6 +560,9 @@ int main(int argc, char **argv) {
                 samplers_cached = result.samplers_cached;
                 samplers_rebuilt = result.samplers_rebuilt;
                 null_fits = result.null_fits;
+                null_start_refine_used = result.null_start_used == NullStart::refine;
+                null_refined = result.null_refined;
+                null_cold_refits = result.null_cold_refits;
             } else {
                 tiled.emplace();
                 tiled->directory = checkpoint;
@@ -561,7 +588,7 @@ int main(int argc, char **argv) {
                 static const std::set<std::string> volatile_keys = {
                     "phase",          "tile",           "threads",        "output",
                     "checkpoint_dir", "parallel_draws", "parallel_pairs", "sampler_cache_mb",
-                    "draw_cache_mb"};
+                    "draw_cache_mb",  "batch_scoring"};
                 for (const auto &entry : config)
                     if (!volatile_keys.count(entry.first))
                         flatten(entry.first, entry.second);
@@ -575,6 +602,14 @@ int main(int argc, char **argv) {
                     parts.push_back("default:stream_keys=identity");
                 if (!config.count("adjustment_family"))
                     parts.push_back("default:adjustment_family=tested");
+                if (!config.count("null_start"))
+                    parts.push_back("default:null_start=refine");
+                // So are the CRT sampler and hazard's fallback without AES
+                // instructions: tiles drawn with and without them are not merged.
+                if (o.crt && !config.count("crt_draw"))
+                    parts.push_back("default:crt_draw=hazard");
+                if (o.crt && hazard_fallback)
+                    parts.push_back("crt_draw_used=thinned");
                 finish_hashes();
                 for (const auto &entry : hashes)
                     if (entry.first != argv[2])
@@ -590,6 +625,9 @@ int main(int argc, char **argv) {
                                                                assignments, guides, pairs, qc, o);
                 samplers_rebuilt = tiled->samplers_rebuilt;
                 null_fits = tiled->null_fits;
+                null_start_refine_used = tiled->null_refine;
+                null_refined = tiled->null_refined;
+                null_cold_refits = tiled->null_cold_refits;
                 if (!merged) {
                     warn_samplers(samplers_rebuilt);
                     out.close();
@@ -702,6 +740,8 @@ int main(int argc, char **argv) {
 #endif
         record << ",\n  \"config_path\": ";
         io::quoted(record, argv[2]);
+        record << ",\n  \"division\": ";
+        io::quoted(record, vmath::division_name());
         record << ",\n  \"parameters\": ";
         record << config_text;
         if (command == "bulk-de") {
@@ -742,6 +782,10 @@ int main(int argc, char **argv) {
             io::quoted(record, calibration_name);
             record << ",\n  \"effect_fits\": ";
             io::quoted(record, effect_fits);
+            record << ",\n  \"crt_draw\": ";
+            io::quoted(record, crt_draw);
+            record << ",\n  \"crt_draw_used\": ";
+            io::quoted(record, hazard_fallback ? "thinned" : crt_draw);
             record << ",\n  \"screen\": " << screen;
         }
         if (command == "sceptre") {
@@ -761,12 +805,12 @@ int main(int argc, char **argv) {
             record << ",\n  \"confirm_draws\": " << confirm;
             record << ",\n  \"crt_draw\": ";
             io::quoted(record, crt_draw);
-            // hazard needs the processor's AES instructions; without them it is thinned.
             record << ",\n  \"crt_draw_used\": ";
-            io::quoted(record, crt_draw == "hazard" && !aes_instructions() ? "thinned" : crt_draw);
+            io::quoted(record, hazard_fallback ? "thinned" : crt_draw);
             if (command == "sceptre") {
                 record << ",\n  \"count_matrix\": " << (count_matrix ? "true" : "false");
                 record << ",\n  \"reuse_draws\": " << (reuse_draws ? "true" : "false");
+                record << ",\n  \"batch_scoring\": " << (batch_scoring ? "true" : "false");
                 record << ",\n  \"shared_screen\": " << (shared_screen ? "true" : "false");
                 record << ",\n  \"sequential_screen\": " << (sequential_screen ? "true" : "false");
                 record << ",\n  \"early_stop_p\": " << early_stop_p;
@@ -790,6 +834,12 @@ int main(int argc, char **argv) {
                 by_kind("pairs_passing_qc", pairs_passing_qc);
                 by_kind("family_size", family_sizes);
                 record << ",\n  \"null_fits\": " << null_fits;
+                record << ",\n  \"null_start\": ";
+                io::quoted(record, null_start);
+                record << ",\n  \"null_start_used\": "
+                       << (null_start_refine_used ? "\"refine\"" : "\"cold\"")
+                       << ",\n  \"null_refined\": " << null_refined
+                       << ",\n  \"null_cold_refits\": " << null_cold_refits;
                 if (grid_request)
                     record << ",\n  \"grid\": true";
             }

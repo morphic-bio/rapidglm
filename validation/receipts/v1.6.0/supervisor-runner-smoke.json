@@ -1,0 +1,14 @@
+{
+  "label": "runner-smoke",
+  "stages": [
+    "smoke"
+  ],
+  "exit": 1,
+  "started_utc": "2026-10-30T07:56:56.167085+00:00",
+  "finished_utc": "2026-10-30T07:59:03.408702+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 126,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0433199256658554,
+  "cpu_policy_observed_quiet_starts": 2,
+  "error": null
+}

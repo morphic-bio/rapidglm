@@ -1,0 +1,14 @@
+{
+  "label": "glmspeed-1793347602222063679",
+  "stages": [
+    "glmspeed"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-30T08:06:42.327651+00:00",
+  "finished_utc": "2026-10-30T11:19:55.365120+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 11396,
+  "cpu_policy_maximum_poll_gap_seconds": 1.3480013124644756,
+  "cpu_policy_observed_quiet_starts": 411,
+  "error": null
+}

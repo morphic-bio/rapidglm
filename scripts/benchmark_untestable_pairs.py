@@ -173,6 +173,9 @@ def run(binary, work, name, config, cpus):
                         str(out.parent / f"{name}.json")], capture_output=True, text=True,
                        env={**os.environ, "OPENBLAS_NUM_THREADS": "1"})
     wall = time.time() - start
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        from quiet_run import finish_measurement
+        finish_measurement()
     (out.parent / f"{name}.time.log").write_text(r.stderr)
     if r.returncode:
         raise SystemExit(f"{name} failed: {r.stderr[-2000:]}")

@@ -1,0 +1,14 @@
+{
+  "label": "bulk-1793702313176199160",
+  "stages": [
+    "bulk"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T10:38:33.281469+00:00",
+  "finished_utc": "2026-11-03T13:26:25.180563+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 9907,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0638378337025642,
+  "cpu_policy_observed_quiet_starts": 206,
+  "error": null
+}

@@ -151,6 +151,7 @@ inline void parallel_for(std::size_t count, int threads, Function function) {
     require(threads > 0, "threads must be positive");
     require(count <= static_cast<std::size_t>(std::numeric_limits<std::int64_t>::max()),
             "batch too large");
+    const auto division = vmath::division_mode();
     std::exception_ptr failure;
     std::mutex mutex;
 #ifdef _OPENMP
@@ -158,6 +159,7 @@ inline void parallel_for(std::size_t count, int threads, Function function) {
 #endif
     for (std::int64_t i = 0; i < static_cast<std::int64_t>(count); ++i) {
         try {
+            const vmath::DivisionScope scope(division);
             function(static_cast<std::size_t>(i));
         } catch (...) {
             std::lock_guard<std::mutex> lock(mutex);
@@ -174,11 +176,13 @@ template <class Function>
 inline void task_for(std::size_t count, bool parallel, Function function) {
 #if defined(_OPENMP) && _OPENMP >= 201511
     if (parallel && omp_in_parallel()) {
+        const auto division = vmath::division_mode();
         std::exception_ptr failure;
         std::mutex mutex;
 #pragma omp taskloop grainsize(1) shared(function, failure, mutex)
         for (std::size_t i = 0; i < count; ++i) {
             try {
+                const vmath::DivisionScope scope(division);
                 function(i);
             } catch (...) {
                 std::lock_guard<std::mutex> lock(mutex);
@@ -199,6 +203,7 @@ inline void task_for(std::size_t count, bool parallel, Function function) {
 inline std::vector<FitResult> fit_batch(const Matrix &design, const SparseCSC &responses,
                                         FitOptions options = {}, int threads = 1,
                                         const Vector &theta_trend = {}) {
+    const vmath::DivisionScope division(options.division);
     responses.validate();
     design.validate();
     require(design.rows == responses.rows, "batch dimensions mismatch");

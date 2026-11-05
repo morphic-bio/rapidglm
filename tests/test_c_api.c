@@ -55,6 +55,15 @@ int main(void) {
     size_t length = 0, j, called = 0;
     const double *padj, *sf;
 
+    {
+        int previous = -9, original = rapidglm_division_mode();
+        CHECK(rapidglm_set_division(RAPIDGLM_DIVISION_FAST, &previous) == RAPIDGLM_OK);
+        CHECK(rapidglm_division_mode() == RAPIDGLM_DIVISION_FAST);
+        CHECK(rapidglm_set_division(77, NULL) != RAPIDGLM_OK);
+        CHECK(rapidglm_division_mode() == RAPIDGLM_DIVISION_FAST);
+        CHECK(rapidglm_set_division(previous, NULL) == RAPIDGLM_OK);
+        CHECK(rapidglm_division_mode() == original);
+    }
     build();
     counts.rows = SAMPLES;
     counts.cols = GENES;
@@ -66,6 +75,7 @@ int main(void) {
 
     rapidglm_fit_options_init(&fit);
     CHECK(rapidglm_fit_batch(&x, &counts, &fit, 2, &t) == RAPIDGLM_OK);
+    CHECK(rapidglm_table_scalar(t, "division_mode") == rapidglm_division_mode());
     CHECK(rapidglm_table_rows(t) == GENES);
     CHECK(rapidglm_table_numeric(t, "beta1") != NULL);
     CHECK(strcmp(rapidglm_table_text(t, "status", 0), "converged") == 0);
@@ -74,6 +84,7 @@ int main(void) {
     rapidglm_bulk_options_init(&bulk);
     bulk.lfc_shrinkage = RAPIDGLM_SHRINK_NORMAL;
     CHECK(rapidglm_bulk_de(&x, &counts, &bulk, &t) == RAPIDGLM_OK);
+    CHECK(rapidglm_table_scalar(t, "division_mode") == rapidglm_division_mode());
     CHECK(rapidglm_table_rows(t) == GENES);
     CHECK(rapidglm_table_columns(t) == 17);
     padj = rapidglm_table_numeric(t, "padj");

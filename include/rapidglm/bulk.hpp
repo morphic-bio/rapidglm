@@ -6,7 +6,6 @@
 #include <boost/math/distributions/fisher_f.hpp>
 #include <boost/math/distributions/gamma.hpp>
 #include <boost/math/distributions/normal.hpp>
-#include <boost/math/special_functions/trigamma.hpp>
 #include <optional>
 
 // Bulk RNA-seq differential expression following the procedure published for
@@ -62,6 +61,7 @@ struct BulkOptions {
     Vector lfc_prior_variance;
     std::uint64_t seed = 1; // prior-variance simulation (three or fewer residual df)
     int threads = 1;
+    DivisionMode division = DivisionMode::inherit;
 };
 struct BulkGene {
     std::string status = "not_run";
@@ -87,6 +87,19 @@ struct BulkResult {
     std::size_t replaced_genes = 0;
 };
 namespace detail {
+// A saturated observation has undefined Cook's distance. Round leverage close
+// to one before evaluating the denominator so a rounding error cannot make it
+// an arbitrarily large finite candidate for the legacy maximum-count rule.
+inline bool saturated_leverage(double leverage) {
+    return std::abs(leverage - 1) <= 4 * std::numeric_limits<double>::epsilon();
+}
+inline double cooks_distance(double residual, double leverage, std::size_t parameters) {
+    if (saturated_leverage(leverage))
+        leverage = 1;
+    return leverage < 1
+               ? residual * residual / parameters * leverage / ((1 - leverage) * (1 - leverage))
+               : nan;
+}
 // Median as R computes it: the mean of the two middle values for even counts.
 inline double median(Vector v) {
     require(!v.empty(), "median of no values");
@@ -462,10 +475,14 @@ inline FlooredFit floored_nb_fit(const Matrix &x, const Vector &y, const Vector 
     f.beta = std::move(start);
     const Vector beta_initial = f.beta;
     const double k = 1 / dispersion;
+    // The exponentials of whole vectors at once (vmath::exp_array).
     const auto floored_means = [&](const Vector &beta, Vector &mu) {
         mu = matvec(x, beta);
         for (std::size_t i = 0; i < n; ++i)
-            mu[i] = std::max(std::exp(mu[i] + offset[i]), min_mu);
+            mu[i] += offset[i];
+        vmath::exp_array(mu.data(), mu.data(), n);
+        for (std::size_t i = 0; i < n; ++i)
+            mu[i] = std::max(mu[i], min_mu);
     };
     // -2 times the NB log likelihood without its count-only terms.
     const auto deviance = [&](const Vector &mu) {
@@ -597,7 +614,8 @@ inline FlooredFit floored_nb_fit(const Matrix &x, const Vector &y, const Vector 
     f.floored = mu;
     f.mu = matvec(x, f.beta);
     for (std::size_t i = 0; i < n; ++i)
-        f.mu[i] = std::exp(f.mu[i] + offset[i]);
+        f.mu[i] += offset[i];
+    vmath::exp_array(f.mu.data(), f.mu.data(), n);
     f.deviance = deviance(f.mu);
     // Leverages diag(W^1/2 X (X'WX + ridge)^-1 X'W^1/2) at the floored weights.
     for (std::size_t i = 0; i < n; ++i)
@@ -974,6 +992,7 @@ nb_dispersions(const Matrix &design, const Matrix &counts, const Matrix &mu, con
 }
 inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
                           const BulkOptions &o = {}) {
+    const vmath::DivisionScope division(o.division);
     design.validate();
     counts.validate();
     const std::size_t m = counts.rows, genes = counts.cols, p = design.cols;
@@ -1243,7 +1262,7 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
     const double s_lr = detail::mad(residuals), df = static_cast<double>(m - p);
     out.log_residual_variance = s_lr * s_lr;
     out.prior_variance =
-        df > 3 ? std::max(s_lr * s_lr - boost::math::trigamma(df / 2), 0.25)
+        df > 3 ? std::max(s_lr * s_lr - detail::trigamma(df / 2), 0.25)
                : std::max(detail::simulated_prior_variance(residuals, df, o.seed, o.threads), 0.25);
     const detail::LogThetaPrior base_prior{0, out.prior_variance};
     // MAP dispersions; dispersion outliers keep the gene-wise estimate. Then the
@@ -1471,8 +1490,11 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
         return std::max((var - base_mean) / (base_mean * base_mean), 0.25 * trend);
     };
     std::vector<Vector> cooks(genes);
+    // Byte storage: each gene is written by one worker (vector<bool> would race).
+    std::vector<unsigned char> saturated(genes, 0);
     const auto cook_distances = [&](std::size_t j, const Vector &y, const FitResult &f) {
         Vector d(m, nan);
+        saturated[j] = 0;
         if (!f.ok() || f.fitted.size() != m || f.covariance.rows != p)
             return d;
         const double arob = o.legacy_cooks ? legacy_dispersion(y, out.genes[j].base_mean)
@@ -1485,8 +1507,9 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
                 for (std::size_t b = 0; b < p; ++b)
                     h += tested.x(i, a) * f.covariance(a, b) * tested.x(i, b);
             h *= w;
+            saturated[j] |= detail::saturated_leverage(h);
             const double r = (y[i] - mu) / std::sqrt(mu + arob * mu * mu);
-            d[i] = h < 1 ? r * r / p * h / ((1 - h) * (1 - h)) : nan;
+            d[i] = detail::cooks_distance(r, h, p);
         }
         return d;
     };
@@ -1647,7 +1670,10 @@ inline BulkResult bulk_de(const Matrix &design, const SparseCSC &counts,
             continue;
         g.max_cooks = max_cooks(cooks[j], 3, flag_limit);
         bool outlier = std::isfinite(g.max_cooks) && g.max_cooks > cutoff;
-        if (outlier && o.legacy_cooks) {
+        // An undefined saturated distance prevents establishing which sample
+        // has the largest distance. In that case a count-rank exemption cannot
+        // override an above-cutoff distance in an eligible replicated cell.
+        if (outlier && o.legacy_cooks && !saturated[j]) {
             // Legacy rule (PyDESeq2): not an outlier when three or more samples have
             // larger counts than the sample with the largest distance over all samples.
             const auto y = counts.column(j); // original counts

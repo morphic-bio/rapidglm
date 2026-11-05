@@ -86,6 +86,8 @@ inline int run_edger_ql(const Tree &config, const std::string &config_path, Hash
     };
     record << "{\"command\": \"edger-ql\", \"version\": \"" << version << "\", \"config\": ";
     quoted(record, config_path);
+    record << ",\n  \"division\": ";
+    quoted(record, vmath::division_name());
     record << ", \"samples\": " << counts.rows << ", \"genes\": " << counts.cols
            << ", \"kept\": " << result.kept << ", \"hypothesis\": ";
     hypothesis_record(record, hypothesis);

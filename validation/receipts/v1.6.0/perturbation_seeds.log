@@ -1,0 +1,6 @@
+{'seed': 20260930, 'pairs_tested_by_both': 9718, 'discoveries': 98, 'jaccard_with_sceptre': 0.8952380952380953}
+{'seed': 1, 'pairs_tested_by_both': 9718, 'discoveries': 103, 'jaccard_with_sceptre': 0.9065420560747663}
+{'seed': 2, 'pairs_tested_by_both': 9718, 'discoveries': 99, 'jaccard_with_sceptre': 0.9230769230769231}
+{'seed': 3, 'pairs_tested_by_both': 9718, 'discoveries': 97, 'jaccard_with_sceptre': 0.9603960396039604}
+{'seed': 4, 'pairs_tested_by_both': 9718, 'discoveries': 100, 'jaccard_with_sceptre': 0.9326923076923077}
+{'seed': 5, 'pairs_tested_by_both': 9718, 'discoveries': 100, 'jaccard_with_sceptre': 0.9142857142857143}

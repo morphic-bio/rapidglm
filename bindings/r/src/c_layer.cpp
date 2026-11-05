@@ -152,6 +152,8 @@ run_sceptre(const cpp11::doubles_matrix<> &design, const cpp11::integers &yp,
     integer("threads", s.threads);
     integer("stream_keys", s.stream_keys);
     integer("adjustment_family", s.family);
+    integer("null_start", s.null_start);
+    integer("batch_scoring", s.batch_scoring);
     real("screen", s.screen);
     real("alpha", s.alpha);
     real("lower_quantile", s.lower_quantile);

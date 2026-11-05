@@ -1,0 +1,18 @@
+{
+  "recorded_utc": "2026-11-03T10:33:38.295018+00:00",
+  "decision": "accepted_documented_reconstruction",
+  "user_answer": "Accept the documented reconstruction",
+  "accepted_evidence": [
+    "exact retained historical scientific diagnostics",
+    "byte comparison of new accepted results against reconstruction from preserved historical binaries"
+  ],
+  "original_historical_raw_tables_available": false,
+  "historical_raw_table_identity_established": false,
+  "scope": "Rust agreement for the resumed full 1.6.0 receipts run; no historical timings inferred from reconstruction",
+  "statement": "The user accepted exact retained historical scientific diagnostics plus byte comparison against a documented untimed reconstruction from the preserved historical binaries. The original historical raw tables are unavailable; byte identity with those deleted original tables remains unestablished.",
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

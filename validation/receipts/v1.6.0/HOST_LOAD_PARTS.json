@@ -1,0 +1,50 @@
+{
+  "recorded_utc": "2026-11-05T10:18:13.325365+00:00",
+  "original_compressed_file": "HOST_LOAD.jsonl.gz",
+  "original_compressed_sha256": "b20c2b851f465dbf71a4713ade2134aba2f3fbb54d118f7ec334b5c1f6b2370a",
+  "parts": [
+    {
+      "path": "host_load_parts/HOST_LOAD.jsonl.gz.part000",
+      "bytes": 50331648,
+      "sha256": "32c86b9d71563f0ff63552be46e029b755d839d23e00d1a18f8cdca5ccc6def2"
+    },
+    {
+      "path": "host_load_parts/HOST_LOAD.jsonl.gz.part001",
+      "bytes": 50331648,
+      "sha256": "e8b1b2429b8aa16276726b761f0441191a5a57718d4a08312b05783b0e468006"
+    },
+    {
+      "path": "host_load_parts/HOST_LOAD.jsonl.gz.part002",
+      "bytes": 50331648,
+      "sha256": "62f5d3793efeb6dee45aa8f2af3f2b5f7275093888e633637dd720b4df91eb69"
+    },
+    {
+      "path": "host_load_parts/HOST_LOAD.jsonl.gz.part003",
+      "bytes": 50331648,
+      "sha256": "0ced7417807559881b3f695ec6585aa5285fffae57420cf0a0a80fffd5965cf4"
+    },
+    {
+      "path": "host_load_parts/HOST_LOAD.jsonl.gz.part004",
+      "bytes": 50331648,
+      "sha256": "bdc1d85a8ac1c33d71b47936e74a4d3ccd270138b0f83e812900b139560840ae"
+    },
+    {
+      "path": "host_load_parts/HOST_LOAD.jsonl.gz.part005",
+      "bytes": 50331648,
+      "sha256": "4a9dee28f61dea989d923ddf4db5ab9ddbce627a2c3471366f0d3eafc378d5d1"
+    },
+    {
+      "path": "host_load_parts/HOST_LOAD.jsonl.gz.part006",
+      "bytes": 50331648,
+      "sha256": "6315805ef45becfc0acdf2159c2057a6023a0e9437f79686389061ebd86a1c98"
+    },
+    {
+      "path": "host_load_parts/HOST_LOAD.jsonl.gz.part007",
+      "bytes": 2717822,
+      "sha256": "a588e28541aa45f53ad7156cbec585e4016620c4a7824567514f310a26bebd82"
+    }
+  ],
+  "all_parts_sha256_verified": true,
+  "original_retained_on_gpu_server": true,
+  "reconstruction": "Concatenate the parts in listed order to recreate HOST_LOAD.jsonl.gz, then verify its SHA-256 and decompress. No bytes were removed."
+}

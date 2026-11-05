@@ -83,6 +83,12 @@ def confine(threads, args, label=None):
         wait_quiet(cpus or ALLOWED, label=label)
 
 
+def finish_measurement():
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        from quiet_run import finish_measurement as finish
+        finish()
+
+
 def generate(d, n, m, seed=20260929):
     rng = np.random.default_rng(seed)
     depth = rng.lognormal(np.log(5000), 0.5, n)
@@ -159,6 +165,7 @@ def main(args):
                 text=True,
                 check=True,
             )
+            finish_measurement()
             results.append(
                 dict(
                     tool="rapidglm fit_batch",
@@ -192,6 +199,7 @@ def main(args):
                 if tool != "rapidglm"
                 else f"R rapidglm::{'glm_fit' if family == 'poisson' else 'glm_nb'}"
             )
+            finish_measurement()
             results.append(
                 dict(
                     tool=label,
@@ -213,6 +221,7 @@ def main(args):
             confine(1, args, "batch nb glmGamPoi")
             r = subprocess.run(["Rscript", str(script), str(d), GGP_LIBS], env=ENV, capture_output=True,
                                text=True, check=True)
+            finish_measurement()
             info = json.loads(r.stdout.strip().splitlines()[-1])
             results.append(dict(tool="R glmGamPoi::glm_gp", family=family, threads=1, load=os.getloadavg()[0],
                                 seconds=info["seconds"], glmgampoi_version=info["version"]))
@@ -227,6 +236,7 @@ def main(args):
                 sub = Y
             confine(1, args, f"batch {family} Python {tool}")
             seconds, c = python_loop(tool, family, X, sub)
+            finish_measurement()
             results.append(
                 dict(
                     tool=f"Python {tool}",

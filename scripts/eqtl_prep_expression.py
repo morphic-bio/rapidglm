@@ -17,6 +17,7 @@ Outputs (in --out):
   expression_pcs.tsv            top expression PCs (from expr_int_allchr)
   chr{CHR}.counts.bed           integer counts (rounded), TSS BED, expressed genes on CHR
   chr{CHR}.expr_int.bed         inverse-normal TMM-CPM, expressed genes on CHR
+  autosomes.{counts,expr_int}.bed  the same for every expressed autosomal gene (--chr all)
 """
 import argparse
 import json
@@ -31,7 +32,7 @@ from scipy.stats import norm, rankdata
 p = argparse.ArgumentParser()
 p.add_argument("--geuv", required=True, help="directory with Geuvadis downloads")
 p.add_argument("--out", required=True)
-p.add_argument("--chr", default="22")
+p.add_argument("--chr", default="22", help="a chromosome, or all for every autosome")
 p.add_argument("--n-expr-pcs", type=int, default=20)
 p.add_argument("--min-rpkm", type=float, default=0.1)
 p.add_argument("--min-count", type=float, default=6)
@@ -143,17 +144,27 @@ be_k = int(np.argmax(var[:60] <= thr)) if (var[:60] <= thr).any() else 60
 summary["parallel_analysis_k_95pct"] = be_k
 
 # --- chromosome BEDs ---------------------------------------------------------------------
-sel = (gm_out.chr == a.chr).to_numpy()
-order = np.argsort(gm_out.tss.to_numpy()[sel], kind="stable")
+# --chr all: every expressed autosomal gene in one BED (autosomes.*.bed), ordered by
+# chromosome and then TSS; each chromosome's rows are those of its own BED, in its order.
+if a.chr == "all":
+    name = "autosomes"
+    sel = np.ones(len(gm_out), dtype=bool)
+    order = np.lexsort((gm_out.tss.to_numpy(), gm_out.chr.astype(int).to_numpy()))
+    in_gd660 = int(auto.sum())
+else:
+    name = f"chr{a.chr}"
+    sel = (gm_out.chr == a.chr).to_numpy()
+    order = np.argsort(gm_out.tss.to_numpy()[sel], kind="stable")
+    in_gd660 = int((meta.Chr == a.chr).sum())
 g = gm_out.loc[sel].iloc[order]
 bed_meta = pd.DataFrame({"#chr": g.chr.values, "start": g.tss.values - 1, "end": g.tss.values,
                          "gene_id": g.gene_id.values})
 cnt_bed = pd.concat([bed_meta, pd.DataFrame(Ck[sel][order].astype(np.int64), columns=info.iid)], axis=1)
 int_bed = pd.concat([bed_meta, pd.DataFrame(Z[sel][order], columns=info.iid)], axis=1)
-cnt_bed.to_csv(os.path.join(a.out, f"chr{a.chr}.counts.bed"), sep="\t", index=False)
-int_bed.to_csv(os.path.join(a.out, f"chr{a.chr}.expr_int.bed"), sep="\t", index=False, float_format="%.6g")
-summary[f"chr{a.chr}_genes"] = int(sel.sum())
-summary[f"chr{a.chr}_genes_in_GD660"] = int((meta.Chr == a.chr).sum())
+cnt_bed.to_csv(os.path.join(a.out, f"{name}.counts.bed"), sep="\t", index=False)
+int_bed.to_csv(os.path.join(a.out, f"{name}.expr_int.bed"), sep="\t", index=False, float_format="%.6g")
+summary[f"{name}_genes"] = int(sel.sum())
+summary[f"{name}_genes_in_GD660"] = in_gd660
 
 json.dump(summary, open(os.path.join(a.out, "prep_expression_summary.json"), "w"), indent=1)
 print(json.dumps(summary, indent=1))

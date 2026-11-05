@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(counter_rng_stream_is_unchanged) {
 BOOST_AUTO_TEST_CASE(batched_crt_draws_equal_per_draw_draws) {
     for (std::size_t n : {500u, 30000u}) {
         const auto p = probabilities(n);
-        const auto sampler = crt_sampler(p);
+        const auto sampler = crt_sampler(p, CrtDraw::thinned);
         std::vector<std::vector<std::size_t>> batch;
         SamplerScratch scratch;
         for (auto [first, count] :
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(batched_scores_and_null_draws_equal_v020) {
     BOOST_REQUIRE(null.ok());
     const ScoreWorkspace score(x, null);
     const BinaryScoreWorkspace binary(score);
-    const auto sampler = crt_sampler(p);
+    const auto sampler = crt_sampler(p, CrtDraw::thinned);
 
     // Blocked statistics equal one-at-a-time statistics and v0.2.0's.
     std::vector<std::vector<std::size_t>> draws;
@@ -415,21 +415,31 @@ BOOST_AUTO_TEST_CASE(pair_pipeline_results_do_not_depend_on_schedule) {
     for (std::size_t j = 0; j < genes; ++j)
         for (std::size_t t = 0; t + 1 < targets; ++t)
             pairs.push_back({j, "T" + std::to_string(t)});
-    auto run = [&](bool high_moi, int threads, bool parallel_draws, std::size_t cache) {
+    auto run = [&](bool high_moi, CrtDraw draw, int threads, bool parallel_draws,
+                   std::size_t cache) {
         SceptreOptions o;
         o.high_moi = high_moi;
         o.nt_controls = !high_moi;
         o.crt = high_moi;
+        o.crt_draw = draw;
         o.cell_qc = false;
         o.min_nonzero = 3;
         o.resampling.budgets = {99, 999};
         o.threads = threads;
         o.parallel_draws = parallel_draws;
         o.sampler_cache_bytes = cache;
+        o.batch_scoring = false; // the pair pipeline (batch scoring is tested below)
         return sceptre(x, responses, assignments, guides, pairs, {}, o);
     };
-    for (bool high_moi : {true, false}) {
-        const auto reference = run(high_moi, 1, false, 0);
+    // CRT with the default sampler (hazard) and with thinned, and permutations.
+    // Targets with a mean propensity below 1/16 (T2 on) use the sparse samplers.
+    std::vector<SceptreResult> crt;
+    for (auto [high_moi, draw] : {std::pair<bool, CrtDraw>{true, CrtDraw::hazard},
+                                  {true, CrtDraw::thinned},
+                                  {false, CrtDraw::hazard}}) {
+        const auto reference = run(high_moi, draw, 1, false, 0);
+        if (high_moi)
+            crt.push_back(reference);
         std::size_t ok = 0, ended = 0;
         for (const auto &r : reference.tests)
             (r.status == "ok" ? ok : ended) += 1;
@@ -439,7 +449,7 @@ BOOST_AUTO_TEST_CASE(pair_pipeline_results_do_not_depend_on_schedule) {
                                              {8, true, std::size_t(1) << 30},
                                              {16, false, std::size_t(1) << 30},
                                              {32, true, 50000}}) {
-            const auto other = run(high_moi, threads, draws, cache);
+            const auto other = run(high_moi, draw, threads, draws, cache);
             BOOST_REQUIRE(other.tests.size() == reference.tests.size());
             for (std::size_t k = 0; k < reference.tests.size(); ++k) {
                 const auto &a = reference.tests[k], &b = other.tests[k];
@@ -456,6 +466,14 @@ BOOST_AUTO_TEST_CASE(pair_pipeline_results_do_not_depend_on_schedule) {
             }
         }
     }
+    // hazard and thinned draw from different streams, except that without AES
+    // instructions hazard draws with the thinned sampler.
+    std::size_t differ = 0;
+    for (std::size_t k = 0; k < crt[0].tests.size(); ++k) {
+        const auto &a = crt[0].tests[k], &b = crt[1].tests[k];
+        differ += !(a.p_value == b.p_value || (std::isnan(a.p_value) && std::isnan(b.p_value)));
+    }
+    BOOST_TEST((differ > 0) == aes_instructions());
 }
 
 BOOST_AUTO_TEST_CASE(reused_draws_are_shared_by_a_targets_genes) {
@@ -656,40 +674,57 @@ BOOST_AUTO_TEST_CASE(sharded_runs_equal_a_single_run) {
                     compact += f.ok() && f.fitted.empty();
                 BOOST_TEST(compact > 0u); // rebuilt rather than stored
             }
-            // Tiles of 2 targets x 3 responses, in an arbitrary order.
-            std::vector<PairResult> records(layout.task_response.size());
-            for (std::size_t tb = 0; tb < layout.targets; tb += 2)
-                for (std::size_t rb = 0; rb < d.responses.cols; rb += 3) {
-                    std::vector<std::size_t> tasks;
-                    for (std::size_t i = 0; i < records.size(); ++i)
-                        if (layout.task_target[i] / 2 == tb / 2 &&
-                            layout.task_response[i] / 3 == rb / 3)
-                            tasks.push_back(i);
-                    if (tasks.empty())
-                        continue;
-                    SceptreShard shard;
-                    shard.tasks = &tasks;
-                    shard.nulls = high_moi ? &nulls : nullptr;
-                    auto part =
-                        sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o, shard);
-                    BOOST_REQUIRE(part.tests.size() == tasks.size());
-                    for (std::size_t k = 0; k < tasks.size(); ++k)
-                        records[tasks[k]] = part.tests[k];
+            // Tiles of 2 targets x 3 responses, in an arbitrary order; without
+            // and with the score states and propensity models kept across them.
+            for (bool keep : {false, true}) {
+                std::vector<detail::ScoreState> states;
+                std::vector<detail::PropensityState> propensities;
+                std::vector<PairResult> records(layout.task_response.size());
+                for (std::size_t tb = 0; tb < layout.targets; tb += 2)
+                    for (std::size_t rb = 0; rb < d.responses.cols; rb += 3) {
+                        std::vector<std::size_t> tasks;
+                        for (std::size_t i = 0; i < records.size(); ++i)
+                            if (layout.task_target[i] / 2 == tb / 2 &&
+                                layout.task_response[i] / 3 == rb / 3)
+                                tasks.push_back(i);
+                        if (tasks.empty())
+                            continue;
+                        SceptreShard shard;
+                        shard.tasks = &tasks;
+                        shard.nulls = high_moi ? &nulls : nullptr;
+                        shard.score_states = keep && high_moi ? &states : nullptr;
+                        shard.propensities = keep && o.crt ? &propensities : nullptr;
+                        auto part = sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {},
+                                            o, shard);
+                        BOOST_REQUIRE(part.tests.size() == tasks.size());
+                        for (std::size_t k = 0; k < tasks.size(); ++k)
+                            records[tasks[k]] = part.tests[k];
+                    }
+                SceptreShard finish;
+                finish.results = &records;
+                finish.nulls = high_moi ? &nulls : nullptr;
+                const auto merged =
+                    sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o, finish);
+                BOOST_REQUIRE(merged.tests.size() == single.tests.size());
+                std::size_t effects = 0;
+                for (std::size_t k = 0; k < single.tests.size(); ++k) {
+                    BOOST_TEST(same_record(merged.tests[k], single.tests[k]));
+                    effects += std::isfinite(single.tests[k].log2fc);
                 }
-            SceptreShard finish;
-            finish.results = &records;
-            finish.nulls = high_moi ? &nulls : nullptr;
-            const auto merged =
-                sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o, finish);
-            BOOST_REQUIRE(merged.tests.size() == single.tests.size());
-            std::size_t effects = 0;
-            for (std::size_t k = 0; k < single.tests.size(); ++k) {
-                BOOST_TEST(same_record(merged.tests[k], single.tests[k]));
-                effects += std::isfinite(single.tests[k].log2fc);
+                BOOST_TEST(effects > 0u);
+                BOOST_TEST(merged.discovery_rejections == single.discovery_rejections);
+                BOOST_TEST(merged.calibration_qq.size() == single.calibration_qq.size());
+                if (keep) {
+                    // Every tested response's state and every target's model were kept.
+                    std::size_t kept_states = 0, kept_models = 0;
+                    for (const auto &s : states)
+                        kept_states += s.ready;
+                    for (const auto &m : propensities)
+                        kept_models += m.ready;
+                    BOOST_TEST((kept_states > 0u) == high_moi);
+                    BOOST_TEST((kept_models > 0u) == o.crt);
+                }
             }
-            BOOST_TEST(effects > 0u);
-            BOOST_TEST(merged.discovery_rejections == single.discovery_rejections);
-            BOOST_TEST(merged.calibration_qq.size() == single.calibration_qq.size());
         }
     }
 }
@@ -1744,4 +1779,179 @@ BOOST_AUTO_TEST_CASE(a_grid_request_gives_the_records_of_the_listed_pairs) {
     o.stream_keys = StreamKeys::position;
     BOOST_CHECK_THROW(sceptre_grid(d.x, d.responses, d.assignments, d.guides, grid, {}, o),
                       std::invalid_argument);
+}
+
+// ---- 1.6.0: batch scoring, every pair of a response scored stage by stage in
+// one pass over the response's records (SceptreOptions::batch_scoring).
+BOOST_AUTO_TEST_CASE(batched_scoring_kernels_equal_the_per_draw_sums) {
+    // 70,000 cells: three blocks of the default size. Six design columns give
+    // records of eight doubles (the AVX2 kernel where available), three give
+    // five (the generic kernel).
+    const std::size_t n = 70000;
+    for (std::size_t p : {std::size_t(6), std::size_t(3)}) {
+        Matrix x(n, p, 1);
+        Vector y(n);
+        for (std::size_t i = 0; i < n; ++i) {
+            for (std::size_t j = 1; j < p; ++j)
+                x(i, j) = std::cos(0.37 * static_cast<double>(j) * static_cast<double>(i % 997));
+            y[i] = static_cast<double>((i * 2654435761u >> 9) % 7 / 3);
+        }
+        FitOptions fo;
+        const auto null = fit_sceptre_null(x, y, fo);
+        BOOST_REQUIRE(null.ok());
+        const ResamplingWorkspace w(x, null);
+        // 300 draws of about 0.5% to 3% of the cells, an empty draw and a draw of
+        // one cell in the last block.
+        std::vector<std::vector<std::uint32_t>> draws(302);
+        std::vector<std::vector<std::size_t>> selected(draws.size());
+        for (std::size_t d = 0; d < 300; ++d)
+            for (std::size_t i = 0; i < n; ++i)
+                if ((i * 40503u + d * 2654435761u) % 1000 < 5 + d % 25)
+                    draws[d].push_back(static_cast<std::uint32_t>(i));
+        draws[301].push_back(static_cast<std::uint32_t>(n - 1));
+        for (std::size_t d = 0; d < draws.size(); ++d)
+            selected[d].assign(draws[d].begin(), draws[d].end());
+        Vector reference(draws.size()), sums;
+        BinaryScoreScratch scratch;
+        std::vector<std::size_t> cursor;
+        w.binary.statistics(selected, selected.size(), reference.data(), scratch, sums, cursor);
+        for (std::size_t block :
+             {detail::batch_cell_block, std::size_t(1000), std::size_t(7), n + 5})
+            for (bool vectorized : {true, false}) {
+                Vector out(draws.size(), rapidglm::nan);
+                std::vector<detail::ScoreDraw> list;
+                for (std::size_t d = 0; d < draws.size(); ++d)
+                    list.push_back(
+                        {draws[d].data(), static_cast<std::uint32_t>(draws[d].size()), &out[d]});
+                detail::BatchScoreScratch batch;
+                detail::score_draws(w.binary, list.data(), list.size(), batch, block, vectorized);
+                BOOST_TEST(std::memcmp(out.data(), reference.data(), out.size() * sizeof(double)) ==
+                           0);
+            }
+        // A cell beyond the observations is an error, not a silent omission.
+        std::vector<std::uint32_t> beyond{1, static_cast<std::uint32_t>(n)};
+        double out = 0;
+        const detail::ScoreDraw bad{beyond.data(), 2, &out};
+        detail::BatchScoreScratch batch;
+        BOOST_CHECK_THROW(detail::score_draws(w.binary, &bad, 1, batch), std::invalid_argument);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(batched_scoring_gives_the_records_of_the_pair_pipeline) {
+    const auto d = screen_data();
+    // default; reuse_draws; reuse_draws with a draw budget too small to store a
+    // stage, so the draws are drawn for each pair; the default with every
+    // sampler rebuilt for each pair; one test per guide; position stream keys;
+    // and confirmation draws (strict fit check, small budgets).
+    for (int variant = 0; variant < 7; ++variant) {
+        auto o = screen_options(variant == 1 || variant == 2 ? 1 : variant == 4 ? 4 : 0, true);
+        if (variant == 2)
+            o.draw_cache_bytes = 1000;
+        if (variant == 3)
+            o.sampler_cache_bytes = 0;
+        if (variant == 5)
+            o.stream_keys = StreamKeys::position;
+        if (variant == 6) {
+            o.resampling.budgets = {99, 299};
+            o.resampling.confirm = 2999;
+            o.resampling.screen = 0.5;
+            o.effect_fits = EffectFits::all;
+        }
+        o.batch_scoring = false;
+        o.threads = 1;
+        const auto pipeline = sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+        std::size_t ok = 0, later = 0;
+        for (const auto &r : pipeline.tests) {
+            ok += r.status == "ok";
+            later += r.draws > 99;
+        }
+        BOOST_TEST(ok > 20u);
+        BOOST_TEST(later > 0u);
+        o.batch_scoring = true;
+        for (int threads : {1, 3, 8}) {
+            o.threads = threads;
+            const auto batched = sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+            BOOST_REQUIRE(batched.tests.size() == pipeline.tests.size());
+            for (std::size_t k = 0; k < pipeline.tests.size(); ++k)
+                BOOST_TEST(same_record(batched.tests[k], pipeline.tests[k]),
+                           "variant " << variant << ", " << threads << " threads, record " << k);
+            BOOST_TEST(batched.null_fits == pipeline.null_fits);
+            BOOST_TEST(batched.calibration_rejections == pipeline.calibration_rejections);
+            BOOST_TEST(batched.power_rejections == pipeline.power_rejections);
+            BOOST_TEST(batched.discovery_rejections == pipeline.discovery_rejections);
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(batched_scoring_applies_to_crt_with_complement_controls_only) {
+    // Permutations, non-targeting controls and staged screens keep the pair
+    // pipeline whatever the option; their records are unchanged by it.
+    const auto d = screen_data();
+    for (int mode : {2, 3})
+        for (bool high_moi : {true, false}) {
+            if (mode == 2 && !high_moi)
+                continue; // shared_screen needs complement controls
+            auto o = screen_options(mode, high_moi);
+            o.batch_scoring = false;
+            const auto off = sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+            o.batch_scoring = true;
+            const auto on = sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+            BOOST_REQUIRE(on.tests.size() == off.tests.size());
+            for (std::size_t k = 0; k < on.tests.size(); ++k)
+                BOOST_TEST(same_record(on.tests[k], off.tests[k]));
+        }
+}
+
+BOOST_AUTO_TEST_CASE(batched_scoring_transposed_draws_equal_the_per_draw_sums) {
+    // Stored draws of five targets over 70,000 cells, transposed in a group of
+    // four (one target alone), against the per-draw sums of statistics_of.
+    const std::size_t n = 70000;
+    for (std::size_t p : {std::size_t(6), std::size_t(3)}) {
+        Matrix x(n, p, 1);
+        Vector y(n);
+        for (std::size_t i = 0; i < n; ++i) {
+            for (std::size_t j = 1; j < p; ++j)
+                x(i, j) = std::cos(0.37 * static_cast<double>(j) * static_cast<double>(i % 997));
+            y[i] = static_cast<double>((i * 2654435761u >> 9) % 7 / 3);
+        }
+        FitOptions fo;
+        const auto null = fit_sceptre_null(x, y, fo);
+        BOOST_REQUIRE(null.ok());
+        const ResamplingWorkspace w(x, null);
+        std::vector<std::shared_ptr<const CachedDraws>> stored;
+        for (std::uint64_t t = 0; t < 5; ++t) {
+            Vector prob(n);
+            for (std::size_t i = 0; i < n; ++i)
+                prob[i] = 0.002 + 0.01 * std::fmod(0.6180339887 * static_cast<double>(i + t), 1.0);
+            const auto sampler = crt_sampler(prob, CrtDraw::thinned);
+            stored.push_back(std::make_shared<const CachedDraws>(sampler, 7, t, 0, 499, n));
+            detail::check_draws(*stored.back(), n);
+        }
+        for (const auto &group :
+             {std::vector<std::size_t>{0, 1, 2, 3}, std::vector<std::size_t>{4}}) {
+            std::vector<const CachedDraws *> members;
+            for (auto t : group)
+                members.push_back(stored[t].get());
+            const auto transposed = detail::transpose_draws(members, n);
+            BOOST_TEST(transposed.draws == 499 * group.size());
+            std::vector<std::vector<std::size_t>> selected;
+            for (const auto *c : members)
+                for (std::size_t d = 0; d < c->count; ++d)
+                    selected.emplace_back(c->cells.begin() + c->offsets[d],
+                                          c->cells.begin() + c->offsets[d + 1]);
+            Vector reference(selected.size()), sums;
+            BinaryScoreScratch scratch;
+            std::vector<std::size_t> cursor;
+            w.binary.statistics(selected, selected.size(), reference.data(), scratch, sums, cursor);
+            for (bool vectorized : {true, false}) {
+                detail::BatchScoreScratch batch;
+                detail::transposed_sums(w.binary, transposed, batch, vectorized);
+                Vector out(selected.size());
+                for (std::size_t d = 0; d < out.size(); ++d)
+                    out[d] = detail::statistic_of_sums(w.binary, d, batch);
+                BOOST_TEST(std::memcmp(out.data(), reference.data(), out.size() * sizeof(double)) ==
+                           0);
+            }
+        }
+    }
 }

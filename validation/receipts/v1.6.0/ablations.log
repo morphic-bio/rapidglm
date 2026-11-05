@@ -1,0 +1,2 @@
+{"load_before": 4.41, "wall_seconds": 1321.3, "cpu_seconds": 16050.5, "peak_rss_gb": 2.35, "load_average": 18.88, "workflow_wall_seconds": 1321.164660056, "null_fits": 174761, "null_start_used": "cold", "null_refined": 0, "null_cold_refits": 0, "crt_draw_used": "hazard"}
+{"load_before": 6.45, "wall_seconds": 521.14, "cpu_seconds": 7563.9, "peak_rss_gb": 2.17, "load_average": 19.23, "workflow_wall_seconds": 521.018423379, "null_fits": 174761, "null_start_used": "cold", "null_refined": 0, "null_cold_refits": 0, "crt_draw_used": "hazard"}

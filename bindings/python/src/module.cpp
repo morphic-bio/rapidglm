@@ -24,7 +24,9 @@ PYBIND11_MODULE(_rapidglm, m) {
         "fit",
         [](Array x, Array y, Array weights, Array offset, Array start, const std::string &family,
            double theta, bool estimate_theta, double tolerance, std::size_t max_iterations,
-           bool singular_ok, double alias_tolerance) {
+           bool singular_ok, double alias_tolerance, const std::string &division) {
+            const vmath::DivisionScope scope(division.empty() ? DivisionMode::inherit
+                                                              : vmath::parse_division(division));
             if (x.ndim() != 2)
                 throw std::invalid_argument("exog must be two-dimensional");
             Matrix design(static_cast<std::size_t>(x.shape(0)),
@@ -61,6 +63,7 @@ PYBIND11_MODULE(_rapidglm, m) {
             for (std::size_t j = 0; j < p && j < r.aliased.size(); ++j)
                 aliased[j] = r.aliased[j] != 0;
             py::dict out;
+            out["division"] = vmath::division_name();
             out["status"] = status_name(r.status);
             out["converged"] = r.ok();
             out["iterations"] = r.iterations;
@@ -82,5 +85,5 @@ PYBIND11_MODULE(_rapidglm, m) {
         py::arg("x"), py::arg("y"), py::arg("weights"), py::arg("offset"), py::arg("start"),
         py::arg("family"), py::arg("theta") = 10.0, py::arg("estimate_theta") = false,
         py::arg("tolerance") = 1e-9, py::arg("max_iterations") = 100, py::arg("singular_ok") = true,
-        py::arg("alias_tolerance") = 1e-11);
+        py::arg("alias_tolerance") = 1e-11, py::arg("division") = "");
 }

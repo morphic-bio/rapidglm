@@ -9,9 +9,10 @@
 \usage{
 glm_nb(formula, data, weights, subset, na.action, start = NULL, etastart, mustart,
        control = glm.control(...), method = "glm.fit", model = TRUE, x = FALSE,
-       y = TRUE, contrasts = NULL, ..., init.theta, link = log)
+       y = TRUE, contrasts = NULL, ..., init.theta, link = log, division = NULL)
 }
 \arguments{
+\item{division}{Optional numerical backend policy, \code{"slow"} or \code{"fast"}; \code{NULL} inherits the environment/build default.}
   \item{formula, data, weights, subset, na.action, start, etastart, mustart, control,
         method, model, x, y, contrasts, ..., init.theta, link}{
     As for \code{\link[MASS]{glm.nb}}. Links other than log, or supplied

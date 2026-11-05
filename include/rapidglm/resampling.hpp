@@ -594,7 +594,8 @@ inline Sampler permutation_sampler(const Vector &labels,
 // comes out in order; its gaps use an AES generator (AesCounterRng). On a
 // processor without AES instructions hazard draws as thinned does, from
 // thinned's stream. When the mean probability is at least 1/16 none has an
-// advantage and the direct stream is used.
+// advantage and the direct stream is used. hazard is the default; thinned was
+// the default of releases before 1.6.0.
 enum class CrtDraw { thinned, direct, hazard };
 // How a skew-normal fit to the null statistics is accepted. ks: its
 // Kolmogorov-Smirnov discrepancy alone, the check of releases before 1.0.0.
@@ -753,8 +754,8 @@ inline constexpr std::size_t crt_sampler_bytes_per_observation = 12;
 // `aes`: whether hazard may use the AES generator; by default, whether the
 // processor has AES instructions. Without it hazard is thinned. (Passing true
 // on a processor without the instructions computes the same draws by table
-// lookups, slowly.)
-inline Sampler crt_sampler(Vector probabilities, CrtDraw method = CrtDraw::thinned,
+// lookups, slowly; passing false gives the fallback on any processor.)
+inline Sampler crt_sampler(Vector probabilities, CrtDraw method = CrtDraw::hazard,
                            bool aes = aes_instructions()) {
     double expected = 0;
     for (double p : probabilities) {
@@ -980,6 +981,10 @@ struct BinaryScoreWorkspace {
                 record[2 + j] = s.design(i, j) * s.weights[i];
         }
     }
+    // Records for a caller that fills them (cells, then inverse).
+    BinaryScoreWorkspace(std::size_t columns, std::size_t observations)
+        : columns(columns), stride(columns + 2), cells(observations * (columns + 2)),
+          correction(columns, 0), scale(1) {}
     std::size_t observations() const {
         return cells.size() / stride;
     }
@@ -1597,10 +1602,12 @@ inline void staged_null(ResampleResult &out, const ResampleOptions &o, MakeBatch
             // Idle workers can help even when there is only one gene.
             std::exception_ptr failure;
             std::mutex failure_mutex;
+            const auto division = vmath::division_mode();
 #pragma omp taskloop grainsize(1) shared(null, make_batch, failure, failure_mutex)                 \
-    firstprivate(begin, budget, chunk_size, stream)
+    firstprivate(begin, budget, chunk_size, stream, division)
             for (std::size_t chunk = 0; chunk < chunks; ++chunk) {
                 try {
+                    const vmath::DivisionScope scope(division);
                     auto batch = make_batch();
                     const auto first = begin + chunk * chunk_size;
                     batch(stream, first, std::min(budget, first + chunk_size) - first,

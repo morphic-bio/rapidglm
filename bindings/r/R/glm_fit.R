@@ -33,7 +33,9 @@
 
 glm_fit <- function(x, y, weights = NULL, start = NULL, etastart = NULL, mustart = NULL,
                     offset = NULL, family = gaussian(), control = list(), intercept = TRUE,
-                    singular.ok = TRUE) {
+                    singular.ok = TRUE, division = NULL) {
+  .division_previous <- .division_set(division)
+  on.exit(.division_restore(.division_previous), add = TRUE)
   control <- do.call("glm.control", control)
   x <- as.matrix(x)
   native <- .native_family(family)
@@ -112,11 +114,15 @@ glm_fit <- function(x, y, weights = NULL, start = NULL, etastart = NULL, mustart
 glm <- function(formula, family = gaussian, data, weights, subset, na.action, start = NULL,
                 etastart, mustart, offset, control = list(...), model = TRUE,
                 method = glm_fit, x = FALSE, y = TRUE, singular.ok = TRUE, contrasts = NULL,
-                ...) {
+                ..., division = NULL) {
+  .division_previous <- .division_set(division)
+  on.exit(.division_restore(.division_previous), add = TRUE)
   call <- match.call()
+  call$division <- NULL
   call[[1L]] <- quote(stats::glm)
   if (missing(method)) call$method <- quote(rapidglm::glm_fit)
   fit <- eval(call, parent.frame())
   fit$call[[1L]] <- quote(rapidglm::glm)
+  fit$call$division <- division
   fit
 }

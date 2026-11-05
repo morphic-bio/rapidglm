@@ -1,0 +1,473 @@
+{
+ "purpose": "Three speed-ups of high-MOI CRT runs for 1.6.0-dev.2, each byte-identical to dev.1: stored first-stage draws scored in cell-major form (legacy), and each response's score state and each target's propensity model kept across tiles. Alternatives, numbers, choices, reasons.",
+ "data": "Gasperini et al. 2019, GEO GSE120861 (public); panel t100_g7418 (100 targets x 7,418 genes, 741,800 pairs), seed 20260930, cell_qc false.",
+ "host": "uwt-biocloud1, Intel Xeon E5-2640 v4, 8 threads on cores 1-8, SMT siblings 11-18 idle, nothing else running",
+ "binaries": {
+  "dev1": "9348302 (v1.6.0-dev.1 plus documentation)",
+  "A": "item 1",
+  "B": "items 1 and 2",
+  "C": "items 1, 2 and 3 (branch head before documentation)"
+ },
+ "configuration": "tiled as the full-set runs: legacy (reuse_draws, confirm_draws 0) in tiles of 64 targets x all responses (2 tiles); default in tiles of all targets x 256 responses (29 tiles); checkpoint_dir, phase all",
+ "timing": {
+  "legacy": {
+   "dev1": {
+    "runs": [
+     {
+      "run": "d2tim_legacy_dev1_r1",
+      "wall_seconds": 524.1,
+      "cpu_seconds": 3826.6,
+      "peak_rss_gb": 11.63
+     },
+     {
+      "run": "d2tim_legacy_dev1_r2",
+      "wall_seconds": 524.82,
+      "cpu_seconds": 3828.3,
+      "peak_rss_gb": 11.63
+     }
+    ],
+    "mean_wall_seconds": 524.5,
+    "mean_cpu_seconds": 3827.4,
+    "max_peak_rss_gb": 11.63,
+    "speedup_over_dev1": 1.0,
+    "cpu_saved_seconds": 0.0
+   },
+   "A": {
+    "runs": [
+     {
+      "run": "d2tim_legacy_A_r1",
+      "wall_seconds": 456.98,
+      "cpu_seconds": 3287.7,
+      "peak_rss_gb": 11.62
+     },
+     {
+      "run": "d2tim_legacy_A_r2",
+      "wall_seconds": 455.14,
+      "cpu_seconds": 3282.2,
+      "peak_rss_gb": 11.68
+     }
+    ],
+    "mean_wall_seconds": 456.1,
+    "mean_cpu_seconds": 3284.9,
+    "max_peak_rss_gb": 11.68,
+    "speedup_over_dev1": 1.15,
+    "cpu_saved_seconds": 542.5
+   },
+   "B": {
+    "runs": [
+     {
+      "run": "d2tim_legacy_B_r1",
+      "wall_seconds": 436.89,
+      "cpu_seconds": 3136.2,
+      "peak_rss_gb": 11.6
+     },
+     {
+      "run": "d2tim_legacy_B_r2",
+      "wall_seconds": 438.09,
+      "cpu_seconds": 3143.3,
+      "peak_rss_gb": 11.57
+     }
+    ],
+    "mean_wall_seconds": 437.5,
+    "mean_cpu_seconds": 3139.8,
+    "max_peak_rss_gb": 11.6,
+    "speedup_over_dev1": 1.199,
+    "cpu_saved_seconds": 687.6
+   },
+   "C": {
+    "runs": [
+     {
+      "run": "d2tim_legacy_C_r1",
+      "wall_seconds": 440.15,
+      "cpu_seconds": 3154.8,
+      "peak_rss_gb": 11.68
+     },
+     {
+      "run": "d2tim_legacy_C_r2",
+      "wall_seconds": 440.16,
+      "cpu_seconds": 3151.2,
+      "peak_rss_gb": 11.66
+     }
+    ],
+    "mean_wall_seconds": 440.2,
+    "mean_cpu_seconds": 3153.0,
+    "max_peak_rss_gb": 11.68,
+    "speedup_over_dev1": 1.192,
+    "cpu_saved_seconds": 674.4
+   }
+  },
+  "default": {
+   "dev1": {
+    "runs": [
+     {
+      "run": "d2tim_default_dev1_r1",
+      "wall_seconds": 2392.93,
+      "cpu_seconds": 17882.0,
+      "peak_rss_gb": 11.19
+     },
+     {
+      "run": "d2tim_default_dev1_r2",
+      "wall_seconds": 2390.93,
+      "cpu_seconds": 17878.5,
+      "peak_rss_gb": 11.31
+     }
+    ],
+    "mean_wall_seconds": 2391.9,
+    "mean_cpu_seconds": 17880.2,
+    "max_peak_rss_gb": 11.31,
+    "speedup_over_dev1": 1.0,
+    "cpu_saved_seconds": 0.0
+   },
+   "B": {
+    "runs": [
+     {
+      "run": "d2tim_default_B_r1",
+      "wall_seconds": 2386.77,
+      "cpu_seconds": 17874.1,
+      "peak_rss_gb": 11.58
+     },
+     {
+      "run": "d2tim_default_B_r2",
+      "wall_seconds": 2385.68,
+      "cpu_seconds": 17855.8,
+      "peak_rss_gb": 11.62
+     }
+    ],
+    "mean_wall_seconds": 2386.2,
+    "mean_cpu_seconds": 17864.9,
+    "max_peak_rss_gb": 11.62,
+    "speedup_over_dev1": 1.002,
+    "cpu_saved_seconds": 15.3
+   },
+   "C": {
+    "runs": [
+     {
+      "run": "d2tim_default_C_r1",
+      "wall_seconds": 2336.82,
+      "cpu_seconds": 17484.0,
+      "peak_rss_gb": 11.66
+     },
+     {
+      "run": "d2tim_default_C_r2",
+      "wall_seconds": 2335.53,
+      "cpu_seconds": 17466.2,
+      "peak_rss_gb": 11.61
+     }
+    ],
+    "mean_wall_seconds": 2336.2,
+    "mean_cpu_seconds": 17475.1,
+    "max_peak_rss_gb": 11.66,
+    "speedup_over_dev1": 1.024,
+    "cpu_saved_seconds": 405.1
+   }
+  }
+ },
+ "extrapolation": {
+  "method": "Each item's CPU-time saving on the tiled panel, per unit of the work it removes, times that work in the full test set (1.5.0 AWS counts, validation/GASPERINI_FULL_CLOUD_1_5_0.json), subtracted from dev.1's modelled thread time (validation/BATCH_SCORING.json); the ratio is applied to dev.1's AWS-scaled hours.",
+  "units": {
+   "item1_seconds_per_stage0_draw": 1.5073140127184628e-06,
+   "item2_seconds_per_response_first_tile": 0.007861647795805102,
+   "item2_seconds_per_response_later_tile": 0.0116988806485195,
+   "item2_micro_benchmark_ms_per_response_8_threads": {
+    "ResamplingWorkspace": 24.7,
+    "state_and_records": 16.3,
+    "records_from_kept_state": 12.2,
+    "bits_differing": 0
+   },
+   "item3_seconds_per_target_tile_reuse": 0.13921428571428676
+  },
+  "counts": {
+   "panel": {
+    "tested_pairs": 721266,
+    "stage0_draws": 359911734,
+    "responses": 7418,
+    "targets": 100,
+    "legacy_tiles": 2,
+    "default_tiles": 29
+   },
+   "full": {
+    "tested_pairs": 27612895,
+    "stage0_draws": 13778834605,
+    "responses": 7418,
+    "targets": 3837,
+    "legacy_tiles": 60,
+    "default_tiles": 29
+   }
+  },
+  "legacy": {
+   "dev1_thread_seconds": 89602.0,
+   "item1_saved": 20769,
+   "item2_saved": 5178,
+   "dev2_thread_seconds": 63654,
+   "ratio": 0.71,
+   "dev1_aws_scaled_hours": 1.98,
+   "dev2_aws_scaled_hours": 1.41
+  },
+  "default": {
+   "dev1_thread_seconds": 660723.0,
+   "item3_saved": 14957,
+   "dev2_thread_seconds": 645766,
+   "ratio": 0.977,
+   "dev1_aws_scaled_hours": 7.83,
+   "dev2_aws_scaled_hours": 7.65
+  }
+ },
+ "kernel_measurements_item1": [
+  {
+   "kernel": "cell_major",
+   "block_or_group_targets": 2,
+   "ns_per_treated_cell_and_draw": 3.80625,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group_targets": 32768,
+   "ns_per_treated_cell_and_draw": 3.67083,
+   "bit_identical": true
+  },
+  {
+   "kernel": "cell_major",
+   "block_or_group_targets": 4,
+   "ns_per_treated_cell_and_draw": 2.78388,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group_targets": 32768,
+   "ns_per_treated_cell_and_draw": 3.66418,
+   "bit_identical": true
+  },
+  {
+   "kernel": "cell_major",
+   "block_or_group_targets": 8,
+   "ns_per_treated_cell_and_draw": 3.30441,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group_targets": 32768,
+   "ns_per_treated_cell_and_draw": 3.66874,
+   "bit_identical": true
+  },
+  {
+   "kernel": "cell_major",
+   "block_or_group_targets": 4,
+   "ns_per_treated_cell_and_draw": 2.68747,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group_targets": 32768,
+   "ns_per_treated_cell_and_draw": 3.68955,
+   "bit_identical": true
+  },
+  {
+   "kernel": "quad",
+   "block_or_group_targets": 16384,
+   "ns_per_treated_cell_and_draw": 3.81092,
+   "bit_identical": true
+  },
+  {
+   "kernel": "quad",
+   "block_or_group_targets": 32768,
+   "ns_per_treated_cell_and_draw": 4.02918,
+   "bit_identical": true
+  },
+  {
+   "kernel": "quad",
+   "block_or_group_targets": 65536,
+   "ns_per_treated_cell_and_draw": 6.96004,
+   "bit_identical": true
+  }
+ ],
+ "items": {
+  "1_cell_major_first_stage": {
+   "design": "With batch scoring and reuse_draws, the stored first-stage draws of consecutive targets are grouped by about 2,048 draws (4 targets of 499) and transposed once per run: per cell a 16-bit count and the 16-bit indices of the group's draws that contain it. A response whose pairs cover at least half of a group's targets scores the whole group in one pass over its records in cell order, adding each record to the sums of its draws (two 4-lane AVX2 adds per draw, or the scalar loop); the sums (128 KB) stay in the core's cache. Each draw adds its records in ascending cell order, so its sums and statistic are those of score_draws bit for bit. Later stages, partial groups and draws over the budget keep score_draws.",
+   "alternatives": [
+    "score_draws (blocked, 32,768 cells, two draws at a time): 3.7 ns per treated cell and draw (8 threads)",
+    "cell-major groups of 2 / 4 / 8 targets: 3.8 / 2.7 / 3.3 ns (2: the records are read 50 times per response; 8: the sums leave the core's cache)",
+    "a group scored when at least half of its targets are scored for the response (chosen) or always (wasted passes for sparse pair lists, such as cis pairs) or only when complete (a target whose pair fails pair QC would drop its whole group back to score_draws)",
+    "32-bit counts per cell (0.8 MB per group) or 16-bit (chosen, 0.4 MB): a group has at most 65,535 draws"
+   ],
+   "choice": "groups of 2,048 draws (4 targets), at least half of a group's targets scored, 16-bit counts and indices",
+   "reason": "1.37 times faster kernel on 79% of the legacy draws, results unchanged; about 2.2 bytes per treated cell and draw more memory (55% of the stored first stage, within draw_cache_mb)"
+  },
+  "2_score_state_across_tiles": {
+   "design": "sceptre_tiled keeps, for each response, the inverse information and nuisance correction (the O(p^2) part of its BinaryScoreWorkspace) from the first tile that computes it (SceptreShard::score_states). Each tile builds the per-cell score records from the rebuilt null directly, without ScoreWorkspace's copies of the design, weights and residuals, its cross product and its inverse; the state uses ScoreWorkspace's checks and arithmetic, so the records are bit for bit the same.",
+   "alternatives": [
+    "keep the whole score records across tiles: 13 MB per response, about 97 GB for 7,418 responses (rejected, memory)",
+    "keep the O(p^2) state (chosen): 42 doubles per response, about 2.5 MB in all",
+    "larger tiles (tile_targets 128 halves the rebuilds) at about 4.7 GB more stored draws per tile, and a changed default (not adopted)",
+    "persist the state in the checkpoint directory for tiles run as separate processes (not adopted: the full-set runs use one process; a resumed or separate process computes it again, with the same bits)"
+   ],
+   "choice": "the O(p^2) state in memory within one process",
+   "reason": "removes the cross products and copies per response and tile at about 2.5 MB; the O(n) records and the null rebuild remain per tile"
+  },
+  "3_propensity_across_tiles": {
+   "design": "sceptre_tiled keeps each target's propensity status and coefficients from the first tile that fits it (SceptreShard::propensities); later tiles build the sampler from them. The fit is a deterministic function of the design and the target's labels, so the kept coefficients are the bits a refit gives.",
+   "alternatives": [
+    "keep the samplers too: 12 bytes per cell and target, about 9.5 GB for 3,837 targets (rejected, memory)",
+    "keep the coefficients (chosen): O(p) per target, about 0.2 MB",
+    "fit propensities in the prepare phase and persist them (not adopted, as for item 2)"
+   ],
+   "choice": "coefficients in memory within one process",
+   "reason": "removes 28 of 29 propensity fits per target in default-mode tiled runs; samplers are still built per tile (about 8.6 ms each)"
+  }
+ },
+ "memory": {
+  "panel_peak_rss_gb": {
+   "legacy": {
+    "dev1": 11.63,
+    "A": 11.68,
+    "B": 11.6,
+    "C": 11.68
+   },
+   "default": {
+    "dev1": 11.31,
+    "B": 11.62,
+    "C": 11.66
+   }
+  },
+  "full_set_estimate": "The kept data add about 1.1 MB per target in a legacy tile (64 targets: about 70 MB) and about 3 MB in all for the states of items 2 and 3. With the default-mode rise seen on the panel (0.3 to 0.4 GB at 8 threads), the full-set peaks (34.3 GB legacy, 42.1 GB default at 16 threads on 1.5.0) are expected to rise by under 1 GB.",
+  "panel_peak_rss_gb_per_run": {
+   "legacy": {
+    "dev1": [
+     11.63,
+     11.63
+    ],
+    "A": [
+     11.62,
+     11.68
+    ],
+    "B": [
+     11.6,
+     11.57
+    ],
+    "C": [
+     11.68,
+     11.66
+    ]
+   },
+   "default": {
+    "dev1": [
+     11.19,
+     11.31
+    ],
+    "B": [
+     11.58,
+     11.62
+    ],
+    "C": [
+     11.66,
+     11.61
+    ]
+   }
+  },
+  "note": "Legacy peaks are unchanged within 0.05 GB. Default-mode peaks rose from 11.19 / 11.31 GB to 11.58-11.66 GB with item 2, whose kept states take about 3 MB. The rise most likely follows the changed allocation of the score records (a BinaryScoreWorkspace built directly instead of inside a ResamplingWorkspace) in glibc's per-thread arenas rather than kept data; this was not investigated further."
+ },
+ "identity": {
+  "dev2_vs_dev1": [
+   "legacy_true_dev1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/legacy_true_dev1/rapid.tsv (63 invalid rows; 10.0425 s)",
+   "legacy_true_dev2 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/legacy_true_dev2/rapid.tsv (63 invalid rows; 9.85925 s)",
+   "IDENTICAL legacy_true_dev1 legacy_true_dev2",
+   "legacy_false_dev1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/legacy_false_dev1/rapid.tsv (63 invalid rows; 12.5178 s)",
+   "legacy_false_dev2 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/legacy_false_dev2/rapid.tsv (63 invalid rows; 12.0517 s)",
+   "IDENTICAL legacy_false_dev1 legacy_false_dev2",
+   "legacy_true_dev2_t1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/legacy_true_dev2_t1/rapid.tsv (63 invalid rows; 40.0829 s)",
+   "IDENTICAL legacy_true_dev1 legacy_true_dev2_t1",
+   "legacy_true_dev2_t3 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/legacy_true_dev2_t3/rapid.tsv (63 invalid rows; 17.4947 s)",
+   "IDENTICAL legacy_true_dev1 legacy_true_dev2_t3",
+   "legacy_tiled_dev1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/legacy_tiled_dev1/rapid.tsv (63 invalid rows; 18.4954 s)",
+   "IDENTICAL legacy_true_dev1 legacy_tiled_dev1",
+   "legacy_tiled_dev2 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/legacy_tiled_dev2/rapid.tsv (63 invalid rows; 17.3239 s)",
+   "IDENTICAL legacy_true_dev1 legacy_tiled_dev2",
+   "default_true_dev1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/default_true_dev1/rapid.tsv (63 invalid rows; 13.7567 s)",
+   "default_true_dev2 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/default_true_dev2/rapid.tsv (63 invalid rows; 13.6516 s)",
+   "IDENTICAL default_true_dev1 default_true_dev2",
+   "default_false_dev1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/default_false_dev1/rapid.tsv (63 invalid rows; 16.8843 s)",
+   "default_false_dev2 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/default_false_dev2/rapid.tsv (63 invalid rows; 16.4066 s)",
+   "IDENTICAL default_false_dev1 default_false_dev2",
+   "default_true_dev2_t1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/default_true_dev2_t1/rapid.tsv (63 invalid rows; 68.5656 s)",
+   "IDENTICAL default_true_dev1 default_true_dev2_t1",
+   "default_true_dev2_t3 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/default_true_dev2_t3/rapid.tsv (63 invalid rows; 27.0811 s)",
+   "IDENTICAL default_true_dev1 default_true_dev2_t3",
+   "default_tiled_dev1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/default_tiled_dev1/rapid.tsv (63 invalid rows; 19.7474 s)",
+   "IDENTICAL default_true_dev1 default_tiled_dev1",
+   "default_tiled_dev2 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/default_tiled_dev2/rapid.tsv (63 invalid rows; 18.5458 s)",
+   "IDENTICAL default_true_dev1 default_tiled_dev2",
+   "legacy_g1000_dev1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/legacy_g1000_dev1/rapid.tsv (362 invalid rows; 29.436 s)",
+   "legacy_g1000_resumed_dev2 stopped with 2 tile files of tiles 5",
+   "legacy_g1000_resumed_dev2 resumed exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/legacy_g1000_resumed_dev2/rapid.tsv (362 invalid rows; 16.2869 s) computed here \"computed_here\": 3",
+   "IDENTICAL legacy_g1000_dev1 legacy_g1000_resumed_dev2",
+   "default_g1000_dev1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/default_g1000_dev1/rapid.tsv (362 invalid rows; 49.1498 s)",
+   "default_g1000_resumed_dev2 stopped with 2 tile files of tiles 10",
+   "default_g1000_resumed_dev2 resumed exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_identity/default_g1000_resumed_dev2/rapid.tsv (362 invalid rows; 32.105 s) computed here \"computed_here\": 8",
+   "IDENTICAL default_g1000_dev1 default_g1000_resumed_dev2",
+   "2026-10-29T22:51:01Z done"
+  ],
+  "portable": [
+   "legacy dev1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_portable/legacy_dev1/rapid.tsv (63 invalid rows; 12.642 s) \"crt_draw_used\": \"thinned\"",
+   "legacy dev2 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_portable/legacy_dev2/rapid.tsv (63 invalid rows; 12.4482 s) \"crt_draw_used\": \"thinned\"",
+   "legacy dev2_tiled exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_portable/legacy_dev2_tiled/rapid.tsv (63 invalid rows; 21.8632 s) \"crt_draw_used\": \"thinned\"",
+   "IDENTICAL portable legacy dev1 dev2",
+   "IDENTICAL portable legacy dev1 dev2_tiled",
+   "default dev1 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_portable/default_dev1/rapid.tsv (63 invalid rows; 23.9595 s) \"crt_draw_used\": \"thinned\"",
+   "default dev2 exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_portable/default_dev2/rapid.tsv (63 invalid rows; 23.9367 s) \"crt_draw_used\": \"thinned\"",
+   "default dev2_tiled exit 0 /mnt/lhhung/highmoi_batch_20261029/runs/dev2_portable/default_dev2_tiled/rapid.tsv (63 invalid rows; 29.1574 s) \"crt_draw_used\": \"thinned\"",
+   "IDENTICAL portable default dev1 dev2",
+   "IDENTICAL portable default dev1 dev2_tiled",
+   "2026-10-29T22:53:37Z done"
+  ],
+  "full_t100_legacy_panel": [
+   "2026-10-29T22:51:32Z start",
+   "2026-10-30T00:10:45Z full t100 legacy panel, dev2 vs the pipeline table of dev.1's base runs: IDENTICAL",
+   "2026-10-30T00:10:45Z done"
+  ]
+ },
+ "tests": {
+  "suite": [
+   "2026-10-29T22:54:43Z build_native PASS 66 s",
+   "2026-10-29T23:00:31Z ctest_native PASS 348 s",
+   "2026-10-29T23:01:13Z build_portable PASS 42 s",
+   "2026-10-29T23:01:13Z ctest_portable PASS 0 s",
+   "2026-10-29T23:01:19Z cli_native PASS 6 s",
+   "2026-10-29T23:01:28Z cli_portable PASS 9 s",
+   "2026-10-29T23:01:28Z recipe_qtl PASS 0 s",
+   "2026-10-29T23:01:29Z recipe_replogle PASS 1 s",
+   "2026-10-29T23:01:29Z recipe_quiet_run PASS 0 s",
+   "2026-10-29T23:01:38Z external PASS 9 s",
+   "2026-10-29T23:05:06Z bindings PASS 208 s",
+   "2026-10-29T23:05:14Z python_capi PASS 8 s",
+   "2026-10-29T23:05:14Z python_deseq PASS 0 s",
+   "2026-10-29T23:05:15Z python_special PASS 1 s",
+   "2026-10-29T23:05:26Z python_pydeseq2 PASS 11 s",
+   "2026-10-29T23:05:33Z rust_test PASS 7 s",
+   "2026-10-29T23:05:36Z rust_clippy PASS 3 s",
+   "2026-10-29T23:05:36Z rust_fmt PASS 0 s",
+   "2026-10-29T23:05:37Z clang_format PASS 1 s",
+   "2026-10-29T23:05:37Z done",
+   "2026-10-29T23:17:29Z ctest_portable (rerun in build-portable-tests: the first portable configure had RAPIDGLM_TESTS off) PASS 619 s"
+  ],
+  "arm64": [
+   "2026-10-29T23:45:44Z arm64_native (no container: cross g++ + qemu-aarch64 -cpu max) PASS 3127 s"
+  ],
+  "arm64_note": "no container: aarch64-linux-gnu-g++ 13.3 and qemu-aarch64 -cpu max, arm64 LAPACKE/OpenBLAS unpacked into a private sysroot",
+  "arm64_cli_identity": [
+   "legacy dev1 exit 0 78 s /mnt/lhhung/highmoi_batch_20261029/runs/dev2_tests/arm64_cli/small_legacy_dev1/rapid.tsv (24 invalid rows; 77.8997 s) \"crt_draw_used\": \"hazard\" ok_rows 76",
+   "legacy dev2 exit 0 78 s /mnt/lhhung/highmoi_batch_20261029/runs/dev2_tests/arm64_cli/small_legacy_dev2/rapid.tsv (24 invalid rows; 77.5689 s) \"crt_draw_used\": \"hazard\" ok_rows 76",
+   "IDENTICAL arm64 legacy dev1 dev2",
+   "default dev1 exit 0 79 s /mnt/lhhung/highmoi_batch_20261029/runs/dev2_tests/arm64_cli/small_default_dev1/rapid.tsv (24 invalid rows; 79.0157 s) \"crt_draw_used\": \"hazard\" ok_rows 76",
+   "default dev2 exit 0 79 s /mnt/lhhung/highmoi_batch_20261029/runs/dev2_tests/arm64_cli/small_default_dev2/rapid.tsv (24 invalid rows; 78.8449 s) \"crt_draw_used\": \"hazard\" ok_rows 76",
+   "IDENTICAL arm64 default dev1 dev2",
+   "2026-10-30T05:49:50Z done"
+  ],
+  "arm64_cli_note": "dev1 and dev2 CLIs cross-compiled for arm64 and run under qemu-aarch64 -cpu max (Arm AES: crt_draw_used hazard), one thread, on every 26th cell of the screen (7,974 cells), 50 genes and 10 targets (100 pairs, 76 tested) in both modes with batch scoring; full-size inputs were stopped as too slow under emulation",
+  "suite_note": "ctest_portable first ran no tests (a portable build directory configured earlier without tests); it was rerun in build-portable-tests: 3/3 passed."
+ },
+ "not_adopted": [
+  "keeping whole score records across tiles (about 97 GB) or samplers across tiles (about 9.5 GB): memory",
+  "persisting the kept states in the checkpoint directory for tile tasks run as separate processes: the full-set runs use one process; separate processes compute the states again with the same bits",
+  "larger tiles to halve the per-tile work: about 4.7 GB more stored draws per tile and a changed default",
+  "cell-major scoring of later stages and of partial groups: few draws (21% of legacy draws are in later stages, each for a few pairs per response), which score_draws already handles"
+ ]
+}

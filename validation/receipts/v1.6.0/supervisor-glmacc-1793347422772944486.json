@@ -1,0 +1,14 @@
+{
+  "label": "glmacc-1793347422772944486",
+  "stages": [
+    "glmacc"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-30T08:03:42.881743+00:00",
+  "finished_utc": "2026-10-30T08:06:41.818945+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 177,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0519627127796412,
+  "cpu_policy_observed_quiet_starts": 0,
+  "error": null
+}

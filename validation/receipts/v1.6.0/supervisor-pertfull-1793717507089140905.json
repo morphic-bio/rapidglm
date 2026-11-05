@@ -1,0 +1,14 @@
+{
+  "label": "pertfull-1793717507089140905",
+  "stages": [
+    "pertfull"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T14:51:47.198880+00:00",
+  "finished_utc": "2026-11-03T15:42:31.910900+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 2996,
+  "cpu_policy_maximum_poll_gap_seconds": 1.107770748436451,
+  "cpu_policy_observed_quiet_starts": 7,
+  "error": null
+}

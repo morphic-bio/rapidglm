@@ -1,0 +1,14 @@
+{
+  "label": "edgerval-1793374521742727602",
+  "stages": [
+    "edgerval"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-30T15:35:21.851720+00:00",
+  "finished_utc": "2026-10-30T15:35:36.146527+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 15,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0411122236400843,
+  "cpu_policy_observed_quiet_starts": 0,
+  "error": null
+}

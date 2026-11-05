@@ -127,12 +127,15 @@ def timed_run(run, threads, args, *arguments):
     if cpus:
         busy, own = busy_seconds(cpus), os.times()
     result = run(*arguments)
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        from quiet_run import finish_measurement
+        finish_measurement()
     if cpus:
         after = os.times()
         ours = sum(after[:4]) - sum(own[:4])  # this process and the children it has waited for
         wall = after.elapsed - own.elapsed
         record["others_cpu"] = round(max(0.0, busy_seconds(cpus) - busy - ours) / (wall * len(cpus)), 4)
-        record["contended"] = record["others_cpu"] > 0.2
+        record["contended"] = record["others_cpu"] > 0.05
     else:
         record["contended"] = record["load"] > CORES / 4
     return result, record

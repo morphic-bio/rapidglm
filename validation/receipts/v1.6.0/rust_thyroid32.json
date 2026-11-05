@@ -1,0 +1,72 @@
+{
+  "data": "validation/work/benchmark/thyroid32",
+  "samples": 32,
+  "genes": 28769,
+  "pydeseq2_rapidglm_seconds": 4.57,
+  "rust_seconds": 0.86,
+  "rust_log": "RapidGLM 1.6.0 (C API 4)\n28769 genes, 32 samples in 0.77 s; 1232 at padj < 0.05; 0 refitted, 110 Cook's outliers, 2 bounded fits",
+  "columns": {
+    "baseMean": {
+      "max_relative": 2.1023910697032952e-15,
+      "over_1e-6": 0,
+      "over_1e-3": 0,
+      "missing_mismatch": 0
+    },
+    "log2FoldChange": {
+      "max_relative": 6.206594840668248,
+      "over_1e-6": 28667,
+      "over_1e-3": 8757,
+      "missing_mismatch": 0
+    },
+    "lfcSE": {
+      "max_relative": 217.06032889656137,
+      "over_1e-6": 28700,
+      "over_1e-3": 8266,
+      "missing_mismatch": 0
+    },
+    "stat": {
+      "max_relative": 6.063406497752158,
+      "over_1e-6": 28752,
+      "over_1e-3": 14135,
+      "missing_mismatch": 0
+    },
+    "pvalue": {
+      "max_relative": 3.4003635397556437e+21,
+      "over_1e-6": 28619,
+      "over_1e-3": 14199,
+      "missing_mismatch": 26
+    },
+    "padj": {
+      "max_relative": 2.7626605174567004e+18,
+      "over_1e-6": 28620,
+      "over_1e-3": 8955,
+      "missing_mismatch": 26
+    }
+  },
+  "calls": {
+    "rust": 1232,
+    "pydeseq2": 1250,
+    "both": 1224,
+    "jaccard": 0.972972972972973
+  },
+  "cooks_outliers": {
+    "deseq2": 128,
+    "rust": 110,
+    "pydeseq2_rapidglm": 90,
+    "jaccard_rust_deseq2": 0.845,
+    "jaccard_pydeseq2_deseq2": 0.703,
+    "singleton_design_cell_samples": 13,
+    "pydeseq2_infinite_distances": 0,
+    "mismatched_genes": {
+      "total": 26,
+      "rust_only": 23,
+      "pydeseq2_only": 3,
+      "pydeseq2_max_at_singleton_design_cell_sample": 24
+    }
+  },
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

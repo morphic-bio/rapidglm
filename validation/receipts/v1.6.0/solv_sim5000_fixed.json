@@ -1,0 +1,241 @@
+{
+  "dataset": "/data",
+  "mode": "fixed",
+  "threads": 1,
+  "observations": 5000,
+  "columns": 5,
+  "genes": 1000,
+  "boundary_genes": 0,
+  "setup_seconds": 6.55869,
+  "methods": [
+    {
+      "name": "rapidglm_newton",
+      "wall_seconds": 1.14696,
+      "finite": {
+        "genes": 1000,
+        "cpu_seconds": 0.921451,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 4.729372449e-11,
+        "shortfall_max": 7.639755495e-11,
+        "iterations_median": 4,
+        "iterations_99": 4
+      },
+      "boundary": {
+        "genes": 0,
+        "cpu_seconds": 0,
+        "converged": 0,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": null,
+        "shortfall_99": null,
+        "shortfall_max": null,
+        "iterations_median": null,
+        "iterations_99": null
+      }
+    },
+    {
+      "name": "rapidglm_newton_plain",
+      "wall_seconds": 1.26283,
+      "finite": {
+        "genes": 1000,
+        "cpu_seconds": 1.0242,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 4.729372449e-11,
+        "shortfall_max": 7.639755495e-11,
+        "iterations_median": 4,
+        "iterations_99": 4
+      },
+      "boundary": {
+        "genes": 0,
+        "cpu_seconds": 0,
+        "converged": 0,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": null,
+        "shortfall_99": null,
+        "shortfall_max": null,
+        "iterations_median": null,
+        "iterations_99": null
+      }
+    },
+    {
+      "name": "ceres_levenberg_marquardt/ceres_default",
+      "wall_seconds": 1.98511,
+      "finite": {
+        "genes": 1000,
+        "cpu_seconds": 1.75932,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0.0003249932251,
+        "shortfall_99": 0.002412151884,
+        "shortfall_max": 0.002727677604,
+        "iterations_median": 4,
+        "iterations_99": 6
+      },
+      "boundary": {
+        "genes": 0,
+        "cpu_seconds": 0,
+        "converged": 0,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": null,
+        "shortfall_99": null,
+        "shortfall_max": null,
+        "iterations_median": null,
+        "iterations_99": null
+      }
+    },
+    {
+      "name": "ceres_dogleg/ceres_default",
+      "wall_seconds": 2.04814,
+      "finite": {
+        "genes": 1000,
+        "cpu_seconds": 1.82247,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0.0003246253168,
+        "shortfall_99": 0.002403052724,
+        "shortfall_max": 0.002746853223,
+        "iterations_median": 4,
+        "iterations_99": 6
+      },
+      "boundary": {
+        "genes": 0,
+        "cpu_seconds": 0,
+        "converged": 0,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": null,
+        "shortfall_99": null,
+        "shortfall_max": null,
+        "iterations_median": null,
+        "iterations_99": null
+      }
+    },
+    {
+      "name": "ceres_lbfgs/ceres_default",
+      "wall_seconds": 3.11779,
+      "finite": {
+        "genes": 1000,
+        "cpu_seconds": 2.89284,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 362,
+        "shortfall_median": 2.638098522e-07,
+        "shortfall_99": 2.272275772,
+        "shortfall_max": 13.548108,
+        "iterations_median": 9,
+        "iterations_99": 12
+      },
+      "boundary": {
+        "genes": 0,
+        "cpu_seconds": 0,
+        "converged": 0,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": null,
+        "shortfall_99": null,
+        "shortfall_max": null,
+        "iterations_median": null,
+        "iterations_99": null
+      }
+    },
+    {
+      "name": "ceres_levenberg_marquardt/tight",
+      "wall_seconds": 3.56795,
+      "finite": {
+        "genes": 1000,
+        "cpu_seconds": 3.34233,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 3.442437446e-10,
+        "shortfall_99": 2.383785613e-09,
+        "shortfall_max": 2.624801709e-09,
+        "iterations_median": 9,
+        "iterations_99": 12
+      },
+      "boundary": {
+        "genes": 0,
+        "cpu_seconds": 0,
+        "converged": 0,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": null,
+        "shortfall_99": null,
+        "shortfall_max": null,
+        "iterations_median": null,
+        "iterations_99": null
+      }
+    },
+    {
+      "name": "ceres_dogleg/tight",
+      "wall_seconds": 3.70128,
+      "finite": {
+        "genes": 1000,
+        "cpu_seconds": 3.47552,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 3.44698492e-10,
+        "shortfall_99": 2.311935532e-09,
+        "shortfall_max": 2.651177056e-09,
+        "iterations_median": 9,
+        "iterations_99": 12
+      },
+      "boundary": {
+        "genes": 0,
+        "cpu_seconds": 0,
+        "converged": 0,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": null,
+        "shortfall_99": null,
+        "shortfall_max": null,
+        "iterations_median": null,
+        "iterations_99": null
+      }
+    },
+    {
+      "name": "ceres_lbfgs/tight",
+      "wall_seconds": 4.0175,
+      "finite": {
+        "genes": 1000,
+        "cpu_seconds": 3.79244,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 5.638867151e-11,
+        "shortfall_max": 6.421032595e-10,
+        "iterations_median": 11,
+        "iterations_99": 14
+      },
+      "boundary": {
+        "genes": 0,
+        "cpu_seconds": 0,
+        "converged": 0,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": null,
+        "shortfall_99": null,
+        "shortfall_max": null,
+        "iterations_median": null,
+        "iterations_99": null
+      }
+    }
+  ],
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

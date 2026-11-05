@@ -57,6 +57,8 @@ extern "C" {
     pub fn rapidglm_version() -> *const c_char;
     pub fn rapidglm_c_api_version() -> c_int;
     pub fn rapidglm_last_error() -> *const c_char;
+    pub fn rapidglm_set_division(mode: c_int, previous: *mut c_int) -> c_int;
+    pub fn rapidglm_division_mode() -> c_int;
 
     pub fn rapidglm_table_rows(table: *const rapidglm_table) -> usize;
     pub fn rapidglm_table_columns(table: *const rapidglm_table) -> usize;

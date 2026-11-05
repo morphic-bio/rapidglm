@@ -1,0 +1,14 @@
+{
+  "label": "staging-1793712923030019860",
+  "stages": [
+    "staging"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T13:35:23.138173+00:00",
+  "finished_utc": "2026-11-03T13:46:24.056354+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 650,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0640002507716417,
+  "cpu_policy_observed_quiet_starts": 0,
+  "error": null
+}

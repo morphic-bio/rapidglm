@@ -1,0 +1,175 @@
+{
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "stages": {
+    "glmacc": {
+      "started_utc": "2026-10-30T08:03:42.772951+00:00",
+      "label": "glmacc-1793347422772944486",
+      "slurm_job_id": "690",
+      "exit": 0,
+      "finished_utc": "2026-10-30T08:06:41.823499+00:00"
+    },
+    "glmspeed": {
+      "started_utc": "2026-10-30T08:06:42.222067+00:00",
+      "label": "glmspeed-1793347602222063679",
+      "slurm_job_id": "690",
+      "exit": 0,
+      "finished_utc": "2026-10-30T11:19:55.370349+00:00"
+    },
+    "batch": {
+      "started_utc": "2026-10-30T13:17:04.742598+00:00",
+      "label": "batch-1793366224742590970",
+      "slurm_job_id": "691",
+      "exit": 0,
+      "finished_utc": "2026-10-30T14:12:08.989623+00:00"
+    },
+    "solvers": {
+      "started_utc": "2026-10-30T14:12:12.521541+00:00",
+      "label": "solvers-1793369532521537162",
+      "slurm_job_id": "691",
+      "exit": 0,
+      "finished_utc": "2026-10-30T14:25:54.930759+00:00"
+    },
+    "solvers_control": {
+      "started_utc": "2026-10-30T14:25:58.474366+00:00",
+      "label": "solvers_control-1793370358474362529",
+      "slurm_job_id": "691",
+      "exit": 0,
+      "finished_utc": "2026-10-30T14:29:48.541091+00:00"
+    },
+    "bulkval": {
+      "started_utc": "2026-10-30T14:29:52.085563+00:00",
+      "label": "bulkval-1793370592085560108",
+      "slurm_job_id": "691",
+      "exit": 0,
+      "finished_utc": "2026-10-30T15:35:16.805712+00:00"
+    },
+    "edgerval": {
+      "started_utc": "2026-10-30T15:35:21.742732+00:00",
+      "label": "edgerval-1793374521742727602",
+      "slurm_job_id": "691",
+      "exit": 0,
+      "finished_utc": "2026-10-30T15:35:36.151145+00:00"
+    },
+    "bulk": {
+      "started_utc": "2026-11-03T10:38:33.176206+00:00",
+      "label": "bulk-1793702313176199160",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T13:26:25.219464+00:00"
+    },
+    "cooks": {
+      "started_utc": "2026-11-03T13:26:33.446255+00:00",
+      "label": "cooks-1793712393446249459",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T13:31:27.077200+00:00"
+    },
+    "rust": {
+      "started_utc": "2026-11-03T13:31:34.477350+00:00",
+      "label": "rust-1793712694477345221",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T13:35:17.320720+00:00"
+    },
+    "staging": {
+      "started_utc": "2026-11-03T13:35:23.030024+00:00",
+      "label": "staging-1793712923030019860",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T13:46:24.060665+00:00"
+    },
+    "pert50k": {
+      "started_utc": "2026-11-03T13:46:30.972549+00:00",
+      "label": "pert50k-1793713590972543300",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T14:51:40.467477+00:00"
+    },
+    "pertfull": {
+      "started_utc": "2026-11-03T14:51:47.089146+00:00",
+      "label": "pertfull-1793717507089140905",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T15:42:31.943715+00:00"
+    },
+    "seeds": {
+      "started_utc": "2026-11-03T15:42:50.048986+00:00",
+      "label": "seeds-1793720570048974863",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T16:06:58.158010+00:00"
+    },
+    "untestable": {
+      "started_utc": "2026-11-03T16:07:04.385922+00:00",
+      "label": "untestable-1793722024385916552",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T16:22:19.659102+00:00"
+    },
+    "crt": {
+      "started_utc": "2026-11-03T16:23:36.952758+00:00",
+      "label": "crt-1793723016952753703",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T17:01:23.846355+00:00"
+    },
+    "replogle": {
+      "started_utc": "2026-11-03T17:01:31.771320+00:00",
+      "label": "replogle-1793725291771314217",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T19:44:39.312516+00:00"
+    },
+    "qtl": {
+      "started_utc": "2026-11-03T19:44:49.654610+00:00",
+      "label": "qtl-1793735089654604392",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T20:49:57.835060+00:00"
+    },
+    "special": {
+      "started_utc": "2026-11-03T20:50:04.313378+00:00",
+      "label": "special-1793739004313373804",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T21:19:23.752307+00:00"
+    },
+    "vmath_e2e": {
+      "started_utc": "2026-11-03T21:19:30.205291+00:00",
+      "label": "vmath_e2e-1793740770205286875",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T21:42:59.024769+00:00"
+    },
+    "ablations": {
+      "started_utc": "2026-11-03T21:43:05.642335+00:00",
+      "label": "ablations-1793742185642330393",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-03T23:04:31.799093+00:00"
+    },
+    "replogle_full": {
+      "started_utc": "2026-11-03T23:04:38.560028+00:00",
+      "label": "replogle_full-1793747078560022973",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-04T07:00:02.742335+00:00"
+    },
+    "eqtl_gw": {
+      "started_utc": "2026-11-04T07:00:09.860804+00:00",
+      "label": "eqtl_gw-1793775609860799473",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-04T08:14:25.327541+00:00"
+    },
+    "compress": {
+      "started_utc": "2026-11-04T08:14:32.608216+00:00",
+      "label": "compress-1793780072608211588",
+      "slurm_job_id": "693",
+      "exit": 0,
+      "finished_utc": "2026-11-04T08:20:51.032015+00:00"
+    }
+  },
+  "scope_status": "full_run_resumed_by_user_2026-11-03",
+  "finished_utc": "2026-11-04T08:20:58.417674+00:00"
+}

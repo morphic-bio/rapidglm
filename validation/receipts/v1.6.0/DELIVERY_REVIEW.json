@@ -1,0 +1,25 @@
+{
+  "recorded_utc": "2026-11-01T13:26:48.955527+00:00",
+  "reviewed_evidence_commit": "174f349f7d2eeb740381d58df292e232f7e7b12e",
+  "scientific_gate_passed": true,
+  "accepted_focused_commands": 13,
+  "paired_ablations_passed": 5,
+  "accepted_prior_commands": 492,
+  "prior_full_run_stages": 7,
+  "focused_contention_reruns": 8,
+  "public_export_check": {
+    "passed": true,
+    "commit": "174f349f7d2eeb740381d58df292e232f7e7b12e",
+    "log_sha256": "993c9ef88a963946bf3781f27379416bd02f7126903d31162a3ba841ef3febbb"
+  },
+  "raw_whitespace_preserved": true,
+  "whitespace_note": "Raw build logs and git-format patches retain original trailing whitespace. Authored documentation and export-script whitespace checks passed.",
+  "full_benchmark_suite_deferred": true,
+  "manuscript_draft_available": false,
+  "release_or_publication_performed": false,
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

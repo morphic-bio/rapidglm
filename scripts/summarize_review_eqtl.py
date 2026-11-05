@@ -10,17 +10,24 @@ from compare_eqtl import qvalues
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--runs',type=pathlib.Path,required=True)
 p.add_argument('--output',type=pathlib.Path,required=True)
+p.add_argument('--tensorqtl',type=pathlib.Path,
+               help='tensorQTL cis table (default: RUNS/tensorqtl/chr22.cis_qtl.txt.gz)')
+p.add_argument('--tensorqtl-only',action='store_true',
+               help='the tensorQTL reference alone (the genome-wide run has no FastQTL or jaxQTL)')
 a=p.parse_args()
-cols=['phenotype_id','num_var','beta_shape1','beta_shape2','true_df','pval_true_df',
-      'variant_id','tss_distance','ma_samples','ma_count','maf','ref_factor',
-      'pval_nominal','slope','slope_se','pval_perm','pval_beta']
-parts=sorted((a.runs/'fastqtl/chunks').glob('chunk_*.txt.gz'))
-f=pd.concat([pd.read_csv(x,sep='\t',header=None,names=cols) for x in parts])
-frames={'FastQTL_perm_beta':pd.DataFrame({'id':f.phenotype_id,'p':f.pval_beta,'lead':f.variant_id})}
-t=pd.read_csv(a.runs/'tensorqtl/chr22.cis_qtl.txt.gz',sep='\t')
+frames={}
+if not a.tensorqtl_only:
+    cols=['phenotype_id','num_var','beta_shape1','beta_shape2','true_df','pval_true_df',
+          'variant_id','tss_distance','ma_samples','ma_count','maf','ref_factor',
+          'pval_nominal','slope','slope_se','pval_perm','pval_beta']
+    parts=sorted((a.runs/'fastqtl/chunks').glob('chunk_*.txt.gz'))
+    f=pd.concat([pd.read_csv(x,sep='\t',header=None,names=cols) for x in parts])
+    frames['FastQTL_perm_beta']=pd.DataFrame({'id':f.phenotype_id,'p':f.pval_beta,'lead':f.variant_id})
+t=pd.read_csv(a.tensorqtl or a.runs/'tensorqtl/chr22.cis_qtl.txt.gz',sep='\t')
 frames['tensorQTL_perm10000_beta']=pd.DataFrame({'id':t.phenotype_id,'p':t.pval_beta,'lead':t.variant_id})
-for name,folder in [('jaxQTL_NB_score_perm1000','jaxqtl_nb_score_perm1000'),
-                    ('jaxQTL_NB_score_SPA_ACAT','jaxqtl_nb_score_spa_acat')]:
+for name,folder in ([] if a.tensorqtl_only else
+                    [('jaxQTL_NB_score_perm1000','jaxqtl_nb_score_perm1000'),
+                     ('jaxQTL_NB_score_SPA_ACAT','jaxqtl_nb_score_spa_acat')]):
     paths=sorted((a.runs/folder).glob('part*/chr22.*.parquet.gz'))
     d=pl.concat([pl.read_parquet(x) for x in paths],how='vertical_relaxed').to_pandas()
     valid=d.result_valid.fillna(False)&d.model_converged.fillna(False)

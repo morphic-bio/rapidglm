@@ -1,0 +1,117 @@
+{
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "checked_utc": "2026-10-30T08:49:48.654985+00:00",
+  "untimed": true,
+  "cpus": "0-5",
+  "files": [
+    {
+      "file": "validation/work/eqtl/data/genotypes/autosomes.bed",
+      "sha256": "61d0500ae10ec1137bee80e5f41ff58da25f05f1280141166fc8e86cb23a2bfa",
+      "expected_sha256": "61d0500ae10ec1137bee80e5f41ff58da25f05f1280141166fc8e86cb23a2bfa",
+      "baseline": "1.4.1 genome-wide receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/eqtl/data/genotypes/autosomes.bim",
+      "sha256": "2e0ce428ae9f8709918e2adb416a55bc626993fc3492f7d1f0748e494f520daf",
+      "expected_sha256": "2e0ce428ae9f8709918e2adb416a55bc626993fc3492f7d1f0748e494f520daf",
+      "baseline": "1.4.1 genome-wide receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/eqtl/data/genotypes/autosomes.fam",
+      "sha256": "99abcb5c20ac7e76726990b13afdaebd7d29a7798ba70987e21f247d22e97a94",
+      "expected_sha256": "99abcb5c20ac7e76726990b13afdaebd7d29a7798ba70987e21f247d22e97a94",
+      "baseline": "1.4.1 genome-wide receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/eqtl/data/genotypes/autosomes.pgen",
+      "sha256": "0f2dbfbef72a5c21f6e0f7992157edc92a405374723ed9c09ae82ef620f6953f",
+      "expected_sha256": "0f2dbfbef72a5c21f6e0f7992157edc92a405374723ed9c09ae82ef620f6953f",
+      "baseline": "1.4.1 genome-wide receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/eqtl/data/genotypes/autosomes.pvar",
+      "sha256": "890e7a8612ae48f3eb9ccedc673a030f67a60ff95f2049d49208b308c7f97a3b",
+      "expected_sha256": "890e7a8612ae48f3eb9ccedc673a030f67a60ff95f2049d49208b308c7f97a3b",
+      "baseline": "1.4.1 genome-wide receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/eqtl/data/genotypes/autosomes.psam",
+      "sha256": "e04e9a889a0b33726738468cc4db9f2b19116e268fefee9c85abc7dc8a04af41",
+      "expected_sha256": "e04e9a889a0b33726738468cc4db9f2b19116e268fefee9c85abc7dc8a04af41",
+      "baseline": "1.4.1 genome-wide receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/eqtl/data/covariates/covariates.fastqtl.txt",
+      "sha256": "3cb400dba06421204a5246fe63ca69ceb888aa166f8fc263f245352d5b81ab93",
+      "expected_sha256": "3cb400dba06421204a5246fe63ca69ceb888aa166f8fc263f245352d5b81ab93",
+      "baseline": "1.4.1 genome-wide receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/eqtl/data/expression-genomewide/autosomes.expr_int.bed",
+      "sha256": "ee0803ce126658ca2aa86795f920d0d1358fda0604076ea4c9040fabd30138ca",
+      "expected_sha256": "ee0803ce126658ca2aa86795f920d0d1358fda0604076ea4c9040fabd30138ca",
+      "baseline": "1.4.1 phenotype content hash",
+      "identical": true,
+      "compressed_sha256": "87fc002ed509db37fdab52e4ddec31dbe3e159ed3188cdb1e04294968898b5b3",
+      "compressed_file": "validation/work/eqtl/data/expression-genomewide/autosomes.expr_int.bed.gz",
+      "decompressed_sha256": "ee0803ce126658ca2aa86795f920d0d1358fda0604076ea4c9040fabd30138ca",
+      "reference_hash_scope": "The receipt labels the .bed.gz path but its recorded digest is for the uncompressed BED content."
+    },
+    {
+      "file": "validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/pseudobulk/counts.npy",
+      "sha256": "a2315db8a4b97a9b8d64301f3f5ca007512b9ef4c0c4782c85d944e698ae7d81",
+      "expected_sha256": "a2315db8a4b97a9b8d64301f3f5ca007512b9ef4c0c4782c85d944e698ae7d81",
+      "baseline": "1.4.1 full Replogle receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/pseudobulk/samples.tsv",
+      "sha256": "e807dff27e46a4d1da46688477c425b3004dfc2d9f6d49ae5747b0a3e8048cd5",
+      "expected_sha256": "e807dff27e46a4d1da46688477c425b3004dfc2d9f6d49ae5747b0a3e8048cd5",
+      "baseline": "1.4.1 full Replogle receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/pseudobulk/genes.tsv",
+      "sha256": "d97372dd32ab7467dccbc4e72d5ea8b181a5eca25629209b6746320f5885e9b8",
+      "expected_sha256": "d97372dd32ab7467dccbc4e72d5ea8b181a5eca25629209b6746320f5885e9b8",
+      "baseline": "1.4.1 full Replogle receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/replogle/k562-essential/full-v1.6.0-gpu/pseudobulk/counts.npy",
+      "sha256": "a2315db8a4b97a9b8d64301f3f5ca007512b9ef4c0c4782c85d944e698ae7d81",
+      "expected_sha256": "a2315db8a4b97a9b8d64301f3f5ca007512b9ef4c0c4782c85d944e698ae7d81",
+      "baseline": "1.4.1 full Replogle receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/replogle/k562-essential/full-v1.6.0-gpu/pseudobulk/samples.tsv",
+      "sha256": "e807dff27e46a4d1da46688477c425b3004dfc2d9f6d49ae5747b0a3e8048cd5",
+      "expected_sha256": "e807dff27e46a4d1da46688477c425b3004dfc2d9f6d49ae5747b0a3e8048cd5",
+      "baseline": "1.4.1 full Replogle receipt",
+      "identical": true
+    },
+    {
+      "file": "validation/work/replogle/k562-essential/full-v1.6.0-gpu/pseudobulk/genes.tsv",
+      "sha256": "d97372dd32ab7467dccbc4e72d5ea8b181a5eca25629209b6746320f5885e9b8",
+      "expected_sha256": "d97372dd32ab7467dccbc4e72d5ea8b181a5eca25629209b6746320f5885e9b8",
+      "baseline": "1.4.1 full Replogle receipt",
+      "identical": true
+    }
+  ],
+  "passed": true,
+  "scope": "Existing shared genome-wide inputs and fresh Replogle input copies verified before their 1.6.0 timed stages; no outputs or timings reused.",
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

@@ -53,7 +53,8 @@ def pydeseq2(data, threads):
     if os.environ.get("RAPIDGLM_QUIET_LOAD"):
         sys.path.insert(0, str(ROOT / "scripts"))
         from quiet_run import wait_quiet
-        cpus = set(range(16, 16 + threads))
+        first = int(os.environ.get("RAPIDGLM_TIMED_FIRST_CPU", "16"))
+        cpus = set(range(first, first + threads))
         wait_quiet(cpus, label=f"Rust comparison {data.name} PyDESeq2")
         os.sched_setaffinity(0, cpus)
     start = time.perf_counter()
@@ -65,6 +66,9 @@ def pydeseq2(data, threads):
     stats = DeseqStats(dds, contrast=contrast, inference=inference, quiet=True)
     stats.summary()
     seconds = time.perf_counter() - start
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        from quiet_run import finish_measurement
+        finish_measurement()
     os.sched_setaffinity(0, affinity)
     return stats.results_df.reset_index(drop=True), dds, seconds, contrast
 
@@ -78,12 +82,16 @@ def rust(data, contrast, workdir):
     if os.environ.get("RAPIDGLM_QUIET_LOAD"):
         sys.path.insert(0, str(ROOT / "scripts"))
         from quiet_run import wait_quiet
-        wait_quiet("16-23", label=f"Rust comparison {data.name} native")
-        command = ["taskset", "-c", "16-23", *command]
+        cpus = os.environ.get("RAPIDGLM_TIMED_EIGHT_CPUS", "16-23")
+        wait_quiet(cpus, label=f"Rust comparison {data.name} native")
+        command = ["taskset", "-c", cpus, *command]
     start = time.perf_counter()
     run = subprocess.run(command,
                          capture_output=True, text=True, check=True)
     seconds = time.perf_counter() - start
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        from quiet_run import finish_measurement
+        finish_measurement()
     return pd.read_csv(path / "results.tsv", sep="\t"), seconds, run.stderr.strip()
 
 

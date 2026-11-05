@@ -7,12 +7,7 @@ DESeq2 1.48.2 is run through its public interface; no DESeq2 source is read.
 The method is in [METHODS.md](../METHODS.md#bulk-differential-expression) and
 the interface in [CLI.md](CLI.md#bulk-differential-expression).
 
-Every table below comes from the complete final 1.4.0 run, completed 2026-10-22,
-on the library code of `v1.4.0-dev.4`. Sources are
-[BULK_DE.json](../validation/BULK_DE.json),
-[COOKS_LEGACY.json](../validation/COOKS_LEGACY.json),
-[COOKS_THYROID.json](../validation/COOKS_THYROID.json), and
-[the release collection](../validation/receipts/v1.4.0/README.md).
+All current tables below report completed 1.6.0 measurements on `v1.6.0-dev.2` (`4505ef6afaa00a38c5c871ae0e12d531c91ec1cf`). The release library is unchanged from the measured dev.2 source. The [receipt collection](../validation/receipts/v1.6.0/README.md) retains tests and timing evidence.
 
 ## Floored fits and starting dispersion in 1.4.0
 
@@ -47,158 +42,107 @@ they document agreement rather than a prediction on held-out data.
 
 ## Agreement with DESeq2
 
-Airway has eight samples and design `~ cell + dex`; the Kang monocyte
-pseudobulk panel has 16 samples with donor and stimulation. Three simulations
-have 4,000 genes, dispersion 0.05 + 2/mean, 10% changed genes and injected
-outliers in 2% of genes. sim3/sim3b have three replicates per group; sim8 has eight.
+Airway, Kang monocyte pseudobulk and three simulations exercise size factors, dispersion, outlier handling and independent filtering. Sources: [BULK_DE.json](../validation/BULK_DE.json).
 
-| Dataset | Discoveries (RapidGLM / DESeq2) | Jaccard | p-value Spearman | Trend a0, a1 (RapidGLM / DESeq2) | Prior variance |
-|---|---|---|---|---|---|
-| airway | 4,833 / 4,834 | 0.986 | 0.999813 | 0.009821, 3.349 / 0.009717, 3.474 | 0.4975 / 0.5285 |
-| Kang | 635 / 635 | 1.000 | 0.999999 | 0.05771, 0.4541 / 0.05773, 0.4542 | 0.8799 / 0.8782 |
-| sim3 | 239 / 239 | 0.983 | 0.999999 | 0.04744, 3.214 / 0.04716, 3.22 | 0.25 / 0.25 |
-| sim3b | 201 / 201 | 1.000 | 0.999999 | 0.04823, 3.434 / 0.04793, 3.439 | 0.25 / 0.25 |
-| sim8 | 253 / 253 | 1.000 | 0.999949 | 0.07045, 2.057 / 0.07014, 2.061 | 0.25 / 0.25 |
-
-Maximum relative size-factor difference is 4.11e-15.
-
-| Simulation | FDR (RapidGLM / DESeq2) | Power (RapidGLM / DESeq2) | Flagged / reference / injected | Replaced (RapidGLM / DESeq2) |
-|---|---|---|---|---|
-| sim3 | 0.121 / 0.117 | 0.506 / 0.508 | 61 / 61 / 69 | 0 / 0 |
-| sim3b | 0.085 / 0.085 | 0.437 / 0.437 | 82 / 82 / 97 | 0 / 0 |
-| sim8 | 0.059 / 0.059 | 0.652 / 0.652 | 0 / 0 / 79 | 79 / 79 |
-
-With eight replicates per group, both tools replace outlying counts and refit.
+| Dataset | Genes | Discoveries (RapidGLM / DESeq2) | Jaccard | P-value Spearman | Median relative dispersion difference |
+| --- | --- | --- | --- | --- | --- |
+| airway | 22369 | 4833 / 4834 | 0.9862 | 0.999813 | 0.0102 |
+| kang | 1000 | 635 / 635 | 1 | 0.999999 | 0.000822 |
+| sim3 | 4000 | 239 / 239 | 0.9834 | 0.999999 | 0.00204 |
+| sim3b | 4000 | 201 / 201 | 1 | 0.999999 | 0.00218 |
+| sim8 | 4000 | 253 / 253 | 1 | 0.999949 | 0.00125 |
 
 ## Mock-comparison null
 
-All 70 four-versus-four donor splits of the Kang panel within one condition.
+All seventy four-versus-four donor splits within one condition on the Kang panel:
 
-| Tool | Tests | Valid | p≤0.05 | p≤0.01 | p≤0.001 | BH 0.05 discoveries/split |
-|---|---|---|---|---|---|---|
-| RapidGLM | 70000 | 69995 | 2.367% | 0.536% | 0.146% | 0.471 |
-| DESeq2 1.48.2 | 70000 | 69995 | 2.392% | 0.537% | 0.146% | 0.471 |
+| Tool | Valid tests | P < .05 | P < .01 | P < .001 | Mean BH .05 discoveries per split |
+| --- | --- | --- | --- | --- | --- |
+| rapidglm | 69995 | 0.023673 | 0.0053575 | 0.0014572 | 0.47143 |
+| deseq2 | 69995 | 0.023916 | 0.0053718 | 0.0014572 | 0.47143 |
 
 ## Speed
 
-One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional.
-The runs below use one or eight efficiency cores. Quiet-start samples are
-retained. These timings are final, not provisional. RapidGLM measures the
-complete CLI command; DESeq2 measures `DESeq()` and `results()`. The separate
-[application benchmark](BENCHMARK.md) compares the R interfaces.
+One AMD Threadripper PRO 5965WX workstation (Zen 3). Timed work uses one thread per physical core on CPUs 6-21, with SMT siblings 30-45 idle; one thread uses CPU 6, eight use 6-13, twelve use 6-17. Drivers and untimed checks use CPUs 0-5.
 
-| Dataset | Genes × samples | RapidGLM 1 thread (s) | RapidGLM 8 threads (s) | DESeq2 (s) |
-|---|---|---|---|---|
-| airway | 22,369 × 8 | 1.025 | 0.271 | 5.988 |
-| Kang | 1,000 × 16 | 0.090 | 0.027 | 1.132 |
-| sim3 | 4,000 × 6 | 0.105 | 0.040 | 1.319 |
-| sim3b | 4,000 × 6 | 0.112 | 0.033 | 1.313 |
-| sim8 | 4,000 × 16 | 0.154 | 0.042 | 2.736 |
+The following CLI timings include input/output; DESeq2 timings cover DESeq() and results(). The application benchmark separately compares the R interfaces.
+
+| Dataset | Genes | RapidGLM 1 thread (s) | RapidGLM 8 threads (s) | DESeq2 (s) |
+| --- | --- | --- | --- | --- |
+| airway | 22369 | 0.89199 | 0.25149 | 5.129 |
+| kang | 1000 | 0.078312 | 0.025862 | 0.979 |
+| sim3 | 4000 | 0.09661 | 0.07124 | 1.148 |
+| sim3b | 4000 | 0.096956 | 0.055611 | 1.139 |
+| sim8 | 4000 | 0.13904 | 0.046592 | 2.458 |
 
 ## Fold-change shrinkage
 
-`lfc_shrink=normal` adds the normal-prior posterior mode of the tested log2
-fold change and its posterior SD, leaving the test unchanged. The prior uses
-the weighted-quantile rule, an intercept variance of 1e6, and a sandwich SD
-with fitted means floored at 0.5. From DESeq2's own coefficient, dispersion
-and size-factor estimates:
+The normal-prior posterior mode and SD use the validated rules in METHODS. From fixed DESeq2 estimates, the formula comparison is:
 
-| Dataset | Genes | Prior variance relative difference | LFC median (max) difference | SD median (max) relative difference |
-|---|---|---|---|---|
-| airway | 2000 | 5.55e-16 | 2.49e-09 (6.45e-07) | 2.78e-11 (1.74e-08) |
-| Kang | 1000 | 2.22e-15 | 6.41e-09 (5.06e-02) | 1.33e-10 (5.94e-03) |
-| sim3 | 2000 | 5.33e-15 | 2.53e-09 (3.50e-02) | 2.29e-11 (2.69e-03) |
-| sim3b | 2000 | 1.78e-15 | 2.12e-09 (7.11e-02) | 1.58e-11 (1.93e-03) |
-| sim8 | 2000 | 1.03e-14 | 1.53e-09 (6.89e-06) | 1.32e-11 (6.75e-08) |
+| Dataset | Genes | Prior variance relative difference | Median / maximum LFC difference | Median / maximum SD relative difference |
+| --- | --- | --- | --- | --- |
+| airway | 2000 | 5.5511e-16 | 2.4916e-09 / 6.4455e-07 | 2.7829e-11 / 1.7435e-08 |
+| kang | 1000 | 2.2204e-15 | 6.4081e-09 / 0.050622 | 1.33e-10 / 0.005935 |
+| sim3 | 2000 | 5.3291e-15 | 2.5326e-09 / 0.034965 | 2.2861e-11 / 0.0026939 |
+| sim3b | 2000 | 1.7764e-15 | 2.1216e-09 / 0.071089 | 1.5792e-11 / 0.0019306 |
+| sim8 | 2000 | 1.0325e-14 | 1.5277e-09 / 6.8868e-06 | 1.3199e-11 / 6.7486e-08 |
 
-End to end, with each tool's own estimates:
+End to end, using each tool’s own estimates:
 
 | Dataset | LFC Pearson | Median absolute difference | 99th percentile |
-|---|---|---|---|
-| airway | 0.999894 | 0.000162 | 0.0136 |
-| Kang | 0.999999 | 8.65e-06 | 0.000499 |
-| sim3 | 0.999982 | 4.16e-05 | 0.0069 |
-| sim3b | 0.999975 | 9.42e-05 | 0.00271 |
-| sim8 | 1.000000 | 2.13e-05 | 0.000432 |
+| --- | --- | --- | --- |
+| airway | 0.9998945 | 0.00016244 | 0.013635 |
+| kang | 0.9999993 | 8.6546e-06 | 0.00049883 |
+| sim3 | 0.9999817 | 4.1555e-05 | 0.0068981 |
+| sim3b | 0.9999751 | 9.4164e-05 | 0.0027111 |
+| sim8 | 1 | 2.1279e-05 | 0.00043222 |
 
-On airway, shrinkage adds 0.192 s to RapidGLM; DESeq2's `lfcShrink` takes 2.720 s.
+For replaced counts, RapidGLM shrinks the refitted effect; the DESeq2 black-box output refits the original counts. This deliberate workflow difference remains.
 
-For replaced counts, RapidGLM shrinks the refitted fold change, consistent
-with its test. DESeq2's black-box outputs show `lfcShrink` refitting the
-original counts. This is a deliberate workflow difference.
+## Larger multi-factor designs and Cook's distances
 
-## Larger multi-factor designs
+The leverage-one rule treats h within four double epsilons of one as exactly one, with undefined Cook distance. Saturation alone does not flag a gene; a finite above-cutoff distance in an eligible replicated cell is still required. An undefined saturated maximum prevents the legacy count-rank exemption. All sixteen required regression genes are flagged in the current one- and eight-thread tables and have missing DESeq2 p-values. [Current evidence](../validation/COOKS_REGRESSION.json).
 
-GTEx thyroid uses `~ centre + Hardy scale + age + sex`, testing sex.
-Outlying counts may still be replaced when Cook's filtering is disabled.
+The earlier alternatives and isolated pre-fix comparisons remain in [COOKS_LEVERAGE.json](../validation/COOKS_LEVERAGE.json); those are development evidence.
 
-| Samples | Discoveries (RapidGLM / DESeq2) | Jaccard | Without Cook filtering: Jaccard (Spearman) |
-|---|---|---|---|
-| 32 | 1,623 / 1,615 | 0.9853 | — |
-| 128 | 790 / 792 | 0.9975 | 1.0000 (0.999959) |
-| 647 | 7,178 / 7,177 | 0.9999 | 1.0000 (0.999998) |
+| Dataset | DESeq2 discoveries | Default discoveries / Jaccard | Own estimator discoveries / Jaccard |
+| --- | --- | --- | --- |
+| airway | 4834 | 4833 / 0.98623 | 4833 / 0.98623 |
+| kang | 635 | 635 / 1 | 635 / 1 |
+| sim3 | 239 | 239 / 0.9834 | 239 / 0.9834 |
+| sim3b | 201 | 201 / 1 | 200 / 0.99502 |
+| sim8 | 253 | 253 / 1 | 253 / 1 |
+| thyroid128 | 792 | 790 / 0.99747 | 463 / 0.5806 |
+| thyroid | 7177 | 7178 / 0.99986 | 6586 / 0.90465 |
 
-## Legacy Cook's distances
+## Replogle pseudobulk
 
-`legacy_cooks` uses the robust-dispersion formula ported from MIT PyDESeq2;
-it has been the default since 1.2.0. `legacy_cooks: false` selects RapidGLM's
-own estimator, based on squared MADs within design cells. Small design cells
-can lead to smaller robust dispersions and more flagged genes.
+The twenty-target pilot aggregates by lane, compares each perturbation with non-targeting cells and uses design ~ lane + perturbed. Complete-command times use one thread.
 
-| Dataset | DESeq2 discoveries | Default: discoveries, Jaccard | Own estimator: discoveries, Jaccard |
-|---|---|---|---|
-| airway | 4834 | 4,833, 0.9862 | 4,833, 0.9862 |
-| kang | 635 | 635, 1.0000 | 635, 1.0000 |
-| sim3 | 239 | 239, 0.9834 | 239, 0.9834 |
-| sim3b | 201 | 201, 1.0000 | 200, 0.9950 |
-| sim8 | 253 | 253, 1.0000 | 253, 1.0000 |
-| thyroid128 | 792 | 790, 0.9975 | 463, 0.5806 |
-| thyroid | 7177 | 7,178, 0.9999 | 6,586, 0.9046 |
+| Target | Samples | Bulk discoveries RapidGLM / DESeq2 | Bulk Jaccard | Bulk speedup | QL Jaccard | QL speedup |
+| --- | --- | --- | --- | --- | --- | --- |
+| AARS2 | 96 | 17 / 17 | 1 | 5.4606× | 1 | 8.1108× |
+| EIF6 | 93 | 1020 / 1025 | 0.9951 | 5.1003× | 1 | 7.8563× |
+| EXOC1 | 92 | 3 / 3 | 1 | 5.3944× | 1 | 7.6548× |
+| FAM136A | 79 | 2056 / 2057 | 0.9947 | 4.4474× | 0.9998 | 6.8193× |
+| GATA1 | 92 | 6062 / 6067 | 0.9988 | 4.4867× | 1 | 8.1901× |
+| HIST1H2AE | 91 | 0 / 0 | 1 | 5.0602× | 1 | 7.6563× |
+| HNRNPR | 94 | 2 / 2 | 1 | 5.2051× | 1 | 7.9399× |
+| ISCA2 | 96 | 69 / 69 | 1 | 5.656× | 1 | 7.7579× |
+| KANSL3 | 95 | 1375 / 1382 | 0.9949 | 5.2568× | 1 | 7.8344× |
+| MRPL16 | 88 | 132 / 132 | 1 | 5.0161× | 1 | 7.7125× |
+| MRPL27 | 90 | 178 / 175 | 0.9721 | 4.9614× | 1 | 7.7445× |
+| MRPS31 | 91 | 111 / 111 | 1 | 5.1136× | 1 | 7.6× |
+| NEPRO | 75 | 1099 / 1098 | 0.9973 | 4.5884× | 1 | 6.7346× |
+| NUP98 | 96 | 2788 / 2787 | 0.9996 | 6.2227× | 1 | 7.9111× |
+| RPS20 | 96 | 2299 / 2299 | 1 | 5.4809× | 1 | 10.91× |
+| RRN3 | 74 | 909 / 909 | 0.9978 | 4.3942× | 1 | 6.4217× |
+| SAP18 | 82 | 615 / 623 | 0.9872 | 4.696× | 1 | 7.3301× |
+| TAF1B | 90 | 31 / 31 | 1 | 4.9834× | 1 | 7.7764× |
+| TRNT1 | 95 | 30 / 30 | 1 | 5.4297× | 1 | 7.1813× |
+| USP8 | 87 | 5 / 5 | 1 | 4.9727× | 1 | 7.5737× |
 
-On thyroid128, the default flags 219
-genes and replaces counts in 67;
-the own estimator flags 753
-and replaces 284.
-The direct public-assay comparison finds 217 shared
-flags between RapidGLM and DESeq2, out of 219 and
-224 respectively
-([COOKS_FLAGS.json](../validation/COOKS_FLAGS.json)).
-
-The historical robust-dispersion inversion diagnostics remain in the
-[dev.3 review](REVIEW_1.4.0_R2.md). They are not reissued as final-run numerical
-validation of equality between the two robust estimators.
-
-## Replogle pseudobulk pilot
-
-Each target is compared with non-targeting cells after aggregation by 10x
-lane, with design `~ lane + perturbed`. Small perturbation groups and widely
-different size factors exercise the floored-fit and independent-filtering
-rules. These are 20 selected targets, not a full Replogle screen. One thread;
-times below cover complete commands. Source:
-[REPLOGLE_PSEUDOBULK.json](../validation/REPLOGLE_PSEUDOBULK.json).
-
-| Target | Samples | Bulk discoveries (RapidGLM / DESeq2) | Bulk Jaccard | Bulk speedup | QL Jaccard | QL speedup |
-|---|---|---|---|---|---|---|
-| AARS2 | 96 | 17 / 17 | 1.0000 | 6.27× | 1.0000 | 6.57× |
-| EIF6 | 93 | 1020 / 1025 | 0.9951 | 5.62× | 1.0000 | 6.29× |
-| EXOC1 | 92 | 3 / 3 | 1.0000 | 5.69× | 1.0000 | 6.16× |
-| FAM136A | 79 | 2056 / 2057 | 0.9947 | 4.85× | 0.9998 | 5.69× |
-| GATA1 | 92 | 6062 / 6067 | 0.9988 | 4.73× | 1.0000 | 6.63× |
-| HIST1H2AE | 91 | 0 / 0 | 1.0000 | 5.40× | 1.0000 | 6.31× |
-| HNRNPR | 94 | 2 / 2 | 1.0000 | 5.90× | 1.0000 | 6.47× |
-| ISCA2 | 96 | 69 / 69 | 1.0000 | 6.55× | 1.0000 | 6.31× |
-| KANSL3 | 95 | 1375 / 1382 | 0.9949 | 6.09× | 1.0000 | 6.35× |
-| MRPL16 | 88 | 132 / 132 | 1.0000 | 5.59× | 1.0000 | 6.25× |
-| MRPL27 | 90 | 178 / 175 | 0.9721 | 5.70× | 1.0000 | 6.39× |
-| MRPS31 | 91 | 111 / 111 | 1.0000 | 5.43× | 1.0000 | 6.30× |
-| NEPRO | 75 | 1099 / 1098 | 0.9973 | 5.02× | 1.0000 | 5.56× |
-| NUP98 | 96 | 2788 / 2787 | 0.9996 | 7.13× | 1.0000 | 6.42× |
-| RPS20 | 96 | 2299 / 2299 | 1.0000 | 6.33× | 1.0000 | 8.87× |
-| RRN3 | 74 | 909 / 909 | 0.9978 | 4.81× | 1.0000 | 5.38× |
-| SAP18 | 82 | 615 / 623 | 0.9872 | 5.26× | 1.0000 | 6.20× |
-| TAF1B | 90 | 31 / 31 | 1.0000 | 5.70× | 1.0000 | 6.43× |
-| TRNT1 | 95 | 30 / 30 | 1.0000 | 6.28× | 1.0000 | 5.85× |
-| USP8 | 87 | 5 / 5 | 1.0000 | 5.50× | 1.0000 | 6.32× |
+The separate full-screen run uses sixteen single-thread workers per tool. Screen speedups are 5.1228× over DESeq2 and 7.5435× over edgeR; median discovery Jaccards are 1 and 1. [The full receipt](../validation/REPLOGLE_PSEUDOBULK_FULL.json) retains every perturbation, filtering discrepancies and pilot/full identity.
 
 ## Known limits and checks
 
@@ -212,8 +156,4 @@ contrast shrinkage, `lfcThreshold`, custom filters, observation weights,
 locfit trends and variance-stabilizing transforms are not implemented.
 Contrasts and joint likelihood-ratio tests are supported.
 
-The final native and forced-portable C++ suites each pass all 172 cases;
-C99, 28 CLI cases on both builds, Python/R bindings, Rust, selected ARM64
-checks and container suites also pass. See [TESTS.json](../validation/TESTS.json)
-and [ARM64.json](../validation/ARM64.json). QEMU checks establish correctness
-on their declared scope and do not measure native ARM performance.
+The GPU-host native, CLI, Python/R binding and container checks passed in both division modes. See [TESTS.json](../validation/TESTS.json). The runbook records the earlier full functional suite on the same source; the coordinator’s separate full ARM64 run is outside this receipt collection.

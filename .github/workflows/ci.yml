@@ -68,6 +68,7 @@ jobs:
           export RAPIDGLM_C_LIBRARY="$PWD/build/librapidglm_c.so" PYTHONPATH="$PWD/bindings/python"
           python3 bindings/python/tests/test_capi.py build/rapidglm
           python3 bindings/python/tests/test_deseq.py build/rapidglm
+          python3 bindings/python/tests/test_special.py
           python3 tests/test_replogle.py
           python3 tests/test_qtl_recipe.py
       - name: RapidGLM as a PyDESeq2 inference back end

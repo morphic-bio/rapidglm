@@ -65,7 +65,9 @@ def main():
                  "beta_vs_permutation_spearman": float(spearmanr(ours.beta_p[valid],
                                                                  ours.permutation_p[valid]).statistic),
                  "wall_seconds": record.get("wall_seconds"), "threads": record.get("threads"),
-                 "permutations": record.get("permutations"), "references": {}}
+                 "permutations": record.get("permutations"),
+                 "permutation_precision": record.get("permutation_precision", "double"),
+                 "references": {}}
         for name in REFERENCES:
             if f"{name}.p" not in reference:
                 continue

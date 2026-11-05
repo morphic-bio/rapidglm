@@ -1,0 +1,860 @@
+{
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "retries": [
+    {
+      "stage": "preprint_qtl",
+      "label": "build/rapidglm qtl /data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/config.json",
+      "pid": 1998933,
+      "cpus": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "slurm_job_id": "692",
+      "started_utc": "2026-10-31T19:29:52.490728+00:00",
+      "finished_utc": "2026-10-31T19:30:29.479351+00:00",
+      "others_cpu": 2.324556942990547e-05,
+      "sibling_busy_fraction": {
+        "30": 0.0007138697853397098,
+        "31": 0.0019149460169926248,
+        "32": 0.004045403560711715,
+        "33": 0.001082132891497579,
+        "34": 0.001065704139312119,
+        "35": 0.0009784981336650696,
+        "36": 0.7991551403709621,
+        "37": 0.801048872931083,
+        "38": 0.002545963487841003,
+        "39": 0.0013496215064284234,
+        "40": 0.0034884405827868264,
+        "41": 0.009314177536066946
+      },
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "command": [
+        "build/rapidglm",
+        "qtl",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/config.json"
+      ],
+      "command_exit": 0,
+      "audit_file": "commands/1998933-1793475029509300743.json",
+      "audit_sha256": "7e164f3655492b7bf982bff9ad9e435d98ba31894106a026e224fa63d3d57c47",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/config.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1998933-1793475029525099313/config.json",
+          "relative_output": "config.json",
+          "sha256": "79bd82b7b8e6541fd143e3824867e9ebaed850b2d9b96577cd7a0e08e0f7b6a3"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/host.failed.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1998933-1793475029525099313/host.failed.json",
+          "relative_output": "host.failed.json",
+          "sha256": "9dffd6c5daef4b8de0195889e586c59f60820f4c7e04a8ceaa4688e32a57499c"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/result.cis.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1998933-1793475029525099313/result.cis.tsv",
+          "relative_output": "result.cis.tsv",
+          "sha256": "1711ddaee4ca140f6edd4e2ab4fc2cd63eb267b7172724cb8a7e51e171852508"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/result.run.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1998933-1793475029525099313/result.run.json",
+          "relative_output": "result.run.json",
+          "sha256": "51f4cc229604bdd75a71bbc94379b766e536652dd80d950b42b8da9a0bbb79c7"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/stderr.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1998933-1793475029525099313/stderr.log",
+          "relative_output": "stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/stdout.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1998933-1793475029525099313/stdout.log",
+          "relative_output": "stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/rapidglm_gaussian10000/time.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1998933-1793475029525099313/time.log",
+          "relative_output": "time.log",
+          "sha256": "eb8de29db0b77cf272e22fc4e25c2db73b771edaa85c76b54b16618fc8d10fdb"
+        }
+      ],
+      "baseline_files_sha256": {
+        "config.json": "79bd82b7b8e6541fd143e3824867e9ebaed850b2d9b96577cd7a0e08e0f7b6a3"
+      },
+      "reason": "Successful command rejected by the unchanged 5% contention predicate. All outputs archived and SHA-256 verified; identical command retried after the full quiet predicate."
+    },
+    {
+      "stage": "preprint_crt",
+      "label": "build/rapidglm sceptre /data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/config.json",
+      "pid": 1999958,
+      "cpus": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "slurm_job_id": "692",
+      "started_utc": "2026-10-31T20:35:33.581932+00:00",
+      "finished_utc": "2026-10-31T20:46:46.813398+00:00",
+      "others_cpu": 0.003975101605630934,
+      "sibling_busy_fraction": {
+        "30": 0.07563440683371168,
+        "31": 0.03471194093703613,
+        "32": 0.02527558721715006,
+        "33": 0.017325760500484854,
+        "34": 0.012481702116108839,
+        "35": 0.00402446941445918,
+        "36": 0.041339575858164085,
+        "37": 0.026753411221295403,
+        "38": 0.01714171160085378,
+        "39": 0.010221149282323878,
+        "40": 0.008995181229567382,
+        "41": 0.006844987548122428,
+        "42": 0.014162788255974567,
+        "43": 0.008135212777153789,
+        "44": 0.009451643879492353,
+        "45": 0.008509067807048971
+      },
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/config.json"
+      ],
+      "command_exit": 0,
+      "audit_file": "commands/1999958-1793479606868129518.json",
+      "audit_sha256": "66e98a47149a1041d2bb85ca7882380783de2143aabdb1bebd1bbedc6d2b9873",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/config.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1999958-1793479606908503159/config.json",
+          "relative_output": "config.json",
+          "sha256": "112bed3e3cbb813a1fe5b391041b797abed5b56c8d760fbba9f5eb510de07454"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/host.failed.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1999958-1793479606908503159/host.failed.json",
+          "relative_output": "host.failed.json",
+          "sha256": "6bc8fb1da58894faae761f0a29797646578b0fb6c6df51d0ac3de94339cb02f4"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/result.qq.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1999958-1793479606908503159/result.qq.tsv",
+          "relative_output": "result.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/result.run.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1999958-1793479606908503159/result.run.json",
+          "relative_output": "result.run.json",
+          "sha256": "b19c33725f646ac96e7ef242328105179e8c242eda51912399d3d5157fc3ce36"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/result.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1999958-1793479606908503159/result.tsv",
+          "relative_output": "result.tsv",
+          "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/stderr.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1999958-1793479606908503159/stderr.log",
+          "relative_output": "stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/stdout.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1999958-1793479606908503159/stdout.log",
+          "relative_output": "stdout.log",
+          "sha256": "63a0ced54a64676a2a3ea693240e38ac0f6acfb59c2f1eacb341be71d546cb63"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_default/time.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-1999958-1793479606908503159/time.log",
+          "relative_output": "time.log",
+          "sha256": "60ece7f69c93459f583a342f737be3a5b23d6e531c623999b2cd6694966f926e"
+        }
+      ],
+      "baseline_files_sha256": {
+        "config.json": "112bed3e3cbb813a1fe5b391041b797abed5b56c8d760fbba9f5eb510de07454"
+      },
+      "reason": "Successful command rejected by the unchanged 5% contention predicate. All outputs archived and SHA-256 verified; identical command retried after the full quiet predicate."
+    },
+    {
+      "stage": "preprint_crt",
+      "label": "build/rapidglm sceptre /data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+      "pid": 2001688,
+      "cpus": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "slurm_job_id": "692",
+      "started_utc": "2026-10-31T21:09:04.518350+00:00",
+      "finished_utc": "2026-10-31T21:26:33.521465+00:00",
+      "others_cpu": 0.0008898772345647044,
+      "sibling_busy_fraction": {
+        "30": 0.03802201207140671,
+        "31": 0.39706743715527626,
+        "32": 0.19411275704410036,
+        "33": 0.10734684933369348,
+        "34": 0.00017197590638606808,
+        "35": 0.03609516832089129,
+        "36": 0.40070781914483655,
+        "37": 0.2501231187352305,
+        "38": 0.070354196394532,
+        "39": 0.0030886271299360277,
+        "40": 0.0657538553260815,
+        "41": 0.0730506093821726,
+        "42": 0.07241775457205277,
+        "43": 0.0010450954469678846,
+        "44": 0.0008322453378292845,
+        "45": 0.0015196175956690725
+      },
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json"
+      ],
+      "command_exit": 0,
+      "audit_file": "commands/2001688-1793481993552164816.json",
+      "audit_sha256": "5ac28236c78a19fe0103d1cda9dd46168b48d53b3c00b30fedc5b4a82c7d0aa8",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793481993568475970/config.json",
+          "relative_output": "config.json",
+          "sha256": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/host.failed.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793481993568475970/host.failed.json",
+          "relative_output": "host.failed.json",
+          "sha256": "f27914e0a6d8d09375d3e2bfd436f56a05e03c90e7ceb4094419c36ab9a2c669"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.qq.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793481993568475970/result.qq.tsv",
+          "relative_output": "result.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.run.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793481993568475970/result.run.json",
+          "relative_output": "result.run.json",
+          "sha256": "d473b1a37ee3bb6aee7a63e0a0357bf90c45a361c4727ab66be25bbae441d3d0"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793481993568475970/result.tsv",
+          "relative_output": "result.tsv",
+          "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stderr.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793481993568475970/stderr.log",
+          "relative_output": "stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stdout.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793481993568475970/stdout.log",
+          "relative_output": "stdout.log",
+          "sha256": "416a45ce479c9747aaf9bb0024d41df068f1a129fe6ee61e3182c09ccd38b037"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/time.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793481993568475970/time.log",
+          "relative_output": "time.log",
+          "sha256": "33161853360516faca784e2500044150888cfd98544da6cc2e62c9398b06e300"
+        }
+      ],
+      "baseline_files_sha256": {
+        "config.json": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+      },
+      "reason": "Successful command rejected by the unchanged 5% contention predicate. All outputs archived and SHA-256 verified; identical command retried after the full quiet predicate."
+    },
+    {
+      "stage": "preprint_crt",
+      "label": "build/rapidglm sceptre /data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+      "pid": 2001688,
+      "cpus": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "slurm_job_id": "692",
+      "started_utc": "2026-10-31T21:46:57.373237+00:00",
+      "finished_utc": "2026-10-31T22:04:24.825888+00:00",
+      "others_cpu": 0.0013729865234957392,
+      "sibling_busy_fraction": {
+        "30": 0.0014526778604902074,
+        "31": 0.08776403268398815,
+        "32": 0.020480212935182755,
+        "33": 0.15942357543789035,
+        "34": 0.0017454365937812596,
+        "35": 0.005134647903408894,
+        "36": 0.14885194106731797,
+        "37": 0.0035783582992660115,
+        "38": 0.42530107652508536,
+        "39": 0.1512571075338049,
+        "40": 0.012180675075196996,
+        "41": 0.0022442039608590388,
+        "42": 0.14033624709807313,
+        "43": 0.0871208980102626,
+        "44": 0.13711635448663953,
+        "45": 0.18369386170864466
+      },
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json"
+      ],
+      "command_exit": 0,
+      "audit_file": "commands/2001688-1793484264856886765.json",
+      "audit_sha256": "b5ad291bd2771ac4388208884efc0397fa61d4e53e9e2414f91a27e5d395e881",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793484264872741855/config.json",
+          "relative_output": "config.json",
+          "sha256": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/host.failed.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793484264872741855/host.failed.json",
+          "relative_output": "host.failed.json",
+          "sha256": "eac50923925cc1415eb3af69b13a0e7a05b2fa08faecbeda905ef49dc2b6606c"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.qq.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793484264872741855/result.qq.tsv",
+          "relative_output": "result.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.run.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793484264872741855/result.run.json",
+          "relative_output": "result.run.json",
+          "sha256": "ca291adf5af11444d2afd45bd38286178214e8dd4ae26a2dd32371bf482c1363"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793484264872741855/result.tsv",
+          "relative_output": "result.tsv",
+          "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stderr.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793484264872741855/stderr.log",
+          "relative_output": "stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stdout.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793484264872741855/stdout.log",
+          "relative_output": "stdout.log",
+          "sha256": "d5e7276f5ef862b3a552894056e1496f8aab1e8c520dc89b61f8e475ce14f086"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/time.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793484264872741855/time.log",
+          "relative_output": "time.log",
+          "sha256": "a792e11cd1b4e6746ffb2a81798729ed5dfda44b7786665b0e47c58a3068ac18"
+        }
+      ],
+      "baseline_files_sha256": {
+        "config.json": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+      },
+      "reason": "Successful command rejected by the unchanged 5% contention predicate. All outputs archived and SHA-256 verified; identical command retried after the full quiet predicate."
+    },
+    {
+      "stage": "preprint_crt",
+      "label": "build/rapidglm sceptre /data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+      "pid": 2001688,
+      "cpus": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "slurm_job_id": "692",
+      "started_utc": "2026-10-31T22:18:28.125222+00:00",
+      "finished_utc": "2026-10-31T22:35:52.800063+00:00",
+      "others_cpu": 0.0014343832223724482,
+      "sibling_busy_fraction": {
+        "30": 0.02115210789113474,
+        "31": 0.06573480544750991,
+        "32": 0.25897407393679417,
+        "33": 0.08595350268681978,
+        "34": 0.0034405894576103368,
+        "35": 0.16501962130235412,
+        "36": 0.012145373226090102,
+        "37": 0.002146759959656579,
+        "38": 0.0009699061875811167,
+        "39": 0.0010741471068873507,
+        "40": 0.026335366361503864,
+        "41": 0.8617775932474686,
+        "42": 0.00974650878765446,
+        "43": 0.0028958218737920316,
+        "44": 0.004122008110473673,
+        "45": 0.008643883009941351
+      },
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json"
+      ],
+      "command_exit": 0,
+      "audit_file": "commands/2001688-1793486152830509601.json",
+      "audit_sha256": "0699d9a9f4c6c0ed19042d6e1d53e2cbabf7adfad194cde53f88b59868082216",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793486152845672162/config.json",
+          "relative_output": "config.json",
+          "sha256": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/host.failed.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793486152845672162/host.failed.json",
+          "relative_output": "host.failed.json",
+          "sha256": "4618805a5ebd8091cb98c6634e39799ea47fe71f0d50a19489547fb4c276da63"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.qq.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793486152845672162/result.qq.tsv",
+          "relative_output": "result.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.run.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793486152845672162/result.run.json",
+          "relative_output": "result.run.json",
+          "sha256": "c3de345ff5e2464d08e762ced0349bc5e2864468013111e6b9b226bcf936b987"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793486152845672162/result.tsv",
+          "relative_output": "result.tsv",
+          "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stderr.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793486152845672162/stderr.log",
+          "relative_output": "stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stdout.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793486152845672162/stdout.log",
+          "relative_output": "stdout.log",
+          "sha256": "c72d18588726a7ff6e0c75b7353dbcfa86951825c2885b51c0f07d2d9789e421"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/time.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793486152845672162/time.log",
+          "relative_output": "time.log",
+          "sha256": "5246a99b78bc8f1635738b80151fd1b786462b7b3c68f5b9a4ff95bf1ea488bc"
+        }
+      ],
+      "baseline_files_sha256": {
+        "config.json": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+      },
+      "reason": "Successful command rejected by the unchanged 5% contention predicate. All outputs archived and SHA-256 verified; identical command retried after the full quiet predicate."
+    },
+    {
+      "stage": "preprint_crt",
+      "label": "build/rapidglm sceptre /data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+      "pid": 2001688,
+      "cpus": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "slurm_job_id": "692",
+      "started_utc": "2026-10-31T22:49:56.065224+00:00",
+      "finished_utc": "2026-10-31T23:07:17.142309+00:00",
+      "others_cpu": 0.0007440740992467981,
+      "sibling_busy_fraction": {
+        "30": 0.0018651738035072357,
+        "31": 0.006349347696587748,
+        "32": 0.09667204281302967,
+        "33": 0.3189474793325148,
+        "34": 0.001227415963053543,
+        "35": 0.000993098570389895,
+        "36": 0.6050969953670591,
+        "37": 0.14944171493664726,
+        "38": 0.0024869427002617425,
+        "39": 0.0028989979343614146,
+        "40": 0.004084660194090304,
+        "41": 0.001113611397054036,
+        "42": 0.23384661518575858,
+        "43": 0.0051767910754899026,
+        "44": 0.011357576865768824,
+        "45": 0.0023796615078774605
+      },
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json"
+      ],
+      "command_exit": 0,
+      "audit_file": "commands/2001688-1793488037173349334.json",
+      "audit_sha256": "41d4a62ec19cb8233f1f69430c6fe2534f344141883b4c4cd5062da0ffa10ee5",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793488037188594722/config.json",
+          "relative_output": "config.json",
+          "sha256": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/host.failed.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793488037188594722/host.failed.json",
+          "relative_output": "host.failed.json",
+          "sha256": "0889610b2ab10903068c7fcbf9e424a9d5212f80214f43251bc32a3997d40f6b"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.qq.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793488037188594722/result.qq.tsv",
+          "relative_output": "result.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.run.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793488037188594722/result.run.json",
+          "relative_output": "result.run.json",
+          "sha256": "4f2811af2f5a54e8f76d518061a07be9c98784c6bbf8d909904c205a1bcfb68d"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793488037188594722/result.tsv",
+          "relative_output": "result.tsv",
+          "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stderr.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793488037188594722/stderr.log",
+          "relative_output": "stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stdout.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793488037188594722/stdout.log",
+          "relative_output": "stdout.log",
+          "sha256": "5c9646408bed7adf609d37f2be176b22cf2112b8e5144841242610f668daec22"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/time.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793488037188594722/time.log",
+          "relative_output": "time.log",
+          "sha256": "2a4932969f33d00e7478de3b593af266438f480a45f345be8fcacb7b3cca3b5c"
+        }
+      ],
+      "baseline_files_sha256": {
+        "config.json": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+      },
+      "reason": "Successful command rejected by the unchanged 5% contention predicate. All outputs archived and SHA-256 verified; identical command retried after the full quiet predicate."
+    },
+    {
+      "stage": "preprint_crt",
+      "label": "build/rapidglm sceptre /data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+      "pid": 2001688,
+      "cpus": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "slurm_job_id": "692",
+      "started_utc": "2026-10-31T23:21:30.930012+00:00",
+      "finished_utc": "2026-10-31T23:38:55.457931+00:00",
+      "others_cpu": 0.002996384993327188,
+      "sibling_busy_fraction": {
+        "30": 0.261213195546985,
+        "31": 0.01651998804797081,
+        "32": 0.003319271615755516,
+        "33": 0.004625379838314676,
+        "34": 0.1666262087117167,
+        "35": 0.0010333220332987213,
+        "36": 0.1740159651348149,
+        "37": 0.11138054933475636,
+        "38": 0.5743054848947766,
+        "39": 0.024995699901778384,
+        "40": 0.004412517236823671,
+        "41": 0.0018246512464378949,
+        "42": 0.06932334244482145,
+        "43": 0.04883888437191481,
+        "44": 0.001262403316792042,
+        "45": 0.0013792653165049698
+      },
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json"
+      ],
+      "command_exit": 0,
+      "audit_file": "commands/2001688-1793489935488590137.json",
+      "audit_sha256": "4c4e64e6618641059353ccf77c2c45b3428d792d5371b52247cbc7be1549cbc7",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793489935503856676/config.json",
+          "relative_output": "config.json",
+          "sha256": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/host.failed.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793489935503856676/host.failed.json",
+          "relative_output": "host.failed.json",
+          "sha256": "acef92f7f0cbffe57b8de98c8404ebe265b86ce67fc4b27b42bd5d23639ff351"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.qq.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793489935503856676/result.qq.tsv",
+          "relative_output": "result.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.run.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793489935503856676/result.run.json",
+          "relative_output": "result.run.json",
+          "sha256": "6983e5343ae778dc3c642f020a125cc397b220a660535d8188b9d2829def9e0c"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793489935503856676/result.tsv",
+          "relative_output": "result.tsv",
+          "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stderr.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793489935503856676/stderr.log",
+          "relative_output": "stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stdout.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793489935503856676/stdout.log",
+          "relative_output": "stdout.log",
+          "sha256": "cebc4999d5a2764dfff8c105bb27ff747f87d3278693d66f568d45e44b719901"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/time.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793489935503856676/time.log",
+          "relative_output": "time.log",
+          "sha256": "a5e5c9e887ff0c914a5b3b3d48e93c7c56dec95aa58865295f09a79cf3a569ef"
+        }
+      ],
+      "baseline_files_sha256": {
+        "config.json": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+      },
+      "reason": "Successful command rejected by the unchanged 5% contention predicate. All outputs archived and SHA-256 verified; identical command retried after the full quiet predicate."
+    },
+    {
+      "stage": "preprint_crt",
+      "label": "build/rapidglm sceptre /data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+      "pid": 2001688,
+      "cpus": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "slurm_job_id": "692",
+      "started_utc": "2026-10-31T23:52:58.965853+00:00",
+      "finished_utc": "2026-11-01T00:10:26.936645+00:00",
+      "others_cpu": 0.0006785417438543368,
+      "sibling_busy_fraction": {
+        "30": 0.04319557809002485,
+        "31": 0.1788768748047751,
+        "32": 0.003430218780515556,
+        "33": 0.006303123707273455,
+        "34": 0.25306027620618493,
+        "35": 0.15237551036079522,
+        "36": 0.011802800912718936,
+        "37": 0.1606008149609972,
+        "38": 0.28309886261471373,
+        "39": 0.4414387104185117,
+        "40": 0.0019367976454938711,
+        "41": 0.0024278045773601506,
+        "42": 0.09006262434734634,
+        "43": 0.0012156763463499623,
+        "44": 0.001085921472242583,
+        "45": 0.0010801439162338449
+      },
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "command": [
+        "build/rapidglm",
+        "sceptre",
+        "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json"
+      ],
+      "command_exit": 0,
+      "audit_file": "commands/2001688-1793491826967373190.json",
+      "audit_sha256": "2c4df40e00fc22d32a8f4661e87cec0a75abde787882da038219cbbb062b25b1",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/config.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793491826982633680/config.json",
+          "relative_output": "config.json",
+          "sha256": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/host.failed.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793491826982633680/host.failed.json",
+          "relative_output": "host.failed.json",
+          "sha256": "081e04d1ac15707db750210d9c3cd9fb5f2e5f556322087b4df0579d3fccd696"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.qq.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793491826982633680/result.qq.tsv",
+          "relative_output": "result.qq.tsv",
+          "sha256": "46083d515a516cf5f5bbb2538f5bdc84aea4c622eca7d246fa9985a1f8011691"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.run.json",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793491826982633680/result.run.json",
+          "relative_output": "result.run.json",
+          "sha256": "d24f6e96bbecf89edaa3b17ae2fe7904ae1ad738990c8fa8a68b4359b8b54879"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/result.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793491826982633680/result.tsv",
+          "relative_output": "result.tsv",
+          "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stderr.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793491826982633680/stderr.log",
+          "relative_output": "stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/stdout.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793491826982633680/stdout.log",
+          "relative_output": "stdout.log",
+          "sha256": "75c4f488b8b3243e1751d1ca921ae83c9a48e234f9011e3a675a6528feb8532b"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/preprint/crt_ks_opt_out/time.log",
+          "copy": "validation/work/release-1.6.0-gpu/guarded-command-retries/692-2001688-1793491826982633680/time.log",
+          "relative_output": "time.log",
+          "sha256": "42e6fd70766efd0161b3c0f74e62195590927f8a63fc4a34f37377ba5a4f4442"
+        }
+      ],
+      "baseline_files_sha256": {
+        "config.json": "61c0e7e2547024c3322c4b9424a281df1cb0a4ef39703b3b03fd7d8d3366e7b7"
+      },
+      "reason": "Successful command rejected by the unchanged 5% contention predicate. All outputs archived and SHA-256 verified; identical command retried after the full quiet predicate."
+    }
+  ],
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

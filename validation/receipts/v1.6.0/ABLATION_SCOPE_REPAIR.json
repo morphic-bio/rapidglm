@@ -1,0 +1,48 @@
+{
+  "recorded_utc": "2026-11-03T10:37:19.810272+00:00",
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "runner_commit": "3e731bd2cd784e829ba30fb228401cea776e12cc",
+  "reason": "Remove the redundant outer measurement from the two cold-start Replogle ablation drivers; each actual command retains its inner timing guard, lock and CPU affinity.",
+  "library_sources_binaries_images_inputs_and_thresholds_unchanged": true,
+  "no_timed_command_interrupted": true,
+  "no_prior_full_stage_ablation_timings": true,
+  "no_accepted_timings_invalidated": true,
+  "focused_preprint_pairs_retained_separately": true,
+  "tests": {
+    "all_passed": true,
+    "ablation_scope_tests": 4,
+    "existing_driver_scope_tests": 6,
+    "preserved_preprint_stamp": {
+      "passed": true,
+      "preserved_preprint_files": [
+        "PREPRINT_PLAN.json",
+        "PREPRINT_GATE.json",
+        "preprint-chain-status.json"
+      ],
+      "new_stage_stamped": true
+    },
+    "logs": {
+      "ablation-tests.log": {
+        "file": "validation/work/release-1.6.0-gpu/full-resume-20261103/ablation-tests.log",
+        "sha256": "98f1fe11490be35e84263f3be3a3d52e9cde760e4b18747c26b257bc6c478c4f"
+      },
+      "driver-tests.log": {
+        "file": "validation/work/release-1.6.0-gpu/full-resume-20261103/driver-tests.log",
+        "sha256": "0dda2f2857622c8ea8238b19a284708ffb1f0ae508012beb64a190fc9e3f4539"
+      },
+      "STAMP_TESTS.json": {
+        "file": "validation/work/release-1.6.0-gpu/full-resume-20261103/STAMP_TESTS.json",
+        "sha256": "f122f7bb60bde47d3ebda12393247ee5dd10e0806345588859af239ede87df06"
+      }
+    }
+  },
+  "patch": {
+    "file": "validation/work/release-1.6.0-gpu/full-resume-20261103/resume-harness.patch",
+    "sha256": "3d797d272631d00e176fa7ee2fb0cb93f2d11d32d7b681db22584cf71de4809f"
+  },
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

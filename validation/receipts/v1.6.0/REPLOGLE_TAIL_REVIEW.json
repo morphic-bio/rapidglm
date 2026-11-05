@@ -1,0 +1,29 @@
+{
+  "recorded_utc": "2026-11-05T10:14:31.655365+00:00",
+  "scope": "completed full-run Replogle ablations",
+  "pairs": {
+    "strict": {
+      "tail_rows": 15370,
+      "tail_values_changed": 15355,
+      "tail_relative_over_1e_4": 44,
+      "maximum_p_in_relative_over_1e_4": "5.039846036163087E-20",
+      "max_absolute_tail_p_difference": "3.630791E-12",
+      "max_relative_p_difference": "11.333333333333333388717833157704828413112994465905",
+      "calculation": "50-digit Decimal arithmetic on emitted table strings; no binary floating-point underflow in diagnostics",
+      "default_sha256": "5a43a46bd78af4aa9dcbddc4e35dde160b2f3069be76952148136acf4d564f35",
+      "opt_out_sha256": "49a4b906c9bc5035f4b4e05dd217518701d746b7de3b83b81d9e75b477541144"
+    },
+    "ks": {
+      "tail_rows": 16057,
+      "tail_values_changed": 16037,
+      "tail_relative_over_1e_4": 72,
+      "maximum_p_in_relative_over_1e_4": "2.7267684638010437E-17",
+      "max_absolute_tail_p_difference": "3.630791E-12",
+      "max_relative_p_difference": "60.000000000000001636881833810611281335230051464294",
+      "calculation": "50-digit Decimal arithmetic on emitted table strings; no binary floating-point underflow in diagnostics",
+      "default_sha256": "372362b2bf6a86a929e16a51f55c155d13db7ec90a098bb5d9f3a981042b8000",
+      "opt_out_sha256": "33945d227639cdebda497b35fef426666481de142178a414a801d6a61b56aa05"
+    }
+  },
+  "empirical_p_status_and_discovery_agreement_unchanged": true
+}

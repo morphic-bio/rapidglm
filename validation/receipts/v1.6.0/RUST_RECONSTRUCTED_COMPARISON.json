@@ -1,0 +1,440 @@
+{
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "checked_utc": "2026-11-05T10:14:27.975313+00:00",
+  "historical_raw_table_identity_established": false,
+  "scope": "The original historical temporary tables are unavailable. This is a fresh untimed reconstruction from their preserved hash-verified binaries, with exact agreement of every retained historical scientific diagnostic. It strengthens scientific agreement without claiming possession of the deleted historical tables.",
+  "comparisons": [
+    {
+      "dataset": "airway",
+      "reference_reconstruction": {
+        "checked_utc": "2026-10-30T09:27:24.278049+00:00",
+        "dataset": "airway",
+        "reference_commit": "67f5adc3aeb09329a93d10cd608110f3bc0ca72e",
+        "untimed": true,
+        "cpus": "0-5",
+        "historical_raw_tables": false,
+        "scope": "Fresh reconstruction from the preserved hash-verified 1.5.0 binaries and unchanged own comparison source. Elapsed diagnostics are not benchmark timings. Original temporary historical tables are unavailable.",
+        "binaries_sha256": {
+          "build/librapidglm_c.so": "78e85c361d2471f53e5703f9902a8d013f30a8d7b8d0a9552ca47c5f90ed45de",
+          "bindings/rust/target/release/examples/deseq": "45d3882239bca5e364693cd3fb32f6932a8366b299628993bcfd7b676a78653a"
+        },
+        "comparison_script_sha256": "3ad84da1bef69d9567b3c684e0d07277fd2e065c79467f687de2e443ff4dd6f0",
+        "input_sha256": {
+          "counts.mtx": "0fcaf1f5f07ab9e11d64f3f636d68985349218b23b0a96cae5b84d7d7ff6ae9e",
+          "design.tsv": "a8436a8b479baee8fdf676a07974783fa458d6212d22554c21e969551d952424"
+        },
+        "retained_historical_scientific_fields_identical": true,
+        "scientific_fields": {
+          "samples": 8,
+          "genes": 22369,
+          "columns": {
+            "baseMean": {
+              "max_relative": 7.167681902154538e-16,
+              "over_1e-6": 0,
+              "over_1e-3": 0,
+              "missing_mismatch": 0
+            },
+            "log2FoldChange": {
+              "max_relative": 1704.362672673584,
+              "over_1e-6": 21375,
+              "over_1e-3": 8016,
+              "missing_mismatch": 0
+            },
+            "lfcSE": {
+              "max_relative": 9.50891638349221,
+              "over_1e-6": 22331,
+              "over_1e-3": 19302,
+              "missing_mismatch": 0
+            },
+            "stat": {
+              "max_relative": 1675.2542092315555,
+              "over_1e-6": 22368,
+              "over_1e-3": 19180,
+              "missing_mismatch": 0
+            },
+            "pvalue": {
+              "max_relative": 12111.078155085395,
+              "over_1e-6": 22359,
+              "over_1e-3": 18991,
+              "missing_mismatch": 0
+            },
+            "padj": {
+              "max_relative": 5487.627196984809,
+              "over_1e-6": 18031,
+              "over_1e-3": 16325,
+              "missing_mismatch": 0
+            }
+          },
+          "calls": {
+            "rust": 3917,
+            "pydeseq2": 3882,
+            "both": 3882,
+            "jaccard": 0.9910645902476385
+          }
+        },
+        "tables_sha256": {
+          "native.tsv": "cdc105730cd789be2c06a03958dda62046978c4b26d99fd980914266aea0d054",
+          "pydeseq2.tsv": "7c522eeb557426f368ad374613fc642ade942abb0320db0ce989ee18481994df"
+        },
+        "execution": {
+          "driver_sha256": "86a5d4ac25e60afd55876bc6e409811184b34b14254abfb30d5aab073289400b",
+          "capture_helper_sha256": "d48c0082b49916082c66ca4edde1924c6681db9eb23c53fd44eff5eb6c8f09cc",
+          "python_library": "/data/lhhung/rapidglm/build/librapidglm_c.so",
+          "python_source": "/data/lhhung/rapidglm/bindings/python",
+          "native_library_resolution": "/data/lhhung/rapidglm/build/librapidglm_c.so.1",
+          "native_library_resolution_sha256": "78e85c361d2471f53e5703f9902a8d013f30a8d7b8d0a9552ca47c5f90ed45de",
+          "native_runpath": "/data/lhhung/rapidglm/build",
+          "requested_workers": 8,
+          "allowed_cpus": "0-5",
+          "guard_disabled_for_untimed_reference": true
+        }
+      },
+      "tables": [
+        {
+          "file": "validation/receipts/v1.6.0/rust_tables/airway/native.tsv",
+          "new_sha256": "cdc105730cd789be2c06a03958dda62046978c4b26d99fd980914266aea0d054",
+          "reconstructed_reference_sha256": "cdc105730cd789be2c06a03958dda62046978c4b26d99fd980914266aea0d054",
+          "byte_identical": true,
+          "reference_archive": "validation/receipts/v1.6.0/rust_reference_tables/airway/native.tsv.gz",
+          "reference_archive_sha256": "5a152a1bd4649a9a109377a174bd2ea56302ecd83668d87c27cec2dd66720b8b"
+        },
+        {
+          "file": "validation/receipts/v1.6.0/rust_tables/airway/pydeseq2.tsv",
+          "new_sha256": "7c522eeb557426f368ad374613fc642ade942abb0320db0ce989ee18481994df",
+          "reconstructed_reference_sha256": "7c522eeb557426f368ad374613fc642ade942abb0320db0ce989ee18481994df",
+          "byte_identical": true,
+          "reference_archive": "validation/receipts/v1.6.0/rust_reference_tables/airway/pydeseq2.tsv.gz",
+          "reference_archive_sha256": "e1e7f21e740919c7b570d290e6fff0ef69383982e28fd13e1f923f9263bc6f0d"
+        }
+      ]
+    },
+    {
+      "dataset": "thyroid32",
+      "reference_reconstruction": {
+        "checked_utc": "2026-10-30T09:27:31.877466+00:00",
+        "dataset": "thyroid32",
+        "reference_commit": "67f5adc3aeb09329a93d10cd608110f3bc0ca72e",
+        "untimed": true,
+        "cpus": "0-5",
+        "historical_raw_tables": false,
+        "scope": "Fresh reconstruction from the preserved hash-verified 1.5.0 binaries and unchanged own comparison source. Elapsed diagnostics are not benchmark timings. Original temporary historical tables are unavailable.",
+        "binaries_sha256": {
+          "build/librapidglm_c.so": "78e85c361d2471f53e5703f9902a8d013f30a8d7b8d0a9552ca47c5f90ed45de",
+          "bindings/rust/target/release/examples/deseq": "45d3882239bca5e364693cd3fb32f6932a8366b299628993bcfd7b676a78653a"
+        },
+        "comparison_script_sha256": "3ad84da1bef69d9567b3c684e0d07277fd2e065c79467f687de2e443ff4dd6f0",
+        "input_sha256": {
+          "counts.mtx": "c60e988542caacb914e45dc1a88e956f1612d940509ddf5c6a670104d2d45093",
+          "design.tsv": "be10a55c6a051f13b69dfc0b495042443f146862d6758bb2dc86c63833d9f06c"
+        },
+        "retained_historical_scientific_fields_identical": true,
+        "scientific_fields": {
+          "samples": 32,
+          "genes": 28769,
+          "columns": {
+            "baseMean": {
+              "max_relative": 2.1023910697032952e-15,
+              "over_1e-6": 0,
+              "over_1e-3": 0,
+              "missing_mismatch": 0
+            },
+            "log2FoldChange": {
+              "max_relative": 6.206594840668248,
+              "over_1e-6": 28667,
+              "over_1e-3": 8757,
+              "missing_mismatch": 0
+            },
+            "lfcSE": {
+              "max_relative": 217.06032889656137,
+              "over_1e-6": 28700,
+              "over_1e-3": 8266,
+              "missing_mismatch": 0
+            },
+            "stat": {
+              "max_relative": 6.063406497752158,
+              "over_1e-6": 28752,
+              "over_1e-3": 14135,
+              "missing_mismatch": 0
+            },
+            "pvalue": {
+              "max_relative": 3.4003635397556437e+21,
+              "over_1e-6": 28619,
+              "over_1e-3": 14199,
+              "missing_mismatch": 26
+            },
+            "padj": {
+              "max_relative": 2.7626605174567004e+18,
+              "over_1e-6": 28620,
+              "over_1e-3": 8955,
+              "missing_mismatch": 26
+            }
+          },
+          "calls": {
+            "rust": 1232,
+            "pydeseq2": 1250,
+            "both": 1224,
+            "jaccard": 0.972972972972973
+          },
+          "cooks_outliers": {
+            "deseq2": 128,
+            "rust": 110,
+            "pydeseq2_rapidglm": 90,
+            "jaccard_rust_deseq2": 0.845,
+            "jaccard_pydeseq2_deseq2": 0.703,
+            "singleton_design_cell_samples": 13,
+            "pydeseq2_infinite_distances": 0,
+            "mismatched_genes": {
+              "total": 26,
+              "rust_only": 23,
+              "pydeseq2_only": 3,
+              "pydeseq2_max_at_singleton_design_cell_sample": 24
+            }
+          }
+        },
+        "tables_sha256": {
+          "native.tsv": "c353a396780301ac6809df724dbd42146d35eec2e24b63a2f5bb743b6abab5f0",
+          "pydeseq2.tsv": "7ddd68184860892bb306cd1bc2d0e8b0f8b1b97a782ff25f3b4ab062d7d15df5"
+        },
+        "execution": {
+          "driver_sha256": "86a5d4ac25e60afd55876bc6e409811184b34b14254abfb30d5aab073289400b",
+          "capture_helper_sha256": "d48c0082b49916082c66ca4edde1924c6681db9eb23c53fd44eff5eb6c8f09cc",
+          "python_library": "/data/lhhung/rapidglm/build/librapidglm_c.so",
+          "python_source": "/data/lhhung/rapidglm/bindings/python",
+          "native_library_resolution": "/data/lhhung/rapidglm/build/librapidglm_c.so.1",
+          "native_library_resolution_sha256": "78e85c361d2471f53e5703f9902a8d013f30a8d7b8d0a9552ca47c5f90ed45de",
+          "native_runpath": "/data/lhhung/rapidglm/build",
+          "requested_workers": 8,
+          "allowed_cpus": "0-5",
+          "guard_disabled_for_untimed_reference": true
+        }
+      },
+      "tables": [
+        {
+          "file": "validation/receipts/v1.6.0/rust_tables/thyroid32/native.tsv",
+          "new_sha256": "c353a396780301ac6809df724dbd42146d35eec2e24b63a2f5bb743b6abab5f0",
+          "reconstructed_reference_sha256": "c353a396780301ac6809df724dbd42146d35eec2e24b63a2f5bb743b6abab5f0",
+          "byte_identical": true,
+          "reference_archive": "validation/receipts/v1.6.0/rust_reference_tables/thyroid32/native.tsv.gz",
+          "reference_archive_sha256": "493a371ff1609b0e373c2e694f72a06d800c6976f3abd988334a641657619510"
+        },
+        {
+          "file": "validation/receipts/v1.6.0/rust_tables/thyroid32/pydeseq2.tsv",
+          "new_sha256": "7ddd68184860892bb306cd1bc2d0e8b0f8b1b97a782ff25f3b4ab062d7d15df5",
+          "reconstructed_reference_sha256": "7ddd68184860892bb306cd1bc2d0e8b0f8b1b97a782ff25f3b4ab062d7d15df5",
+          "byte_identical": true,
+          "reference_archive": "validation/receipts/v1.6.0/rust_reference_tables/thyroid32/pydeseq2.tsv.gz",
+          "reference_archive_sha256": "820c6ab1789d7085168fe954bfad9162982f1a2f47a64f283937cdd498f409a8"
+        }
+      ]
+    },
+    {
+      "dataset": "thyroid128",
+      "reference_reconstruction": {
+        "checked_utc": "2026-10-30T09:27:42.652161+00:00",
+        "dataset": "thyroid128",
+        "reference_commit": "67f5adc3aeb09329a93d10cd608110f3bc0ca72e",
+        "untimed": true,
+        "cpus": "0-5",
+        "historical_raw_tables": false,
+        "scope": "Fresh reconstruction from the preserved hash-verified 1.5.0 binaries and unchanged own comparison source. Elapsed diagnostics are not benchmark timings. Original temporary historical tables are unavailable.",
+        "binaries_sha256": {
+          "build/librapidglm_c.so": "78e85c361d2471f53e5703f9902a8d013f30a8d7b8d0a9552ca47c5f90ed45de",
+          "bindings/rust/target/release/examples/deseq": "45d3882239bca5e364693cd3fb32f6932a8366b299628993bcfd7b676a78653a"
+        },
+        "comparison_script_sha256": "3ad84da1bef69d9567b3c684e0d07277fd2e065c79467f687de2e443ff4dd6f0",
+        "input_sha256": {
+          "counts.mtx": "f2dbd9877f6235b7e82b3d76923821410a0fa596fe6b7037964c7d7d154445bc",
+          "design.tsv": "1de4a5345b34f654679e7af2cc9880e3a1094400dc56c02ceb59bf585c8a5b33"
+        },
+        "retained_historical_scientific_fields_identical": true,
+        "scientific_fields": {
+          "samples": 128,
+          "genes": 28769,
+          "columns": {
+            "baseMean": {
+              "max_relative": 0.2387121932791845,
+              "over_1e-6": 2,
+              "over_1e-3": 2,
+              "missing_mismatch": 0
+            },
+            "log2FoldChange": {
+              "max_relative": 52.168661760723495,
+              "over_1e-6": 28631,
+              "over_1e-3": 7825,
+              "missing_mismatch": 0
+            },
+            "lfcSE": {
+              "max_relative": 904.5329130896996,
+              "over_1e-6": 27089,
+              "over_1e-3": 134,
+              "missing_mismatch": 0
+            },
+            "stat": {
+              "max_relative": 52.16888831490415,
+              "over_1e-6": 28670,
+              "over_1e-3": 7829,
+              "missing_mismatch": 0
+            },
+            "pvalue": {
+              "max_relative": 1.1343825603218405e+56,
+              "over_1e-6": 28426,
+              "over_1e-3": 6906,
+              "missing_mismatch": 6
+            },
+            "padj": {
+              "max_relative": 1.03118462579602e+56,
+              "over_1e-6": 28471,
+              "over_1e-3": 3736,
+              "missing_mismatch": 6
+            }
+          },
+          "calls": {
+            "rust": 458,
+            "pydeseq2": 463,
+            "both": 458,
+            "jaccard": 0.9892008639308856
+          }
+        },
+        "tables_sha256": {
+          "native.tsv": "cab670ee301afc0c60d9df2435a41564c1d7c626a387a296608a598ed1510357",
+          "pydeseq2.tsv": "38ae1cc1f609ebbed829ced9003081d724a1363a1259d63f4af63b8b22cfb9f8"
+        },
+        "execution": {
+          "driver_sha256": "86a5d4ac25e60afd55876bc6e409811184b34b14254abfb30d5aab073289400b",
+          "capture_helper_sha256": "d48c0082b49916082c66ca4edde1924c6681db9eb23c53fd44eff5eb6c8f09cc",
+          "python_library": "/data/lhhung/rapidglm/build/librapidglm_c.so",
+          "python_source": "/data/lhhung/rapidglm/bindings/python",
+          "native_library_resolution": "/data/lhhung/rapidglm/build/librapidglm_c.so.1",
+          "native_library_resolution_sha256": "78e85c361d2471f53e5703f9902a8d013f30a8d7b8d0a9552ca47c5f90ed45de",
+          "native_runpath": "/data/lhhung/rapidglm/build",
+          "requested_workers": 8,
+          "allowed_cpus": "0-5",
+          "guard_disabled_for_untimed_reference": true
+        }
+      },
+      "tables": [
+        {
+          "file": "validation/receipts/v1.6.0/rust_tables/thyroid128/native.tsv",
+          "new_sha256": "cab670ee301afc0c60d9df2435a41564c1d7c626a387a296608a598ed1510357",
+          "reconstructed_reference_sha256": "cab670ee301afc0c60d9df2435a41564c1d7c626a387a296608a598ed1510357",
+          "byte_identical": true,
+          "reference_archive": "validation/receipts/v1.6.0/rust_reference_tables/thyroid128/native.tsv.gz",
+          "reference_archive_sha256": "afd2a2e76b3cf1fe6535ad5f5aea35317b05624b092f53794aaa76b3890f46e7"
+        },
+        {
+          "file": "validation/receipts/v1.6.0/rust_tables/thyroid128/pydeseq2.tsv",
+          "new_sha256": "38ae1cc1f609ebbed829ced9003081d724a1363a1259d63f4af63b8b22cfb9f8",
+          "reconstructed_reference_sha256": "38ae1cc1f609ebbed829ced9003081d724a1363a1259d63f4af63b8b22cfb9f8",
+          "byte_identical": true,
+          "reference_archive": "validation/receipts/v1.6.0/rust_reference_tables/thyroid128/pydeseq2.tsv.gz",
+          "reference_archive_sha256": "c06961d4f4ee92902bd48ca6df0bd864edde21a300fc65abcb94f24beba283af"
+        }
+      ]
+    },
+    {
+      "dataset": "thyroid",
+      "reference_reconstruction": {
+        "checked_utc": "2026-10-30T09:28:10.792238+00:00",
+        "dataset": "thyroid",
+        "reference_commit": "67f5adc3aeb09329a93d10cd608110f3bc0ca72e",
+        "untimed": true,
+        "cpus": "0-5",
+        "historical_raw_tables": false,
+        "scope": "Fresh reconstruction from the preserved hash-verified 1.5.0 binaries and unchanged own comparison source. Elapsed diagnostics are not benchmark timings. Original temporary historical tables are unavailable.",
+        "binaries_sha256": {
+          "build/librapidglm_c.so": "78e85c361d2471f53e5703f9902a8d013f30a8d7b8d0a9552ca47c5f90ed45de",
+          "bindings/rust/target/release/examples/deseq": "45d3882239bca5e364693cd3fb32f6932a8366b299628993bcfd7b676a78653a"
+        },
+        "comparison_script_sha256": "3ad84da1bef69d9567b3c684e0d07277fd2e065c79467f687de2e443ff4dd6f0",
+        "input_sha256": {
+          "counts.mtx": "e0874834e10479ae036326ac0e81f8df7f4fcc063a6a17e98530f7ed2c70dcef",
+          "design.tsv": "8fc0bb079934aee994309c30c2a9f9be26039eae284f5882d03bed29323a2b0f"
+        },
+        "retained_historical_scientific_fields_identical": true,
+        "scientific_fields": {
+          "samples": 647,
+          "genes": 28769,
+          "columns": {
+            "baseMean": {
+              "max_relative": 0.00012388549839794277,
+              "over_1e-6": 1,
+              "over_1e-3": 0,
+              "missing_mismatch": 0
+            },
+            "log2FoldChange": {
+              "max_relative": 4.83834646387328,
+              "over_1e-6": 28232,
+              "over_1e-3": 3403,
+              "missing_mismatch": 0
+            },
+            "lfcSE": {
+              "max_relative": 2960.644990587723,
+              "over_1e-6": 2110,
+              "over_1e-3": 43,
+              "missing_mismatch": 0
+            },
+            "stat": {
+              "max_relative": 0.9980286811949346,
+              "over_1e-6": 28314,
+              "over_1e-3": 3402,
+              "missing_mismatch": 0
+            },
+            "pvalue": {
+              "max_relative": 3.603120396610884e+175,
+              "over_1e-6": 28481,
+              "over_1e-3": 5213,
+              "missing_mismatch": 0
+            },
+            "padj": {
+              "max_relative": 3.838657711426372e+178,
+              "over_1e-6": 28631,
+              "over_1e-3": 4295,
+              "missing_mismatch": 0
+            }
+          },
+          "calls": {
+            "rust": 5516,
+            "pydeseq2": 5517,
+            "both": 5516,
+            "jaccard": 0.9998187420699656
+          }
+        },
+        "tables_sha256": {
+          "native.tsv": "ebadf30f7eeda34054d11bf0ae97d4f111722b2d83df00cfa9ad1b28210d2c9a",
+          "pydeseq2.tsv": "09225eb0891d659fe5c81f64556fd5e8e44a7b1b15020eb77d07bd3f7b838673"
+        },
+        "execution": {
+          "driver_sha256": "86a5d4ac25e60afd55876bc6e409811184b34b14254abfb30d5aab073289400b",
+          "capture_helper_sha256": "d48c0082b49916082c66ca4edde1924c6681db9eb23c53fd44eff5eb6c8f09cc",
+          "python_library": "/data/lhhung/rapidglm/build/librapidglm_c.so",
+          "python_source": "/data/lhhung/rapidglm/bindings/python",
+          "native_library_resolution": "/data/lhhung/rapidglm/build/librapidglm_c.so.1",
+          "native_library_resolution_sha256": "78e85c361d2471f53e5703f9902a8d013f30a8d7b8d0a9552ca47c5f90ed45de",
+          "native_runpath": "/data/lhhung/rapidglm/build",
+          "requested_workers": 8,
+          "allowed_cpus": "0-5",
+          "guard_disabled_for_untimed_reference": true
+        }
+      },
+      "tables": [
+        {
+          "file": "validation/receipts/v1.6.0/rust_tables/thyroid/native.tsv",
+          "new_sha256": "ebadf30f7eeda34054d11bf0ae97d4f111722b2d83df00cfa9ad1b28210d2c9a",
+          "reconstructed_reference_sha256": "ebadf30f7eeda34054d11bf0ae97d4f111722b2d83df00cfa9ad1b28210d2c9a",
+          "byte_identical": true,
+          "reference_archive": "validation/receipts/v1.6.0/rust_reference_tables/thyroid/native.tsv.gz",
+          "reference_archive_sha256": "83656d0349165ca9719bb6408718f4c9967a996076be60781ab703df520248d0"
+        },
+        {
+          "file": "validation/receipts/v1.6.0/rust_tables/thyroid/pydeseq2.tsv",
+          "new_sha256": "09225eb0891d659fe5c81f64556fd5e8e44a7b1b15020eb77d07bd3f7b838673",
+          "reconstructed_reference_sha256": "09225eb0891d659fe5c81f64556fd5e8e44a7b1b15020eb77d07bd3f7b838673",
+          "byte_identical": true,
+          "reference_archive": "validation/receipts/v1.6.0/rust_reference_tables/thyroid/pydeseq2.tsv.gz",
+          "reference_archive_sha256": "cae5906d1b3704083ff22a98c3a20c8fd4d31e1228fed6567d9b610fd2a45a3b"
+        }
+      ]
+    }
+  ],
+  "all_reconstructed_tables_byte_identical": true
+}

@@ -1,0 +1,14 @@
+{
+  "label": "batch-1793366224742590970",
+  "stages": [
+    "batch"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-30T13:17:04.849467+00:00",
+  "finished_utc": "2026-10-30T14:12:08.984726+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 3249,
+  "cpu_policy_maximum_poll_gap_seconds": 1.1135679129511118,
+  "cpu_policy_observed_quiet_starts": 15,
+  "error": null
+}

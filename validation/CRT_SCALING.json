@@ -1,15 +1,15 @@
 {
  "purpose": "Wall time of the perturbation workflow (conditional randomization test) on panels of the Gasperini screen, with RapidGLM's defaults and with fit_check ks",
- "version": "1.4.0",
- "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
- "commit_note": "Library code of v1.4.0-dev.4; all final release measurements were run on this commit.",
- "configuration": "207,324 cells, moi high, complement controls, CRT, budgets 499/4,999/19,999, screen 0.02, cell_qc false, seed 20260930, 16 threads on CPUs 16-31; default: fit_check strict with 199,999 confirmation draws; ks: fit_check ks",
  "panels": "every pair of T targets and G response genes: the first T of a random order of the benchmark panel's 3,776 discovery targets and the first G of a random order of its 7,418 response genes (numpy default_rng(20261001): one permutation of the sorted target names, then one of the gene indices), so the sets are nested; written by scripts/prepare_crt_panels.py",
  "commands": [
   "python3 scripts/prepare_crt_panels.py --output DIR 50x1000 200x1000 100x7418",
   "rapidglm sceptre config.json under /usr/bin/time -v"
  ],
- "host": "One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional. Final timings on the 16 identical efficiency cores (CPUs 16-31), one thread per core: one on 16, four on 16-19, eight on 16-23, twelve on 16-27, sixteen on 16-31. Each timed command holds the shared lock and starts after two consecutive ten-second quiet samples: one-minute load <=4 and every selected CPU <20% busy. Both samples are retained. Untimed work uses CPUs 0-7 under nice 10. These release timings are final, not provisional.",
+ "version": "1.6.0",
+ "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+ "commit_note": "Library code of v1.6.0-dev.2; this local 1.6.0 measurement collection was run on this commit.",
+ "configuration": "207,324 cells, moi high, complement controls, CRT, budgets 499/4,999/19,999, screen 0.02, cell_qc false, seed 20260930, 16 threads on CPUs 16-31; default: fit_check strict with 199,999 confirmation draws; ks: fit_check ks; CRT labels drawn with the hazard sampler (the 1.6.0 default); CRT labels drawn with the hazard sampler (the 1.6.0 default); CRT labels drawn with the hazard sampler (the 1.6.0 default)",
+ "host": "One AMD Threadripper PRO 5965WX workstation (Zen 3). Timed work uses one thread per physical core on CPUs 6-21, with SMT siblings 30-45 idle; one thread uses CPU 6, eight use 6-13, twelve use 6-17. Drivers and untimed checks use CPUs 0-5. Exclusive Slurm allocation; schedutil governor, boost enabled and SMT enabled, unchanged. Each timed command starts after two ten-second quiet samples. More than 5% other CPU activity on selected cores or any sibling invalidates the command. Host load, other-user processes and vLLM CPU use are retained per command. From the resumed bulk stage on 2026-11-03, a user-authorized runtime service cpuset confines vLLM to CPUs 0-5,22-29,46-47; the reservation receipt records its application and restoration. Earlier accepted measurements retain their original guarded host conditions.",
  "points": [
   {
    "panel": "t50_g1000",
@@ -17,16 +17,29 @@
    "genes": 1000,
    "fit_check": "ks",
    "confirm_draws": 0,
+   "crt_draw_used": "hazard",
    "pairs": 50000,
    "pairs_tested": 48596,
-   "draws": 29389904,
-   "wall_seconds": 121.07,
-   "user_seconds": 1773.58,
-   "max_rss_gb": 2.745552,
-   "waited_for_idle_seconds": 0.0,
-   "others_cpu": 0.0012,
-   "discoveries": 6,
-   "pairs_past_the_screen": 1049,
+   "draws": 29431904,
+   "wall_seconds": 54.92,
+   "user_seconds": 760.19,
+   "max_rss_gb": 3.54196,
+   "quiet_start_utc": "2026-11-03T16:23:57.356872+00:00",
+   "others_cpu": 6.12161090294652e-05,
+   "concurrent_host_load": {
+    "start": [
+     5.39404296875,
+     7.11328125,
+     8.81005859375
+    ],
+    "end": [
+     14.205078125,
+     9.29833984375,
+     9.4619140625
+    ]
+   },
+   "discoveries": 5,
+   "pairs_past_the_screen": 1035,
    "confirmation": {
     "pairs": 0,
     "fit_confirmed": 0,
@@ -35,7 +48,6 @@
    "discovery_pairs": [
     "response 155 x chr5.4556_top_two",
     "response 296 x chr15.2327_top_two",
-    "response 669 x chr1.6127_top_two",
     "response 771 x chr15.2327_top_two",
     "response 772 x chr15.2327_top_two",
     "response 971 x chr15.2327_top_two"
@@ -47,20 +59,33 @@
    "genes": 1000,
    "fit_check": "strict",
    "confirm_draws": 199999,
+   "crt_draw_used": "hazard",
    "pairs": 50000,
    "pairs_tested": 48596,
-   "draws": 31039904,
-   "wall_seconds": 126.7,
-   "user_seconds": 1864.72,
-   "max_rss_gb": 2.87232,
-   "waited_for_idle_seconds": 0.0,
-   "others_cpu": 0.0001,
+   "draws": 31081904,
+   "wall_seconds": 55.32,
+   "user_seconds": 798.2,
+   "max_rss_gb": 3.97158,
+   "quiet_start_utc": "2026-11-03T16:26:12.658224+00:00",
+   "others_cpu": 2.419205680991966e-05,
+   "concurrent_host_load": {
+    "start": [
+     6.88232421875,
+     8.0849609375,
+     9.01806640625
+    ],
+    "end": [
+     13.56298828125,
+     9.84228515625,
+     9.5712890625
+    ]
+   },
    "discoveries": 6,
-   "pairs_past_the_screen": 1049,
+   "pairs_past_the_screen": 1035,
    "confirmation": {
     "pairs": 6,
-    "fit_confirmed": 6,
-    "fit_rejected_empirical_p": 0
+    "fit_confirmed": 5,
+    "fit_rejected_empirical_p": 1
    },
    "discovery_pairs": [
     "response 155 x chr5.4556_top_two",
@@ -77,16 +102,29 @@
    "genes": 1000,
    "fit_check": "ks",
    "confirm_draws": 0,
+   "crt_draw_used": "hazard",
    "pairs": 200000,
    "pairs_tested": 193824,
-   "draws": 116759676,
-   "wall_seconds": 396.99,
-   "user_seconds": 6042.05,
-   "max_rss_gb": 3.189092,
-   "waited_for_idle_seconds": 0.0,
-   "others_cpu": 0.0003,
-   "discoveries": 5,
-   "pairs_past_the_screen": 3987,
+   "draws": 116591676,
+   "wall_seconds": 166.34,
+   "user_seconds": 2596.51,
+   "max_rss_gb": 8.735016,
+   "quiet_start_utc": "2026-11-03T16:28:28.316006+00:00",
+   "others_cpu": 2.2453072955682203e-05,
+   "concurrent_host_load": {
+    "start": [
+     6.62158203125,
+     8.49609375,
+     9.1181640625
+    ],
+    "end": [
+     19.03759765625,
+     13.2255859375,
+     10.82421875
+    ]
+   },
+   "discoveries": 7,
+   "pairs_past_the_screen": 3963,
    "confirmation": {
     "pairs": 0,
     "fit_confirmed": 0,
@@ -95,9 +133,11 @@
    "discovery_pairs": [
     "response 296 x chr15.2327_top_two",
     "response 343 x chr1.11567_top_two",
+    "response 699 x chr14.1550_top_two",
     "response 771 x chr15.2327_top_two",
     "response 772 x chr15.2327_top_two",
-    "response 944 x chr1.11567_top_two"
+    "response 944 x chr1.11567_top_two",
+    "response 971 x chr15.2327_top_two"
    ]
   },
   {
@@ -106,20 +146,33 @@
    "genes": 1000,
    "fit_check": "strict",
    "confirm_draws": 199999,
+   "crt_draw_used": "hazard",
    "pairs": 200000,
    "pairs_tested": 193824,
-   "draws": 122354676,
-   "wall_seconds": 418.86,
-   "user_seconds": 6319.96,
-   "max_rss_gb": 3.370368,
-   "waited_for_idle_seconds": 0.0,
-   "others_cpu": 0.0008,
+   "draws": 122516676,
+   "wall_seconds": 178.12,
+   "user_seconds": 2720.06,
+   "max_rss_gb": 8.977584,
+   "quiet_start_utc": "2026-11-03T16:32:55.283515+00:00",
+   "others_cpu": 3.473693061097883e-05,
+   "concurrent_host_load": {
+    "start": [
+     6.5302734375,
+     10.45849609375,
+     10.0791015625
+    ],
+    "end": [
+     18.14599609375,
+     14.46142578125,
+     11.71484375
+    ]
+   },
    "discoveries": 5,
-   "pairs_past_the_screen": 3987,
+   "pairs_past_the_screen": 3963,
    "confirmation": {
-    "pairs": 18,
-    "fit_confirmed": 18,
-    "fit_rejected_empirical_p": 0
+    "pairs": 21,
+    "fit_confirmed": 17,
+    "fit_rejected_empirical_p": 4
    },
    "discovery_pairs": [
     "response 296 x chr15.2327_top_two",
@@ -135,16 +188,29 @@
    "genes": 7418,
    "fit_check": "ks",
    "confirm_draws": 0,
+   "crt_draw_used": "hazard",
    "pairs": 741800,
    "pairs_tested": 721266,
-   "draws": 436984734,
-   "wall_seconds": 1564.99,
-   "user_seconds": 23646.96,
-   "max_rss_gb": 12.38468,
-   "waited_for_idle_seconds": 0.0,
-   "others_cpu": 0.0005,
-   "discoveries": 25,
-   "pairs_past_the_screen": 15154,
+   "draws": 437043234,
+   "wall_seconds": 645.88,
+   "user_seconds": 10200.37,
+   "max_rss_gb": 12.383672,
+   "quiet_start_utc": "2026-11-03T16:37:33.936938+00:00",
+   "others_cpu": 2.8521865053177575e-05,
+   "concurrent_host_load": {
+    "start": [
+     6.64501953125,
+     11.4677734375,
+     10.91796875
+    ],
+    "end": [
+     19.66845703125,
+     18.8984375,
+     15.4453125
+    ]
+   },
+   "discoveries": 20,
+   "pairs_past_the_screen": 15147,
    "confirmation": {
     "pairs": 0,
     "fit_confirmed": 0,
@@ -157,7 +223,6 @@
     "response 1837 x chr9.3066_top_two",
     "response 2043 x chr5.980_top_two",
     "response 2043 x chr12.3309_top_two",
-    "response 2264 x chr15.2327_top_two",
     "response 2406 x chr15.2327_top_two",
     "response 2536 x chr6.4971_second_two",
     "response 2597 x chr1.11567_top_two",
@@ -171,11 +236,7 @@
     "response 5341 x chr1.11567_top_two",
     "response 5745 x chr15.2327_top_two",
     "response 5747 x chr15.2327_top_two",
-    "response 5788 x chr1.4670_top_two",
-    "response 6348 x chr9.3149_top_two",
-    "response 6768 x chr10.2656_top_two",
-    "response 6966 x chr1.11567_top_two",
-    "response 7193 x chr15.2327_top_two"
+    "response 6966 x chr1.11567_top_two"
    ]
   },
   {
@@ -184,20 +245,33 @@
    "genes": 7418,
    "fit_check": "strict",
    "confirm_draws": 199999,
+   "crt_draw_used": "hazard",
    "pairs": 741800,
    "pairs_tested": 721266,
-   "draws": 456694734,
-   "wall_seconds": 1644.56,
-   "user_seconds": 24662.81,
-   "max_rss_gb": 12.382812,
-   "waited_for_idle_seconds": 0.0,
-   "others_cpu": 0.0003,
+   "draws": 455448234,
+   "wall_seconds": 672.99,
+   "user_seconds": 10603.02,
+   "max_rss_gb": 12.385312,
+   "quiet_start_utc": "2026-11-03T16:50:10.412363+00:00",
+   "others_cpu": 3.3023462009145085e-05,
+   "concurrent_host_load": {
+    "start": [
+     6.5244140625,
+     14.31884765625,
+     14.16650390625
+    ],
+    "end": [
+     19.47119140625,
+     19.34814453125,
+     17.17041015625
+    ]
+   },
    "discoveries": 14,
-   "pairs_past_the_screen": 15154,
+   "pairs_past_the_screen": 15147,
    "confirmation": {
-    "pairs": 57,
-    "fit_confirmed": 53,
-    "fit_rejected_empirical_p": 4
+    "pairs": 53,
+    "fit_confirmed": 50,
+    "fit_rejected_empirical_p": 3
    },
    "discovery_pairs": [
     "response 515 x chr15.2327_top_two",
@@ -217,60 +291,23 @@
    ]
   }
  ],
- "measured_tag": "v1.4.0-dev.4",
- "host_note": "One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional. Final timings on the 16 identical efficiency cores (CPUs 16-31), one thread per core: one on 16, four on 16-19, eight on 16-23, twelve on 16-27, sixteen on 16-31. Each timed command holds the shared lock and starts after two consecutive ten-second quiet samples: one-minute load <=4 and every selected CPU <20% busy. Both samples are retained. Untimed work uses CPUs 0-7 under nice 10. These release timings are final, not provisional.",
+ "measured_tag": "v1.6.0-dev.2",
+ "host_note": "One AMD Threadripper PRO 5965WX workstation (Zen 3). Timed work uses one thread per physical core on CPUs 6-21, with SMT siblings 30-45 idle; one thread uses CPU 6, eight use 6-13, twelve use 6-17. Drivers and untimed checks use CPUs 0-5. Exclusive Slurm allocation; schedutil governor, boost enabled and SMT enabled, unchanged. Each timed command starts after two ten-second quiet samples. More than 5% other CPU activity on selected cores or any sibling invalidates the command. Host load, other-user processes and vLLM CPU use are retained per command. From the resumed bulk stage on 2026-11-03, a user-authorized runtime service cpuset confines vLLM to CPUs 0-5,22-29,46-47; the reservation receipt records its application and restoration. Earlier accepted measurements retain their original guarded host conditions.",
  "_provenance": {
-  "version": "1.4.0",
-  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "version": "1.6.0",
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
   "worktree_dirty": false
  },
  "_benchmark_host_configuration": {
-  "workstation": "Intel Core i9-13900KF",
-  "ram_gib": 125,
-  "bios_version": "1836",
-  "bios_date": "04/16/2026",
-  "microcode": "0x133",
-  "power_limits": {
-   "long_term": {
-    "power_limit_watts": 253.0,
-    "time_window_microseconds": 55967744
-   },
-   "short_term": {
-    "power_limit_watts": 253.0,
-    "time_window_microseconds": 2440
-   }
-  },
-  "memory": {
-   "modules": 4,
-   "module_gib": 32,
-   "configured_rate_mt_per_second": 4200,
-   "evidence": "Final host setting supplied by the user; BIOS/microcode and RAPL limits independently read at preflight."
-  },
-  "faulty_performance_cores": {
-   "physical_cores": 2,
-   "logical_cpus": [
-    8,
-    9,
-    10,
-    11
-   ],
-   "maximum_khz": 2200000,
-   "thread_siblings": {
-    "8": "8-9",
-    "9": "8-9",
-    "10": "10-11",
-    "11": "10-11"
-   },
-   "timed": false
-  },
-  "cap_faulty_cores_service": {
-   "enabled": true,
-   "executable": "/usr/local/sbin/cap-faulty-cores"
-  },
-  "fixed_cpu_clock_service": {
-   "enabled": false
-  },
-  "reproducibility": "Every timed run is pinned to identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Absolute seconds from other host settings are not directly comparable; matched tool speed-up ratios are the comparison of interest.",
-  "verified_utc": "2026-10-22T00:08:31.141014+00:00"
+  "processor": "AMD Threadripper PRO 5965WX",
+  "physical_cores": 24,
+  "logical_cpus": 48,
+  "ram_gib": 125.61,
+  "driver_cpus": "0-5",
+  "timed_cpus": "6-21",
+  "idle_siblings": "30-45",
+  "governor": "schedutil",
+  "boost": "1",
+  "smt": "on"
  }
 }

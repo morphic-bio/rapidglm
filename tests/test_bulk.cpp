@@ -576,3 +576,89 @@ BOOST_AUTO_TEST_CASE(moments_start_prefers_the_smaller_pydeseq2_estimate) {
     const auto optimized = bulk_de(d.x, dense_columns(d.y), o);
     BOOST_TEST(optimized.genes[0].dispersion_gene > .001);
 }
+
+BOOST_AUTO_TEST_CASE(cooks_distance_rounds_saturated_leverage) {
+    for (double h : {1.0, std::nextafter(1.0, 0.0), std::nextafter(1.0, 2.0)})
+        for (double r : {0.0, 0.25, 100.0})
+            BOOST_TEST(std::isnan(detail::cooks_distance(r, h, 3)));
+    // Ordinary observations retain the original formula, bit for bit.
+    for (double h : {0.0, 0.25, 0.9, 1 - 8 * std::numeric_limits<double>::epsilon()})
+        BOOST_TEST(detail::cooks_distance(2, h, 3) == 4.0 / 3 * h / ((1 - h) * (1 - h)));
+}
+
+BOOST_AUTO_TEST_CASE(cooks_single_entry_design_is_stable_under_ulp_weight_changes) {
+    Matrix x(10, 3, 1);
+    for (std::size_t i = 0; i < x.rows; ++i) {
+        x(i, 1) = i >= 5;
+        x(i, 2) = i == 2;
+    }
+    // The singleton column fits observation 2 exactly for any positive weights.
+    // Compute leverage by the same cross-product/inverse route as bulk_de.
+    const Vector y{10, 11, 1, 12, 10, 500, 12, 11, 10, 12};
+    for (int direction : {-1, 0, 1}) {
+        Vector w(x.rows);
+        for (std::size_t i = 0; i < w.size(); ++i) {
+            w[i] = 0.5 + 0.1 * i;
+            if (direction)
+                w[i] = std::nextafter(w[i], direction < 0 ? 0.0 : 2.0);
+        }
+        const detail::Cholesky factor(detail::crossprod(x, w), 1e-12, false);
+        const auto inverse = factor.inverse();
+        Vector distances(x.rows);
+        for (std::size_t i = 0; i < x.rows; ++i) {
+            double h = 0;
+            for (std::size_t a = 0; a < x.cols; ++a)
+                for (std::size_t b = 0; b < x.cols; ++b)
+                    h += x(i, a) * inverse(a, b) * x(i, b);
+            h *= w[i];
+            distances[i] = detail::cooks_distance(i == 5 ? 100 : 1, h, x.cols);
+        }
+        BOOST_TEST(std::isnan(distances[2]));
+        std::size_t top = 0;
+        for (std::size_t i = 1; i < distances.size(); ++i)
+            if (std::isfinite(distances[i]) &&
+                (!std::isfinite(distances[top]) || distances[i] > distances[top]))
+                top = i;
+        BOOST_TEST(top == 5u);
+        BOOST_TEST(distances[top] > 10);
+        std::size_t larger = 0;
+        for (double count : y)
+            larger += count > y[top];
+        BOOST_TEST(larger < 3u);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(cooks_saturated_design_keeps_flags_under_weight_perturbations) {
+    auto b = simulate(4, 6, 300);
+    Matrix x(12, 3, 1);
+    for (std::size_t i = 0; i < x.rows; ++i) {
+        x(i, 1) = i >= 6;
+        x(i, 2) = i == 2;
+    }
+    b.y[1].assign(12, 200);
+    b.y[1][7] = 5000;
+    BulkOptions o;
+    o.coefficient = 1;
+    o.size_factors.assign(12, 1);
+    const auto base = bulk_de(x, dense_columns(b.y), o);
+    BOOST_TEST(base.genes[1].status == "cooks_outlier");
+    for (double direction : {0.0, 2.0}) {
+        o.size_factors.assign(12, std::nextafter(1.0, direction));
+        const auto changed = bulk_de(x, dense_columns(b.y), o);
+        for (std::size_t j = 0; j < b.y.size(); ++j)
+            BOOST_TEST((base.genes[j].status == "cooks_outlier") ==
+                       (changed.genes[j].status == "cooks_outlier"));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(division_option_preserves_aggregate_initializers) {
+    const FitOptions fit_options{Family::poisson};
+    const BulkOptions bulk_options{2};
+    const QlOptions ql_options{false};
+    BOOST_CHECK(fit_options.family == Family::poisson);
+    BOOST_CHECK_EQUAL(bulk_options.coefficient, 2);
+    BOOST_CHECK(!ql_options.filter);
+    BOOST_CHECK(fit_options.division == DivisionMode::inherit);
+    BOOST_CHECK(bulk_options.division == DivisionMode::inherit);
+    BOOST_CHECK(ql_options.division == DivisionMode::inherit);
+}

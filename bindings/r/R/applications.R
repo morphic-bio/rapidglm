@@ -55,7 +55,9 @@ bulk_de <- function(counts, design, col_data = NULL, coefficient = NULL, contras
                     alpha = 0.1, cooks_filter = TRUE, legacy_cooks = TRUE, independent_filtering = TRUE,
                     min_replicates_for_replace = 7, min_mean = 0.5, outlier_sd = 2,
                     cooks_cutoff = 0, keep_minimum_start = TRUE, min_dispersion = 1e-8,
-                    max_dispersion = 0, seed = 1, threads = 1) {
+                    max_dispersion = 0, seed = 1, threads = 1, division = NULL) {
+  .division_previous <- .division_set(division)
+  on.exit(.division_restore(.division_previous), add = TRUE)
   y <- as_observations(counts)
   x <- as_design(design, col_data, nrow(y))
   if (sum(!is.null(coefficient), !is.null(contrast), !is.null(coefficients)) > 1)
@@ -130,7 +132,9 @@ bulk_de <- function(counts, design, col_data = NULL, coefficient = NULL, contras
 edger_ql <- function(counts, design, col_data = NULL, coefficient = NULL, contrast = NULL,
                      coefficients = NULL, filter = TRUE, min_count = 10, min_total_count = 15,
                      large_n = 10, min_prop = 0.7, normalization = c("tmm", "none"),
-                     norm_factors = NULL, dispersion = NULL, prior_count = 0.125, threads = 1) {
+                     norm_factors = NULL, dispersion = NULL, prior_count = 0.125, threads = 1, division = NULL) {
+  .division_previous <- .division_set(division)
+  on.exit(.division_restore(.division_previous), add = TRUE)
   y <- as_observations(counts)
   x <- as_design(design, col_data, nrow(y))
   if (sum(!is.null(coefficient), !is.null(contrast), !is.null(coefficients)) > 1)
@@ -189,6 +193,12 @@ edger_ql <- function(counts, design, col_data = NULL, coefficient = NULL, contra
 #'   ids default to the row names of `assignments`, non_targeting to target == "non-targeting").
 #' @param pairs data frame with response (gene name or 1-based index), target and kind
 #'   (discovery, negative or positive).
+#' @param crt_draw the sampler of CRT labels. "hazard" (default) draws them with an
+#'   AES-based generator and needs the processor's AES instructions; without them it draws
+#'   as "thinned" does, so CRT p-values depend on the kind of processor. "thinned" (the
+#'   default of releases before 1.6.0) and "direct" (one uniform per cell) can be asked for.
+#'   All three draw the same law from different random streams, so their p-values differ
+#'   within Monte Carlo error. `attr(, "run")$crt_draw_used` names the sampler used.
 #' @param fit_check acceptance of the skew-normal fit: "strict" (default) also checks the
 #'   tail where the statistic lies and confirms small p-values on `confirm_draws` draws;
 #'   "ks" is the check of releases before 1.0.0.
@@ -211,10 +221,20 @@ edger_ql <- function(counts, design, col_data = NULL, coefficient = NULL, contra
 #'   the pairs at hand (the pairs not listed count with p = 1): sizes named by kind, such as
 #'   `c(discovery = 20000)`, or three sizes in the order discovery, negative, positive;
 #'   `NULL` or 0: the pairs at hand.
+#' @param null_start how a pair's null is started with NT controls and
+#'   `null_model = "sceptre"`. "refine" (default): one Fisher-scoring step from the
+#'   response's null on all retained cells, using additive totals, then exact passes over
+#'   the pair's cells to the cold fit's convergence criteria; a pair that does not converge
+#'   is fitted cold. "cold": every pair fitted from scratch, as before 1.6.0. Both give the
+#'   same nulls to the convergence tolerance.
+#' @param batch_scoring CRT with complement controls (high MOI): score each response's pairs
+#'   together, all their draws of a stage in one pass over the response's score records
+#'   (`TRUE`, default). The results are those of scoring the pairs one by one (`FALSE`).
 #' @param .grid for `sceptre_grid()`.
 #' @return A data frame per pair (`adjusted_p` is `NA` for a pair outside its adjustment
 #'   family) with run-level values in `attr(, "run")`: retained_cells, the rejection counts,
-#'   null_fits (null models fitted) and, by kind, pairs_listed_<kind>,
+#'   null_fits (null models fitted), crt_draw_used, null_start_used, null_refined,
+#'   null_cold_refits and, by kind, pairs_listed_<kind>,
 #'   pairs_passing_qc_<kind> and family_size_<kind> (the size of the adjustment family).
 sceptre <- function(responses, assignments, design, guides, pairs, cell_data = NULL,
                     moi = c("low", "high"), control_group = NULL, resampling_mechanism = NULL,
@@ -223,13 +243,17 @@ sceptre <- function(responses, assignments, design, guides, pairs, cell_data = N
                     approximation = c("skew_normal", "no_approximation"), budgets = NULL,
                     screen = 0.02, null_model = c("sceptre", "direct"),
                     effect_fits = c("significant", "all", "none"),
-                    crt_draw = c("thinned", "direct", "hazard"), fit_check = c("strict", "ks"),
+                    crt_draw = c("hazard", "thinned", "direct"), fit_check = c("strict", "ks"),
                     confirm_draws = NULL,
                     cell_qc = TRUE, assignment_qc = TRUE, min_nonzero = 7, alpha = 0.1,
                     qc_lower = 0.01, qc_upper = 0.99, max_mito = 0.2, adjustment = c("BH", "bonferroni"),
                     family = c("nb", "poisson"), seed = 1, threads = 1,
                     stream_keys = c("identity", "position"), response_ids = NULL,
-                    adjustment_family = c("tested", "listed"), family_size = NULL, .grid = NULL) {
+                    adjustment_family = c("tested", "listed"), family_size = NULL,
+                    null_start = c("refine", "cold"), batch_scoring = TRUE,
+                    .grid = NULL, division = NULL) {
+  .division_previous <- .division_set(division)
+  on.exit(.division_restore(.division_previous), add = TRUE)
   y <- as_observations(responses)
   g <- as_observations(assignments != 0)
   x <- as_design(design, cell_data, nrow(y))
@@ -254,9 +278,11 @@ sceptre <- function(responses, assignments, design, guides, pairs, cell_data = N
             stream_keys = choice(match.arg(stream_keys), c(identity = 0, position = 1), "stream_keys"),
             adjustment_family = choice(match.arg(adjustment_family), c(tested = 0, listed = 1),
                                        "adjustment_family"),
+            null_start = choice(match.arg(null_start), c(refine = 0, cold = 1), "null_start"),
             screen = screen, cell_qc = as.numeric(cell_qc), assignment_qc = as.numeric(assignment_qc),
             min_nonzero = min_nonzero, alpha = alpha, lower_quantile = qc_lower,
-            upper_quantile = qc_upper, max_mito = max_mito, seed = seed, threads = threads)
+            upper_quantile = qc_upper, max_mito = max_mito, seed = seed, threads = threads,
+            batch_scoring = as.numeric(batch_scoring))
   if (!is.null(confirm_draws)) o$confirm_draws <- confirm_draws
   if (!is.null(control_group))
     o$nt_controls <- choice(control_group, c(complement = 0, nt_cells = 1), "control_group")
@@ -303,6 +329,10 @@ sceptre <- function(responses, assignments, design, guides, pairs, cell_data = N
     r <- both$result
   }
   frame <- as_frame(r)
+  run <- attr(frame, "run")
+  run$crt_draw_used <- c("thinned", "direct", "hazard")[run$crt_draw_used + 1]
+  if (!is.null(run$null_start_used)) run$null_start_used <- c("refine", "cold")[run$null_start_used + 1]
+  attr(frame, "run") <- run
   frame$kind <- names(kinds)[frame$kind + 1]
   if (!is.null(colnames(y))) frame$response_id <- colnames(y)[frame$response + 1]
   frame$response <- frame$response + 1
@@ -338,7 +368,9 @@ sceptre <- function(responses, assignments, design, guides, pairs, cell_data = N
 #'   cells with a nonzero count) and few_control (enough of those, too few such control
 #'   cells).
 sceptre_grid <- function(responses, assignments, design, guides, discovery_targets,
-                         negative_targets = character(), grid_responses = NULL, pairs = NULL, ...) {
+                         negative_targets = character(), grid_responses = NULL, pairs = NULL, ..., division = NULL) {
+  .division_previous <- .division_set(division)
+  on.exit(.division_restore(.division_previous), add = TRUE)
   if (is.null(pairs)) pairs <- data.frame(response = integer(), target = character(), kind = character())
   sceptre(responses, assignments, design, guides, pairs, ...,
           .grid = list(discovery = discovery_targets, negative = negative_targets,

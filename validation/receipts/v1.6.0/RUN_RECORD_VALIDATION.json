@@ -1,0 +1,6327 @@
+{
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "checked_utc": "2026-11-05T10:14:31.750943+00:00",
+  "passed": true,
+  "required_fields_by_command": {
+    "qtl": [
+      "permutation_fits",
+      "permutations_refitted"
+    ],
+    "scan": [
+      "crt_draw_used"
+    ],
+    "sceptre": [
+      "null_start_used",
+      "null_refined",
+      "null_cold_refits",
+      "batch_scoring",
+      "crt_draw_used"
+    ]
+  },
+  "run_records": 488,
+  "paired_modes_checked": 5,
+  "checks": [
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed1.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed1.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed10.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed10.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed100.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed101.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed102.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed103.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed104.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed105.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed106.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed107.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed108.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed109.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed11.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed110.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed111.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed112.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed113.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed114.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed115.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed116.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed117.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed118.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed119.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed12.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed120.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed121.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed122.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed123.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed124.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed125.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed126.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed127.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed128.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed129.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed13.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed130.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed131.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed132.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed133.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed134.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed135.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed136.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed137.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed138.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed139.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed14.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed140.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed141.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed142.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed143.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed144.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed145.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed146.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed147.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed148.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed149.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed15.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed150.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed151.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed152.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed153.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed154.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed155.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed156.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed157.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed158.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed159.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed16.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed160.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed161.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed162.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed163.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed164.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed165.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed166.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed167.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed168.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed169.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed17.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed170.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed171.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed172.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed173.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed174.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed175.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed176.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed177.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed178.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed179.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed18.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed180.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed181.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed182.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed183.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed184.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed185.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed186.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed187.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed188.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed189.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed19.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed190.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed191.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed192.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed193.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed194.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed195.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed196.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed197.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed198.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed199.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed2.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed2.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed20.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed200.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed21.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed22.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed23.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed24.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed25.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed26.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed27.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed28.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed29.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed3.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed3.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed30.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed31.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed32.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed33.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed34.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed35.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed36.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed37.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed38.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed39.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed4.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed4.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed40.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed41.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed42.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed43.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed44.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed45.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed46.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed47.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed48.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed49.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed5.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed5.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed50.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed51.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed52.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed53.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed54.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed55.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed56.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed57.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed58.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed59.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed6.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed6.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed60.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed61.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed62.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed63.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed64.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed65.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed66.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed67.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed68.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed69.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed7.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed7.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed70.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed71.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed72.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed73.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed74.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed75.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed76.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed77.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed78.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed79.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed8.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed8.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed80.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed81.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed82.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed83.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed84.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed85.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed86.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed87.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed88.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed89.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed9.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed9.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed90.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed91.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed92.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed93.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed94.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed95.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed96.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed97.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed98.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.02.seed99.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.seed1.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.seed10.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.seed2.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.seed3.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.seed4.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.seed5.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.seed6.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.seed7.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.seed8.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S1_public/screen0.seed9.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed1.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed1.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed10.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed10.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed100.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed101.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed102.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed103.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed104.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed105.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed106.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed107.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed108.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed109.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed11.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed110.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed111.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed112.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed113.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed114.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed115.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed116.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed117.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed118.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed119.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed12.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed120.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed121.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed122.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed123.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed124.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed125.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed126.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed127.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed128.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed129.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed13.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed130.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed131.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed132.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed133.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed134.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed135.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed136.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed137.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed138.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed139.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed14.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed140.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed141.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed142.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed143.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed144.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed145.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed146.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed147.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed148.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed149.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed15.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed150.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed151.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed152.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed153.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed154.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed155.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed156.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed157.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed158.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed159.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed16.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed160.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed161.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed162.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed163.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed164.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed165.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed166.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed167.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed168.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed169.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed17.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed170.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed171.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed172.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed173.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed174.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed175.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed176.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed177.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed178.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed179.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed18.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed180.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed181.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed182.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed183.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed184.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed185.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed186.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed187.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed188.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed189.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed19.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed190.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed191.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed192.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed193.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed194.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed195.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed196.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed197.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed198.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed199.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed2.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed2.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed20.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed200.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed21.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed22.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed23.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed24.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed25.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed26.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed27.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed28.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed29.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed3.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed3.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed30.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed31.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed32.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed33.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed34.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed35.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed36.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed37.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed38.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed39.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed4.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed4.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed40.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed41.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed42.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed43.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed44.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed45.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed46.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed47.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed48.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed49.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed5.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed5.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed50.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed51.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed52.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed53.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed54.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed55.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed56.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed57.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed58.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed59.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed6.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed6.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed60.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed61.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed62.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed63.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed64.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed65.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed66.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed67.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed68.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed69.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed7.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed7.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed70.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed71.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed72.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed73.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed74.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed75.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed76.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed77.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed78.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed79.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed8.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed8.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed80.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed81.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed82.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed83.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed84.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed85.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed86.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed87.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed88.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed89.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed9.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed9.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed90.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed91.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed92.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed93.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed94.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed95.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed96.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed97.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed98.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.02.seed99.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.seed1.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.seed10.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.seed2.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.seed3.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.seed4.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.seed5.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.seed6.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.seed7.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.seed8.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/S2_public/screen0.seed9.ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/null/nb-binary/crt.screen.run.json",
+      "command": "scan",
+      "required_fields": [
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/null/nb-binary/permutation.screen.run.json",
+      "command": "scan",
+      "required_fields": [
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/null/nb-continuous/permutation.screen.run.json",
+      "command": "scan",
+      "required_fields": [
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/null/poisson-binary/crt.screen.run.json",
+      "command": "scan",
+      "required_fields": [
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/null/poisson-binary/permutation.screen.run.json",
+      "command": "scan",
+      "required_fields": [
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "staging",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/staging/null/poisson-continuous/permutation.screen.run.json",
+      "command": "scan",
+      "required_fields": [
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "pert50k",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/gasperini50k/rapidglm-cli-ks-t1/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "pert50k",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/gasperini50k/rapidglm-cli-ks-t8/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "pert50k",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/gasperini50k/rapidglm-cli-t1/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "pert50k",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/gasperini50k/rapidglm-cli-t8/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "pertfull",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/gasperini/rapidglm-cli-ks-t8/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "pertfull",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/gasperini/rapidglm-cli-t8/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "seeds",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/seeds/seed1.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "seeds",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/seeds/seed2.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "seeds",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/seeds/seed20260930.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "seeds",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/seeds/seed3.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "seeds",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/seeds/seed4.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "seeds",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/seeds/seed5.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_atac_high_grid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_atac_high_listed.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_atac_high_testable.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_atac_low_grid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_atac_low_listed.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_atac_low_testable.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_rna_high_grid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_rna_high_listed.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_rna_high_testable.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_rna_low_grid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_rna_low_listed.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "untestable",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/untestable/runs/1.6.0_rna_low_testable.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "crt",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/crt/t100_g7418_default/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "crt",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/crt/t100_g7418_ks/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "crt",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/crt/t200_g1000_default/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "crt",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/crt/t200_g1000_ks/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "crt",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/crt/t50_g1000_default/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "crt",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/crt/t50_g1000_ks/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "replogle",
+      "file": "validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/runs/rapidglm_t16.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "replogle",
+      "file": "validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/runs/rapidglm_t16_ks.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "qtl",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/eqtl/rapidglm_gaussian/chr22.run.json",
+      "command": "qtl",
+      "required_fields": [
+        "permutation_fits",
+        "permutations_refitted"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "qtl",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/eqtl/rapidglm_gaussian10000/chr22.run.json",
+      "command": "qtl",
+      "required_fields": [
+        "permutation_fits",
+        "permutations_refitted"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "qtl",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/eqtl/rapidglm_gaussian10000_double/chr22.run.json",
+      "command": "qtl",
+      "required_fields": [
+        "permutation_fits",
+        "permutations_refitted"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "qtl",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/eqtl/rapidglm_nb/chr22.run.json",
+      "command": "qtl",
+      "required_fields": [
+        "permutation_fits",
+        "permutations_refitted"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "ablations",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/ablations/crt_t100_g7418_default/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "ablations",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/ablations/crt_t100_g7418_ks/rapid.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "ablations",
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/ablations/qtl_nb_separate/chr22.run.json",
+      "command": "qtl",
+      "required_fields": [
+        "permutation_fits",
+        "permutations_refitted"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "ablations",
+      "file": "validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/runs/rapidglm_t16_cold.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "ablations",
+      "file": "validation/work/replogle/k562-essential/pilot-v1.6.0-gpu/runs/rapidglm_t16_ks_cold.run.json",
+      "command": "sceptre",
+      "required_fields": [
+        "null_start_used",
+        "null_refined",
+        "null_cold_refits",
+        "batch_scoring",
+        "crt_draw_used"
+      ],
+      "passed": true
+    },
+    {
+      "stage": "eqtl_gw",
+      "file": "validation/work/eqtl/runs-genomewide-v1.6.0-gpu/rapidglm_gaussian10000/autosomes.run.json",
+      "command": "qtl",
+      "required_fields": [
+        "permutation_fits",
+        "permutations_refitted"
+      ],
+      "passed": true
+    }
+  ]
+}

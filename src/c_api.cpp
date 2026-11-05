@@ -18,6 +18,9 @@ struct rapidglm_table {
         Vector numbers;
         std::vector<std::string> text;
     };
+    rapidglm_table() {
+        scalars.emplace_back("division_mode", static_cast<int>(vmath::division_mode()));
+    }
     std::size_t rows = 0;
     std::deque<Column> columns; // stable references while columns are added
     std::vector<std::pair<std::string, double>> scalars;
@@ -135,6 +138,11 @@ CrtDraw crt_draw(int d) {
            : d == RAPIDGLM_CRT_HAZARD ? CrtDraw::hazard
                                       : CrtDraw::thinned;
 }
+// The sampler that draws CRT labels for crt_draw `d`, as RAPIDGLM_CRT_*:
+// hazard needs the processor's AES instructions and is otherwise thinned.
+double crt_draw_used(int d) {
+    return d == RAPIDGLM_CRT_HAZARD && !aes_instructions() ? RAPIDGLM_CRT_THINNED : d;
+}
 FitCheck fit_check(int c) {
     require(c == RAPIDGLM_FIT_CHECK_STRICT || c == RAPIDGLM_FIT_CHECK_KS, "unknown fit_check");
     return c == RAPIDGLM_FIT_CHECK_KS ? FitCheck::ks : FitCheck::strict;
@@ -222,6 +230,10 @@ SceptreOptions sceptre_options(const rapidglm_sceptre_options &c, std::size_t ce
             o.response_ids.push_back(text_or_empty(c.response_ids, j));
     o.family = adjustment_family(c.family);
     std::copy(c.family_size, c.family_size + 3, o.family_size.begin());
+    require(c.null_start == RAPIDGLM_NULL_START_REFINE || c.null_start == RAPIDGLM_NULL_START_COLD,
+            "unknown null start");
+    o.null_start = c.null_start == RAPIDGLM_NULL_START_COLD ? NullStart::cold : NullStart::refine;
+    o.batch_scoring = c.batch_scoring != 0;
     return o;
 }
 CellQC sceptre_qc(const rapidglm_sceptre_options &c, std::size_t cells) {
@@ -231,7 +243,7 @@ CellQC sceptre_qc(const rapidglm_sceptre_options &c, std::size_t cells) {
     qc.mitochondrial_fraction = optional_vector(c.qc_mito, cells);
     return qc;
 }
-std::unique_ptr<rapidglm_table> sceptre_table(const SceptreResult &r) {
+std::unique_ptr<rapidglm_table> sceptre_table(const SceptreResult &r, int crt_draw) {
     auto t = std::make_unique<rapidglm_table>();
     t->rows = r.tests.size();
     auto &response = t->numeric("response");
@@ -275,7 +287,14 @@ std::unique_ptr<rapidglm_table> sceptre_table(const SceptreResult &r) {
                   {"calibration_rejections", static_cast<double>(r.calibration_rejections)},
                   {"power_rejections", static_cast<double>(r.power_rejections)},
                   {"discovery_rejections", static_cast<double>(r.discovery_rejections)},
-                  {"null_fits", static_cast<double>(r.null_fits)}};
+                  {"null_fits", static_cast<double>(r.null_fits)},
+                  {"crt_draw_used", crt_draw_used(crt_draw)},
+                  {"null_start_used", r.null_start_used == NullStart::refine
+                                          ? double(RAPIDGLM_NULL_START_REFINE)
+                                          : double(RAPIDGLM_NULL_START_COLD)},
+                  {"null_refined", static_cast<double>(r.null_refined)},
+                  {"null_cold_refits", static_cast<double>(r.null_cold_refits)}};
+    t->scalars.emplace_back("division_mode", static_cast<int>(vmath::division_mode()));
     // By kind, in the order of RAPIDGLM_PAIR_*.
     const auto by_kind = [&](const char *name, const std::array<std::size_t, 3> &counts) {
         const char *const kinds[] = {"discovery", "negative", "positive"};
@@ -293,6 +312,18 @@ extern "C" {
 
 const char *rapidglm_version(void) {
     return rapidglm::version;
+}
+int rapidglm_set_division(int mode, int *previous) {
+    return guarded([&] {
+        const auto old = vmath::set_division(static_cast<DivisionMode>(mode));
+        if (previous)
+            *previous = static_cast<int>(old);
+    });
+}
+int rapidglm_division_mode(void) {
+    int mode = -2;
+    guarded([&] { mode = static_cast<int>(vmath::division_mode()); });
+    return mode;
 }
 int rapidglm_c_api_version(void) {
     return RAPIDGLM_C_API_VERSION;
@@ -526,6 +557,7 @@ int rapidglm_bulk_de(const rapidglm_dense *design, const rapidglm_sparse *counts
                       {"filter_threshold", r.filter_threshold},
                       {"filter_theta", r.filter_theta},
                       {"replaced_genes", static_cast<double>(r.replaced_genes)}};
+        t->scalars.emplace_back("division_mode", static_cast<int>(vmath::division_mode()));
         t->vectors = {{"size_factors", r.size_factors},
                       {"lfc_prior_variance", r.lfc_prior_variance}};
         *result = t.release();
@@ -614,6 +646,7 @@ int rapidglm_edger_ql(const rapidglm_dense *design, const rapidglm_sparse *count
                       {"minimum_group", r.minimum_group},
                       {"kept", static_cast<double>(r.kept)},
                       {"top_genes", static_cast<double>(r.top_genes)}};
+        t->scalars.emplace_back("division_mode", static_cast<int>(vmath::division_mode()));
         t->vectors = {{"library_sizes", r.library_sizes},
                       {"filtered_library_sizes", r.filtered_library_sizes},
                       {"norm_factors", r.norm_factors},
@@ -708,6 +741,7 @@ void rapidglm_sceptre_options_init(rapidglm_sceptre_options *o, int high_moi) {
     o->side = RAPIDGLM_SIDE_BOTH;
     o->approximate = 1;
     o->effect_fits = RAPIDGLM_EFFECTS_SIGNIFICANT;
+    o->crt_draw = RAPIDGLM_CRT_HAZARD;
     o->screen = d.resampling.screen;
     o->confirm_draws = d.resampling.confirm;
     o->cell_qc = d.cell_qc;
@@ -721,6 +755,8 @@ void rapidglm_sceptre_options_init(rapidglm_sceptre_options *o, int high_moi) {
     o->threads = 1;
     o->stream_keys = RAPIDGLM_STREAMS_IDENTITY;
     o->family = RAPIDGLM_FAMILY_TESTED;
+    o->null_start = RAPIDGLM_NULL_START_REFINE;
+    o->batch_scoring = d.batch_scoring;
 }
 
 int rapidglm_sceptre(const rapidglm_dense *design, const rapidglm_sparse *responses,
@@ -740,7 +776,7 @@ int rapidglm_sceptre(const rapidglm_dense *design, const rapidglm_sparse *respon
         const auto pairs = sceptre_pairs(n_pairs, pair_responses, pair_targets, pair_kinds);
         const auto o = sceptre_options(c, x.rows, y.cols);
         const auto r = sceptre(x, y, a, guides, pairs, sceptre_qc(c, x.rows), o);
-        *result = sceptre_table(r).release();
+        *result = sceptre_table(r, c.crt_draw).release();
     });
 }
 
@@ -773,7 +809,7 @@ int rapidglm_sceptre_grid(const rapidglm_dense *design, const rapidglm_sparse *r
         grid.pairs = sceptre_pairs(n_pairs, pair_responses, pair_targets, pair_kinds);
         const auto o = sceptre_options(c, x.rows, y.cols);
         const auto r = sceptre_grid(x, y, a, guides, grid, sceptre_qc(c, x.rows), o);
-        auto t = sceptre_table(r.result);
+        auto t = sceptre_table(r.result, c.crt_draw);
         if (tally) {
             auto counts = std::make_unique<rapidglm_table>();
             counts->rows = r.tally.size();
@@ -810,6 +846,7 @@ void rapidglm_scan_options_init(rapidglm_scan_options *o) {
     o->side = RAPIDGLM_SIDE_BOTH;
     o->approximate = 1;
     o->effect_fits = RAPIDGLM_EFFECTS_SIGNIFICANT;
+    o->crt_draw = RAPIDGLM_CRT_HAZARD;
     o->screen = d.resampling.screen;
     o->confirm_draws = d.resampling.confirm;
     o->alpha = d.alpha;
@@ -892,8 +929,42 @@ int rapidglm_scan(const rapidglm_dense *design, const rapidglm_sparse *responses
             draws[i] = static_cast<double>(e.draws);
             approximation[i] = e.approximation;
         }
+        t->scalars = {{"crt_draw_used", crt_draw_used(c.crt_draw)}};
+        t->scalars.emplace_back("division_mode", static_cast<int>(vmath::division_mode()));
         *result = t.release();
     });
 }
 
 } // extern "C"
+
+namespace {
+int special(const double *x, double *out, size_t n,
+            void (*f)(const double *, double *, std::size_t)) {
+    return guarded([&] {
+        require(n == 0 || (x && out), "arrays required");
+        f(x, out, n);
+    });
+}
+} // namespace
+
+int rapidglm_log_array(const double *x, double *out, size_t n) {
+    return special(x, out, n, vmath::log_array);
+}
+int rapidglm_log1p_array(const double *x, double *out, size_t n) {
+    return special(x, out, n, vmath::log1p_array);
+}
+int rapidglm_exp_array(const double *x, double *out, size_t n) {
+    return special(x, out, n, vmath::exp_array);
+}
+int rapidglm_lgamma_array(const double *x, double *out, size_t n) {
+    return special(x, out, n, vmath::lgamma_array);
+}
+int rapidglm_digamma_array(const double *x, double *out, size_t n) {
+    return special(x, out, n, vmath::digamma_array);
+}
+int rapidglm_trigamma_array(const double *x, double *out, size_t n) {
+    return special(x, out, n, vmath::trigamma_array);
+}
+const char *rapidglm_special_path(void) {
+    return vmath::path();
+}

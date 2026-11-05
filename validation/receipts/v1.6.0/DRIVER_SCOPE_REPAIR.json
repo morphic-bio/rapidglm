@@ -1,0 +1,151 @@
+{
+  "recorded_utc": "2026-10-30T13:13:59.896192+00:00",
+  "measured_commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "runner_commit_before": "4b3b7435a1a7f1c0f859f1510ef0780e8a70c422",
+  "runner_commit_after": "ecc1334772356b99a36dca754d934c744a15773b",
+  "prior_source_manifest": "validation/work/release-1.6.0-gpu/stage-reruns/batch-1793359199112530918/validation/receipts/v1.6.0/source.json",
+  "prior_source_manifest_sha256": "a12ed8fa9c27098036cc6456c953fe3d3f2b2b28426a77026a41786d8bfcf6e3",
+  "stage_archive": "validation/work/release-1.6.0-gpu/stage-reruns/batch-1793359199112530918",
+  "stage_archive_manifest_sha256": "b9c0d3ad4694c7243a6080b0efd8efcad966db30ef917bf1c0b82ac38db67f7b",
+  "failed_stage": "batch",
+  "all_prior_batch_timings_discarded": true,
+  "prior_inner_commands": 15,
+  "prior_inner_guards_all_passed": true,
+  "prior_scientific_diagnostics_identical_to_historical": true,
+  "reason": "Redundant outer measurements around internally guarded drivers included untimed preparation and quiet waits. They are not scientific timing intervals. Only the existing per-command guards are used for these drivers; the whole-screen Replogle outer guard remains because run_full has no inner guard.",
+  "affected_driver_stages": [
+    "batch",
+    "bulkval",
+    "untestable",
+    "replogle"
+  ],
+  "expected_inner_commands": {
+    "batch": 15,
+    "bulkval": 60,
+    "untestable": 12,
+    "replogle": 83
+  },
+  "whole_screen_guard_preserved": true,
+  "library_sources_binaries_images_inputs_and_thresholds_unchanged": true,
+  "changed_harness": {
+    "validation/receipts/v1.6.0/check_run_accepted.py": {
+      "before": "fd1e6bf1e84499e62ae3d2dfdb1189b9ca5a62e8320fbc92847ae42764bca684",
+      "after": "4cee451ac671bd86cc688f6ee9330d36e6c67cea1d4f969c304d7ddaec23a3bf"
+    },
+    "validation/receipts/v1.6.0/run_accepted.sh": {
+      "before": "1f169ec0398fe337694f1cb71dfbd04d2fcba5c55cd5bdf0ed835b7422903422",
+      "after": "9915f5045fb95f11b36cd40cfb71abad0dec487ba102157d74c2fc9baeb3496f"
+    }
+  },
+  "added_harness": {
+    "validation/receipts/v1.6.0/tests/test_driver_scope.py": "5d2795ef6bc3b0a757b17e61dd2e1815449affbcd65eee26de124a60be22b20f"
+  },
+  "tests": {
+    "untimed": true,
+    "cpus": "0-5",
+    "slurm_job_submitted": false,
+    "driver_scope_tests": 6,
+    "acceptance_checker_tests": 5,
+    "all_passed": true,
+    "driver_test_sha256": "5d2795ef6bc3b0a757b17e61dd2e1815449affbcd65eee26de124a60be22b20f",
+    "checker_sha256": "4cee451ac671bd86cc688f6ee9330d36e6c67cea1d4f969c304d7ddaec23a3bf",
+    "driver_log_sha256": "0dda2f2857622c8ea8238b19a284708ffb1f0ae508012beb64a190fc9e3f4539",
+    "checker_results": {
+      "result": "PASS",
+      "untimed": true,
+      "synthetic_fixture": true,
+      "slurm_job_submitted": false,
+      "tests_passed": 5,
+      "tests": [
+        {
+          "case": "valid",
+          "passed": true,
+          "commands": 1,
+          "problems": []
+        },
+        {
+          "case": "audit_hash_changed",
+          "passed": true,
+          "commands": 2,
+          "problems": [
+            [
+              "guarded retry evidence invalid",
+              "commands/rejected.json",
+              ""
+            ],
+            [
+              "contention",
+              "qtl",
+              "2026-10-29T00:00:01+00:00"
+            ]
+          ]
+        },
+        {
+          "case": "source_changed",
+          "passed": true,
+          "commands": 2,
+          "problems": [
+            [
+              "guarded retry evidence invalid",
+              "commands/rejected.json",
+              ""
+            ],
+            [
+              "contention",
+              "qtl",
+              "2026-10-29T00:00:01+00:00"
+            ]
+          ]
+        },
+        {
+          "case": "missing_rerun",
+          "passed": true,
+          "commands": 2,
+          "problems": [
+            [
+              "guarded retry evidence invalid",
+              "commands/rejected.json",
+              ""
+            ],
+            [
+              "contention",
+              "qtl",
+              "2026-10-29T00:00:01+00:00"
+            ]
+          ]
+        },
+        {
+          "case": "archive_missing",
+          "passed": true,
+          "commands": 2,
+          "problems": [
+            [
+              "guarded retry evidence invalid",
+              "commands/rejected.json",
+              "[Errno 2] No such file or directory: '/data/lhhung/rapidglm-1.6.0/validation/work/release-1.6.0-gpu/driver-repair-checker-tests/checker-fixture-final/nonexistent'"
+            ],
+            [
+              "contention",
+              "qtl",
+              "2026-10-29T00:00:01+00:00"
+            ]
+          ]
+        }
+      ],
+      "cpus": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "checker_sha256": "4cee451ac671bd86cc688f6ee9330d36e6c67cea1d4f969c304d7ddaec23a3bf"
+    }
+  },
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

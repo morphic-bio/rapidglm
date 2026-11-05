@@ -1,305 +1,184 @@
 {
- "version": "1.4.0",
- "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
- "measured_tag": "v1.4.0-dev.4",
- "native_cpp_cases": 172,
- "portable_cpp_cases": 172,
- "native_c99": true,
- "portable_c99": true,
- "native_cli_cases": 28,
- "portable_cli_cases": 28,
- "python_cpp_binding_statsmodels": "passed",
- "python_c_api_cases": 10,
- "python_deseq_cases": 4,
- "r_parity_and_applications": "passed",
- "rust_unit_cases": 5,
- "rust_integration_cases": 3,
- "rust_doc_cases": 1,
- "quiet_guard_cases": 3,
- "replogle_and_qtl_recipe_tests": "passed",
- "container_suites": "passed on clean clone of v1.4.0-dev.4",
- "arm64_selected_cases": 29,
- "arm64_assertions": 5281712,
- "arm64_c99": true,
- "arm64_cli_cases": 28,
- "format": "all tracked C/C++ files passed",
- "log_sha256": {
-  "native-cpp-c99.log": "2580ffd48aeb551de8b4587d557f18768723d7b4d35b87d5eebf8be5d42e5ed2",
-  "portable-cpp-c99.log": "3c308c0f3304e67ed79d78f45396b9a3c24d018d4d9edd762a8eb6ebbc8bae32",
-  "native-cli.log": "40a1420d8ceeb839385292f27c2ed7ddc841673927f9ce7b5b88adfeb9149f13",
-  "portable-cli.log": "5058b0f0c377100eb498a718548b83df4b6ef8efd20bf7f6e0829d1224c0b542",
-  "bindings.log": "6e94085bf76134885fbf4608ebb454811d63f31ff4a91529255d487e73e17d1f",
-  "rust.log": "b3ddabf71356c264bfb1f56578c86335d225a98e13caacbb38073de09b111598",
-  "quiet-run.log": "199ba496f288116d36c62f29346d4fbf0bd75745a1c893abfcbdaa4c6d5b1033",
-  "replogle-recipe.log": "8fc491c33af10c373d8f98a2362fd7e66cdc6c96497aa5aa59d429264ca5ac92",
-  "qtl-recipe.log": "a52c1ff8889b999d6fe8749db50643a0137218a538230cf4806a56ad932bd101",
-  "candidate-container-tests.log": "a0f84078f250380adbdded9ba757465b64999fe77468ccbc5a9738113092478e",
-  "arm64/unit-tests.log": "e03e0a66c2677fd6a16a9bc3ded5da366b3d4faff5cc4df56d098f29a85151dc",
-  "arm64/c-api-test.log": "bc8fc80e015f65a159b5687f41963cd0b392509a921833892fdd6b3766c07541",
-  "arm64/cli-tests.log": "dc3a32c058117c1aeedc7788c1c08aa1528d8297945c3f42312aa1d8589ed503",
-  "format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-  "final-container-tests.log": "611a5381e1b956ef1ddfddae09fe815d62f24258eb9b4bcd04352962ca6e9edc"
- },
- "source_identity": {
-  "candidate_container_commit": "eb4aae9ddff5768f6d881eb7d1fff21878ba0be8",
-  "final_candidate_commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
-  "library_bindings_tests_build_files_identical": true,
-  "scopes": [
-   "include",
-   "src",
-   "CMakeLists.txt",
-   "cmake",
-   "Dockerfile",
-   "bindings/python/rapidglm",
-   "bindings/r",
-   "bindings/rust/src",
-   "bindings/rust/Cargo.toml",
-   "bindings/rust/build.rs",
-   "tests"
-  ],
-  "only_changes_after_container_checkout": "Release runner and benchmark timing guards/reference-path configuration."
- },
- "native_commands": {
+ "version": "1.6.0",
+ "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+ "host": "biocloudgpu1",
+ "cpus": "0-5",
+ "untimed": true,
+ "native": {
   "native-configure": {
    "command": [
     "cmake",
     "-S",
-    "/mnt/pikachu/rapidglm",
+    "/data/lhhung/rapidglm-1.6.0",
     "-B",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-native",
+    "/data/lhhung/rapidglm-1.6.0/build",
     "-DCMAKE_BUILD_TYPE=Release",
-    "-DRAPIDGLM_PYTHON=OFF",
-    "-DRAPIDGLM_FORCE_PORTABLE=OFF",
-    "-DBLAS_openblas_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so",
-    "-DBLA_VENDOR=OpenBLAS",
-    "-DLAPACKE_INCLUDE_DIR=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/include",
-    "-DLAPACKE_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/liblapacke.a",
-    "-DLAPACK_openblas_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so"
+    "-DRAPIDGLM_PYTHON=ON",
+    "-DRAPIDGLM_BENCHMARKS=ON",
+    "-DRAPIDGLM_DIVISION_DEFAULT=slow",
+    "-Dpybind11_DIR=/data/lhhung/rapidglm-1.6.0/validation/local-data/python/pybind11/share/cmake/pybind11",
+    "-DPython_EXECUTABLE=/usr/bin/python3",
+    "-DLAPACKE_INCLUDE_DIR=/data/lhhung/rapidglm-1.6.0/validation/local-data/numerical-deps/root/usr/include",
+    "-DLAPACKE_LIBRARY=/data/lhhung/rapidglm-1.6.0/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/liblapacke.a",
+    "-DBLAS_openblas_LIBRARY=/data/lhhung/rapidglm-1.6.0/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so",
+    "-DLAPACK_openblas_LIBRARY=/data/lhhung/rapidglm-1.6.0/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so"
    ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0",
+   "environment": {},
+   "started_utc": "2026-10-30T07:36:07.680191+00:00",
+   "finished_utc": "2026-10-30T07:36:09.238878+00:00",
    "exit": 0,
-   "wall_seconds": 0.4560048580169678
+   "wall_seconds": 1.559,
+   "log": "logs/native-configure.log"
   },
   "native-build": {
    "command": [
     "cmake",
     "--build",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-native",
+    "/data/lhhung/rapidglm-1.6.0/build",
     "--parallel",
     "4"
    ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0",
+   "environment": {},
+   "started_utc": "2026-10-30T07:36:09.239131+00:00",
+   "finished_utc": "2026-10-30T07:38:15.747341+00:00",
    "exit": 0,
-   "wall_seconds": 64.60751080513
-  },
-  "native-cpp-c99": {
-   "command": [
-    "ctest",
-    "--test-dir",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-native",
-    "-V"
-   ],
-   "exit": 0,
-   "wall_seconds": 88.31737470626831
-  },
-  "native-cli": {
-   "command": [
-    "python3",
-    "tests/test_cli.py",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-native/rapidglm"
-   ],
-   "exit": 0,
-   "wall_seconds": 1.751283884048462
-  },
-  "portable-configure": {
-   "command": [
-    "cmake",
-    "-S",
-    "/mnt/pikachu/rapidglm",
-    "-B",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-portable",
-    "-DCMAKE_BUILD_TYPE=Release",
-    "-DRAPIDGLM_PYTHON=OFF",
-    "-DRAPIDGLM_FORCE_PORTABLE=ON",
-    "-DBLAS_openblas_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so",
-    "-DBLA_VENDOR=OpenBLAS",
-    "-DLAPACKE_INCLUDE_DIR=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/include",
-    "-DLAPACKE_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/liblapacke.a",
-    "-DLAPACK_openblas_LIBRARY=/mnt/pikachu/rapidglm/validation/local-data/numerical-deps/root/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so"
-   ],
-   "exit": 0,
-   "wall_seconds": 0.49651670455932617
-  },
-  "portable-build": {
-   "command": [
-    "cmake",
-    "--build",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-portable",
-    "--parallel",
-    "4"
-   ],
-   "exit": 0,
-   "wall_seconds": 62.383119344711304
-  },
-  "portable-cpp-c99": {
-   "command": [
-    "ctest",
-    "--test-dir",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-portable",
-    "-V"
-   ],
-   "exit": 0,
-   "wall_seconds": 128.56599688529968
-  },
-  "portable-cli": {
-   "command": [
-    "python3",
-    "tests/test_cli.py",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/build-portable/rapidglm"
-   ],
-   "exit": 0,
-   "wall_seconds": 2.038055181503296
+   "wall_seconds": 126.508,
+   "log": "logs/native-build.log"
   },
   "bindings": {
    "command": [
     "bash",
     "scripts/check_bindings.sh"
    ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0",
+   "environment": {
+    "RAPIDGLM_DIVISION": "slow"
+   },
+   "started_utc": "2026-10-30T07:38:15.774992+00:00",
+   "finished_utc": "2026-10-30T07:39:05.354438+00:00",
    "exit": 0,
-   "wall_seconds": 35.15788435935974
+   "wall_seconds": 49.579,
+   "log": "logs/bindings.log"
   },
-  "rust": {
+  "bindings-fast": {
+   "command": [
+    "bash",
+    "scripts/check_bindings.sh"
+   ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0",
+   "environment": {
+    "RAPIDGLM_DIVISION": "fast"
+   },
+   "started_utc": "2026-10-30T07:39:05.356913+00:00",
+   "finished_utc": "2026-10-30T07:39:51.911686+00:00",
+   "exit": 0,
+   "wall_seconds": 46.555,
+   "log": "logs/bindings-fast.log"
+  },
+  "native-cpp-c99-slow": {
+   "command": [
+    "ctest",
+    "--test-dir",
+    "/data/lhhung/rapidglm-1.6.0/build",
+    "--output-on-failure"
+   ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0",
+   "environment": {
+    "RAPIDGLM_DIVISION": "slow"
+   },
+   "started_utc": "2026-10-30T07:39:51.912187+00:00",
+   "finished_utc": "2026-10-30T07:42:36.262618+00:00",
+   "exit": 0,
+   "wall_seconds": 164.35,
+   "log": "logs/native-cpp-c99-slow.log"
+  },
+  "native-cli-slow": {
+   "command": [
+    "python3",
+    "tests/test_cli.py",
+    "/data/lhhung/rapidglm-1.6.0/build/rapidglm"
+   ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0",
+   "environment": {
+    "RAPIDGLM_DIVISION": "slow"
+   },
+   "started_utc": "2026-10-30T07:42:36.273473+00:00",
+   "finished_utc": "2026-10-30T07:42:39.218567+00:00",
+   "exit": 0,
+   "wall_seconds": 2.945,
+   "log": "logs/native-cli-slow.log"
+  },
+  "native-cpp-c99-fast": {
+   "command": [
+    "ctest",
+    "--test-dir",
+    "/data/lhhung/rapidglm-1.6.0/build",
+    "--output-on-failure"
+   ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0",
+   "environment": {
+    "RAPIDGLM_DIVISION": "fast"
+   },
+   "started_utc": "2026-10-30T07:42:39.218977+00:00",
+   "finished_utc": "2026-10-30T07:45:22.498422+00:00",
+   "exit": 0,
+   "wall_seconds": 163.279,
+   "log": "logs/native-cpp-c99-fast.log"
+  },
+  "native-cli-fast": {
+   "command": [
+    "python3",
+    "tests/test_cli.py",
+    "/data/lhhung/rapidglm-1.6.0/build/rapidglm"
+   ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0",
+   "environment": {
+    "RAPIDGLM_DIVISION": "fast"
+   },
+   "started_utc": "2026-10-30T07:45:22.508351+00:00",
+   "finished_utc": "2026-10-30T07:45:25.458643+00:00",
+   "exit": 0,
+   "wall_seconds": 2.95,
+   "log": "logs/native-cli-fast.log"
+  },
+  "rust-example": {
    "command": [
     "cargo",
-    "test",
-    "--release"
-   ],
-   "exit": 0,
-   "wall_seconds": 1.6983592510223389
-  },
-  "quiet-run": {
-   "command": [
-    "python3",
-    "tests/test_quiet_run.py"
-   ],
-   "exit": 0,
-   "wall_seconds": 0.04076504707336426
-  },
-  "replogle-recipe": {
-   "command": [
-    "python3",
-    "tests/test_replogle.py"
-   ],
-   "exit": 0,
-   "wall_seconds": 0.19340014457702637
-  },
-  "qtl-recipe": {
-   "command": [
-    "python3",
-    "tests/test_qtl_recipe.py"
-   ],
-   "exit": 0,
-   "wall_seconds": 0.3623330593109131
-  }
- },
- "container_commands": {
-  "candidate-clone": {
-   "command": [
-    "git",
-    "clone",
-    "--quiet",
-    "--no-hardlinks",
-    "--branch",
-    "feat/engine",
-    "/mnt/pikachu/rapidglm",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/candidate-clone"
-   ],
-   "exit": 0,
-   "wall_seconds": 0.14666366577148438
-  },
-  "candidate-image-build": {
-   "command": [
-    "docker",
     "build",
-    "--cpuset-cpus",
-    "0-7",
-    "--cpu-shares",
-    "128",
-    "-t",
-    "rapidglm:1.4.0",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/candidate-clone"
+    "--release",
+    "--example",
+    "deseq"
    ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0/bindings/rust",
+   "environment": {
+    "RAPIDGLM_LIB_DIR": "/data/lhhung/rapidglm-1.6.0/build"
+   },
+   "started_utc": "2026-10-30T07:45:25.459169+00:00",
+   "finished_utc": "2026-10-30T07:45:34.457615+00:00",
    "exit": 0,
-   "wall_seconds": 304.9284300804138
+   "wall_seconds": 8.998,
+   "log": "logs/rust-example.log"
   },
-  "candidate-container-tests": {
+  "r-install": {
    "command": [
-    "docker",
-    "run",
-    "--rm",
-    "--cpuset-cpus",
-    "0-7",
-    "rapidglm:1.4.0",
-    "nice",
-    "-n",
-    "10",
-    "bash",
-    "scripts/container_tests.sh"
+    "R",
+    "CMD",
+    "INSTALL",
+    "--preclean",
+    "--library=/data/lhhung/rapidglm-1.6.0/validation/local-data/R_rapidglm",
+    "bindings/r"
    ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0",
+   "environment": {},
+   "started_utc": "2026-10-30T07:45:34.458004+00:00",
+   "finished_utc": "2026-10-30T07:46:10.804624+00:00",
    "exit": 0,
-   "wall_seconds": 99.94076895713806
+   "wall_seconds": 36.347,
+   "log": "logs/r-install.log"
   },
-  "arm64-build-tests": {
-   "command": [
-    "docker",
-    "run",
-    "--rm",
-    "--cpuset-cpus",
-    "0-7",
-    "-e",
-    "BUILD_JOBS=4",
-    "-v",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/candidate-clone:/src:ro",
-    "-v",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/arm64:/out",
-    "rapidglm-arm64-review-toolchain:local",
-    "nice",
-    "-n",
-    "10",
-    "bash",
-    "/src/scripts/build_arm64.sh",
-    "ars_*,philox_*,exponential_ziggurat*,thinned_*,hazard_*,batched_*,kernels_agree_with_direct_sums,market_reader_is_independent_of_entry_order,sha1_matches_published_digests,leverages_and_fixed_dispersion_fits,rank_windows_equal_average_rank_trims,edger_ql_finds_changed_genes_and_is_reproducible,count_loader_equals_the_csc_reader,deviance_moment_table_interpolates,*qtl*,blocked_product_kernels_agree_with_direct_sums,beta_maximum_likelihood_recovers_its_parameters,cis_windows_and_nominal_pairs"
-   ],
-   "exit": 0,
-   "wall_seconds": 984.3843431472778
-  }
- },
- "final_build_and_container_checks": {
-  "final-configure": {
-   "command": [
-    "cmake",
-    "-S",
-    ".",
-    "-B",
-    "build",
-    "-DCMAKE_BUILD_TYPE=Release"
-   ],
-   "exit": 0,
-   "started_utc": "2026-10-21T11:29:55.534084+00:00",
-   "wall_seconds": 0.09867715835571289
-  },
-  "final-native-build": {
-   "command": [
-    "cmake",
-    "--build",
-    "build",
-    "--clean-first",
-    "--parallel",
-    "4"
-   ],
-   "exit": 0,
-   "started_utc": "2026-10-21T11:29:55.632919+00:00",
-   "wall_seconds": 69.97370481491089
-  },
-  "final-glm-reference": {
+  "glm-reference": {
    "command": [
     "g++",
     "-std=c++17",
@@ -308,185 +187,635 @@
     "-DNDEBUG",
     "benchmarks/glm/reference.cpp",
     "-o",
-    "/mnt/pikachu/rapidglm/validation/work/benchmark/runs-v1.4.0-final/bin/glm_reference",
+    "/data/lhhung/rapidglm-1.6.0/validation/work/benchmark/runs-v1.6.0-gpu/bin/glm_reference",
     "-lquadmath"
    ],
+   "cwd": "/data/lhhung/rapidglm-1.6.0",
+   "environment": {},
+   "started_utc": "2026-10-30T07:46:10.806413+00:00",
+   "finished_utc": "2026-10-30T07:46:11.590228+00:00",
    "exit": 0,
-   "started_utc": "2026-10-21T11:31:05.606839+00:00",
-   "wall_seconds": 0.5003805160522461
+   "wall_seconds": 0.784,
+   "log": "logs/glm-reference.log"
   },
-  "final-r-install": {
-   "command": [
-    "R",
-    "CMD",
-    "INSTALL",
-    "--preclean",
-    "--library=validation/local-data/R_rapidglm",
-    "bindings/r"
-   ],
-   "exit": 0,
-   "started_utc": "2026-10-21T11:31:06.114376+00:00",
-   "wall_seconds": 23.23519802093506
-  },
-  "final-r-version": {
-   "command": [
-    "Rscript",
-    "-e",
-    "library(rapidglm, lib.loc=\"validation/local-data/R_rapidglm\"); stopifnot(as.character(packageVersion(\"rapidglm\")) == \"1.4.0\"); print(packageVersion(\"rapidglm\")); print(file.info(system.file(package=\"rapidglm\"))$mtime)"
-   ],
-   "exit": 0,
-   "started_utc": "2026-10-21T11:31:29.349749+00:00",
-   "wall_seconds": 0.07250189781188965
-  },
-  "final-rust-example": {
-   "command": [
-    "cargo",
-    "build",
-    "--release",
-    "--example",
-    "deseq"
-   ],
-   "exit": 0,
-   "started_utc": "2026-10-21T11:31:29.422434+00:00",
-   "wall_seconds": 0.06398558616638184
-  },
-  "measured-clone": {
-   "command": [
-    "git",
-    "clone",
-    "--quiet",
-    "--no-hardlinks",
-    "--branch",
-    "v1.4.0-dev.4",
-    "/mnt/pikachu/rapidglm",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/measured-clone"
-   ],
-   "exit": 0,
-   "started_utc": "2026-10-21T11:31:29.487015+00:00",
-   "wall_seconds": 0.1021885871887207
-  },
-  "final-image-build": {
+  "binaries_sha256": {
+   "/data/lhhung/rapidglm-1.6.0/build/rapidglm": "fbb618a5a537e04bdafb44351a0791967c9b49e6324cba95194439eec444fbdd",
+   "/data/lhhung/rapidglm-1.6.0/build/librapidglm_c.so": "fd91c8399452acb9b855f58c14018f286931b7c33fbd2e693cd7213d12d5b0c5",
+   "/data/lhhung/rapidglm-1.6.0/build/rapidglm_glm_compare": "ef642c8e1abacdda0c811af349bdef22fa2dcc6fbe3d88af6f91029507610fbb",
+   "/data/lhhung/rapidglm-1.6.0/build/rapidglm_glm_batch": "a2b87b9a331ea2592070f67af84262ed104e45a39753f3c9cd7959bd36a143e8",
+   "/data/lhhung/rapidglm-1.6.0/build/rapidglm_effect_benchmark": "b3468d88b8514310243a0c0d15b03826323459c8a3d453517f50cc99453f78c9",
+   "/data/lhhung/rapidglm-1.6.0/build/rapidglm_special_functions": "6e3db9526092387a847417bd6ead79260f06557d22455d82494d3745e769ce9c",
+   "/data/lhhung/rapidglm-1.6.0/build/rapidglm_qtl_precision_benchmark": "21fe301bc9fc7ab4c112ce0326d96575754f303ebeb04c161197a2feb118ff03",
+   "/data/lhhung/rapidglm-1.6.0/build/rapidglm_tests": "f172548bde62d793876195bc3201841c2b83ea689e559f7e5b0160759c3ef447"
+  }
+ },
+ "containers": {
+  "image-build": {
    "command": [
     "docker",
     "build",
     "--cpuset-cpus",
-    "0-7",
+    "0-5",
     "--cpu-shares",
     "128",
+    "--label",
+    "org.opencontainers.image.revision=4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
     "-t",
-    "rapidglm:1.4.0",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/measured-clone"
+    "rapidglm:1.6.0",
+    "/data/lhhung/rapidglm-1.6.0/validation/work/release-1.6.0-gpu/docker-context"
    ],
+   "started_utc": "2026-10-30T07:46:12.973069+00:00",
+   "finished_utc": "2026-10-30T07:48:46.450483+00:00",
    "exit": 0,
-   "started_utc": "2026-10-21T11:31:29.589370+00:00",
-   "wall_seconds": 105.87828040122986
+   "wall_seconds": 153.47743626870215,
+   "log": "logs/image-build.log"
   },
-  "final-solvers-image-build": {
-   "command": [
-    "docker",
-    "build",
-    "--cpuset-cpus",
-    "0-7",
-    "--cpu-shares",
-    "128",
-    "-t",
-    "rapidglm-solvers:1.4.0",
-    "-f",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/Dockerfile.solvers",
-    "/mnt/pikachu/rapidglm/validation/work/release-1.4.0/measured-clone"
-   ],
-   "exit": 0,
-   "started_utc": "2026-10-21T11:33:15.474119+00:00",
-   "wall_seconds": 38.2326602935791
+  "image": {
+   "id": "sha256:3aa4599e9b04782e03fe0830c3ded6257cccd8886d24729b709c5b3cb932d4e5",
+   "source_commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+   "version": "1.6.0",
+   "cli_sha256": "3190fe7d91f025f221ed06a8b43f2377071aa048b14618f00be85e86b81814a0",
+   "packages": "cmake\t3.28.3-1build7\ng++\t4:13.2.0-7ubuntu1\nlibboost-dev:amd64\t1.83.0.1ubuntu2\nliblapacke-dev:amd64\t3.12.0-3build1.1\nlibopenblas-pthread-dev:amd64\t0.3.26+ds-1ubuntu0.1\npython3\t3.12.3-0ubuntu2.1\nr-base-core\t4.3.3-2build2",
+   "pydeseq2_environment": "anndata==0.13.4\nannotated-types==0.8.0\narray-api-compat==1.16.0\ncloudpickle==3.1.2\ncontourpy==1.4.0\ncycler==0.12.1\ndonfig==0.8.1.post1\nfonttools==4.68.0\nformulaic==1.2.2\nformulaic-contrasts==1.0.0\ngoogle-crc32c==1.9.0\nh5py==3.16.0\ninterface_meta==2.0.1\njoblib==1.6.0\nkiwisolver==1.5.1\nlegacy-api-wrap==1.5\nmatplotlib==3.11.2\nmsgspec==0.22.0\nnarwhals==2.28.0\nnatsort==8.4.0\nnumcodecs==0.17.1\nnumpy==2.5.4\npackaging==26.3\npandas==2.3.3\npillow==13.0.0\npydantic==2.14.2\npydantic-settings==2.16.2\npydantic_core==2.50.2\npydeseq2==0.5.2\npyparsing==3.3.3\npython-dateutil==3.0.0\npython-dotenv==1.2.4\npytz==2026.6\nPyYAML==6.0.3\nscikit-learn==1.9.1\nscipy==1.18.1\nscverse-misc==0.1.8\nsession-info2==0.4.2\nsession_info==1.0.1\nsix==1.17.0\nstdlib-list==0.12.0\nthreadpoolctl==3.7.0\ntyping-inspection==0.4.4\ntyping_extensions==4.16.0\ntzdata==2026.6\nwrapt==2.5.2\nzarr==3.4.2"
   },
-  "final-container-tests": {
+  "container-tests-slow": {
    "command": [
     "docker",
     "run",
     "--rm",
     "--cpuset-cpus",
-    "0-7",
-    "rapidglm:1.4.0",
+    "0-5",
+    "-e",
+    "RAPIDGLM_DIVISION=slow",
+    "-e",
+    "OMP_NUM_THREADS=4",
+    "sha256:3aa4599e9b04782e03fe0830c3ded6257cccd8886d24729b709c5b3cb932d4e5",
     "nice",
     "-n",
     "10",
     "bash",
     "scripts/container_tests.sh"
    ],
+   "started_utc": "2026-10-30T07:48:48.761184+00:00",
+   "finished_utc": "2026-10-30T07:51:49.644057+00:00",
    "exit": 0,
-   "started_utc": "2026-10-21T11:33:53.707446+00:00",
-   "wall_seconds": 99.62264275550842
+   "wall_seconds": 180.88289055787027,
+   "log": "logs/container-tests-slow.log"
   },
-  "final-container-version": {
+  "container-tests-fast": {
    "command": [
     "docker",
     "run",
     "--rm",
     "--cpuset-cpus",
-    "0-7",
-    "rapidglm:1.4.0",
-    "rapidglm",
-    "--version"
+    "0-5",
+    "-e",
+    "RAPIDGLM_DIVISION=fast",
+    "-e",
+    "OMP_NUM_THREADS=4",
+    "sha256:3aa4599e9b04782e03fe0830c3ded6257cccd8886d24729b709c5b3cb932d4e5",
+    "nice",
+    "-n",
+    "10",
+    "bash",
+    "scripts/container_tests.sh"
    ],
+   "started_utc": "2026-10-30T07:51:49.644802+00:00",
+   "finished_utc": "2026-10-30T07:54:50.581843+00:00",
    "exit": 0,
-   "started_utc": "2026-10-21T11:35:33.340578+00:00",
-   "wall_seconds": 0.595020055770874
+   "wall_seconds": 180.9370621033013,
+   "log": "logs/container-tests-fast.log"
+  },
+  "solvers-image-build": {
+   "command": [
+    "docker",
+    "build",
+    "--cpuset-cpus",
+    "0-5",
+    "--cpu-shares",
+    "128",
+    "--label",
+    "org.opencontainers.image.revision=4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "-f",
+    "/data/lhhung/rapidglm-1.6.0/validation/work/release-1.6.0-gpu/Dockerfile.solvers",
+    "-t",
+    "rapidglm-solvers:1.6.0",
+    "/data/lhhung/rapidglm-1.6.0/validation/work/release-1.6.0-gpu/docker-context"
+   ],
+   "started_utc": "2026-10-30T07:54:50.583326+00:00",
+   "finished_utc": "2026-10-30T07:55:15.108268+00:00",
+   "exit": 0,
+   "wall_seconds": 24.524957489222288,
+   "log": "logs/solvers-image-build.log"
+  },
+  "solvers": {
+   "id": "sha256:056e31358744c2d079f7950a9f12bf11eb94f1e908d55b880718521c78b7e740",
+   "source_commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+   "dockerfile_sha256": "5951efe1addae39ed1434a4531e91ebc0c2893aeb3a127f866f0bbc5fd697ad3",
+   "binary_sha256": "87389b9929049012551ee655f455198b46614ca3ccf07b8a1a18b728bbff7bea",
+   "ceres_package": "libceres-dev:amd64\t2.2.0+dfsg-4.1ubuntu2"
   }
  },
- "_provenance": {
-  "version": "1.4.0",
-  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
-  "worktree_dirty": false
- },
- "host_note": "These correctness checks ran on CPUs 0-7 under nice 10 before the final-policy timing restart. Their source-identity evidence and pass/fail results remain valid. Elapsed times are test diagnostics; they do not belong to the final benchmark collection or its CPU-policy audit.",
- "_timing_scope": "Retained correctness checks; elapsed diagnostics are not benchmark measurements.",
- "_benchmark_host_configuration": {
-  "workstation": "Intel Core i9-13900KF",
-  "ram_gib": 125,
-  "bios_version": "1836",
-  "bios_date": "04/16/2026",
-  "microcode": "0x133",
-  "power_limits": {
-   "long_term": {
-    "power_limit_watts": 253.0,
-    "time_window_microseconds": 55967744
+ "container_source_archive_sha256": "5a176388d8da74f0e59e1581f03c12c0a1507a992ac1cc034f3465ab268f8eee",
+ "runner_regressions": {
+  "result": "PASS",
+  "finished_utc": "2026-10-30T07:47:36.020396+00:00",
+  "untimed": true,
+  "cpus": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "slurm_job_submitted": false,
+  "tests_passed": 30,
+  "tests": {
+   "public_qtl_retry_integration": {
+    "command": [
+     "/data/lhhung/rapidglm-1.6.0/build/rapidglm",
+     "qtl",
+     "/data/lhhung/rapidglm-1.6.0/validation/work/release-1.6.0-gpu/runner-tests/tests-5/public_qtl_integration/output/config.json"
+    ],
+    "permutations": 100,
+    "phenotypes": 3,
+    "precision": "double",
+    "actual_cli_runs": 2,
+    "pids": [
+     1915518,
+     1915524
+    ],
+    "quiet_gate_calls": 2,
+    "result_sha256": "769e47e4c304e525d0839159c4385dd0e2fcace3efcff60418c3a83bf2193bb1",
+    "archived_result_byte_identical": true,
+    "external_input_sha256": {
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt": "3cb400dba06421204a5246fe63ca69ceb888aa166f8fc263f245352d5b81ab93",
+     "/data/lhhung/rapidglm/validation/work/eqtl/runs/rapidglm/inputs/chr22.expr_int.bed": "7e6d583490e70bab10362dddc5f9219a654b2884a33e102f417672d52bde8bb3",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.bed": "3026db5139cecdb8c7225a0969b5eaa34c514ffe894a38f563cfa6a46cf4e1aa",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.bim": "15322620fbbf718df4660f48756304d1b99e05b9713adcb85f6d353df1d5d6d7",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.fam": "99abcb5c20ac7e76726990b13afdaebd7d29a7798ba70987e21f247d22e97a94",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.input_variant_types.txt": "bbec056cfec8319d983c2c16cbbe73b15923f7a06d547a9f65b6a126ad390e5c",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.log": "45f83dcd3306301a18e39e6daedf5fc8a9d7a4a9bd76bf03d66bcda9ff26759a",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.n_dup_positions.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.n_final.txt": "7f17661dfcfcb817e08a0b12ba80fbaedc6e6eae7304a4bce5be5277d58c86c7",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.n_input_records.txt": "49682b2e5653af789d574273752d24ae164306b4da6e023e1a4ff8c6df9847e5",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.n_pruned.txt": "e24290c2405948e4090400bbfc772cc069a95949408f28a90bdeb7af34e31664",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.n_snv_complete.txt": "82435d77a23be05065b59ce78f19c2440d554834034012c3ebeabbf8ab6662ab",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.pca.eigenval": "3c4a80902437fb619e512b6fdbee927c7032f759b67f18f788087fb2103da5a7",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.pca.eigenvec": "7065cb3cb6203b298c6d69d7c657e242ef9635b885c5cecdb12a347d313efb3c",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.pca.log": "32bc2afd2d85921ae2d3ff88660b3c1fd315ee76380add25672c372dac0c171a",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.pgen": "42ed23759eb8c6122ef8222cd5dc79fddc87626cfa24546367ab43075337b294",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.prune.log": "46397d0689d975f48ba5250e5fda6fef3466ee2d50ea479b2f6db8e27cd7c0f4",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.prune.prune.in": "787deea6f8b262ff31c5d53ffe5469dda8fc3e31005e615f10f5970950dc55cd",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.prune.prune.out": "f7469534d4df0cb8d1e67a52f1127ae1851654e33a2d2cc9de46c06117cb3430",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.psam": "e04e9a889a0b33726738468cc4db9f2b19116e268fefee9c85abc7dc8a04af41",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.pvar": "d7de0db1ad09fc59b589a49b288a096907fed1ca74efa7d7acab38cdd410ded6",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.vcf.gz": "da45c5ae184e375d022e319e4f3df402babc0125af382a98bf4e848c182137ba",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.vcf.gz.tbi": "cd658db0f1bf41a0ebbc5d840cf5677f06b14e63ca9c1440def1603d3baf8dfb",
+     "/data/lhhung/rapidglm/validation/work/eqtl/data/genotypes/chr22.vcf_samples.txt": "c88ef1ef96d21f9c9255358ffed34183ecef1c14324e8b49646c366daf4b4a9a"
+    },
+    "untimed": true,
+    "synthetic_contention": true
    },
-   "short_term": {
-    "power_limit_watts": 253.0,
-    "time_window_microseconds": 2440
+   "reject_tampered_record_audit_sha256": {},
+   "reject_tampered_record_command_exit": {},
+   "reject_tampered_record_pid": {},
+   "reject_tampered_record_label": {},
+   "reject_tampered_record_stage": {},
+   "reject_missing_rerun_evidence": {},
+   "reject_tampered_archive": {},
+   "no_retry_policy_changed": {},
+   "no_retry_wrong_pid": {},
+   "no_retry_wrong_label": {},
+   "no_retry_wrong_cpus": {},
+   "no_retry_wrong_stage": {},
+   "no_retry_wrong_job": {},
+   "no_retry_below_threshold": {},
+   "no_retry_stale_time": {},
+   "no_retry_stale_file": {},
+   "no_retry_outside_directory": {},
+   "no_retry_malformed": {},
+   "no_retry_unrelated": {},
+   "no_retry_empty_success": {},
+   "no_retry_changed_input": {},
+   "nonzero_clean": {},
+   "nonzero_contended": {},
+   "prior_outputs_not_overwritten": {},
+   "hold_blocks_timed_entrypoint": {
+    "exit": 2
+   },
+   "policy_hook_disabled_without_policy_flag": {},
+   "policy_check_before_quiet_ready_audit": {},
+   "policy_failure_blocks_quiet_ready": {},
+   "full_launcher_blocks_active_hold": {
+    "exit": 1
    }
   },
-  "memory": {
-   "modules": 4,
-   "module_gib": 32,
-   "configured_rate_mt_per_second": 4200,
-   "evidence": "Final host setting supplied by the user; BIOS/microcode and RAPL limits independently read at preflight."
-  },
-  "faulty_performance_cores": {
-   "physical_cores": 2,
-   "logical_cpus": [
-    8,
-    9,
-    10,
-    11
-   ],
-   "maximum_khz": 2200000,
-   "thread_siblings": {
-    "8": "8-9",
-    "9": "8-9",
-    "10": "10-11",
-    "11": "10-11"
+  "guarded_sha256": "576b4236fc9bc4ce89f21dc9db8ca0438b679008d0dd88d5de0284e7ebcb0a37",
+  "checker_sha256": "fd1e6bf1e84499e62ae3d2dfdb1189b9ca5a62e8320fbc92847ae42764bca684"
+ },
+ "acceptance_checker": {
+  "result": "PASS",
+  "untimed": true,
+  "synthetic_fixture": true,
+  "slurm_job_submitted": false,
+  "tests_passed": 5,
+  "tests": [
+   {
+    "case": "valid",
+    "passed": true,
+    "commands": 1,
+    "problems": []
    },
-   "timed": false
+   {
+    "case": "audit_hash_changed",
+    "passed": true,
+    "commands": 2,
+    "problems": [
+     [
+      "guarded retry evidence invalid",
+      "commands/rejected.json",
+      ""
+     ],
+     [
+      "contention",
+      "qtl",
+      "2026-10-29T00:00:01+00:00"
+     ]
+    ]
+   },
+   {
+    "case": "source_changed",
+    "passed": true,
+    "commands": 2,
+    "problems": [
+     [
+      "guarded retry evidence invalid",
+      "commands/rejected.json",
+      ""
+     ],
+     [
+      "contention",
+      "qtl",
+      "2026-10-29T00:00:01+00:00"
+     ]
+    ]
+   },
+   {
+    "case": "missing_rerun",
+    "passed": true,
+    "commands": 2,
+    "problems": [
+     [
+      "guarded retry evidence invalid",
+      "commands/rejected.json",
+      ""
+     ],
+     [
+      "contention",
+      "qtl",
+      "2026-10-29T00:00:01+00:00"
+     ]
+    ]
+   },
+   {
+    "case": "archive_missing",
+    "passed": true,
+    "commands": 2,
+    "problems": [
+     [
+      "guarded retry evidence invalid",
+      "commands/rejected.json",
+      "[Errno 2] No such file or directory: '/data/lhhung/rapidglm-1.6.0/validation/work/release-1.6.0-gpu/runner-tests/checker-fixture-final/nonexistent'"
+     ],
+     [
+      "contention",
+      "qtl",
+      "2026-10-29T00:00:01+00:00"
+     ]
+    ]
+   }
+  ],
+  "cpus": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "checker_sha256": "fd1e6bf1e84499e62ae3d2dfdb1189b9ca5a62e8320fbc92847ae42764bca684"
+ },
+ "full_functional_suite": "Previously passed on uwt-biocloud1 on this measured commit; this run performs the required GPU-host quick checks only.",
+ "driver_scope_repair": {
+  "untimed": true,
+  "cpus": "0-5",
+  "slurm_job_submitted": false,
+  "driver_scope_tests": 6,
+  "acceptance_checker_tests": 5,
+  "all_passed": true,
+  "driver_test_sha256": "5d2795ef6bc3b0a757b17e61dd2e1815449affbcd65eee26de124a60be22b20f",
+  "checker_sha256": "4cee451ac671bd86cc688f6ee9330d36e6c67cea1d4f969c304d7ddaec23a3bf",
+  "driver_log_sha256": "0dda2f2857622c8ea8238b19a284708ffb1f0ae508012beb64a190fc9e3f4539",
+  "checker_results": {
+   "result": "PASS",
+   "untimed": true,
+   "synthetic_fixture": true,
+   "slurm_job_submitted": false,
+   "tests_passed": 5,
+   "tests": [
+    {
+     "case": "valid",
+     "passed": true,
+     "commands": 1,
+     "problems": []
+    },
+    {
+     "case": "audit_hash_changed",
+     "passed": true,
+     "commands": 2,
+     "problems": [
+      [
+       "guarded retry evidence invalid",
+       "commands/rejected.json",
+       ""
+      ],
+      [
+       "contention",
+       "qtl",
+       "2026-10-29T00:00:01+00:00"
+      ]
+     ]
+    },
+    {
+     "case": "source_changed",
+     "passed": true,
+     "commands": 2,
+     "problems": [
+      [
+       "guarded retry evidence invalid",
+       "commands/rejected.json",
+       ""
+      ],
+      [
+       "contention",
+       "qtl",
+       "2026-10-29T00:00:01+00:00"
+      ]
+     ]
+    },
+    {
+     "case": "missing_rerun",
+     "passed": true,
+     "commands": 2,
+     "problems": [
+      [
+       "guarded retry evidence invalid",
+       "commands/rejected.json",
+       ""
+      ],
+      [
+       "contention",
+       "qtl",
+       "2026-10-29T00:00:01+00:00"
+      ]
+     ]
+    },
+    {
+     "case": "archive_missing",
+     "passed": true,
+     "commands": 2,
+     "problems": [
+      [
+       "guarded retry evidence invalid",
+       "commands/rejected.json",
+       "[Errno 2] No such file or directory: '/data/lhhung/rapidglm-1.6.0/validation/work/release-1.6.0-gpu/driver-repair-checker-tests/checker-fixture-final/nonexistent'"
+      ],
+      [
+       "contention",
+       "qtl",
+       "2026-10-29T00:00:01+00:00"
+      ]
+     ]
+    }
+   ],
+   "cpus": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "checker_sha256": "4cee451ac671bd86cc688f6ee9330d36e6c67cea1d4f969c304d7ddaec23a3bf"
+  }
+ },
+ "preprint_scope_tests": {
+  "PREPRINT_RUNNER_TESTS": {
+   "result": "PASS",
+   "untimed": true,
+   "synthetic": true,
+   "cpus": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "tests": [
+    {
+     "case": "valid",
+     "passed": true
+    },
+    {
+     "case": "missing_command",
+     "passed": true
+    },
+    {
+     "case": "wrong_cores",
+     "passed": true
+    },
+    {
+     "case": "wrong_division",
+     "passed": true
+    },
+    {
+     "case": "contention",
+     "passed": true
+    },
+    {
+     "case": "missing_policy",
+     "passed": true
+    },
+    {
+     "case": "bad_quiet_sample",
+     "passed": true
+    },
+    {
+     "case": "identity",
+     "passed": true
+    },
+    {
+     "case": "allowed_rounding",
+     "passed": true
+    },
+    {
+     "case": "beta_outside_bound",
+     "passed": true
+    },
+    {
+     "case": "status_change",
+     "passed": true
+    },
+    {
+     "case": "missing_row",
+     "passed": true
+    }
+   ],
+   "tests_passed": 12,
+   "fixture": "/data/lhhung/rapidglm-1.6.0/validation/work/release-1.6.0-gpu/preprint-checker-1z869lnu"
   },
-  "cap_faulty_cores_service": {
-   "enabled": true,
-   "executable": "/usr/local/sbin/cap-faulty-cores"
+  "PREPRINT_CHECKER_COMPATIBILITY": {
+   "result": "PASS",
+   "untimed": true,
+   "synthetic_fixture": true,
+   "slurm_job_submitted": false,
+   "tests_passed": 5,
+   "tests": [
+    {
+     "case": "valid",
+     "passed": true,
+     "commands": 1,
+     "problems": []
+    },
+    {
+     "case": "audit_hash_changed",
+     "passed": true,
+     "commands": 2,
+     "problems": [
+      [
+       "guarded retry evidence invalid",
+       "commands/rejected.json",
+       ""
+      ],
+      [
+       "contention",
+       "qtl",
+       "2026-10-29T00:00:01+00:00"
+      ]
+     ]
+    },
+    {
+     "case": "source_changed",
+     "passed": true,
+     "commands": 2,
+     "problems": [
+      [
+       "guarded retry evidence invalid",
+       "commands/rejected.json",
+       ""
+      ],
+      [
+       "contention",
+       "qtl",
+       "2026-10-29T00:00:01+00:00"
+      ]
+     ]
+    },
+    {
+     "case": "missing_rerun",
+     "passed": true,
+     "commands": 2,
+     "problems": [
+      [
+       "guarded retry evidence invalid",
+       "commands/rejected.json",
+       ""
+      ],
+      [
+       "contention",
+       "qtl",
+       "2026-10-29T00:00:01+00:00"
+      ]
+     ]
+    },
+    {
+     "case": "archive_missing",
+     "passed": true,
+     "commands": 2,
+     "problems": [
+      [
+       "guarded retry evidence invalid",
+       "commands/rejected.json",
+       "[Errno 2] No such file or directory: '/data/lhhung/rapidglm-1.6.0/validation/work/release-1.6.0-gpu/runner-tests/checker-fixture-preprint-compatibility/nonexistent'"
+      ],
+      [
+       "contention",
+       "qtl",
+       "2026-10-29T00:00:01+00:00"
+      ]
+     ]
+    }
+   ],
+   "cpus": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "checker_sha256": "29402106170c04cf304f31aa4c5f8e2eb72db5f43bef00eac70c0e3c0c48faaf"
+  }
+ },
+ "full_resume_tests": {
+  "all_passed": true,
+  "ablation_scope_tests": 4,
+  "existing_driver_scope_tests": 6,
+  "preserved_preprint_stamp": {
+   "passed": true,
+   "preserved_preprint_files": [
+    "PREPRINT_PLAN.json",
+    "PREPRINT_GATE.json",
+    "preprint-chain-status.json"
+   ],
+   "new_stage_stamped": true
   },
-  "fixed_cpu_clock_service": {
-   "enabled": false
-  },
-  "reproducibility": "Every timed run is pinned to identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Absolute seconds from other host settings are not directly comparable; matched tool speed-up ratios are the comparison of interest.",
-  "verified_utc": "2026-10-22T00:08:31.141014+00:00"
+  "logs": {
+   "ablation-tests.log": {
+    "file": "validation/work/release-1.6.0-gpu/full-resume-20261103/ablation-tests.log",
+    "sha256": "98f1fe11490be35e84263f3be3a3d52e9cde760e4b18747c26b257bc6c478c4f"
+   },
+   "driver-tests.log": {
+    "file": "validation/work/release-1.6.0-gpu/full-resume-20261103/driver-tests.log",
+    "sha256": "0dda2f2857622c8ea8238b19a284708ffb1f0ae508012beb64a190fc9e3f4539"
+   },
+   "STAMP_TESTS.json": {
+    "file": "validation/work/release-1.6.0-gpu/full-resume-20261103/STAMP_TESTS.json",
+    "sha256": "f122f7bb60bde47d3ebda12393247ee5dd10e0806345588859af239ede87df06"
+   }
+  }
+ },
+ "measured_tag": "v1.6.0-dev.2",
+ "host_note": "These correctness checks ran on CPUs 0-5 before the timed run. Elapsed times are test diagnostics, not benchmark measurements.",
+ "_timing_scope": "Correctness checks; elapsed diagnostics are not benchmark measurements.",
+ "_provenance": {
+  "version": "1.6.0",
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "worktree_dirty": false
+ },
+ "_benchmark_host_configuration": {
+  "processor": "AMD Threadripper PRO 5965WX",
+  "physical_cores": 24,
+  "logical_cpus": 48,
+  "ram_gib": 125.61,
+  "driver_cpus": "0-5",
+  "timed_cpus": "6-21",
+  "idle_siblings": "30-45",
+  "governor": "schedutil",
+  "boost": "1",
+  "smt": "on"
  }
 }

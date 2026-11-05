@@ -55,55 +55,63 @@ relative to the log likelihood.
 
 ## Results
 
-These final runs use version 1.4.0 (`v1.4.0-dev.4`), completed 2026-10-22, each on one efficiency core of
-an Intel Core i9-13900KF (see [BENCHMARK.md](BENCHMARK.md#host)). Times are
-wall seconds for all genes. Each cell gives the time and either the largest
-shortfall or the number of genes worse than the best answer.
+Completed RapidGLM 1.6.0 measurements on `v1.6.0-dev.2` (`4505ef6afaa00a38c5c871ae0e12d531c91ec1cf`); the release library is unchanged from the measured dev.2 source.
 
-**Fixed dispersion** (DESeq2's final GLM):
+One thread on Zen 3 core 6 under the quiet-start and contention protocol in [BENCHMARK.md](BENCHMARK.md#host). Wall times cover all genes. Shortfalls and failures are reported alongside time; Ceres default and tight tolerances remain separate.
 
-| Data (samples × columns, genes) | RapidGLM | RapidGLM, plain `fit` | LM default | LM tight | Dogleg tight | L-BFGS default | L-BFGS tight |
-|---|---|---|---|---|---|---|---|
-| airway (8 × 5, 22,369) | 0.20 s; max 1e-9 | 0.21 s | 0.35 s; max 3e-6 | 0.47 s; max 2e-9 | 0.70 s | 0.44 s; 9,323 worse | 0.59 s |
-| simulation (5,000 × 5, 1,000) | 1.66 s; max 8e-11 | 1.72 s | 2.53 s; max 3e-3 | 4.60 s; max 3e-9 | 4.76 s | 4.01 s; 362 worse | 5.17 s |
-| GTEx thyroid (647 × 12, 28,769) | 7.07 s; max 8e-8 | 7.82 s | 10.3 s; max 7e-4 | 15.2 s; max 1e-8 | 15.8 s | 15.7 s; 23,163 worse | 32.0 s; 3 worse |
+**Fixed dispersion:**
 
-**Maximum-likelihood dispersion:**
+| Dataset | Method | Seconds | Genes with relative shortfall > 1e-6 | Largest log-likelihood shortfall | Failed |
+| --- | --- | --- | --- | --- | --- |
+| airway | rapidglm_newton | 0.1772 | 0 | 1.4e-09 | 0 |
+| airway | rapidglm_newton_plain | 0.193 | 0 | 1.4e-09 | 0 |
+| airway | ceres_levenberg_marquardt/ceres_default | 0.2461 | 0 | 3.41e-06 | 0 |
+| airway | ceres_dogleg/ceres_default | 0.2566 | 0 | 3.41e-06 | 0 |
+| airway | ceres_lbfgs/ceres_default | 0.3686 | 9323 | 56.7 | 0 |
+| airway | ceres_levenberg_marquardt/tight | 0.3531 | 0 | 3.13e-09 | 0 |
+| airway | ceres_dogleg/tight | 0.5475 | 0 | 5.32e-08 | 0 |
+| airway | ceres_lbfgs/tight | 0.5044 | 0 | 9.48e-08 | 0 |
+| sim5000 | rapidglm_newton | 1.147 | 0 | 7.64e-11 | 0 |
+| sim5000 | rapidglm_newton_plain | 1.263 | 0 | 7.64e-11 | 0 |
+| sim5000 | ceres_levenberg_marquardt/ceres_default | 1.985 | 0 | 0.00273 | 0 |
+| sim5000 | ceres_dogleg/ceres_default | 2.048 | 0 | 0.00275 | 0 |
+| sim5000 | ceres_lbfgs/ceres_default | 3.118 | 362 | 13.5 | 0 |
+| sim5000 | ceres_levenberg_marquardt/tight | 3.568 | 0 | 2.62e-09 | 0 |
+| sim5000 | ceres_dogleg/tight | 3.701 | 0 | 2.65e-09 | 0 |
+| sim5000 | ceres_lbfgs/tight | 4.018 | 0 | 6.42e-10 | 0 |
+| thyroid | rapidglm_newton | 5.389 | 0 | 7.89e-08 | 0 |
+| thyroid | rapidglm_newton_plain | 5.914 | 0 | 7.89e-08 | 0 |
+| thyroid | ceres_levenberg_marquardt/ceres_default | 8.112 | 0 | 0.000718 | 0 |
+| thyroid | ceres_dogleg/ceres_default | 8.317 | 0 | 0.00107 | 0 |
+| thyroid | ceres_lbfgs/ceres_default | 12.23 | 23163 | 2.45e+03 | 0 |
+| thyroid | ceres_levenberg_marquardt/tight | 12.13 | 0 | 8.86e-09 | 0 |
+| thyroid | ceres_dogleg/tight | 12.43 | 0 | 1.32e-08 | 0 |
+| thyroid | ceres_lbfgs/tight | 24.87 | 3 | 0.04 | 0 |
 
-| Data | RapidGLM joint Newton | RapidGLM, plain `fit` | BFGS default | BFGS tight | L-BFGS tight |
-|---|---|---|---|---|---|
-| airway | 1.12 s; 198 worse, max 6e-4 (θ at its 1e8 bound) | 1.22 s | 1.24 s; 17,804 worse, max 28 | 1.90 s; 6 worse, max 0.33 | 2.16 s; 8 worse |
-| simulation | 3.29 s; max 1e-5 | 3.46 s | 11.1 s; 120 worse, max 42 | 14.0 s; max 9e-6 | 14.3 s |
-| GTEx thyroid | 15.0 s; max 1e-5 | 16.5 s | 43.3 s; 21,364 worse, max 8.4e3 | 87.6 s; 2 worse, max 22 | 92.4 s; 3 worse |
+**Estimated dispersion:**
 
-The final fixed-dispersion speedups are
-2.15–2.77× over tight
-Levenberg–Marquardt and 2.23–3.52× over tight
-dogleg. With estimated dispersion, speedups over tight BFGS are
-1.71–5.85×. Accuracy and boundary shortfalls are
-reported in the same cells; a fast early stop is not treated as an equally
-accurate optimum.
+| Dataset | Method | Seconds | Genes with relative shortfall > 1e-6 | Largest log-likelihood shortfall | Failed |
+| --- | --- | --- | --- | --- | --- |
+| airway | rapidglm_newton | 0.9804 | 198 | 0.000602 | 0 |
+| airway | rapidglm_newton_plain | 1.068 | 198 | 0.000602 | 0 |
+| airway | ceres_bfgs/ceres_default | 1.128 | 17804 | 28.4 | 0 |
+| airway | ceres_lbfgs/ceres_default | 1.112 | 17884 | 28.4 | 0 |
+| airway | ceres_bfgs/tight | 1.751 | 6 | 0.327 | 0 |
+| airway | ceres_lbfgs/tight | 1.962 | 8 | 0.327 | 0 |
+| sim5000 | rapidglm_newton | 2.455 | 0 | 1.27e-05 | 0 |
+| sim5000 | rapidglm_newton_plain | 2.576 | 0 | 1.27e-05 | 0 |
+| sim5000 | ceres_bfgs/ceres_default | 10.3 | 120 | 42.3 | 0 |
+| sim5000 | ceres_lbfgs/ceres_default | 10.29 | 120 | 42.3 | 0 |
+| sim5000 | ceres_bfgs/tight | 12.94 | 0 | 8.53e-06 | 0 |
+| sim5000 | ceres_lbfgs/tight | 13.18 | 0 | 5.58e-05 | 0 |
+| thyroid | rapidglm_newton | 12.54 | 0 | 1.39e-05 | 0 |
+| thyroid | rapidglm_newton_plain | 13.54 | 0 | 1.39e-05 | 0 |
+| thyroid | ceres_bfgs/ceres_default | 37.79 | 21364 | 8.38e+03 | 0 |
+| thyroid | ceres_lbfgs/ceres_default | 37.75 | 21475 | 8.38e+03 | 0 |
+| thyroid | ceres_bfgs/tight | 76.31 | 2 | 21.7 | 0 |
+| thyroid | ceres_lbfgs/tight | 80.45 | 3 | 0.032 | 0 |
 
-Plain `fit` repeats the design work for each gene. Its wall time divided by
-the shared-design path ranges from
-1.04–1.11×.
-Against plain `fit`, tight Levenberg–Marquardt takes
-1.95–2.67×
-as long, and tight BFGS takes
-1.56–5.30× as long.
-
-RapidGLM bounds θ at 1e8; its near-Poisson boundary shortfalls should be
-interpreted with that constraint. Quasi-Newton default tolerances can stop
-well short of the optimum, as the tables show. RapidGLM reuses factorizations
-already needed for standard errors and needs no external optimizer.
-
-Three control runs repeat on efficiency CPU 16, under the same quiet-start
-protocol: airway fixed, airway joint and thyroid fixed. Across all methods,
-first measurement / repeat ranges from 0.988 to
-1.035. Their per-method times are in
-`efficiency_core_control` in the receipt. All timings use the workstation's
-16 identical efficiency cores, one thread per core; they are final, not
-provisional. One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional.
+RapidGLM bounds theta at 1e8; near-Poisson shortfalls must be interpreted with that constraint. Plain fit repeats design work for each gene. Three control measurements repeat airway fixed, airway joint and thyroid fixed on the same core; their per-method times remain in the receipt. The historical defects and development measurements below describe how the solver was established and are not substituted for these 1.6.0 timings.
 
 ## Defects the comparison found
 

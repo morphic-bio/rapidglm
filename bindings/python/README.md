@@ -4,6 +4,13 @@ Bulk differential expression, SCEPTRE-method perturbation analysis, score scans
 and batch GLM fits with the RapidGLM engine, plus statsmodels-compatible GLM
 fitting.
 
+The native fit, application and special-function entry points accept
+`division="slow"` or `division="fast"`. The default `None` inherits
+`RAPIDGLM_DIVISION`, read on first native use; the build default is `slow`.
+An explicit value applies only to that call and its workers, and is restored
+after errors. Application results record the resolved mode in
+`result.attrs["division"]`.
+
 ## Applications (C interface)
 
 ```python
@@ -37,6 +44,13 @@ python3 bindings/python/tests/test_capi.py build/rapidglm
 The test checks every column against the CLI bit for bit: bulk-de with
 shrinkage, contrasts, joint LRTs and local trends; fit; permutation and
 asymptotic scans; and three SCEPTRE configurations.
+
+`rapidglm.special` has the engine's special functions for float64 arrays of any
+shape: `log`, `log1p`, `exp`, `digamma` and `trigamma` (RapidGLM's; digamma and
+trigamma for x >= 0) and `lgamma` (libm in slow mode; the own positive kernel
+in fast mode), with `out=`, through the
+same library; `tests/test_special.py` checks RapidGLM's against the C++ values
+bit for bit and all of them against NumPy and SciPy.
 
 ## PyDESeq2-style interface
 
@@ -84,10 +98,8 @@ dds.deseq2()
 DeseqStats(dds, contrast=["condition", "B", "A"], inference=inference).summary()
 ```
 
-On airway, a PyDESeq2 run took 8.8 s instead of 86 s on one thread (shared
-host). Discoveries agree with PyDESeq2's default at Jaccard 0.99. The Wald test
-matches PyDESeq2's to rounding. Fits and dispersions differ only where
-RapidGLM's optimum is better:
+The Wald test matches PyDESeq2's to rounding. The fit checks also compare
+optima when fits and dispersions differ:
 - PyDESeq2's IRLS floors means at `min_mu` while fitting;
 - its L-BFGS-B stops early;
 - genes that start at the dispersion floor keep it, as in DESeq2.

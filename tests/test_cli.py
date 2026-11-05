@@ -133,6 +133,31 @@ class CLI(unittest.TestCase):
         self.assertNotEqual(subprocess.run([str(BINARY), "qtl", self.file("bad.json", json.dumps(config))],
                                            capture_output=True).returncode, 0)
 
+    def test_default_division_is_recorded(self):
+        r, _ = self.execute("fit")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        expected = os.environ.get("RAPIDGLM_DIVISION", os.environ.get("RAPIDGLM_TEST_DEFAULT_DIVISION", "slow"))
+        self.assertEqual(json.loads((self.root / "result.run.json").read_text())["division"], expected)
+
+    def test_division_config_overrides_environment_and_is_recorded(self):
+        for mode in ("slow", "fast"):
+            r, config = self.execute("fit", division=mode, threads=2)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            opposite = "fast" if mode == "slow" else "slow"
+            r = subprocess.run([BINARY, "fit", self.root / "config.json"],
+                               env={**os.environ, "RAPIDGLM_DIVISION": opposite}, capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(json.loads((self.root / "result.run.json").read_text())["division"], mode)
+            config.pop("division")
+            (self.root / "config.json").write_text(json.dumps(config))
+            r = subprocess.run([BINARY, "fit", self.root / "config.json"],
+                               env={**os.environ, "RAPIDGLM_DIVISION": mode}, capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(json.loads((self.root / "result.run.json").read_text())["division"], mode)
+        r, _ = self.execute("fit", division="unknown")
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("division must be slow or fast", r.stderr)
+
     def test_json_and_hashes(self):
         r, c = self.execute("fit", threads=2)
         self.assertEqual(r.returncode, 0, r.stderr)
@@ -424,6 +449,13 @@ class CLI(unittest.TestCase):
             rows = list(csv.DictReader(expected.decode().splitlines(), delimiter="\t"))
             self.assertGreater(sum(r["status"] == "ok" for r in rows), 10)
             record = json.loads((self.root / f"single_{name}.run.json").read_text())
+            self.assertTrue(record["batch_scoring"])
+            # Batch scoring (the default) gives the records of the pair pipeline.
+            unbatched = run(**mode, batch_scoring=False, output=str(self.root / f"unbatched_{name}"))
+            self.assertEqual(unbatched.returncode, 0, unbatched.stderr)
+            self.assertEqual((self.root / f"unbatched_{name}.tsv").read_bytes(), expected)
+            self.assertFalse(
+                json.loads((self.root / f"unbatched_{name}.run.json").read_text())["batch_scoring"])
             self.assertEqual(record["shared_screen"], mode.get("shared_screen", False))
             self.assertEqual(record["sequential_screen"], mode.get("sequential_screen", False))
             self.assertEqual(record["early_stop_p"], mode.get("early_stop_p", 0))
@@ -442,7 +474,8 @@ class CLI(unittest.TestCase):
                           output=str(self.root / f"phases_{name}"))
             self.assertEqual(run(**phases, phase="prepare").returncode, 0)
             for k in range(6):
-                result = run(**dict(phases, threads=1), phase="tile", tile=k)
+                # Batch scoring does not change results, so tiles may differ in it.
+                result = run(**dict(phases, threads=1, batch_scoring=k % 2 == 0), phase="tile", tile=k)
                 self.assertEqual(result.returncode, 0, result.stderr)
             result = run(**phases, phase="merge")
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -674,6 +707,89 @@ class CLI(unittest.TestCase):
     @staticmethod
     def by_pair(rows):
         return sorted(rows, key=lambda r: (int(r["response"]), r["target"], r["guide"], r["kind"]))
+
+    def test_crt_draw_defaults_to_hazard_and_records_the_sampler_used(self):
+        # Sparse calls (about 3% of cells per target), so that the CRT samplers
+        # differ; with denser calls all of them use the direct stream.
+        cells, genes, targets = 2000, 4, 2
+        counts = [(g + 1, c + 1, (c * (g + 3) * 7919) % (g + 5) // 2)
+                  for g in range(genes) for c in range(cells)]
+        counts = [t for t in counts if t[2] > 0]
+        calls = [(t + 1, c + 1) for c in range(cells) for t in range(targets)
+                 if (c * 2654435761 + 977 * t) % 4096 < 128]
+        assignments = self.file(
+            "sparse_guides.mtx",
+            f"%%MatrixMarket matrix coordinate integer general\n{targets} {cells} {len(calls)}\n"
+            + "".join(f"{t} {c} 1\n" for t, c in calls))
+        base = dict(
+            responses=self.file(
+                "sparse.mtx",
+                f"%%MatrixMarket matrix coordinate integer general\n{genes} {cells} {len(counts)}\n"
+                + "".join(f"{g} {c} {v}\n" for g, c, v in counts)),
+            design=self.file("sparse_design.tsv", "".join(f"1\t{(c % 7) / 7}\n" for c in range(cells))),
+            family="poisson", cell_qc=False, min_nonzero=1, budgets=[499],
+            approximation="no_approximation", threads=2, seed=13)
+        sceptre = dict(
+            base, assignments=assignments, moi="high", null_model="direct",
+            guides=self.file("sparse_guides.tsv", "id\ttarget\tnon_targeting\n"
+                             + "".join(f"g{t}\tT{t}\t0\n" for t in range(targets))),
+            pairs=self.file("sparse_pairs.tsv", "response\ttarget\tkind\n"
+                            + "".join(f"{g}\tT{t}\tdiscovery\n"
+                                      for g in range(genes) for t in range(targets))))
+        path = self.root / "sparse.json"
+
+        def run(command, config, name, **kwargs):
+            path.write_text(json.dumps(dict(config, output=str(self.root / name), **kwargs)))
+            result = subprocess.run([BINARY, command, path], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            output = (self.root / f"{name}.tsv").read_bytes()
+            return result, output, json.loads((self.root / f"{name}.run.json").read_text())
+
+        defaults = {}
+        for command, config in (("sceptre", sceptre),
+                                ("scan", dict(base, predictors=assignments, calibration="crt"))):
+            with self.subTest(command=command):
+                default, default_output, record = run(command, config, f"{command}_default")
+                rows = list(csv.DictReader(default_output.decode().splitlines(), delimiter="\t"))
+                self.assertEqual(len(rows), genes * targets)
+                self.assertTrue(all(r["status"].startswith("ok") for r in rows))
+                # The default is hazard, which draws with thinned (and says so)
+                # on a processor without AES instructions.
+                self.assertEqual(record["crt_draw"], "hazard")
+                self.assertIn(record["crt_draw_used"], ("hazard", "thinned"))
+                fallback = record["crt_draw_used"] == "thinned"
+                self.assertEqual("no AES instructions" in default.stderr, fallback)
+                outputs = defaults[command] = {"default": default_output}
+                for draw in ("hazard", "thinned", "direct"):
+                    result, outputs[draw], record = run(command, config, f"{command}_{draw}",
+                                                        crt_draw=draw)
+                    self.assertEqual(record["crt_draw"], draw)
+                    self.assertEqual(record["crt_draw_used"],
+                                     "thinned" if draw == "hazard" and fallback else draw)
+                    self.assertEqual("no AES instructions" in result.stderr,
+                                     draw == "hazard" and fallback)
+                self.assertEqual(outputs["hazard"], outputs["default"])
+                self.assertEqual(outputs["hazard"] == outputs["thinned"], fallback)
+                self.assertNotEqual(outputs["thinned"], outputs["direct"])
+        # Runs that draw no CRT labels do not warn.
+        for command, config in (("sceptre", dict(sceptre, resampling_mechanism="permutations")),
+                                ("scan", dict(base, predictors=assignments))):
+            result, _, record = run(command, config, f"{command}_permutations")
+            self.assertNotIn("AES", result.stderr, command)
+            self.assertEqual(record["crt_draw"], "hazard")
+        result, _ = self.execute("fit")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("AES", result.stderr)
+        # The default sampler is part of a tiled plan: a checkpoint written with
+        # it is not resumed with another sampler.
+        tiled = dict(sceptre, tile_targets=1, tile_responses=2, checkpoint_dir=str(self.root / "ck"))
+        result, output, _ = run("sceptre", tiled, "tiled")
+        self.assertEqual(output, defaults["sceptre"]["default"])
+        path.write_text(json.dumps(dict(tiled, crt_draw="thinned", phase="merge",
+                                        output=str(self.root / "tiled_thinned"))))
+        result = subprocess.run([BINARY, "sceptre", path], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("holds a run with other inputs", result.stderr)
 
     def test_sceptre_streams_are_keyed_by_identity(self):
         screen = self.screen()
@@ -990,6 +1106,42 @@ class CLI(unittest.TestCase):
         r,_=self.execute("qtl",**kwargs); self.assertEqual(r.returncode,2)
         self.assertIn(".fam line",r.stderr)
 
+    def test_qtl_gaussian_permutation_precision(self):
+        panel = self.qtl_inputs(n=90)
+        base = {**panel, "responses": None, "design": None, "library_sizes": None,
+                "family": "gaussian", "window": 250_000, "permutations": 600, "seed": 3}
+        tables, records = {}, {}
+        for precision in ("single", "double", None):
+            out = str(self.root / f"precision_{precision}")
+            r, _ = self.execute("qtl", **{**base, "permutation_precision": precision, "output": out})
+            self.assertEqual(r.returncode, 0, r.stderr)
+            with open(out + ".cis.tsv") as f:
+                tables[precision] = list(csv.DictReader(f, delimiter="\t"))
+            records[precision] = json.loads(pathlib.Path(out + ".run.json").read_text())
+        self.assertEqual(tables[None], tables["single"])  # the default
+        self.assertEqual([records[k]["permutation_precision"] for k in ("single", "double", None)],
+                         ["single", "double", "single"])
+        for s, d in zip(tables["single"], tables["double"]):
+            self.assertEqual(s["status"], "ok")
+            for key in ("status", "lead_variant", "statistic", "p_value", "estimate",
+                        "standard_error", "permutations", "permutations_failed", "permutation_p"):
+                self.assertEqual(s[key], d[key], key)
+            self.assertAlmostEqual(float(s["beta_p"]) / float(d["beta_p"]), 1, delta=1e-5)
+        # Count models refit each permutation in double precision.
+        r, _ = self.execute("qtl", **{**panel, "responses": None, "design": None, "family": "nb",
+                                     "permutations": 10, "permutation_precision": "single"})
+        self.assertEqual(r.returncode, 0, r.stderr)
+        record = json.loads((self.root / "result.run.json").read_text())
+        self.assertEqual(record["permutation_precision"], "double")
+        # Without permutations no permutation scores are computed.
+        r, _ = self.execute("qtl", **{**base, "permutations": 0})
+        self.assertEqual(r.returncode, 0, r.stderr)
+        record = json.loads((self.root / "result.run.json").read_text())
+        self.assertIsNone(record["permutation_precision"])
+        r, _ = self.execute("qtl", **{**base, "permutation_precision": "half"})
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("permutation_precision must be single or double", r.stderr)
+
     def test_qtl_loads_only_phenotype_chromosomes(self):
         panel=self.qtl_inputs()
         bim=self.root/"geno.bim"; text=bim.read_text()
@@ -1000,6 +1152,112 @@ class CLI(unittest.TestCase):
         self.assertEqual(r.returncode,0,r.stderr)
         record=json.loads((self.root/"result.run.json").read_text())
         self.assertLessEqual(record["variants"],15)
+
+    def test_qtl_plink_hard_calls(self):
+        """PLINK calls are kept as their two-bit codes; the tables are those of
+        the allele-1 dosages, with missing calls at the variant's mean."""
+        n, width = 81, (81 + 3) // 4  # a partial last byte
+        panel = self.qtl_inputs(n=n)
+        # Alleles that differ between variants, so that IDs, positions and
+        # alleles must stay aligned through min_maf.
+        bim = [r.split("\t") for r in (self.root / "geno.bim").read_text().splitlines()]
+        for v, row in enumerate(bim):
+            row[4], row[5] = "ACGT"[v % 4] * (1 + v % 3), "ACGT"[(v + 1) % 4]
+        (self.root / "geno.bim").write_text("".join("\t".join(r) + "\n" for r in bim))
+        data = bytearray((self.root / "geno.bed").read_bytes())
+        code_of = {2: 0b00, None: 0b01, 1: 0b10, 0: 0b11}
+        dosage_of = {c: d for d, c in code_of.items()}
+
+        def codes(v):
+            block = data[3 + v * width:3 + (v + 1) * width]
+            return [(block[i // 4] >> (2 * (i % 4))) & 3 for i in range(n)]
+
+        def put(v, calls):
+            for i in range(width):
+                data[3 + v * width + i] = sum(code_of[d] << (2 * j)
+                                              for j, d in enumerate(calls[4 * i:4 * i + 4]))
+        # rs3: 2, 0, 2, 0, ... with ones in samples 0, 2 and 9 (mean 1); rs4 the
+        # same with sample 9 missing, imputed to its mean, 1; rs5 never called.
+        a = [2 if i % 2 == 0 else 0 for i in range(n)]
+        a[0] = a[2] = a[9] = 1
+        put(3, a)
+        put(4, a[:9] + [None] + a[10:])
+        put(5, [None] * n)
+        (self.root / "geno.bed").write_bytes(bytes(data))
+        dosages = [[dosage_of[c] for c in codes(v)] for v in range(len(bim))]
+        self.assertEqual(sum(d is None for d in dosages[0]), 1)  # the panel's own missing call
+        base = {**panel, "responses": None, "design": None, "covariates": None,
+                "library_sizes": None, "family": "gaussian", "window": 250_000,
+                "permutations": 200, "nominal": True, "seed": 3, "threads": 2}
+
+        def run(name, **extra):
+            out = str(self.root / name)
+            r, _ = self.execute("qtl", **{**base, **extra, "output": out})
+            self.assertEqual(r.returncode, 0, r.stderr)
+            return [pathlib.Path(out + suffix).read_text() for suffix in (".cis.tsv", ".nominal.tsv")]
+
+        def rows(text):
+            return list(csv.DictReader(text.splitlines(), delimiter="\t"))
+
+        def aligned(cis, nominal):
+            by_id = {r[1]: r for r in bim}
+            for r in rows(nominal):
+                self.assertEqual(r["position"], by_id[r["variant"]][3])
+            for r in rows(cis):
+                b = by_id[r["lead_variant"]]
+                self.assertEqual((r["lead_position"], r["allele1"], r["allele2"]), (b[3], b[4], b[5]))
+        cis, nominal = run("direct")
+        aligned(cis, nominal)
+        # With an intercept only, z = g'(y - mean y) / sqrt(|g - mean g|^2 scale)
+        # for the mean-imputed dosages g and the residual variance scale.
+        phenotypes = [line.split("\t") for line in
+                      pathlib.Path(panel["phenotypes"]).read_text().splitlines()[1:]]
+        scores = {r["variant"]: r for r in rows(nominal)}
+        self.assertEqual(len(scores), 45)
+        for gene, ph in enumerate(phenotypes):
+            y = [float(x) for x in ph[4:]]
+            ybar = sum(y) / n
+            scale = sum((v - ybar) ** 2 for v in y) / (n - 1)
+            for v in range(15 * gene, 15 * gene + 15):
+                called = [d for d in dosages[v] if d is not None]
+                mean = sum(called) / len(called) if called else 0.0
+                g = [mean if d is None else d for d in dosages[v]]
+                gbar = sum(g) / n
+                information = sum((x - gbar) ** 2 for x in g)
+                got = scores[f"rs{v}"]["statistic"]
+                if information < 1e-9:
+                    self.assertEqual(got, "NA", v)
+                    continue
+                z = sum(x * (t - ybar) for x, t in zip(g, y)) / (information * scale) ** 0.5
+                self.assertLessEqual(abs(float(got) - z), 1e-9 * max(1, abs(z)), v)
+        keys = ("statistic", "p_value", "estimate", "standard_error")
+        self.assertEqual([scores["rs3"][k] for k in keys], [scores["rs4"][k] for k in keys])
+        self.assertEqual(scores["rs5"]["statistic"], "NA")
+        # The .fam reversed, with a sample the phenotypes do not list: the codes
+        # are repacked in phenotype order, to the same tables.
+        fam = (self.root / "geno.fam").read_text().splitlines()
+        (self.root / "geno.fam").write_text("\n".join(fam[::-1] + ["FX SX 0 0 0 -9"]) + "\n")
+        repacked = bytearray(data[:3])
+        for v in range(len(bim)):
+            calls = codes(v)[::-1] + [0b10]
+            for i in range(0, n + 1, 4):
+                repacked.append(sum(c << (2 * j) for j, c in enumerate(calls[i:i + 4])))
+        (self.root / "geno.bed").write_bytes(bytes(repacked))
+        self.assertEqual(run("repacked"), [cis, nominal])
+        # min_maf drops variants by their allele-1 frequency in these samples
+        # (rs5, never called, has none); the others keep their tables.
+        def frequency(v):
+            called = [d for d in dosages[v] if d is not None]
+            return sum(called) / (2 * len(called)) if called else 0.0
+        kept = [f"rs{v}" for v in range(len(bim)) if min(frequency(v), 1 - frequency(v)) >= 0.3]
+        self.assertTrue(5 < len(kept) < 40)
+        filtered_cis, filtered = run("maf", min_maf=0.3)
+        record = json.loads((self.root / "maf.run.json").read_text())
+        self.assertEqual(record["variants"], len(kept))
+        self.assertEqual([r["variant"] for r in rows(filtered)], kept)
+        aligned(filtered_cis, filtered)
+        for r in rows(filtered):
+            self.assertEqual([r[k] for k in keys], [scores[r["variant"]][k] for k in keys])
 
     def nb_panel(self):
         # 12 features x 8 samples (feature-by-observation), deterministic counts.

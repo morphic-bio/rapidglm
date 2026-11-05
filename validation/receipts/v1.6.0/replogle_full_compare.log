@@ -1,0 +1,380 @@
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+/data/lhhung/env/pyuser/lib/python3.10/site-packages/pandas/core/arraylike.py:399: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+{
+ "version": "1.6.0",
+ "binary": "/data/lhhung/rapidglm-1.6.0/build/rapidglm",
+ "commit": "3e731bd2cd784e829ba30fb228401cea776e12cc",
+ "perturbations": 2057,
+ "compared": 2057,
+ "skipped_at_prepare": {},
+ "incomplete": {},
+ "agreement": {
+  "jaccard": {
+   "n": 2057,
+   "non_finite": 0,
+   "median": 1.0,
+   "min": 0.0,
+   "max": 1.0,
+   "quantiles": {
+    "0.01": 0.411912,
+    "0.05": 0.9023000000000001,
+    "0.25": 0.9925,
+    "0.75": 1.0,
+    "0.95": 1.0,
+    "0.99": 1.0
+   },
+   "worst": [
+    {
+     "target": "NUS1",
+     "jaccard": 0.0,
+     "samples": 89,
+     "perturbed_samples": 41,
+     "rapidglm_hits": 0,
+     "deseq2_hits": 1,
+     "edger_ql_hits": 2347,
+     "edger_hits": 2347
+    },
+    {
+     "target": "SEC16A",
+     "jaccard": 0.0,
+     "samples": 92,
+     "perturbed_samples": 44,
+     "rapidglm_hits": 1,
+     "deseq2_hits": 0,
+     "edger_ql_hits": 2011,
+     "edger_hits": 2011
+    },
+    {
+     "target": "WDR18",
+     "jaccard": 0.1,
+     "samples": 91,
+     "perturbed_samples": 43,
+     "rapidglm_hits": 13,
+     "deseq2_hits": 31,
+     "edger_ql_hits": 3218,
+     "edger_hits": 3218
+    },
+    {
+     "target": "EMC7",
+     "jaccard": 0.1333,
+     "samples": 95,
+     "perturbed_samples": 47,
+     "rapidglm_hits": 13,
+     "deseq2_hits": 4,
+     "edger_ql_hits": 1809,
+     "edger_hits": 1810
+    },
+    {
+     "target": "CACTIN",
+     "jaccard": 0.1477,
+     "samples": 84,
+     "perturbed_samples": 36,
+     "rapidglm_hits": 100,
+     "deseq2_hits": 102,
+     "edger_ql_hits": 4747,
+     "edger_hits": 4745
+    },
+    {
+     "target": "DPH1",
+     "jaccard": 0.1754,
+     "samples": 96,
+     "perturbed_samples": 48,
+     "rapidglm_hits": 16,
+     "deseq2_hits": 51,
+     "edger_ql_hits": 155,
+     "edger_hits": 155
+    },
+    {
+     "target": "CLP1",
+     "jaccard": 0.1803,
+     "samples": 81,
+     "perturbed_samples": 33,
+     "rapidglm_hits": 29,
+     "deseq2_hits": 43,
+     "edger_ql_hits": 4073,
+     "edger_hits": 4073
+    },
+    {
+     "target": "FGFR1OP",
+     "jaccard": 0.2222,
+     "samples": 92,
+     "perturbed_samples": 44,
+     "rapidglm_hits": 4,
+     "deseq2_hits": 7,
+     "edger_ql_hits": 3402,
+     "edger_hits": 3404
+    },
+    {
+     "target": "AURKAIP1",
+     "jaccard": 0.2258,
+     "samples": 85,
+     "perturbed_samples": 37,
+     "rapidglm_hits": 11,
+     "deseq2_hits": 27,
+     "edger_ql_hits": 3661,
+     "edger_hits": 3661
+    },
+    {
+     "target": "PPP1R7",
+     "jaccard": 0.25,
+     "samples": 83,
+     "perturbed_samples": 35,
+     "rapidglm_hits": 1,
+     "deseq2_hits": 4,
+     "edger_ql_hits": 3864,
+     "edger_hits": 3864
+    }
+   ]
+  },
+  "max_abs_log10_p_difference": {
+   "n": 2057,
+   "non_finite": 0,
+   "median": 0.1543005190155302,
+   "min": 0.011193440962260492,
+   "max": 59.46847444647163,
+   "quantiles": {
+    "0.01": 0.02411856534289948,
+    "0.05": 0.03874961238230497,
+    "0.25": 0.08154313827215987,
+    "0.75": 0.3602628195069606,
+    "0.95": 2.1882142164549703,
+    "0.99": 11.185396100052575
+   },
+   "worst": [
+    {
+     "target": "RPL24",
+     "max_abs_log10_p_difference": 59.46847444647163,
+     "samples": 96,
+     "perturbed_samples": 48,
+     "rapidglm_hits": 4423,
+     "deseq2_hits": 4425,
+     "edger_ql_hits": 4694,
+     "edger_hits": 4694
+    },
+    {
+     "target": "LRPPRC",
+     "max_abs_log10_p_difference": 34.876257067184866,
+     "samples": 91,
+     "perturbed_samples": 43,
+     "rapidglm_hits": 150,
+     "deseq2_hits": 150,
+     "edger_ql_hits": 3677,
+     "edger_hits": 3677
+    },
+    {
+     "target": "TSR2",
+     "max_abs_log10_p_difference": 34.21817031520325,
+     "samples": 96,
+     "perturbed_samples": 48,
+     "rapidglm_hits": 4580,
+     "deseq2_hits": 4580,
+     "edger_ql_hits": 4714,
+     "edger_hits": 4714
+    },
+    {
+     "target": "POLRMT",
+     "max_abs_log10_p_difference": 29.181327438161247,
+     "samples": 96,
+     "perturbed_samples": 48,
+     "rapidglm_hits": 185,
+     "deseq2_hits": 182,
+     "edger_ql_hits": 1221,
+     "edger_hits": 1221
+    },
+    {
+     "target": "GAB2",
+     "max_abs_log10_p_difference": 28.89905971007522,
+     "samples": 96,
+     "perturbed_samples": 48,
+     "rapidglm_hits": 3220,
+     "deseq2_hits": 3220,
+     "edger_ql_hits": 3561,
+     "edger_hits": 3561
+    },
+    {
+     "target": "HSPA5",
+     "max_abs_log10_p_difference": 26.857913143536393,
+     "samples": 96,
+     "perturbed_samples": 48,
+     "rapidglm_hits": 2835,
+     "deseq2_hits": 2836,
+     "edger_ql_hits": 3508,
+     "edger_hits": 3508
+    },
+    {
+     "target": "HSPA9",
+     "max_abs_log10_p_difference": 26.20531914191561,
+     "samples": 96,
+     "perturbed_samples": 48,
+     "rapidglm_hits": 4513,
+     "deseq2_hits": 4513,
+     "edger_ql_hits": 4909,
+     "edger_hits": 4909
+    },
+    {
+     "target": "MTPAP",
+     "max_abs_log10_p_difference": 25.840986756452928,
+     "samples": 88,
+     "perturbed_samples": 40,
+     "rapidglm_hits": 181,
+     "deseq2_hits": 181,
+     "edger_ql_hits": 4104,
+     "edger_hits": 4104
+    },
+    {
+     "target": "SSBP1",
+     "max_abs_log10_p_difference": 22.13412434031997,
+     "samples": 92,
+     "perturbed_samples": 44,
+     "rapidglm_hits": 196,
+     "deseq2_hits": 197,
+     "edger_ql_hits": 3244,
+     "edger_hits": 3244
+    },
+    {
+     "target": "EXOSC8",
+     "max_abs_log10_p_difference": 22.123443532058644,
+     "samples": 92,
+     "perturbed_samples": 44,
+     "rapidglm_hits": 1970,
+     "deseq2_hits": 1979,
+     "edger_ql_hits": 4399,
+     "edger_hits": 4398
+    }
+   ]
+  },
+  "max_abs_lfc_difference": {
+   "n": 2057,
+   "non_finite": 0,
+   "median": 0.017349795049292405,
+   "min": 0.0009308294858160204,
+   "max": 3.2181741610394865,
+   "quantiles": {
+    "0.01": 0.00399061154270729,
+    "0.05": 0.006856162426284973,
+    "0.25": 0.011815273779631597,
+    "0.75": 0.028107573858181245,
+    "0.95": 0.06337925466031359,
+    "0.99": 0.24085527132798099
+   },
+   "worst": [
+    {
+     "target": "SYS1",
+     "max_abs_lfc_difference": 3.2181741610394865,
+     "samples": 82,
+     "perturbed_samples": 34,
+     "rapidglm_hits": 2,
+     "deseq2_hits": 2,
+     "edger_ql_hits": 3941,
+     "edger_hits": 3941
+    },
+    {
+     "target": "NRF1",
+     "max_abs_lfc_difference": 3.005681138057227,
+     "samples": 83,
+     "perturbed_samples": 35,
+     "rapidglm_hits": 451,
+     "deseq2_hits": 451,
+     "edger_ql_hits": 3902,
+     "edger_hits": 3902
+    },
+    {
+     "target": "TELO2",
+     "max_abs_lfc_difference": 2.70237210421999,
+     "samples": 88,
+     "perturbed_samples": 40,
+     "rapidglm_hits": 953,
+     "deseq2_hits": 960,
+     "edger_ql_hits": 4049,
+     "edger_hits": 4049
+    },
+    {
+     "target": "CFL1",
+     "max_abs_lfc_difference": 2.6151401441612423,
+     "samples": 66,
+     "perturbed_samples": 18,
+     "rapidglm_hits": 25,
+     "deseq2_hits": 25,
+     "edger_ql_hits": 2335,
+     "edger_hits": 2335
+    },
+    {
+     "target": "COG8",
+     "max_abs_lfc_difference": 2.5416807806788153,
+     "samples": 79,
+     "perturbed_samples": 31,
+     "rapidglm_hits": 82,
+     "deseq2_hits": 82,
+     "edger_ql_hits": 4037,
+     "edger_hits": 4037
+    },
+    {
+     "target": "DCTN4",
+     "max_abs_lfc_difference": 2.5000858236451933,
+     "samples": 86,
+     "perturbed_samples": 38,
+     "rapidglm_hits": 3,
+     "deseq2_hits": 3,
+     "edger_ql_hits": 3790,
+     "edger_hits": 3790
+    },
+    {
+     "target": "GAPDH",
+     "max_abs_lfc_difference": 2.4284370305820144,
+     "samples": 94,
+     "perturbed_samples": 46,
+     "rapidglm_hits": 40,
+     "deseq2_hits": 40,
+     "edger_ql_hits": 1779,
+     "edger_hits": 1778
+    },
+    {
+     "target": "DIMT1",
+     "max_abs_lfc_difference": 2.404556655042108,
+     "samples": 89,
+     "perturbed_samples": 41,
+     "rapidglm_hits": 2331,
+     "deseq2_hits": 2347,
+     "edger_ql_hits": 3001,
+     "edger_hits": 2999
+    },
+    {
+     "target": "COX10",
+     "max_abs_lfc_difference": 1.9331996960525901,
+     "samples": 87,
+     "perturbed_samples": 39,
+     "rapidglm_hits": 69,
+     "deseq2_hits": 69,
+     "edge

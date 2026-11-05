@@ -1,0 +1,22 @@
+{
+  "recorded_utc": "2026-11-01T13:24:38.338420+00:00",
+  "pairs": {
+    "strict": {
+      "tail_values_differing_as_written": 15355,
+      "relative_over_1e_4": 44,
+      "maximum_p_in_relative_over_1e_4": "5.039846036163087E-20",
+      "max_absolute_tail_p_difference": "3.630791E-12",
+      "max_relative_tail_p_difference": "11.33333333333333338871783316",
+      "calculation": "Decimal arithmetic on emitted table strings, to avoid binary floating-point underflow in diagnostics"
+    },
+    "ks": {
+      "tail_values_differing_as_written": 16037,
+      "relative_over_1e_4": 72,
+      "maximum_p_in_relative_over_1e_4": "2.7267684638010437E-17",
+      "max_absolute_tail_p_difference": "3.630791E-12",
+      "max_relative_tail_p_difference": "60.00000000000000163688183381",
+      "calculation": "Decimal arithmetic on emitted table strings, to avoid binary floating-point underflow in diagnostics"
+    }
+  },
+  "empirical_p_status_and_discovery_agreement_unchanged": true
+}

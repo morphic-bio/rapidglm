@@ -1,0 +1,14 @@
+{
+  "label": "bulkval-1793370592085560108",
+  "stages": [
+    "bulkval"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-30T14:29:52.191582+00:00",
+  "finished_utc": "2026-10-30T15:35:16.800878+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 3852,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0720958430320024,
+  "cpu_policy_observed_quiet_starts": 60,
+  "error": null
+}

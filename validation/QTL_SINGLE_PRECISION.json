@@ -1,0 +1,1084 @@
+{
+ "receipt": "Single-precision Gaussian cis-QTL permutation scores and compact genotype storage: timed comparison with tensorQTL",
+ "decision": "User, 2026-10-24: \"Make the double to single change and do the speed - if it results in a 2x over tensorQTL then we might keep the QTL data in the main paper.\"",
+ "code": {
+  "base_commit": "b4d4c2f (v1.4.1 plus receipts)",
+  "source_diff_sha256": "c9c8ae36ca11a0a29e890237e4845c90ea52177a551e815cc1ce41dabee61e49",
+  "note": "The timed binary was built from the uncommitted worktree diff with this SHA-256 plus benchmarks/qtl_precision.cpp; the commit that adds this receipt contains the same code (only CHANGELOG.md wording differs).",
+  "binary_sha256": "6864f5159b26da71fcbe9cbf5f3e13d79a16c7f0f369a17785a531e3a840dbcf",
+  "version_string": "1.4.1 (not bumped)"
+ },
+ "host": {
+  "machine": "pikachu, Intel Core i9-13900KF, 125 GiB, BIOS 1836, microcode 0x133, 253 W limits, 4 x 32 GiB at 4,200 MT/s",
+  "cpu_setting": "turbo on; efficiency cores 16-31 at 0.8-4.3 GHz; all performance cores (CPUs 0-15) capped at 2.2 GHz since 2026-10-23 13:57 UTC and never used for timing",
+  "protocol": "every timed command holds the shared lock, starts after the quiet-host check, and is pinned to twelve efficiency cores (16-27), one thread per core, as in the chr22 receipts and the 2026-10-23 genome-wide run; CPU policy checked once per second (validation/receipts/v1.4.0 guard code, unchanged)"
+ },
+ "supervisor": {
+  "label": "qtlsingle",
+  "stages": [
+   "chr22_single",
+   "chr22_tensorqtl",
+   "gw_single"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-24T13:46:24.159856+00:00",
+  "finished_utc": "2026-10-24T14:36:00.871344+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 2971,
+  "cpu_policy_maximum_poll_gap_seconds": 1.035819775017444,
+  "cpu_policy_observed_quiet_starts": 3,
+  "error": null
+ },
+ "timed": {
+  "chr22_single": {
+   "command": [
+    "/mnt/pikachu/rapidglm/validation/work/qtl-single-timing/bin/rapidglm",
+    "qtl",
+    "/mnt/pikachu/rapidglm/validation/work/qtl-single-timing/runs/chr22_single/config.json"
+   ],
+   "config": {
+    "phenotypes": "/mnt/pikachu/rapidglm/validation/work/eqtl/runs/rapidglm/inputs/chr22.expr_int.bed",
+    "genotypes": "/mnt/pikachu/rapidglm/validation/work/eqtl/data/genotypes/chr22",
+    "covariates": "/mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt",
+    "family": "gaussian",
+    "window": 1000000,
+    "permutations": 10000,
+    "seed": 20261016,
+    "threads": 12,
+    "permutation_precision": "single",
+    "output": "/mnt/pikachu/rapidglm/validation/work/qtl-single-timing/runs/chr22_single/chr22"
+   },
+   "cpus": "16-27",
+   "started_utc": "2026-10-24T13:46:47.344673+00:00",
+   "load_before": [
+    3.376953125,
+    3.19140625,
+    3.2802734375
+   ],
+   "waited_for_quiet_seconds": 20.02,
+   "wall_seconds": 74.39,
+   "command_cpu_seconds": 882.77,
+   "others_cpu": 0.00021283898570423153,
+   "contended": false,
+   "exit": 0,
+   "elapsed": "1:14.35",
+   "cpu_percent": "1187%",
+   "peak_rss_kbytes": 1006184
+  },
+  "chr22_tensorqtl": {
+   "command": [
+    "/mnt/pikachu/rapidglm/validation/work/eqtl/venv-tensorqtl/bin/python",
+    "-I",
+    "-m",
+    "tensorqtl",
+    "/mnt/pikachu/rapidglm/validation/work/eqtl/data/genotypes/chr22",
+    "/mnt/pikachu/rapidglm/validation/work/eqtl/data/expression/chr22.expr_int.bed.gz",
+    "chr22",
+    "--covariates",
+    "/mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt",
+    "--mode",
+    "cis",
+    "--window",
+    "1000000",
+    "--seed",
+    "20261016",
+    "-o",
+    "/mnt/pikachu/rapidglm/validation/work/qtl-single-timing/runs/chr22_tensorqtl"
+   ],
+   "config": null,
+   "cpus": "16-27",
+   "started_utc": "2026-10-24T13:49:44.979148+00:00",
+   "load_before": [
+    3.16845703125,
+    4.38330078125,
+    3.83349609375
+   ],
+   "waited_for_quiet_seconds": 100.1,
+   "wall_seconds": 146.51,
+   "command_cpu_seconds": 1317.9499999999998,
+   "others_cpu": 0.0030145267471816542,
+   "contended": false,
+   "exit": 0,
+   "elapsed": "2:26.48",
+   "cpu_percent": "899%",
+   "peak_rss_kbytes": 1466012
+  },
+  "gw_single": {
+   "command": [
+    "/mnt/pikachu/rapidglm/validation/work/qtl-single-timing/bin/rapidglm",
+    "qtl",
+    "/mnt/pikachu/rapidglm/validation/work/qtl-single-timing/runs/gw_single/config.json"
+   ],
+   "config": {
+    "phenotypes": "/mnt/pikachu/rapidglm/validation/work/eqtl/data/expression-genomewide/autosomes.expr_int.bed",
+    "genotypes": "/mnt/pikachu/rapidglm/validation/work/eqtl/data/genotypes/autosomes",
+    "covariates": "/mnt/pikachu/rapidglm/validation/work/eqtl/data/covariates/covariates.fastqtl.txt",
+    "family": "gaussian",
+    "window": 1000000,
+    "permutations": 10000,
+    "seed": 20261016,
+    "threads": 12,
+    "permutation_precision": "single",
+    "output": "/mnt/pikachu/rapidglm/validation/work/qtl-single-timing/runs/gw_single/autosomes"
+   },
+   "cpus": "16-27",
+   "started_utc": "2026-10-24T13:54:04.734744+00:00",
+   "load_before": [
+    2.99755859375,
+    5.35888671875,
+    4.52783203125
+   ],
+   "waited_for_quiet_seconds": 110.1,
+   "wall_seconds": 2515.38,
+   "command_cpu_seconds": 30105.09,
+   "others_cpu": 0.00010535179398159246,
+   "contended": false,
+   "exit": 0,
+   "elapsed": "41:55.34",
+   "cpu_percent": "1196%",
+   "peak_rss_kbytes": 3989576
+  }
+ },
+ "tensorqtl_genome_wide_reference": {
+  "source": "validation/EQTL_GENOME_WIDE.json (2026-10-23, same host setting, same inputs and options)",
+  "wall_seconds": 4683.0,
+  "peak_rss_kbytes": 7525728,
+  "started_utc": "2026-10-23T22:26:30.030864+00:00",
+  "others_cpu": 0.0044782700838684845
+ },
+ "double_precision_references": {
+  "chr22_10000_wall_seconds_1_4_0_receipt": 117.19,
+  "genome_wide_10000_wall_seconds_1_4_1": 3987,
+  "genome_wide_peak_rss_gib_1_4_1": 25.9
+ },
+ "speedups": {
+  "chr22_vs_tensorqtl_same_day": 1.969,
+  "genome_wide_vs_tensorqtl": 1.862,
+  "genome_wide_vs_double_1_4_1": 1.585,
+  "genome_wide_peak_memory_tensorqtl_over_rapidglm": 1.886
+ },
+ "agreement_genome_wide": {
+  "comparison": "scripts/compare_eqtl.py against the tensorQTL reference of 2026-10-23; single-precision run against the 1.4.1 double-precision run",
+  "single": {
+   "genes": 20427,
+   "valid": 20248,
+   "statuses": {
+    "ok": 20248,
+    "no_cis_variants": 179
+   },
+   "pi0": 0.350259,
+   "egenes": 9575,
+   "beta_vs_permutation_spearman": 0.9906960638439546,
+   "wall_seconds": 2515.210838527,
+   "threads": 12,
+   "permutations": 10000,
+   "references": {
+    "tensorQTL_perm10000_beta": {
+     "egenes": 9581,
+     "shared": 9556,
+     "jaccard": 0.9954,
+     "spearman_p": 0.9999601510735757,
+     "same_lead": 0.9989134729355986
+    }
+   }
+  },
+  "double": {
+   "genes": 20427,
+   "valid": 20248,
+   "statuses": {
+    "ok": 20248,
+    "no_cis_variants": 179
+   },
+   "pi0": 0.350259,
+   "egenes": 9575,
+   "beta_vs_permutation_spearman": 0.990696055110943,
+   "wall_seconds": 3985.903026877,
+   "threads": 12,
+   "permutations": 10000,
+   "references": {
+    "tensorQTL_perm10000_beta": {
+     "egenes": 9581,
+     "shared": 9556,
+     "jaccard": 0.9954,
+     "spearman_p": 0.9999601509998525,
+     "same_lead": 0.9989134729355986
+    }
+   }
+  },
+  "single_vs_double": {
+   "genes": 20427,
+   "identical_columns": [
+    "status",
+    "lead_variant",
+    "statistic",
+    "p_value",
+    "estimate",
+    "standard_error"
+   ],
+   "permutation_p_differing_genes": 2687,
+   "permutation_p_rise_counts_out_of_10001": [
+    1,
+    5
+   ],
+   "permutation_p_changes": "all upward (tie tolerance 1e-5 relative in single precision)",
+   "beta_p_max_relative_difference": 5.49e-05,
+   "beta_p_median_relative_difference": 1.88e-08,
+   "egenes_q_0_05": [
+    9575,
+    9575
+   ]
+  }
+ },
+ "agreement_chr22_10000": {
+  "genes": 580,
+  "columns_identical_text": [
+   "chrom",
+   "start",
+   "end",
+   "variants",
+   "status",
+   "lead_variant",
+   "lead_position",
+   "allele1",
+   "allele2",
+   "statistic",
+   "p_value",
+   "estimate",
+   "standard_error",
+   "theta",
+   "permutations",
+   "permutations_failed"
+  ],
+  "columns_differing_genes": {
+   "permutation_p": 77,
+   "beta_p": 580,
+   "beta_k": 580,
+   "beta_n": 580,
+   "reference_ncp": 36
+  },
+  "status_identical": true,
+  "lead_variant_identical": true,
+  "lead_position_identical": true,
+  "statistic_identical": true,
+  "p_value_identical": true,
+  "estimate_identical": true,
+  "standard_error_identical": true,
+  "variants_identical": true,
+  "permutations_identical": true,
+  "permutations_failed_identical": true,
+  "permutation_p_differing": [
+   {
+    "gene": "ENSG00000100181.15",
+    "z": 3.766480744959552,
+    "variants": 3201,
+    "perm_p_double": 0.1753824617538246,
+    "perm_p_single": 0.1754824517548245,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.1757055947202049,
+    "beta_p_single": 0.1757055955036221
+   },
+   {
+    "gene": "ENSG00000234764.1",
+    "z": 3.2942926981050134,
+    "variants": 5094,
+    "perm_p_double": 0.7547245275472452,
+    "perm_p_single": 0.7548245175482452,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.753758195379166,
+    "beta_p_single": 0.7537581890018495
+   },
+   {
+    "gene": "ENSG00000260924.1",
+    "z": 3.3696354179690746,
+    "variants": 4937,
+    "perm_p_double": 0.6536346365363463,
+    "perm_p_single": 0.6537346265373462,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.6453737455120935,
+    "beta_p_single": 0.6453737379733243
+   },
+   {
+    "gene": "ENSG00000100084.9",
+    "z": 3.1290058426010945,
+    "variants": 4695,
+    "perm_p_double": 0.8898110188981102,
+    "perm_p_single": 0.8899110088991101,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.8905745699508258,
+    "beta_p_single": 0.8905745745594453
+   },
+   {
+    "gene": "ENSG00000093009.5",
+    "z": 3.602364584028674,
+    "variants": 4535,
+    "perm_p_double": 0.3548645135486451,
+    "perm_p_single": 0.354964503549645,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3486038892731541,
+    "beta_p_single": 0.3486038932705453
+   },
+   {
+    "gene": "ENSG00000185838.9",
+    "z": -3.5036965339499275,
+    "variants": 4344,
+    "perm_p_double": 0.4496550344965503,
+    "perm_p_single": 0.4498550144985501,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.4419211408783695,
+    "beta_p_single": 0.4419211453654821
+   },
+   {
+    "gene": "ENSG00000243762.1",
+    "z": -3.2507847899374345,
+    "variants": 4246,
+    "perm_p_double": 0.7433256674332566,
+    "perm_p_single": 0.7434256574342565,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.7380973989122485,
+    "beta_p_single": 0.7380974080430436
+   },
+   {
+    "gene": "ENSG00000099901.11",
+    "z": -3.8299727759530433,
+    "variants": 4239,
+    "perm_p_double": 0.153984601539846,
+    "perm_p_single": 0.1540845915408459,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.1591109511376245,
+    "beta_p_single": 0.1591109539047079
+   },
+   {
+    "gene": "ENSG00000196622.5",
+    "z": -3.0965119080347447,
+    "variants": 4320,
+    "perm_p_double": 0.8982101789821016,
+    "perm_p_single": 0.8983101689831016,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.8969958619504669,
+    "beta_p_single": 0.8969958670519017
+   },
+   {
+    "gene": "ENSG00000230344.2",
+    "z": 3.352223373726356,
+    "variants": 3159,
+    "perm_p_double": 0.5436456354364563,
+    "perm_p_single": 0.5438456154384561,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.5328909836084174,
+    "beta_p_single": 0.5328909870716699
+   },
+   {
+    "gene": "ENSG00000099937.6",
+    "z": 3.04136704402934,
+    "variants": 3094,
+    "perm_p_double": 0.8720127987201279,
+    "perm_p_single": 0.8721127887211279,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.8715748278878662,
+    "beta_p_single": 0.8715748282160451
+   },
+   {
+    "gene": "ENSG00000211637.2",
+    "z": 3.2804464028250355,
+    "variants": 5123,
+    "perm_p_double": 0.7332266773322667,
+    "perm_p_single": 0.7333266673332666,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.7320056379963324,
+    "beta_p_single": 0.7320056401540794
+   },
+   {
+    "gene": "ENSG00000211642.2",
+    "z": 3.983899523990824,
+    "variants": 5278,
+    "perm_p_double": 0.0941905809419058,
+    "perm_p_single": 0.0942905709429057,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.0986501839128903,
+    "beta_p_single": 0.0986501837934461
+   },
+   {
+    "gene": "ENSG00000211645.2",
+    "z": -3.095632255433076,
+    "variants": 5582,
+    "perm_p_double": 0.9037096290370962,
+    "perm_p_single": 0.9038096190380962,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.9046530736723144,
+    "beta_p_single": 0.90465307903626
+   },
+   {
+    "gene": "ENSG00000211652.2",
+    "z": 3.317855395623704,
+    "variants": 5876,
+    "perm_p_double": 0.7155284471552845,
+    "perm_p_single": 0.7157284271572842,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.7133295398179065,
+    "beta_p_single": 0.7133295419759497
+   },
+   {
+    "gene": "ENSG00000253818.1",
+    "z": 3.533552679071844,
+    "variants": 5915,
+    "perm_p_double": 0.4614538546145385,
+    "perm_p_single": 0.4615538446155384,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.4538869959408837,
+    "beta_p_single": 0.4538869954687296
+   },
+   {
+    "gene": "ENSG00000211659.2",
+    "z": -3.226344389491516,
+    "variants": 6794,
+    "perm_p_double": 0.8645135486451355,
+    "perm_p_single": 0.8646135386461354,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.8626583802846078,
+    "beta_p_single": 0.8626583745607028
+   },
+   {
+    "gene": "ENSG00000211660.3",
+    "z": -3.441789939186326,
+    "variants": 6774,
+    "perm_p_double": 0.6222377762223777,
+    "perm_p_single": 0.6224377562243775,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.6224283682511127,
+    "beta_p_single": 0.6224283753681701
+   },
+   {
+    "gene": "ENSG00000211665.2",
+    "z": 3.4405966718564014,
+    "variants": 6762,
+    "perm_p_double": 0.6270372962703729,
+    "perm_p_single": 0.6271372862713728,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.621148507977065,
+    "beta_p_single": 0.6211485030420457
+   },
+   {
+    "gene": "ENSG00000211667.2",
+    "z": 3.1052318634855745,
+    "variants": 6829,
+    "perm_p_double": 0.9412058794120588,
+    "perm_p_single": 0.9414058594140586,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.9438424818324948,
+    "beta_p_single": 0.9438424788330771
+   },
+   {
+    "gene": "ENSG00000211670.2",
+    "z": -3.5505978488760177,
+    "variants": 6928,
+    "perm_p_double": 0.4924507549245075,
+    "perm_p_single": 0.4925507449255074,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.4868269002023765,
+    "beta_p_single": 0.4868269023626089
+   },
+   {
+    "gene": "ENSG00000211673.2",
+    "z": -3.355291487743616,
+    "variants": 7121,
+    "perm_p_double": 0.745925407459254,
+    "perm_p_single": 0.7460253974602539,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.7420217582542056,
+    "beta_p_single": 0.742021758132316
+   },
+   {
+    "gene": "ENSG00000128266.6",
+    "z": -3.775813490164008,
+    "variants": 7301,
+    "perm_p_double": 0.2711728827117288,
+    "perm_p_single": 0.2712728727127287,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.2675049109079744,
+    "beta_p_single": 0.2675049044117318
+   },
+   {
+    "gene": "ENSG00000230701.1",
+    "z": 3.999730297795383,
+    "variants": 6419,
+    "perm_p_double": 0.1202879712028797,
+    "perm_p_single": 0.1203879612038796,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.1189851996980638,
+    "beta_p_single": 0.1189852009456847
+   },
+   {
+    "gene": "ENSG00000214526.3",
+    "z": 3.7055692372719102,
+    "variants": 6411,
+    "perm_p_double": 0.3081691830816918,
+    "perm_p_single": 0.3083691630836916,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.3063159579936157,
+    "beta_p_single": 0.3063159593380992
+   },
+   {
+    "gene": "ENSG00000178248.10",
+    "z": 3.420224471075932,
+    "variants": 5819,
+    "perm_p_double": 0.6061393860613938,
+    "perm_p_single": 0.6062393760623938,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.6051816650167933,
+    "beta_p_single": 0.6051816745221108
+   },
+   {
+    "gene": "ENSG00000187792.3",
+    "z": -3.5565505454140567,
+    "variants": 5386,
+    "perm_p_double": 0.4328567143285671,
+    "perm_p_single": 0.432956704329567,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.4252139588297885,
+    "beta_p_single": 0.425213956816264
+   },
+   {
+    "gene": "ENSG00000133460.13",
+    "z": 3.427248083289701,
+    "variants": 5378,
+    "perm_p_double": 0.5865413458654135,
+    "perm_p_single": 0.5866413358664133,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.5829960412752778,
+    "beta_p_single": 0.5829960457874127
+   },
+   {
+    "gene": "ENSG00000099991.11",
+    "z": 3.4361344315203413,
+    "variants": 5438,
+    "perm_p_double": 0.5945405459454055,
+    "perm_p_single": 0.5946405359464053,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.5852379659648749,
+    "beta_p_single": 0.585237988440315
+   },
+   {
+    "gene": "ENSG00000215464.3",
+    "z": -3.6093190235016377,
+    "variants": 5566,
+    "perm_p_double": 0.4005599440055994,
+    "perm_p_single": 0.4006599340065993,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3967054787930389,
+    "beta_p_single": 0.3967054820566506
+   },
+   {
+    "gene": "ENSG00000178803.6",
+    "z": -3.756019273935456,
+    "variants": 5190,
+    "perm_p_double": 0.2464753524647535,
+    "perm_p_single": 0.2465753424657534,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.2452394175849438,
+    "beta_p_single": 0.245239423142318
+   },
+   {
+    "gene": "ENSG00000240906.2",
+    "z": -3.770009466404776,
+    "variants": 4885,
+    "perm_p_double": 0.2230776922307769,
+    "perm_p_single": 0.2231776822317768,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.2216183195966095,
+    "beta_p_single": 0.2216183167793462
+   },
+   {
+    "gene": "ENSG00000224806.2",
+    "z": -3.542820486956332,
+    "variants": 4844,
+    "perm_p_double": 0.4353564643535646,
+    "perm_p_single": 0.4354564543545645,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.4321926460589761,
+    "beta_p_single": 0.4321926434630036
+   },
+   {
+    "gene": "ENSG00000206066.3",
+    "z": 3.5462452617816367,
+    "variants": 4877,
+    "perm_p_double": 0.4556544345565443,
+    "perm_p_single": 0.455954404559544,
+    "extreme_count_change": 3,
+    "beta_p_double": 0.447826216299311,
+    "beta_p_single": 0.4478262160172693
+   },
+   {
+    "gene": "ENSG00000100077.7",
+    "z": -3.761572774695927,
+    "variants": 5340,
+    "perm_p_double": 0.2547745225477452,
+    "perm_p_single": 0.254974502549745,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.252230340640978,
+    "beta_p_single": 0.25223034355784
+   },
+   {
+    "gene": "ENSG00000225783.2",
+    "z": -3.6359573351248,
+    "variants": 5873,
+    "perm_p_double": 0.4362563743625637,
+    "perm_p_single": 0.4364563543645635,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.4298509375018848,
+    "beta_p_single": 0.4298509639901205
+   },
+   {
+    "gene": "ENSG00000100209.5",
+    "z": 3.4048326741665447,
+    "variants": 3003,
+    "perm_p_double": 0.3510648935106489,
+    "perm_p_single": 0.3511648835116488,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3483041553560118,
+    "beta_p_single": 0.3483041575149987
+   },
+   {
+    "gene": "ENSG00000237015.1",
+    "z": 3.159538130422897,
+    "variants": 3368,
+    "perm_p_double": 0.590940905909409,
+    "perm_p_single": 0.5910408959104089,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.5858440928140694,
+    "beta_p_single": 0.585844099603074
+   },
+   {
+    "gene": "ENSG00000242156.1",
+    "z": -3.3937933987814564,
+    "variants": 3538,
+    "perm_p_double": 0.3717628237176282,
+    "perm_p_single": 0.371962803719628,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.3624464849874346,
+    "beta_p_single": 0.3624464839825535
+   },
+   {
+    "gene": "ENSG00000176635.12",
+    "z": 3.3382978483429726,
+    "variants": 4100,
+    "perm_p_double": 0.5133486651334866,
+    "perm_p_single": 0.5134486551344865,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.5090568906311073,
+    "beta_p_single": 0.5090568834201618
+   },
+   {
+    "gene": "ENSG00000099995.12",
+    "z": -2.753025172630592,
+    "variants": 3984,
+    "perm_p_double": 0.966003399660034,
+    "perm_p_single": 0.966103389661034,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.9682161236971384,
+    "beta_p_single": 0.9682161237373978
+   },
+   {
+    "gene": "ENSG00000100036.11",
+    "z": 3.7182870481313297,
+    "variants": 3738,
+    "perm_p_double": 0.1506849315068493,
+    "perm_p_single": 0.1507849215078492,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.1518400925146664,
+    "beta_p_single": 0.1518400908785503
+   },
+   {
+    "gene": "ENSG00000248603.1",
+    "z": 3.1368054973304917,
+    "variants": 3690,
+    "perm_p_double": 0.6693330666933307,
+    "perm_p_single": 0.6694330566943306,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.6651523276458106,
+    "beta_p_single": 0.6651523220971052
+   },
+   {
+    "gene": "ENSG00000185133.9",
+    "z": -3.64203869422364,
+    "variants": 3693,
+    "perm_p_double": 0.1970802919708029,
+    "perm_p_single": 0.1972802719728027,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.1953562633143401,
+    "beta_p_single": 0.1953562676448242
+   },
+   {
+    "gene": "ENSG00000228839.1",
+    "z": 3.1835615992950133,
+    "variants": 3966,
+    "perm_p_double": 0.6410358964103589,
+    "perm_p_single": 0.6411358864113588,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.6352942299661009,
+    "beta_p_single": 0.6352942303264296
+   },
+   {
+    "gene": "ENSG00000240591.1",
+    "z": 3.507695333660231,
+    "variants": 4381,
+    "perm_p_double": 0.3411658834116588,
+    "perm_p_single": 0.3412658734126587,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3356554220705535,
+    "beta_p_single": 0.335655421158433
+   },
+   {
+    "gene": "ENSG00000128254.9",
+    "z": -3.5869128992426744,
+    "variants": 4550,
+    "perm_p_double": 0.3071692830716928,
+    "perm_p_single": 0.3072692730726927,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3006709151912828,
+    "beta_p_single": 0.3006709138685578
+   },
+   {
+    "gene": "ENSG00000198125.7",
+    "z": -3.378101857328088,
+    "variants": 5342,
+    "perm_p_double": 0.5956404359564043,
+    "perm_p_single": 0.5957404259574042,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.5878245872870985,
+    "beta_p_single": 0.5878245784711352
+   },
+   {
+    "gene": "ENSG00000237668.1",
+    "z": 3.420067360613141,
+    "variants": 5312,
+    "perm_p_double": 0.6040395960403959,
+    "perm_p_single": 0.6041395860413958,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.6007803548918219,
+    "beta_p_single": 0.6007803570040772
+   },
+   {
+    "gene": "ENSG00000100353.12",
+    "z": 3.7472839340174264,
+    "variants": 5213,
+    "perm_p_double": 0.2513748625137486,
+    "perm_p_single": 0.2515748425157484,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.2509304824631753,
+    "beta_p_single": 0.2509304889675528
+   },
+   {
+    "gene": "ENSG00000188078.5",
+    "z": 3.2882146569872126,
+    "variants": 5210,
+    "perm_p_double": 0.7616238376162384,
+    "perm_p_single": 0.7617238276172382,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.7607482078388702,
+    "beta_p_single": 0.7607482025225499
+   },
+   {
+    "gene": "ENSG00000187045.12",
+    "z": 3.591528180147316,
+    "variants": 5107,
+    "perm_p_double": 0.4022597740225977,
+    "perm_p_single": 0.4023597640235976,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3940047348287314,
+    "beta_p_single": 0.3940047357749486
+   },
+   {
+    "gene": "ENSG00000100060.12",
+    "z": 3.604528486075959,
+    "variants": 4712,
+    "perm_p_double": 0.3686631336866313,
+    "perm_p_single": 0.3687631236876312,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3584128220674974,
+    "beta_p_single": 0.3584128248193707
+   },
+   {
+    "gene": "ENSG00000128283.6",
+    "z": 3.7929138153651625,
+    "variants": 4532,
+    "perm_p_double": 0.2004799520047995,
+    "perm_p_single": 0.2006799320067993,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.1957980756995145,
+    "beta_p_single": 0.1957980741656626
+   },
+   {
+    "gene": "ENSG00000189060.3",
+    "z": -3.8200954210204343,
+    "variants": 4338,
+    "perm_p_double": 0.1602839716028397,
+    "perm_p_single": 0.1604839516048395,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.1590894420499019,
+    "beta_p_single": 0.1590894415070599
+   },
+   {
+    "gene": "ENSG00000128298.11",
+    "z": -3.355170223129504,
+    "variants": 4293,
+    "perm_p_double": 0.5802419758024197,
+    "perm_p_single": 0.5803419658034196,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.5771091900703765,
+    "beta_p_single": 0.5771091911989685
+   },
+   {
+    "gene": "ENSG00000230912.1",
+    "z": 3.3276985175001514,
+    "variants": 4084,
+    "perm_p_double": 0.5638436156384361,
+    "perm_p_single": 0.5640435956404359,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.5626169316963002,
+    "beta_p_single": 0.562616927834459
+   },
+   {
+    "gene": "ENSG00000229598.1",
+    "z": -3.497443199429322,
+    "variants": 4038,
+    "perm_p_double": 0.3731626837316268,
+    "perm_p_single": 0.3732626737326267,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3719569692640306,
+    "beta_p_single": 0.3719569683597084
+   },
+   {
+    "gene": "ENSG00000225720.2",
+    "z": -3.7177199859915113,
+    "variants": 4010,
+    "perm_p_double": 0.1967803219678032,
+    "perm_p_single": 0.1968803119688031,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.1917697043816263,
+    "beta_p_single": 0.1917697020523959
+   },
+   {
+    "gene": "ENSG00000100324.8",
+    "z": 3.3783056226307826,
+    "variants": 3710,
+    "perm_p_double": 0.4746525347465253,
+    "perm_p_single": 0.4747525247475252,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.4644105047711643,
+    "beta_p_single": 0.4644105083175517
+   },
+   {
+    "gene": "ENSG00000100335.8",
+    "z": 2.884956749946032,
+    "variants": 3697,
+    "perm_p_double": 0.9342065793420656,
+    "perm_p_single": 0.9343065693430656,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.9361434131279126,
+    "beta_p_single": 0.9361434092507616
+   },
+   {
+    "gene": "ENSG00000239900.4",
+    "z": -3.6786653614816833,
+    "variants": 2853,
+    "perm_p_double": 0.1358864113588641,
+    "perm_p_single": 0.135986401359864,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.137819575246956,
+    "beta_p_single": 0.1378195744128071
+   },
+   {
+    "gene": "ENSG00000231993.1",
+    "z": 3.606986277783725,
+    "variants": 3278,
+    "perm_p_double": 0.1525847415258474,
+    "perm_p_single": 0.1526847315268473,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.1509478593155028,
+    "beta_p_single": 0.1509478628944567
+   },
+   {
+    "gene": "ENSG00000183864.4",
+    "z": -3.314285565456296,
+    "variants": 3479,
+    "perm_p_double": 0.4084591540845915,
+    "perm_p_single": 0.4085591440855914,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3971263548777495,
+    "beta_p_single": 0.3971263571474208
+   },
+   {
+    "gene": "ENSG00000196419.7",
+    "z": -3.4777806455206326,
+    "variants": 3736,
+    "perm_p_double": 0.2957704229577042,
+    "perm_p_single": 0.2958704129587041,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.2917154366224641,
+    "beta_p_single": 0.2917154465426707
+   },
+   {
+    "gene": "ENSG00000100138.9",
+    "z": 3.4615176731848925,
+    "variants": 3884,
+    "perm_p_double": 0.3263673632636736,
+    "perm_p_single": 0.3264673532646735,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3187727515510369,
+    "beta_p_single": 0.3187727504254435
+   },
+   {
+    "gene": "ENSG00000255782.1",
+    "z": -3.670233130968524,
+    "variants": 3890,
+    "perm_p_double": 0.1770822917708229,
+    "perm_p_single": 0.1771822817718228,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.1764708201125853,
+    "beta_p_single": 0.1764708202972316
+   },
+   {
+    "gene": "ENSG00000100197.15",
+    "z": -3.9753565046613297,
+    "variants": 4546,
+    "perm_p_double": 0.074992500749925,
+    "perm_p_single": 0.0750924907509249,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.0795404367299507,
+    "beta_p_single": 0.0795404360091707
+   },
+   {
+    "gene": "ENSG00000234009.1",
+    "z": -3.402630367621914,
+    "variants": 5271,
+    "perm_p_double": 0.5748425157484252,
+    "perm_p_single": 0.574942505749425,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.5686804957812585,
+    "beta_p_single": 0.5686805034794425
+   },
+   {
+    "gene": "ENSG00000230319.1",
+    "z": -3.642722967452015,
+    "variants": 5510,
+    "perm_p_double": 0.3332666733326667,
+    "perm_p_single": 0.3333666633336666,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.3253599241122608,
+    "beta_p_single": 0.3253599281644588
+   },
+   {
+    "gene": "ENSG00000100344.6",
+    "z": 3.937941609275668,
+    "variants": 6716,
+    "perm_p_double": 0.1747825217478252,
+    "perm_p_single": 0.1748825117488251,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.1738282870853347,
+    "beta_p_single": 0.1738282834015322
+   },
+   {
+    "gene": "ENSG00000100347.10",
+    "z": 3.9232413681017664,
+    "variants": 6742,
+    "perm_p_double": 0.1844815518448155,
+    "perm_p_single": 0.1845815418458154,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.182127647461657,
+    "beta_p_single": 0.1821276427982351
+   },
+   {
+    "gene": "ENSG00000238120.1",
+    "z": -3.6221387640921567,
+    "variants": 6511,
+    "perm_p_double": 0.4704529547045295,
+    "perm_p_single": 0.4705529447055294,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.4641265621236341,
+    "beta_p_single": 0.464126563908353
+   },
+   {
+    "gene": "ENSG00000130638.10",
+    "z": 4.200155904954691,
+    "variants": 6523,
+    "perm_p_double": 0.056994300569943,
+    "perm_p_single": 0.0570942905709429,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.0603414475834167,
+    "beta_p_single": 0.0603414483679743
+   },
+   {
+    "gene": "ENSG00000100416.8",
+    "z": -3.8279252875932497,
+    "variants": 5960,
+    "perm_p_double": 0.2155784421557844,
+    "perm_p_single": 0.2156784321567843,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.2134541619651855,
+    "beta_p_single": 0.2134541614643423
+   },
+   {
+    "gene": "ENSG00000214727.2",
+    "z": -3.4499696204090826,
+    "variants": 7785,
+    "perm_p_double": 0.7385261473852613,
+    "perm_p_single": 0.7387261273872612,
+    "extreme_count_change": 2,
+    "beta_p_double": 0.7346429675205745,
+    "beta_p_single": 0.7346429678066801
+   },
+   {
+    "gene": "ENSG00000254413.4",
+    "z": 3.9159222847276034,
+    "variants": 3589,
+    "perm_p_double": 0.1023897610238976,
+    "perm_p_single": 0.1024897510248975,
+    "extreme_count_change": 1,
+    "beta_p_double": 0.1048437484887524,
+    "beta_p_single": 0.1048437475396642
+   }
+  ],
+  "beta_p_max_abs_diff": 2.6488235715937947e-08,
+  "beta_p_max_abs_gene": "ENSG00000225783.2",
+  "beta_p_max_rel_diff": 2.4750775486226177e-05,
+  "beta_p_max_rel_gene": "ENSG00000100124.7",
+  "beta_p_identical_genes": 0,
+  "beta_k_max_rel_diff": 5.535773462905224e-07,
+  "beta_n_max_rel_diff": 2.6211722490761665e-06,
+  "reference_ncp_max_rel_diff": 7.807650716937531e-06,
+  "double_valid": 580,
+  "double_pi0": 0.384681,
+  "double_egenes": 267,
+  "double_statuses": {
+   "ok": 580
+  },
+  "single_valid": 580,
+  "single_pi0": 0.384681,
+  "single_egenes": 267,
+  "single_statuses": {
+   "ok": 580
+  },
+  "egenes_shared": 267,
+  "egenes_jaccard": 1.0,
+  "egenes_only_double": [],
+  "egenes_only_single": []
+ },
+ "micro_benchmark": {
+  "driver": "benchmarks/qtl_precision.cpp",
+  "gene": "462 samples, 43 covariates, 4,500 variants, 10,000 permutations, one thread, CPU 31 under the timing lock, best of six alternating runs",
+  "double_seconds": 1.737,
+  "single_seconds": 1.01,
+  "ratio": 1.72,
+  "score_product_gfma_per_s": {
+   "double": 11.97,
+   "single": 20.59
+  },
+  "packed_products_gfma_per_s": {
+   "avx2_double": 13.29,
+   "avx2_float": 25.56,
+   "portable_double": 3.16,
+   "portable_float": 12.15
+  }
+ },
+ "tests": "native and forced-portable builds: ctest 2/2 (180 C++ cases), test_cli.py 30/30, test_qtl_recipe.py 1/1; ARM64 cross-build under QEMU: 36 selected cases including all 19 test_qtl cases, c_api, test_cli.py 30/30"
+}

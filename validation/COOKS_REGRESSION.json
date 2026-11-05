@@ -1,0 +1,291 @@
+{
+ "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+ "checked_utc": "2026-11-05T10:14:52.981003+00:00",
+ "regression_genes": 16,
+ "all_flagged_by_rapidglm": true,
+ "all_missing_reference_pvalues": true,
+ "threads": [
+  1,
+  8
+ ],
+ "tables": {
+  "rapidglm-cli-t1": {
+   "file": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/rapidglm-cli-t1/rapid.tsv",
+   "sha256": "499bf03cce743fc6016df85129bd75418475e7d9c7eda5eff85325d98f0713de"
+  },
+  "rapidglm-cli-t8": {
+   "file": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/rapidglm-cli-t8/rapid.tsv",
+   "sha256": "499bf03cce743fc6016df85129bd75418475e7d9c7eda5eff85325d98f0713de"
+  },
+  "deseq2-t1": {
+   "file": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t1/genes.tsv",
+   "sha256": "61c55137c4735b36e59357ac4585a0fd6590750ec461513a0804862027b0bad9"
+  },
+  "deseq2-t8": {
+   "file": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/genes.tsv",
+   "sha256": "61c55137c4735b36e59357ac4585a0fd6590750ec461513a0804862027b0bad9"
+  }
+ },
+ "genes": [
+  {
+   "gene": 2436,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 4047,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 8406,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 9596,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 10471,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 10472,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 11136,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 11873,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 11875,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 14136,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 15915,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 16829,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 16873,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 18372,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 20378,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  },
+  {
+   "gene": 23378,
+   "statuses": {
+    "rapidglm-cli-t1": "cooks_outlier",
+    "rapidglm-cli-t8": "cooks_outlier",
+    "deseq2-t1": null,
+    "deseq2-t8": null
+   },
+   "pvalues": {
+    "rapidglm-cli-t1": "NA",
+    "rapidglm-cli-t8": "NA",
+    "deseq2-t1": "NA",
+    "deseq2-t8": "NA"
+   }
+  }
+ ],
+ "version": "1.6.0",
+ "measured_tag": "v1.6.0-dev.2",
+ "host_note": "One AMD Threadripper PRO 5965WX workstation (Zen 3). Timed work uses one thread per physical core on CPUs 6-21, with SMT siblings 30-45 idle; one thread uses CPU 6, eight use 6-13, twelve use 6-17. Drivers and untimed checks use CPUs 0-5. Exclusive Slurm allocation; schedutil governor, boost enabled and SMT enabled, unchanged. Each timed command starts after two ten-second quiet samples. More than 5% other CPU activity on selected cores or any sibling invalidates the command. Host load, other-user processes and vLLM CPU use are retained per command. From the resumed bulk stage on 2026-11-03, a user-authorized runtime service cpuset confines vLLM to CPUs 0-5,22-29,46-47; the reservation receipt records its application and restoration. Earlier accepted measurements retain their original guarded host conditions.",
+ "_provenance": {
+  "version": "1.6.0",
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "worktree_dirty": false
+ },
+ "_benchmark_host_configuration": {
+  "processor": "AMD Threadripper PRO 5965WX",
+  "physical_cores": 24,
+  "logical_cpus": 48,
+  "ram_gib": 125.61,
+  "driver_cpus": "0-5",
+  "timed_cpus": "6-21",
+  "idle_siblings": "30-45",
+  "governor": "schedutil",
+  "boost": "1",
+  "smt": "on"
+ }
+}

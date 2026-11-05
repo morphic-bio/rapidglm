@@ -1,0 +1,14 @@
+{
+  "label": "bulk-1793374540116244725",
+  "stages": [
+    "bulk"
+  ],
+  "exit": 125,
+  "started_utc": "2026-10-30T15:35:40.235229+00:00",
+  "finished_utc": "2026-10-31T04:07:18.813166+00:00",
+  "cpu_policy_unchanged": false,
+  "cpu_policy_samples": 44311,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0715840831398964,
+  "cpu_policy_observed_quiet_starts": 163,
+  "error": "RuntimeError: supervisor interrupted by signal 15"
+}

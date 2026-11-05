@@ -1,0 +1,209 @@
+{
+  "purpose": "Time and memory of `rapidglm sceptre` when most requested pairs fail pair QC: every pair listed, only the pairs that pass listed, and (from 1.3.0) the targets and responses named without a list",
+  "command": "python3 scripts/benchmark_untestable_pairs.py --work DIR --binary BINARY --label LABEL --output validation/UNTESTABLE_PAIRS.json",
+  "columns": "workflow_wall_seconds: the run's wall time, reading the inputs and writing the table included; peak_rss_gb: the process's peak resident memory; rows_tested: rows that passed pair QC; tested_records: whether the rows of the tested pairs are identical between two ways of requesting them",
+  "screen": {
+    "cells": 20000,
+    "targets": 300,
+    "negative_control_groups": 10,
+    "guides": 621,
+    "seed": 20261009,
+    "min_nonzero": 7,
+    "modalities": {
+      "rna": {
+        "features": 6000,
+        "nonzeros": 3645857,
+        "pairs_listed": 1860000,
+        "pairs_passing_qc_high": 101564,
+        "pairs_passing_qc_low": 60024
+      },
+      "atac": {
+        "features": 40000,
+        "nonzeros": 23363762,
+        "pairs_listed": 12400000,
+        "pairs_passing_qc_high": 645408,
+        "pairs_passing_qc_low": 373181
+      }
+    }
+  },
+  "runs": {
+    "1.6.0": {
+      "version": "1.6.0",
+      "threads": 12,
+      "cpus": "6-17",
+      "date": "2026-11-03",
+      "options": {
+        "moi": "as named",
+        "cell_qc": false,
+        "seed": 7,
+        "sequential_screen": true,
+        "early_stop_p": 0.002,
+        "otherwise": "the binary's defaults"
+      },
+      "note": "",
+      "results": {
+        "rna_high": {
+          "pairs_listed": 1860000,
+          "pairs_passing_qc": 101564,
+          "listed": {
+            "load_before": 6.4599609375,
+            "process_wall_seconds": 25.34,
+            "workflow_wall_seconds": 25.28,
+            "cpu_seconds": 162.4,
+            "peak_rss_gb": 1.43,
+            "null_fits": 4182,
+            "load_average": 7.9482421875,
+            "rows_tested": 101564
+          },
+          "testable": {
+            "load_before": 6.74658203125,
+            "process_wall_seconds": 21.04,
+            "workflow_wall_seconds": 21.01,
+            "cpu_seconds": 152.2,
+            "peak_rss_gb": 0.44,
+            "null_fits": 4182,
+            "load_average": 7.3974609375,
+            "rows_tested": 101564
+          },
+          "grid": {
+            "load_before": 6.43212890625,
+            "process_wall_seconds": 20.98,
+            "workflow_wall_seconds": 20.95,
+            "cpu_seconds": 152.3,
+            "peak_rss_gb": 0.43,
+            "null_fits": 4182,
+            "load_average": 9.447265625,
+            "rows_tested": 101564
+          },
+          "tested_set_is_the_pairs_passing_qc": true,
+          "tested_records": {
+            "testable_equals_listed": true,
+            "grid_equals_listed": true
+          }
+        },
+        "atac_high": {
+          "pairs_listed": 12400000,
+          "pairs_passing_qc": 645408,
+          "listed": {
+            "load_before": 6.73974609375,
+            "process_wall_seconds": 116.74,
+            "workflow_wall_seconds": 116.54,
+            "cpu_seconds": 813.8,
+            "peak_rss_gb": 7.9,
+            "null_fits": 27379,
+            "load_average": 10.1513671875,
+            "rows_tested": 645408
+          },
+          "testable": {
+            "load_before": 6.52685546875,
+            "process_wall_seconds": 91.14,
+            "workflow_wall_seconds": 91.07,
+            "cpu_seconds": 749.7,
+            "peak_rss_gb": 1.16,
+            "null_fits": 27379,
+            "load_average": 9.91748046875,
+            "rows_tested": 645408
+          },
+          "grid": {
+            "load_before": 6.56689453125,
+            "process_wall_seconds": 91.04,
+            "workflow_wall_seconds": 90.97,
+            "cpu_seconds": 751.1,
+            "peak_rss_gb": 1.06,
+            "null_fits": 27379,
+            "load_average": 10.9140625,
+            "rows_tested": 645408
+          },
+          "tested_set_is_the_pairs_passing_qc": true,
+          "tested_records": {
+            "testable_equals_listed": true,
+            "grid_equals_listed": true
+          }
+        },
+        "rna_low": {
+          "pairs_listed": 1860000,
+          "pairs_passing_qc": 60024,
+          "listed": {
+            "load_before": 6.572265625,
+            "process_wall_seconds": 7.88,
+            "workflow_wall_seconds": 7.84,
+            "cpu_seconds": 50.5,
+            "peak_rss_gb": 1.17,
+            "null_fits": 60024,
+            "load_average": 6.40380859375,
+            "rows_tested": 60024
+          },
+          "testable": {
+            "load_before": 5.783203125,
+            "process_wall_seconds": 3.77,
+            "workflow_wall_seconds": 3.75,
+            "cpu_seconds": 30.0,
+            "peak_rss_gb": 0.13,
+            "null_fits": 60024,
+            "load_average": 6.681640625,
+            "rows_tested": 60024
+          },
+          "grid": {
+            "load_before": 5.91943359375,
+            "process_wall_seconds": 3.73,
+            "workflow_wall_seconds": 3.71,
+            "cpu_seconds": 30.2,
+            "peak_rss_gb": 0.13,
+            "null_fits": 60024,
+            "load_average": 5.91943359375,
+            "rows_tested": 60024
+          },
+          "tested_set_is_the_pairs_passing_qc": true,
+          "tested_records": {
+            "testable_equals_listed": true,
+            "grid_equals_listed": true
+          }
+        },
+        "atac_low": {
+          "pairs_listed": 12400000,
+          "pairs_passing_qc": 373181,
+          "listed": {
+            "load_before": 5.15234375,
+            "process_wall_seconds": 52.83,
+            "workflow_wall_seconds": 52.65,
+            "cpu_seconds": 335.6,
+            "peak_rss_gb": 7.53,
+            "null_fits": 373181,
+            "load_average": 7.36474609375,
+            "rows_tested": 373181
+          },
+          "testable": {
+            "load_before": 6.27294921875,
+            "process_wall_seconds": 25.21,
+            "workflow_wall_seconds": 25.17,
+            "cpu_seconds": 199.8,
+            "peak_rss_gb": 0.67,
+            "null_fits": 373181,
+            "load_average": 8.38134765625,
+            "rows_tested": 373181
+          },
+          "grid": {
+            "load_before": 6.65380859375,
+            "process_wall_seconds": 25.01,
+            "workflow_wall_seconds": 24.97,
+            "cpu_seconds": 199.6,
+            "peak_rss_gb": 0.67,
+            "null_fits": 373181,
+            "load_average": 8.5556640625,
+            "rows_tested": 373181
+          },
+          "tested_set_is_the_pairs_passing_qc": true,
+          "tested_records": {
+            "testable_equals_listed": true,
+            "grid_equals_listed": true
+          }
+        }
+      }
+    }
+  },
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

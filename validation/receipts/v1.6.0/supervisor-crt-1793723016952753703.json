@@ -1,0 +1,14 @@
+{
+  "label": "crt-1793723016952753703",
+  "stages": [
+    "crt"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T16:23:37.077474+00:00",
+  "finished_utc": "2026-11-03T17:01:23.841688+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 2231,
+  "cpu_policy_maximum_poll_gap_seconds": 1.1067536603659391,
+  "cpu_policy_observed_quiet_starts": 6,
+  "error": null
+}

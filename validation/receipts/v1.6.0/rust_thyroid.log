@@ -1,0 +1,61 @@
+Fitting dispersions...
+... done in 0.01 seconds.
+
+Fitting MAP dispersions...
+... done in 0.00 seconds.
+
+Fitting LFCs...
+... done in 0.17 seconds.
+
+{
+ "data": "validation/work/benchmark/thyroid",
+ "samples": 647,
+ "genes": 28769,
+ "pydeseq2_rapidglm_seconds": 12.86,
+ "rust_seconds": 10.68,
+ "rust_log": "RapidGLM 1.6.0 (C API 4)\n28769 genes, 647 samples in 9.33 s; 5516 at padj < 0.05; 110 refitted, 4 Cook's outliers, 0 bounded fits",
+ "columns": {
+  "baseMean": {
+   "max_relative": 0.00012388549839794277,
+   "over_1e-6": 1,
+   "over_1e-3": 0,
+   "missing_mismatch": 0
+  },
+  "log2FoldChange": {
+   "max_relative": 4.83834646387328,
+   "over_1e-6": 28232,
+   "over_1e-3": 3403,
+   "missing_mismatch": 0
+  },
+  "lfcSE": {
+   "max_relative": 2960.644990587723,
+   "over_1e-6": 2110,
+   "over_1e-3": 43,
+   "missing_mismatch": 0
+  },
+  "stat": {
+   "max_relative": 0.9980286811949346,
+   "over_1e-6": 28314,
+   "over_1e-3": 3402,
+   "missing_mismatch": 0
+  },
+  "pvalue": {
+   "max_relative": 3.603120396610884e+175,
+   "over_1e-6": 28481,
+   "over_1e-3": 5213,
+   "missing_mismatch": 0
+  },
+  "padj": {
+   "max_relative": 3.838657711426372e+178,
+   "over_1e-6": 28631,
+   "over_1e-3": 4295,
+   "missing_mismatch": 0
+  }
+ },
+ "calls": {
+  "rust": 5516,
+  "pydeseq2": 5517,
+  "both": 5516,
+  "jaccard": 0.9998187420699656
+ }
+}

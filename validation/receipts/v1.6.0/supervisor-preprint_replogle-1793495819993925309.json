@@ -1,0 +1,14 @@
+{
+  "label": "preprint_replogle-1793495819993925309",
+  "stages": [
+    "preprint_replogle"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-01T01:17:00.102253+00:00",
+  "finished_utc": "2026-11-01T02:12:05.276195+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 3233,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0719369128346443,
+  "cpu_policy_observed_quiet_starts": 4,
+  "error": null
+}

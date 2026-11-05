@@ -1,0 +1,513 @@
+{
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "retries": [
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run_edger threads=1",
+      "slurm_job_id": "691",
+      "pid": 1966997,
+      "started_utc": "2026-10-30T17:05:50.764103+00:00",
+      "finished_utc": "2026-10-30T17:06:10.853573+00:00",
+      "audit_file": "commands/1966997-1793379970902709766.json",
+      "audit_sha256": "615578d2929249e93df668d9d2fb049709994aa30d89f12ffc2802eb11235e2d",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/edger-t1/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793379970917561726/genes.tsv",
+          "sha256": "d21b6766e624655f778074c4bb87bba814c9d66bd483043741dd2948a67682b6"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/edger-t1/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793379970917561726/timing.json",
+          "sha256": "10d9da67210e67697a4afe411256a5e2b1b6e5928a760aa1f9740ad2979bf04b"
+        }
+      ],
+      "others_cpu": 0.00014432175008070357,
+      "sibling_busy_fraction": {
+        "30": 0.21531417190119673
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run_rapidglm_r threads=8",
+      "slurm_job_id": "691",
+      "pid": 1966997,
+      "started_utc": "2026-10-30T21:20:44.194801+00:00",
+      "finished_utc": "2026-10-30T21:20:47.410968+00:00",
+      "audit_file": "commands/1966997-1793395247441951031.json",
+      "audit_sha256": "4c60279c64c3f8d828eec14b11ed6f52e62f9e3973c3b93687643ec7ad5aa455",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/rapidglm-r-t8/r.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793395247449963718/r.tsv",
+          "sha256": "431dbb4aee8d59e86aa4dda9707636b45cab58b4f6cc8c688d7a9b2daad53d29"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/rapidglm-r-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793395247449963718/timing.json",
+          "sha256": "ad3041b33791ab1697c8ecb4ea9367d34eb8dbe91a4edee523efe5c07739edcd"
+        }
+      ],
+      "others_cpu": 0.07910967476886445,
+      "sibling_busy_fraction": {
+        "30": 0.3102700915940001,
+        "31": 0.0031340413292323243,
+        "32": 0.0006984521372285828,
+        "33": 3.7493790038137986e-05,
+        "34": 0.0016226640013960174,
+        "35": 0.0003263179502203342,
+        "36": 0.000783445144248433,
+        "37": 0.0
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "691",
+      "pid": 1966997,
+      "started_utc": "2026-10-31T00:59:08.256744+00:00",
+      "finished_utc": "2026-10-31T00:59:44.758202+00:00",
+      "audit_file": "commands/1966997-1793408384789254405.json",
+      "audit_sha256": "0c8d0966669aa8c86cf3f9d28c3c142d7c9ea034d29f5964ce38fed1731b8562",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/deseq2-t8/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793408384797293647/genes.tsv",
+          "sha256": "02b390728a23c1facbe8caa24408bc28e9bbbf588be5b0478550ed5af070820a"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/deseq2-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793408384797293647/timing.json",
+          "sha256": "bd6bf42eaf43d6dd9a93698ba312c3d829a65fc291faa51adbdff2c05ea0589b"
+        }
+      ],
+      "others_cpu": 0.020918111309347606,
+      "sibling_busy_fraction": {
+        "30": 0.823284831733786,
+        "31": 0.001283803938148197,
+        "32": 0.0019308006503693232,
+        "33": 0.0008882412373260369,
+        "34": 0.0015367951997973179,
+        "35": 0.0017586667882843233,
+        "36": 0.0030156953543362124,
+        "37": 0.35694866830415894
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "691",
+      "pid": 1966997,
+      "started_utc": "2026-10-31T01:40:44.372240+00:00",
+      "finished_utc": "2026-10-31T01:41:18.957572+00:00",
+      "audit_file": "commands/1966997-1793410878989099004.json",
+      "audit_sha256": "83a779ff24e8ba3bdf3e59d093e2ac6d0823390a47ebd315d611b0e610989c47",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/deseq2-t8/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793410878997841476/genes.tsv",
+          "sha256": "02b390728a23c1facbe8caa24408bc28e9bbbf588be5b0478550ed5af070820a"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/deseq2-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793410878997841476/timing.json",
+          "sha256": "ac648dae7d205f7d828f14248b86c66e308898d8878a4c524f98419415dd2214"
+        }
+      ],
+      "others_cpu": 0.019170084701763512,
+      "sibling_busy_fraction": {
+        "30": 0.000578704677521679,
+        "31": 0.30709534552768847,
+        "32": 0.001157409355043358,
+        "33": 0.0009457207465085571,
+        "34": 0.000495640243763137,
+        "35": 0.001372472795646062,
+        "36": 3.189467172646206e-05,
+        "37": 0.00031433941784499955
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "691",
+      "pid": 1966997,
+      "started_utc": "2026-10-31T02:56:08.409080+00:00",
+      "finished_utc": "2026-10-31T02:56:46.287151+00:00",
+      "audit_file": "commands/1966997-1793415406318015734.json",
+      "audit_sha256": "0f518e77c0555e6fb01e4f95845c7ed9d272747cd8ebfc4e02864ff374212433",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/deseq2-t8/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793415406326327305/genes.tsv",
+          "sha256": "02b390728a23c1facbe8caa24408bc28e9bbbf588be5b0478550ed5af070820a"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/deseq2-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793415406326327305/timing.json",
+          "sha256": "05bce908a6fd4b487f6091510c929c90ca035143f45021fa5e1568998c7513a8"
+        }
+      ],
+      "others_cpu": 0.046258627863830344,
+      "sibling_busy_fraction": {
+        "30": 0.0005903357408345941,
+        "31": 0.000904767339186077,
+        "32": 0.7476416929176529,
+        "33": 0.0013750260913378358,
+        "34": 0.0006953765454986114,
+        "35": 0.0014574039741622436,
+        "36": 0.25549324745410373,
+        "37": 0.00020397744513579174
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "691",
+      "pid": 1966997,
+      "started_utc": "2026-10-31T03:32:06.973680+00:00",
+      "finished_utc": "2026-10-31T03:32:43.440050+00:00",
+      "audit_file": "commands/1966997-1793417563470979154.json",
+      "audit_sha256": "028b71d98b83cd10f558292ea5f91efe00343386e94501e5f00ca0046fa13a45",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/deseq2-t8/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793417563479078976/genes.tsv",
+          "sha256": "02b390728a23c1facbe8caa24408bc28e9bbbf588be5b0478550ed5af070820a"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid128/deseq2-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/691-1793417563479078976/timing.json",
+          "sha256": "e5ddc3bb9719ec41854db334f729ae468ded854d8e9f4f5e7707edaa57b08ec6"
+        }
+      ],
+      "others_cpu": 0.02332703192235448,
+      "sibling_busy_fraction": {
+        "30": 0.060765582179612906,
+        "31": 0.000629455238670898,
+        "32": 0.0005488373683342073,
+        "33": 0.0015479460727210604,
+        "34": 0.003872970476190818,
+        "35": 0.002999204728588631,
+        "36": 0.4500466420340499,
+        "37": 0.0001639980117063392
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "693",
+      "pid": 2017423,
+      "started_utc": "2026-11-03T11:21:13.898443+00:00",
+      "finished_utc": "2026-11-03T11:21:27.274223+00:00",
+      "audit_file": "commands/2017423-1793704887305134734.json",
+      "audit_sha256": "ab43823928b9f4e10ab77feb919e1b569975d2de50f2c5d049c31036315666ce",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793704887313578368/genes.tsv",
+          "sha256": "61c55137c4735b36e59357ac4585a0fd6590750ec461513a0804862027b0bad9"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793704887313578368/timing.json",
+          "sha256": "444cb31fab8dcf5b0f0468fb2aef6bed9aa7488202df796fcfb5661cb7b8b1e3"
+        }
+      ],
+      "others_cpu": 0.011190013480718715,
+      "sibling_busy_fraction": {
+        "30": 0.001535136059231621,
+        "31": 0.0007490358709695969,
+        "32": 0.08408805776346698,
+        "33": 3.6671073460168234e-05,
+        "34": 7.635079930326004e-05,
+        "35": 5.586459332865448e-05,
+        "36": 0.0016291640301861765,
+        "37": 4.48462756666917e-06
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "693",
+      "pid": 2017423,
+      "started_utc": "2026-11-03T11:21:50.481836+00:00",
+      "finished_utc": "2026-11-03T11:22:05.321493+00:00",
+      "audit_file": "commands/2017423-1793704925353060329.json",
+      "audit_sha256": "73a7b880b089d18229692e8f32ec14d839c0b8e8cc3bf6659840fab61aa5dee3",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793704925361668532/genes.tsv",
+          "sha256": "61c55137c4735b36e59357ac4585a0fd6590750ec461513a0804862027b0bad9"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793704925361668532/timing.json",
+          "sha256": "62c9a1603661f7d860d2f6228e9a16b849f3e812d7a19675a59c8be663766c05"
+        }
+      ],
+      "others_cpu": 0.00036916500795869335,
+      "sibling_busy_fraction": {
+        "30": 0.0006380807124545413,
+        "31": 0.00023490659251033287,
+        "32": 0.26393286215878575,
+        "33": 3.404787923456962e-05,
+        "34": 4.9590959739312374e-05,
+        "35": 0.0017355763301808,
+        "36": 0.002018961989308839,
+        "37": 4.9153614211453865e-06
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "693",
+      "pid": 2017423,
+      "started_utc": "2026-11-03T11:22:28.527207+00:00",
+      "finished_utc": "2026-11-03T11:22:42.159507+00:00",
+      "audit_file": "commands/2017423-1793704962190792647.json",
+      "audit_sha256": "5ec77f5d0c558e499406c4419de2a423106db3babb2c8220f92fa390a1bc3c22",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793704962199471874/genes.tsv",
+          "sha256": "61c55137c4735b36e59357ac4585a0fd6590750ec461513a0804862027b0bad9"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793704962199471874/timing.json",
+          "sha256": "185eb13fc6685552b5ee74fa51676de665747ab88cf7930f27a34828c633c0ca"
+        }
+      ],
+      "others_cpu": 0.00020022076327326616,
+      "sibling_busy_fraction": {
+        "30": 0.00048074612461408196,
+        "31": 0.000734952199996181,
+        "32": 0.06872906086226047,
+        "33": 0.0015179293370345727,
+        "34": 6.280548724111365e-05,
+        "35": 2.891015323426978e-05,
+        "36": 1.3869650442227931e-05,
+        "37": 6.980502500343728e-06
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "693",
+      "pid": 2017423,
+      "started_utc": "2026-11-03T11:23:05.364543+00:00",
+      "finished_utc": "2026-11-03T11:23:19.995619+00:00",
+      "audit_file": "commands/2017423-1793705000026890932.json",
+      "audit_sha256": "79d206f863ae7393d4561c91b2cc48e9a582db6ed11b575003f75b0d952271a9",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793705000034998922/genes.tsv",
+          "sha256": "61c55137c4735b36e59357ac4585a0fd6590750ec461513a0804862027b0bad9"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793705000034998922/timing.json",
+          "sha256": "69f6e071f1ae3b498871b87f1c25dddf3484f3914d2f32046648635340b96b73"
+        }
+      ],
+      "others_cpu": 6.78992761393253e-05,
+      "sibling_busy_fraction": {
+        "30": 0.0007614566051651783,
+        "31": 0.0003643125038536276,
+        "32": 0.16021157899338523,
+        "33": 0.001290115379146982,
+        "34": 0.00011535706106282308,
+        "35": 6.124731191997594e-05,
+        "36": 2.2932165071813868e-06,
+        "37": 7.963268607325489e-06
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "693",
+      "pid": 2017423,
+      "started_utc": "2026-11-03T11:23:43.211143+00:00",
+      "finished_utc": "2026-11-03T11:23:56.627548+00:00",
+      "audit_file": "commands/2017423-1793705036658808491.json",
+      "audit_sha256": "de21e167f7e241730e30e3395ccbd48c197d94d97b90b3d70aa31b93fa6edb23",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793705036667258837/genes.tsv",
+          "sha256": "61c55137c4735b36e59357ac4585a0fd6590750ec461513a0804862027b0bad9"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793705036667258837/timing.json",
+          "sha256": "26b98ec7ee87b8ec0ffd4a64a1466a2a85952639fad12f6359db56964ff8ad89"
+        }
+      ],
+      "others_cpu": 0.0005240940107188477,
+      "sibling_busy_fraction": {
+        "30": 0.0005447254255613641,
+        "31": 0.0007468028958221764,
+        "32": 0.07990790985297287,
+        "33": 0.002000890776785699,
+        "34": 0.00013132230201874642,
+        "35": 0.0017515904949724943,
+        "36": 1.8053960006501116e-06,
+        "37": 1.5233285468980755e-06
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "693",
+      "pid": 2017423,
+      "started_utc": "2026-11-03T11:24:19.833865+00:00",
+      "finished_utc": "2026-11-03T11:24:33.883476+00:00",
+      "audit_file": "commands/2017423-1793705073915136078.json",
+      "audit_sha256": "f2e272da100bbcddd3c1fc6285096a4f864a04bb1e28ac4ed50b7327e57d9524",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/genes.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793705073923291697/genes.tsv",
+          "sha256": "61c55137c4735b36e59357ac4585a0fd6590750ec461513a0804862027b0bad9"
+        },
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/deseq2-t8/timing.json",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793705073923291697/timing.json",
+          "sha256": "dcdc1043f3c00d7932083205e88ada1a989b372e002e05d36eaf3ca73f605b87"
+        }
+      ],
+      "others_cpu": 0.00011575064166729613,
+      "sibling_busy_fraction": {
+        "30": 0.0005162235508696535,
+        "31": 0.00024617089244058414,
+        "32": 0.07415767440784635,
+        "33": 8.810473641118973e-05,
+        "34": 0.0002677126272742211,
+        "35": 9.354684013088323e-05,
+        "36": 0.0015683890356230946,
+        "37": 3.555646571487748e-06
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "693",
+      "pid": 2017423,
+      "started_utc": "2026-11-03T11:43:46.273361+00:00",
+      "finished_utc": "2026-11-03T11:44:03.206300+00:00",
+      "audit_file": "commands/2017423-1793706243239624594.json",
+      "audit_sha256": "aa08ce4c53f2c108326c523d5d0e3eb7161167b51cb3a300f0f7df46c908dee4",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/pydeseq2-t8/pydeseq2.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793706243247732661/pydeseq2.tsv",
+          "sha256": "b35fa76cce51479cb0dc43a598d0166a8c8242e736aa6123ad899e1a7bed14a8"
+        }
+      ],
+      "others_cpu": 0.0011770737395996797,
+      "sibling_busy_fraction": {
+        "30": 0.000414524074694315,
+        "31": 0.00015183591617254987,
+        "32": 0.06310209172282513,
+        "33": 0.001364049570690862,
+        "34": 0.0017400911501016796,
+        "35": 3.958796568597465e-05,
+        "36": 1.6888441092527557e-06,
+        "37": 0.001579893051234564
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "693",
+      "pid": 2017423,
+      "started_utc": "2026-11-03T11:44:26.407822+00:00",
+      "finished_utc": "2026-11-03T11:44:43.234896+00:00",
+      "audit_file": "commands/2017423-1793706283268029760.json",
+      "audit_sha256": "586456faadc46fd4bee1e610db934e5da2f4b9f5c8a05493dab339655117f79e",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/thyroid32/pydeseq2-t8/pydeseq2.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793706283276303359/pydeseq2.tsv",
+          "sha256": "b35fa76cce51479cb0dc43a598d0166a8c8242e736aa6123ad899e1a7bed14a8"
+        }
+      ],
+      "others_cpu": 0.0009832338375810206,
+      "sibling_busy_fraction": {
+        "30": 0.001349586551409996,
+        "31": 0.0005951911600574752,
+        "32": 0.07142293920689702,
+        "33": 8.528131065855926e-05,
+        "34": 0.0035018734944933854,
+        "35": 0.0002230943716611393,
+        "36": 1.6941521179875973e-06,
+        "37": 0.0022385603778866487
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    },
+    {
+      "stage": "pert50k",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "label": "run threads=8",
+      "slurm_job_id": "693",
+      "pid": 2032268,
+      "started_utc": "2026-11-03T13:57:29.405412+00:00",
+      "finished_utc": "2026-11-03T13:58:07.981375+00:00",
+      "audit_file": "commands/2032268-1793714288012935263.json",
+      "audit_sha256": "dcc4d1769076cd8bf0d2ea92a5f2468e49d396e5008c112d8953fd1442dd8d53",
+      "archive_files": [
+        {
+          "original": "validation/work/benchmark/runs-v1.6.0-gpu/gasperini50k/rapidglm-python-t8/python.tsv",
+          "copy": "validation/work/release-1.6.0-gpu/application-retries-6/invalidated/693-1793714288021272252/python.tsv",
+          "sha256": "b92e764578acc00f76b9c35931bd0729a2f849f3f67f0fe6d423bc4fa2b8497c"
+        }
+      ],
+      "others_cpu": 4.27045020802142e-05,
+      "sibling_busy_fraction": {
+        "30": 0.0023591764331644047,
+        "31": 0.07600150071970281,
+        "32": 0.003979694206613682,
+        "33": 0.001297019563730206,
+        "34": 0.0015162382565582805,
+        "35": 0.001424814901344543,
+        "36": 4.4198613494408045e-05,
+        "37": 3.3016618729620826e-05
+      },
+      "reason": "Unchanged guard rejected this application measurement. Outputs retained by SHA-256; repeat the identical original timed_run call after its complete original quiet predicate."
+    }
+  ],
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

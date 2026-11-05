@@ -8,150 +8,148 @@
   2,
   3,
   4,
-  5,
-  6,
-  7
+  5
  ],
  "cpus_by_threads": {
   "1": [
-   16
+   6
   ],
   "4": [
-   16,
-   17,
-   18,
-   19
+   6,
+   7,
+   8,
+   9
   ],
   "16": [
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
    16,
    17,
    18,
    19,
    20,
-   21,
-   22,
-   23,
-   24,
-   25,
-   26,
-   27,
-   28,
-   29,
-   30,
-   31
+   21
   ]
  },
  "results": [
   {
    "tool": "rapidglm fit_batch",
    "family": "poisson",
-   "load": 1.4462890625,
-   "seconds": 1.08656,
+   "load": 4.11083984375,
+   "seconds": 0.721486,
    "threads": 1,
    "failed": 0,
-   "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
+   "max_rel_coef_diff_vs_R": 1.8416019657968127e-06
   },
   {
    "tool": "rapidglm fit_batch",
    "family": "poisson",
-   "load": 1.24462890625,
-   "seconds": 0.293035,
+   "load": 3.96826171875,
+   "seconds": 0.183255,
    "threads": 4,
    "failed": 0,
-   "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
+   "max_rel_coef_diff_vs_R": 1.8416019657968127e-06
   },
   {
    "tool": "rapidglm fit_batch",
    "family": "poisson",
-   "load": 1.25244140625,
-   "seconds": 0.0772096,
+   "load": 2.89990234375,
+   "seconds": 0.0584362,
    "threads": 16,
    "failed": 0,
-   "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
+   "max_rel_coef_diff_vs_R": 1.8416019657968127e-06
   },
   {
    "tool": "R glm.fit",
    "family": "poisson",
    "threads": 1,
-   "load": 1.07275390625,
-   "seconds": 5.548,
+   "load": 2.72314453125,
+   "seconds": 4.168,
    "max_rel_coef_diff_vs_R": 0.0
   },
   {
    "tool": "R rapidglm::glm_fit",
    "family": "poisson",
    "threads": 1,
-   "load": 0.96875,
-   "seconds": 2.868,
+   "load": 3.23974609375,
+   "seconds": 2.074,
    "max_rel_coef_diff_vs_R": 1.8416019677704892e-06
   },
   {
    "tool": "Python statsmodels",
    "family": "poisson",
    "threads": 1,
-   "load": 0.9765625,
-   "seconds": 4.937628496998514,
+   "load": 3.5,
+   "seconds": 3.884462496265769,
    "responses_timed": 1000,
-   "max_rel_coef_diff_vs_R": 1.841601901742036e-06
+   "max_rel_coef_diff_vs_R": 1.8416020289544639e-06
   },
   {
    "tool": "Python rapidglm.fit",
    "family": "poisson",
    "threads": 1,
-   "load": 1.1318359375,
-   "seconds": 1.1596022240009916,
+   "load": 3.67138671875,
+   "seconds": 0.7734883092343807,
    "responses_timed": 1000,
-   "max_rel_coef_diff_vs_R": 1.8416019683087647e-06
+   "max_rel_coef_diff_vs_R": 1.8416019657968127e-06
   },
   {
    "tool": "rapidglm fit_batch",
    "family": "nb",
-   "load": 0.94482421875,
-   "seconds": 3.01001,
+   "load": 3.70361328125,
+   "seconds": 2.22143,
    "threads": 1,
    "failed": 0,
-   "max_rel_coef_diff_vs_R": 0.0009165957712542424
+   "max_rel_coef_diff_vs_R": 0.0009165957712626074
   },
   {
    "tool": "rapidglm fit_batch",
    "family": "nb",
-   "load": 1.07421875,
-   "seconds": 0.787726,
+   "load": 3.8056640625,
+   "seconds": 0.557508,
    "threads": 4,
    "failed": 0,
-   "max_rel_coef_diff_vs_R": 0.0009165957712542424
+   "max_rel_coef_diff_vs_R": 0.0009165957712626074
   },
   {
    "tool": "rapidglm fit_batch",
    "family": "nb",
-   "load": 0.904296875,
-   "seconds": 0.208333,
+   "load": 2.53857421875,
+   "seconds": 0.15092,
    "threads": 16,
    "failed": 0,
-   "max_rel_coef_diff_vs_R": 0.0009165957712542424
+   "max_rel_coef_diff_vs_R": 0.0009165957712626074
   },
   {
    "tool": "R glm.nb",
    "family": "nb",
    "threads": 1,
-   "load": 1.6328125,
-   "seconds": 142.566,
+   "load": 4.8212890625,
+   "seconds": 103.274,
    "max_rel_coef_diff_vs_R": 0.0
   },
   {
    "tool": "R rapidglm::glm_nb",
    "family": "nb",
    "threads": 1,
-   "load": 1.6591796875,
-   "seconds": 10.079,
-   "max_rel_coef_diff_vs_R": 0.0009165957712558615
+   "load": 4.65185546875,
+   "seconds": 8.156,
+   "max_rel_coef_diff_vs_R": 0.0009165957712589645
   },
   {
    "tool": "R glmGamPoi::glm_gp",
    "family": "nb",
    "threads": 1,
-   "load": 1.52685546875,
-   "seconds": 5.831,
+   "load": 4.4814453125,
+   "seconds": 4.441,
    "glmgampoi_version": "1.25.1",
    "max_rel_coef_diff_vs_R": 0.029732091914182555
   },
@@ -159,79 +157,42 @@
    "tool": "Python statsmodels",
    "family": "nb",
    "threads": 1,
-   "load": 1.26708984375,
-   "seconds": 23.302878630001942,
+   "load": 4.37158203125,
+   "seconds": 18.894335078075528,
    "responses_timed": 200,
-   "max_rel_coef_diff_vs_R": 0.009014687429888963
+   "max_rel_coef_diff_vs_R": 0.009014687415194516
   },
   {
    "tool": "Python rapidglm.fit",
    "family": "nb",
    "threads": 1,
-   "load": 1.2568359375,
-   "seconds": 3.1662379800000053,
+   "load": 4.32421875,
+   "seconds": 2.3378291614353657,
    "responses_timed": 1000,
-   "max_rel_coef_diff_vs_R": 0.0009165957712542424
+   "max_rel_coef_diff_vs_R": 0.0009165957712626074
   }
  ],
  "_provenance": {
-  "version": "1.4.0",
-  "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
+  "version": "1.6.0",
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
   "worktree_dirty": false
  },
- "version": "1.4.0",
- "commit": "f0ecfbd7c8dba698bbb50db5fd61785a2a463800",
- "commit_note": "Library code of v1.4.0-dev.4; all final release measurements were run on this commit.",
- "host_note": "One workstation: Intel Core i9-13900KF, 125 GiB RAM; BIOS 1836, microcode 0x133, 253 W sustained and short-term limits; 4 x 32 GiB at 4,200 MT/s. Turbo is on. Two faulty performance cores (logical CPUs 8-11) are capped at 2.2 GHz and never used for timing. Every timed run is pinned to the 16 identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Pinning to identical cores makes the comparisons reproducible. The efficiency cores retain their stock 800 MHz-4.3 GHz range. Absolute seconds from other host settings are not directly comparable; use matched speed-up ratios across settings. These timings are final, not provisional. Final timings on the 16 identical efficiency cores (CPUs 16-31), one thread per core: one on 16, four on 16-19, eight on 16-23, twelve on 16-27, sixteen on 16-31. Each timed command holds the shared lock and starts after two consecutive ten-second quiet samples: one-minute load <=4 and every selected CPU <20% busy. Both samples are retained. Untimed work uses CPUs 0-7 under nice 10. These release timings are final, not provisional.",
- "command": "python3 benchmarks/glm/batch.py --cpus 1:16 4:16-19 16:16-31 --output OUT",
- "measured_tag": "v1.4.0-dev.4",
+ "version": "1.6.0",
+ "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+ "commit_note": "Library code of v1.6.0-dev.2; this local 1.6.0 measurement collection was run on this commit.",
+ "host_note": "One AMD Threadripper PRO 5965WX workstation (Zen 3). Timed work uses one thread per physical core on CPUs 6-21, with SMT siblings 30-45 idle; one thread uses CPU 6, eight use 6-13, twelve use 6-17. Drivers and untimed checks use CPUs 0-5. Exclusive Slurm allocation; schedutil governor, boost enabled and SMT enabled, unchanged. Each timed command starts after two ten-second quiet samples. More than 5% other CPU activity on selected cores or any sibling invalidates the command. Host load, other-user processes and vLLM CPU use are retained per command. From the resumed bulk stage on 2026-11-03, a user-authorized runtime service cpuset confines vLLM to CPUs 0-5,22-29,46-47; the reservation receipt records its application and restoration. Earlier accepted measurements retain their original guarded host conditions.",
+ "command": "python3 benchmarks/glm/batch.py --cpus 1:6 4:6-9 16:6-21 --output OUT",
+ "measured_tag": "v1.6.0-dev.2",
  "_benchmark_host_configuration": {
-  "workstation": "Intel Core i9-13900KF",
-  "ram_gib": 125,
-  "bios_version": "1836",
-  "bios_date": "04/16/2026",
-  "microcode": "0x133",
-  "power_limits": {
-   "long_term": {
-    "power_limit_watts": 253.0,
-    "time_window_microseconds": 55967744
-   },
-   "short_term": {
-    "power_limit_watts": 253.0,
-    "time_window_microseconds": 2440
-   }
-  },
-  "memory": {
-   "modules": 4,
-   "module_gib": 32,
-   "configured_rate_mt_per_second": 4200,
-   "evidence": "Final host setting supplied by the user; BIOS/microcode and RAPL limits independently read at preflight."
-  },
-  "faulty_performance_cores": {
-   "physical_cores": 2,
-   "logical_cpus": [
-    8,
-    9,
-    10,
-    11
-   ],
-   "maximum_khz": 2200000,
-   "thread_siblings": {
-    "8": "8-9",
-    "9": "8-9",
-    "10": "10-11",
-    "11": "10-11"
-   },
-   "timed": false
-  },
-  "cap_faulty_cores_service": {
-   "enabled": true,
-   "executable": "/usr/local/sbin/cap-faulty-cores"
-  },
-  "fixed_cpu_clock_service": {
-   "enabled": false
-  },
-  "reproducibility": "Every timed run is pinned to identical efficiency cores, one thread per core, under the shared lock after a quiet-host check. Absolute seconds from other host settings are not directly comparable; matched tool speed-up ratios are the comparison of interest.",
-  "verified_utc": "2026-10-22T00:08:31.141014+00:00"
+  "processor": "AMD Threadripper PRO 5965WX",
+  "physical_cores": 24,
+  "logical_cpus": 48,
+  "ram_gib": 125.61,
+  "driver_cpus": "0-5",
+  "timed_cpus": "6-21",
+  "idle_siblings": "30-45",
+  "governor": "schedutil",
+  "boost": "1",
+  "smt": "on"
  }
 }

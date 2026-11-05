@@ -1,0 +1,1018 @@
+{
+ "purpose": "Batch scoring of the high-MOI CRT workflow (sceptre): every pair of a response scored stage by stage in one pass over the response's score records, as a cell-blocked sparse x dense product. Profile of the unbatched code, the alternatives measured, the extrapolation to the full Gasperini test set, the choice and the reason.",
+ "data": "Gasperini et al. 2019 at-scale screen, GEO GSE120861 (public): 207,324 cells, 7,418 genes, design intercept, log UMI, log genes detected, log guides, percent mitochondrial, batch. Panel t100_g7418: 100 targets x 7,418 genes, 741,800 pairs (721,266 pass pair QC), cell_qc false, seed 20260930.",
+ "host": {
+  "name": "uwt-biocloud1",
+  "processor": "Intel Xeon E5-2640 v4 (Broadwell), 10 cores / 20 threads, 25 MB L3",
+  "memory_gb": 70,
+  "os": "Ubuntu 24.04",
+  "compiler": "GCC 13.3.0 -O3 (Release)",
+  "cpus": "8 threads on cores 1-8 (taskset), their SMT siblings 11-18 idle, nothing else running"
+ },
+ "binary": {
+  "branch": "proto/highmoi-batch",
+  "base": "67f5adc",
+  "note": "one binary for every run: the unbatched path and each alternative are options of it; stage timers (RAPIDGLM_PROFILE) add two clock reads per 32 draws"
+ },
+ "modes": {
+  "legacy": {
+   "reuse_draws": true,
+   "confirm_draws": 0
+  },
+  "default": {}
+ },
+ "profile_unbatched": {
+  "legacy": {
+   "run": "prof0_t100_g7418_legacy",
+   "wall_seconds": 854.6,
+   "process_cpu_seconds": 6219.8,
+   "threads": 8,
+   "capacity_thread_seconds": 6836.6,
+   "stages": {
+    "input": {
+     "thread_seconds": 208.6,
+     "share_of_capacity": 0.0305
+    },
+    "setup": {
+     "thread_seconds": 23.9,
+     "share_of_capacity": 0.0035
+    },
+    "null_fits": {
+     "thread_seconds": 1024.4,
+     "share_of_capacity": 0.1498
+    },
+    "score_state": {
+     "thread_seconds": 86.2,
+     "share_of_capacity": 0.0126
+    },
+    "propensity_fits": {
+     "thread_seconds": 15.9,
+     "share_of_capacity": 0.0023
+    },
+    "sampler_builds": {
+     "thread_seconds": 0.9,
+     "share_of_capacity": 0.0001
+    },
+    "draw_generation": {
+     "thread_seconds": 127.2,
+     "share_of_capacity": 0.0186
+    },
+    "scoring": {
+     "thread_seconds": 4454.8,
+     "share_of_capacity": 0.6516
+    },
+    "stage_rule_and_tail_fits": {
+     "thread_seconds": 77.2,
+     "share_of_capacity": 0.0113
+    },
+    "pair_preparation_and_waits": {
+     "thread_seconds": 249.4,
+     "share_of_capacity": 0.0365
+    },
+    "effect_fits": {
+     "thread_seconds": 2.9,
+     "share_of_capacity": 0.0004
+    },
+    "merge_adjust_and_output": {
+     "thread_seconds": 12.1,
+     "share_of_capacity": 0.0018
+    },
+    "idle_and_scheduling": {
+     "thread_seconds": 548.9,
+     "share_of_capacity": 0.0803
+    }
+   }
+  },
+  "default": {
+   "run": "prof0_t100_g7418_default",
+   "wall_seconds": 2732.4,
+   "process_cpu_seconds": 21298.0,
+   "threads": 8,
+   "capacity_thread_seconds": 21859.1,
+   "stages": {
+    "input": {
+     "thread_seconds": 209.0,
+     "share_of_capacity": 0.0096
+    },
+    "setup": {
+     "thread_seconds": 23.9,
+     "share_of_capacity": 0.0011
+    },
+    "null_fits": {
+     "thread_seconds": 1030.0,
+     "share_of_capacity": 0.0471
+    },
+    "score_state": {
+     "thread_seconds": 89.2,
+     "share_of_capacity": 0.0041
+    },
+    "propensity_fits": {
+     "thread_seconds": 15.8,
+     "share_of_capacity": 0.0007
+    },
+    "sampler_builds": {
+     "thread_seconds": 0.9,
+     "share_of_capacity": 0.0
+    },
+    "draw_generation": {
+     "thread_seconds": 13744.0,
+     "share_of_capacity": 0.6288
+    },
+    "scoring": {
+     "thread_seconds": 5807.9,
+     "share_of_capacity": 0.2657
+    },
+    "stage_rule_and_tail_fits": {
+     "thread_seconds": 84.0,
+     "share_of_capacity": 0.0038
+    },
+    "pair_preparation_and_waits": {
+     "thread_seconds": 255.0,
+     "share_of_capacity": 0.0117
+    },
+    "effect_fits": {
+     "thread_seconds": 2.8,
+     "share_of_capacity": 0.0001
+    },
+    "merge_adjust_and_output": {
+     "thread_seconds": 12.1,
+     "share_of_capacity": 0.0006
+    },
+    "idle_and_scheduling": {
+     "thread_seconds": 582.7,
+     "share_of_capacity": 0.0267
+    }
+   }
+  }
+ },
+ "alternatives": {
+  "unbatched": "the pair pipeline of 1.5.0: a ring of active pairs, threads drawing 32 draws at a time",
+  "batch_scoring": "one response per thread; each stage of all its pairs scored in one pass over its records in blocks of cells (sparse x dense product); targets' propensities, samplers and (reuse_draws) first-stage draws prepared in parallel first",
+  "batch_fits": "response nulls (Poisson coefficients) and propensity models fitted in lockstep blocks of 16, cross products as matrix products Q'W and X'S, before the pairs; each response's score state then rebuilt from its fit",
+  "batch_scoring_plus_batch_fits": "both",
+  "kernels": "inner loop of batch scoring (benchmarks/highmoi/score_bench.cpp on the proto branch): 64 genes x 100 targets x 499 stored draws, 8 threads, each thread its own genes"
+ },
+ "kernel_measurements": [
+  {
+   "kernel": "per_pair",
+   "block_or_group": 2048,
+   "threads": 8,
+   "seconds": 13.3553,
+   "ns_per_treated_cell_and_draw": 36.3161,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group": 8192,
+   "threads": 8,
+   "seconds": 1.78762,
+   "ns_per_treated_cell_and_draw": 4.86092,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group": 16384,
+   "threads": 8,
+   "seconds": 1.49486,
+   "ns_per_treated_cell_and_draw": 4.06486,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group": 32768,
+   "threads": 8,
+   "seconds": 1.35871,
+   "ns_per_treated_cell_and_draw": 3.69464,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group": 65536,
+   "threads": 8,
+   "seconds": 2.24972,
+   "ns_per_treated_cell_and_draw": 6.11749,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group": 262144,
+   "threads": 8,
+   "seconds": 4.35847,
+   "ns_per_treated_cell_and_draw": 11.8516,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single",
+   "block_or_group": 8192,
+   "threads": 8,
+   "seconds": 2.26947,
+   "ns_per_treated_cell_and_draw": 6.17118,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single",
+   "block_or_group": 16384,
+   "threads": 8,
+   "seconds": 1.88993,
+   "ns_per_treated_cell_and_draw": 5.13913,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single",
+   "block_or_group": 32768,
+   "threads": 8,
+   "seconds": 1.74121,
+   "ns_per_treated_cell_and_draw": 4.73472,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single",
+   "block_or_group": 65536,
+   "threads": 8,
+   "seconds": 2.34246,
+   "ns_per_treated_cell_and_draw": 6.36966,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single",
+   "block_or_group": 262144,
+   "threads": 8,
+   "seconds": 4.42686,
+   "ns_per_treated_cell_and_draw": 12.0376,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single_pf8",
+   "block_or_group": 8192,
+   "threads": 8,
+   "seconds": 2.35255,
+   "ns_per_treated_cell_and_draw": 6.3971,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single_pf8",
+   "block_or_group": 16384,
+   "threads": 8,
+   "seconds": 1.95341,
+   "ns_per_treated_cell_and_draw": 5.31176,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single_pf8",
+   "block_or_group": 32768,
+   "threads": 8,
+   "seconds": 1.81726,
+   "ns_per_treated_cell_and_draw": 4.94154,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single_pf8",
+   "block_or_group": 65536,
+   "threads": 8,
+   "seconds": 2.71695,
+   "ns_per_treated_cell_and_draw": 7.38797,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single_pf8",
+   "block_or_group": 262144,
+   "threads": 8,
+   "seconds": 4.88105,
+   "ns_per_treated_cell_and_draw": 13.2727,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single_pf16",
+   "block_or_group": 8192,
+   "threads": 8,
+   "seconds": 2.47987,
+   "ns_per_treated_cell_and_draw": 6.74331,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single_pf16",
+   "block_or_group": 16384,
+   "threads": 8,
+   "seconds": 1.97749,
+   "ns_per_treated_cell_and_draw": 5.37723,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single_pf16",
+   "block_or_group": 32768,
+   "threads": 8,
+   "seconds": 1.80121,
+   "ns_per_treated_cell_and_draw": 4.89789,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single_pf16",
+   "block_or_group": 65536,
+   "threads": 8,
+   "seconds": 2.34792,
+   "ns_per_treated_cell_and_draw": 6.3845,
+   "bit_identical": true
+  },
+  {
+   "kernel": "single_pf16",
+   "block_or_group": 262144,
+   "threads": 8,
+   "seconds": 4.55,
+   "ns_per_treated_cell_and_draw": 12.3724,
+   "bit_identical": true
+  },
+  {
+   "kernel": "cell_major",
+   "block_or_group": 2,
+   "threads": 8,
+   "seconds": 1.39976,
+   "ns_per_treated_cell_and_draw": 3.80625,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group": 32768,
+   "threads": 8,
+   "seconds": 1.34996,
+   "ns_per_treated_cell_and_draw": 3.67083,
+   "bit_identical": true
+  },
+  {
+   "kernel": "cell_major",
+   "block_or_group": 4,
+   "threads": 8,
+   "seconds": 1.02378,
+   "ns_per_treated_cell_and_draw": 2.78388,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group": 32768,
+   "threads": 8,
+   "seconds": 1.34751,
+   "ns_per_treated_cell_and_draw": 3.66418,
+   "bit_identical": true
+  },
+  {
+   "kernel": "cell_major",
+   "block_or_group": 8,
+   "threads": 8,
+   "seconds": 1.2152,
+   "ns_per_treated_cell_and_draw": 3.30441,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group": 32768,
+   "threads": 8,
+   "seconds": 1.34919,
+   "ns_per_treated_cell_and_draw": 3.66874,
+   "bit_identical": true
+  },
+  {
+   "kernel": "cell_major",
+   "block_or_group": 4,
+   "threads": 8,
+   "seconds": 0.988325,
+   "ns_per_treated_cell_and_draw": 2.68747,
+   "bit_identical": true
+  },
+  {
+   "kernel": "blocked_avx2",
+   "block_or_group": 32768,
+   "threads": 8,
+   "seconds": 1.35684,
+   "ns_per_treated_cell_and_draw": 3.68955,
+   "bit_identical": true
+  },
+  {
+   "kernel": "quad",
+   "block_or_group": 16384,
+   "threads": 8,
+   "seconds": 1.40148,
+   "ns_per_treated_cell_and_draw": 3.81092,
+   "bit_identical": true
+  },
+  {
+   "kernel": "quad",
+   "block_or_group": 32768,
+   "threads": 8,
+   "seconds": 1.48174,
+   "ns_per_treated_cell_and_draw": 4.02918,
+   "bit_identical": true
+  },
+  {
+   "kernel": "quad",
+   "block_or_group": 65536,
+   "threads": 8,
+   "seconds": 2.55957,
+   "ns_per_treated_cell_and_draw": 6.96004,
+   "bit_identical": true
+  }
+ ],
+ "kernel_note": "per_pair is the 1.5.0 per-pair loop run with each thread on its own gene, which exaggerates its cost; inside the workflow it scored 10.8 ns per treated cell and draw (4,402 thread-s for 446.1 million draws). cell_major (each cell listing the draws of a group of 4 targets that contain it, sums held in L2) is 1.37 times faster than the chosen kernel for stored first-stage draws only and needs a transposed copy of them; not adopted.",
+ "lockstep_null_fits": [
+  "genes 256 threads 8",
+  "today: fit_sceptre_null 145.488 ms/gene (Poisson pilot 86.3244 ms, 5.25 iterations; theta outer iterations 2), workspace 15.8603 ms/gene; wall 8.0485 s",
+  "batched(8): wall 4.69865 s (1.71294x incl. workspace in today's wall; fits 256, refitted 0, rounds 252, iterations 1344; thread seconds: products 6.53755, means 4.74552, theta 15.1627, total 36.4953)",
+  "agreement over 256 regular fits: status differs 0; max relative coefficient 8.96258e-10, theta 3.59897e-12, working weight 6.96989e-13, score residual (abs/(1+|s|)) 4.4598e-13",
+  "propensity: targets 64 today wall 1.3927 s, batched wall 1.2472 s (fits 64, refitted 0, rounds 84, iterations 579; thread seconds: products 1.65101, means 2.73309, theta 0, total 9.54646); status differs 0, max relative coefficient 1.57802e-11",
+  "genes 256 threads 8",
+  "today: fit_sceptre_null 145.454 ms/gene (Poisson pilot 86.3122 ms, 5.25 iterations; theta outer iterations 2), workspace 15.8692 ms/gene; wall 8.03737 s",
+  "batched(16): wall 4.55967 s (1.76271x incl. workspace in today's wall; fits 256, refitted 0, rounds 132, iterations 1344; thread seconds: products 4.6916, means 4.91906, theta 15.1528, total 35.1053)",
+  "agreement over 256 regular fits: status differs 0; max relative coefficient 8.96258e-10, theta 3.59897e-12, working weight 6.96989e-13, score residual (abs/(1+|s|)) 4.4598e-13",
+  "propensity: targets 64 today wall 1.38578 s, batched wall 2.08041 s (fits 64, refitted 0, rounds 43, iterations 579; thread seconds: products 1.06899, means 2.57023, theta 0, total 8.21583); status differs 0, max relative coefficient 1.57802e-11",
+  "genes 256 threads 8",
+  "today: fit_sceptre_null 145.526 ms/gene (Poisson pilot 86.3197 ms, 5.25 iterations; theta outer iterations 2), workspace 16.0324 ms/gene; wall 8.05323 s",
+  "batched(32): wall 4.4811 s (1.79716x incl. workspace in today's wall; fits 256, refitted 0, rounds 68, iterations 1344; thread seconds: products 4.10885, means 4.90073, theta 15.1677, total 34.6107)",
+  "agreement over 256 regular fits: status differs 0; max relative coefficient 8.96258e-10, theta 3.59897e-12, working weight 6.96989e-13, score residual (abs/(1+|s|)) 4.4598e-13",
+  "propensity: targets 64 today wall 1.39043 s, batched wall 3.87948 s (fits 64, refitted 0, rounds 22, iterations 579; thread seconds: products 0.961987, means 2.49174, theta 0, total 7.72763); status differs 0, max relative coefficient 1.57802e-11"
+ ],
+ "timing": {
+  "legacy": {
+   "runs": [
+    {
+     "variant": "base",
+     "round": 1,
+     "run": "tim_legacy_base_r1",
+     "wall_seconds": 844.3,
+     "process_cpu_seconds": 6133.2,
+     "wall_stage_seconds": {
+      "input": 22.2,
+      "batch_phase": 0.0,
+      "pipeline": 816.8
+     },
+     "thread_seconds": {
+      "null_fits": 1029.8,
+      "score_state": 85.9,
+      "propensity_fits": 15.6,
+      "draw_generation": 128.6,
+      "scoring": 4402.4,
+      "stage_rule_and_tail_fits": 77.2,
+      "waiting_for_stored_draws": 0.0
+     }
+    },
+    {
+     "variant": "base",
+     "round": 2,
+     "run": "tim_legacy_base_r2",
+     "wall_seconds": 845.2,
+     "process_cpu_seconds": 6138.8,
+     "wall_stage_seconds": {
+      "input": 22.3,
+      "batch_phase": 0.0,
+      "pipeline": 817.5
+     },
+     "thread_seconds": {
+      "null_fits": 1028.2,
+      "score_state": 86.3,
+      "propensity_fits": 15.7,
+      "draw_generation": 128.8,
+      "scoring": 4406.1,
+      "stage_rule_and_tail_fits": 77.1,
+      "waiting_for_stored_draws": 0.0
+     }
+    },
+    {
+     "variant": "batch",
+     "round": 1,
+     "run": "tim_legacy_batch_r1",
+     "wall_seconds": 438.1,
+     "process_cpu_seconds": 3446.1,
+     "wall_stage_seconds": {
+      "input": 16.5,
+      "batch_phase": 0.0,
+      "pipeline": 416.3
+     },
+     "thread_seconds": {
+      "null_fits": 1068.5,
+      "score_state": 93.6,
+      "propensity_fits": 18.3,
+      "draw_generation": 82.7,
+      "scoring": 1947.6,
+      "stage_rule_and_tail_fits": 79.4,
+      "waiting_for_stored_draws": 0.5
+     }
+    },
+    {
+     "variant": "batch",
+     "round": 2,
+     "run": "tim_legacy_batch_r2",
+     "wall_seconds": 439.8,
+     "process_cpu_seconds": 3460.5,
+     "wall_stage_seconds": {
+      "input": 16.8,
+      "batch_phase": 0.0,
+      "pipeline": 417.8
+     },
+     "thread_seconds": {
+      "null_fits": 1069.1,
+      "score_state": 97.8,
+      "propensity_fits": 18.2,
+      "draw_generation": 82.9,
+      "scoring": 1953.8,
+      "stage_rule_and_tail_fits": 79.3,
+      "waiting_for_stored_draws": 1.1
+     }
+    },
+    {
+     "variant": "batchfits",
+     "round": 1,
+     "run": "tim_legacy_batchfits_r1",
+     "wall_seconds": 436.6,
+     "process_cpu_seconds": 3424.3,
+     "wall_stage_seconds": {
+      "input": 21.5,
+      "batch_phase": 129.2,
+      "pipeline": 280.6
+     },
+     "thread_seconds": {
+      "null_fits": 1027.5,
+      "score_state": 92.8,
+      "propensity_fits": 13.8,
+      "draw_generation": 76.9,
+      "scoring": 1927.6,
+      "stage_rule_and_tail_fits": 78.7,
+      "waiting_for_stored_draws": 1.2
+     }
+    },
+    {
+     "variant": "batchfits",
+     "round": 2,
+     "run": "tim_legacy_batchfits_r2",
+     "wall_seconds": 434.9,
+     "process_cpu_seconds": 3408.2,
+     "wall_stage_seconds": {
+      "input": 21.9,
+      "batch_phase": 128.7,
+      "pipeline": 279.1
+     },
+     "thread_seconds": {
+      "null_fits": 1024.1,
+      "score_state": 92.9,
+      "propensity_fits": 13.8,
+      "draw_generation": 76.9,
+      "scoring": 1914.1,
+      "stage_rule_and_tail_fits": 79.4,
+      "waiting_for_stored_draws": 1.1
+     }
+    },
+    {
+     "variant": "fits",
+     "round": 1,
+     "run": "tim_legacy_fits_r1",
+     "wall_seconds": 851.1,
+     "process_cpu_seconds": 6103.5,
+     "wall_stage_seconds": {
+      "input": 20.8,
+      "batch_phase": 128.9,
+      "pipeline": 696.0
+     },
+     "thread_seconds": {
+      "null_fits": 1025.4,
+      "score_state": 85.4,
+      "propensity_fits": 13.7,
+      "draw_generation": 123.3,
+      "scoring": 4295.1,
+      "stage_rule_and_tail_fits": 76.9,
+      "waiting_for_stored_draws": 0.0
+     }
+    },
+    {
+     "variant": "fits",
+     "round": 2,
+     "run": "tim_legacy_fits_r2",
+     "wall_seconds": 851.8,
+     "process_cpu_seconds": 6105.5,
+     "wall_stage_seconds": {
+      "input": 21.5,
+      "batch_phase": 128.4,
+      "pipeline": 696.6
+     },
+     "thread_seconds": {
+      "null_fits": 1018.5,
+      "score_state": 85.4,
+      "propensity_fits": 13.8,
+      "draw_generation": 123.0,
+      "scoring": 4299.3,
+      "stage_rule_and_tail_fits": 76.9,
+      "waiting_for_stored_draws": 0.0
+     }
+    }
+   ],
+   "summary": {
+    "base": {
+     "wall_seconds": [
+      844.3,
+      845.2
+     ],
+     "mean": 844.8,
+     "speedup_over_unbatched": 1.0
+    },
+    "batch": {
+     "wall_seconds": [
+      438.1,
+      439.8
+     ],
+     "mean": 439.0,
+     "speedup_over_unbatched": 1.924
+    },
+    "batchfits": {
+     "wall_seconds": [
+      436.6,
+      434.9
+     ],
+     "mean": 435.8,
+     "speedup_over_unbatched": 1.939
+    },
+    "fits": {
+     "wall_seconds": [
+      851.1,
+      851.8
+     ],
+     "mean": 851.5,
+     "speedup_over_unbatched": 0.992
+    }
+   }
+  },
+  "default": {
+   "runs": [
+    {
+     "variant": "base",
+     "round": 1,
+     "run": "tim_default_base_r1",
+     "wall_seconds": 2645.7,
+     "process_cpu_seconds": 20595.7,
+     "wall_stage_seconds": {
+      "input": 22.2,
+      "batch_phase": 0.0,
+      "pipeline": 2618.5
+     },
+     "thread_seconds": {
+      "null_fits": 1025.5,
+      "score_state": 86.9,
+      "propensity_fits": 15.6,
+      "draw_generation": 13537.8,
+      "scoring": 5373.8,
+      "stage_rule_and_tail_fits": 83.7,
+      "waiting_for_stored_draws": 0.0
+     }
+    },
+    {
+     "variant": "base",
+     "round": 2,
+     "run": "tim_default_base_r2",
+     "wall_seconds": 2668.3,
+     "process_cpu_seconds": 20783.1,
+     "wall_stage_seconds": {
+      "input": 21.8,
+      "batch_phase": 0.0,
+      "pipeline": 2641.4
+     },
+     "thread_seconds": {
+      "null_fits": 1028.2,
+      "score_state": 86.0,
+      "propensity_fits": 15.8,
+      "draw_generation": 13604.0,
+      "scoring": 5495.8,
+      "stage_rule_and_tail_fits": 83.8,
+      "waiting_for_stored_draws": 0.0
+     }
+    },
+    {
+     "variant": "batch",
+     "round": 1,
+     "run": "tim_default_batch_r1",
+     "wall_seconds": 2178.3,
+     "process_cpu_seconds": 17369.9,
+     "wall_stage_seconds": {
+      "input": 26.9,
+      "batch_phase": 0.0,
+      "pipeline": 2146.4
+     },
+     "thread_seconds": {
+      "null_fits": 1025.6,
+      "score_state": 85.9,
+      "propensity_fits": 18.3,
+      "draw_generation": 14129.4,
+      "scoring": 1788.8,
+      "stage_rule_and_tail_fits": 84.1,
+      "waiting_for_stored_draws": 0.0
+     }
+    },
+    {
+     "variant": "batch",
+     "round": 2,
+     "run": "tim_default_batch_r2",
+     "wall_seconds": 2180.4,
+     "process_cpu_seconds": 17387.1,
+     "wall_stage_seconds": {
+      "input": 26.9,
+      "batch_phase": 0.0,
+      "pipeline": 2148.5
+     },
+     "thread_seconds": {
+      "null_fits": 1026.4,
+      "score_state": 86.6,
+      "propensity_fits": 18.4,
+      "draw_generation": 14143.2,
+      "scoring": 1789.0,
+      "stage_rule_and_tail_fits": 84.1,
+      "waiting_for_stored_draws": 0.0
+     }
+    },
+    {
+     "variant": "batchfits",
+     "round": 1,
+     "run": "tim_default_batchfits_r1",
+     "wall_seconds": 2170.4,
+     "process_cpu_seconds": 17288.5,
+     "wall_stage_seconds": {
+      "input": 22.1,
+      "batch_phase": 128.8,
+      "pipeline": 2014.5
+     },
+     "thread_seconds": {
+      "null_fits": 1024.8,
+      "score_state": 96.0,
+      "propensity_fits": 13.8,
+      "draw_generation": 14093.5,
+      "scoring": 1774.6,
+      "stage_rule_and_tail_fits": 84.0,
+      "waiting_for_stored_draws": 0.0
+     }
+    },
+    {
+     "variant": "batchfits",
+     "round": 2,
+     "run": "tim_default_batchfits_r2",
+     "wall_seconds": 2168.9,
+     "process_cpu_seconds": 17279.1,
+     "wall_stage_seconds": {
+      "input": 22.3,
+      "batch_phase": 128.6,
+      "pipeline": 2013.0
+     },
+     "thread_seconds": {
+      "null_fits": 1021.6,
+      "score_state": 92.8,
+      "propensity_fits": 13.8,
+      "draw_generation": 14084.8,
+      "scoring": 1774.9,
+      "stage_rule_and_tail_fits": 84.1,
+      "waiting_for_stored_draws": 0.0
+     }
+    }
+   ],
+   "summary": {
+    "base": {
+     "wall_seconds": [
+      2645.7,
+      2668.3
+     ],
+     "mean": 2657.0,
+     "speedup_over_unbatched": 1.0
+    },
+    "batch": {
+     "wall_seconds": [
+      2178.3,
+      2180.4
+     ],
+     "mean": 2179.4,
+     "speedup_over_unbatched": 1.219
+    },
+    "batchfits": {
+     "wall_seconds": [
+      2170.4,
+      2168.9
+     ],
+     "mean": 2169.7,
+     "speedup_over_unbatched": 1.225
+    }
+   }
+  },
+  "alternation": "rounds r1 then r2, each running base, batch, batchfits (and fits in legacy) in turn"
+ },
+ "agreement": {
+  "legacy_batch": [
+   {
+    "runs": [
+     "tim_legacy_base_r1",
+     "tim_legacy_batch_r1"
+    ],
+    "byte_identical": true
+   },
+   {
+    "runs": [
+     "tim_legacy_base_r1",
+     "tim_legacy_batch_r2"
+    ],
+    "byte_identical": true
+   }
+  ],
+  "default_batch": [
+   {
+    "runs": [
+     "tim_default_base_r1",
+     "tim_default_batch_r1"
+    ],
+    "byte_identical": true
+   },
+   {
+    "runs": [
+     "tim_default_base_r1",
+     "tim_default_batch_r2"
+    ],
+    "byte_identical": true
+   }
+  ],
+  "legacy_batch_fits": {
+   "runs": [
+    "tim_legacy_base_r1",
+    "tim_legacy_batchfits_r1"
+   ],
+   "byte_identical": false,
+   "rows": 741800,
+   "max_abs_statistic_difference": 1.2347900479880991e-12,
+   "draws_differ": 0,
+   "empirical_p_differ": 0,
+   "skew_normal_p_differ": 13964,
+   "skew_normal_p_relative_difference": {
+    "median": 1.8257945412411228e-14,
+    "q999": 3.4800302884852233e-13,
+    "max": 0.35365853658536583,
+    "above_1e-6": 1
+   },
+   "discoveries_bh_0_1": [
+    14,
+    14
+   ]
+  },
+  "default_batch_fits": {
+   "runs": [
+    "tim_default_base_r1",
+    "tim_default_batchfits_r1"
+   ],
+   "byte_identical": false,
+   "rows": 741800,
+   "max_abs_statistic_difference": 1.2347900479880991e-12,
+   "draws_differ": 0,
+   "empirical_p_differ": 0,
+   "skew_normal_p_differ": 13958,
+   "skew_normal_p_relative_difference": {
+    "median": 1.8373969983791048e-14,
+    "q999": 4.030478722330843e-13,
+    "max": 0.10682492581602374,
+    "above_1e-6": 6
+   },
+   "discoveries_bh_0_1": [
+    14,
+    14
+   ]
+  },
+  "thread_counts": [
+   "lbatch t3 identical to 1 thread",
+   "dbatch t3 identical to 1 thread",
+   "lbatchfits t3 identical to 1 thread",
+   "dbatchfits t3 identical to 1 thread",
+   "lbatch t8 identical to 1 thread",
+   "dbatch t8 identical to 1 thread",
+   "lbatchfits t8 identical to 1 thread",
+   "dbatchfits t8 identical to 1 thread"
+  ],
+  "note": "batch fits move the null fits within rounding (statistics by at most about 1e-12); skew-normal p-values then move by about 1e-14 relative, more far in the tail (p near 1e-40) where the tail formula loses relative precision; no empirical p-value, draw count or discovery changes."
+ },
+ "extrapolation": {
+  "method": "per-unit thread costs from each panel run (null fit per response, score state per response and tile, propensity and sampler per target and tile, draw generation per generated draw, scoring per scored draw, stage rule per pair, waits as the panel's fraction), times the counts of the full test set in the 1.5.0 AWS runs (validation/GASPERINI_FULL_CLOUD.json: 28,388,816 pairs, 27,612,895 tested, 3,837 target contexts; legacy 17.16e9 draws scored, 76.7e6 stored draws, 60 tiles of 64 targets; default 18.13e9 draws, 29 tiles of 256 responses). The ratio to the unbatched model is applied to the measured AWS walls (legacy 4.59 h, default 9.57 h on 16 cores).",
+  "assumptions": [
+   "per-draw scoring and generation costs do not depend on the targets per pass (64 per tile in the legacy AWS run, 100 in the panel)",
+   "the AWS processor keeps the ratios measured here; at these costs the legacy model reproduces the AWS CPU time (209,464 against 211,713 s), the default one is 1.6 times above it (generation is faster there)"
+  ],
+  "legacy": [
+   {
+    "run": "tim_legacy_base_r1",
+    "thread_seconds": {
+     "null fits": 1030,
+     "null state (per tile)": 5151,
+     "propensity + sampler": 632,
+     "generation": 4932,
+     "scoring": 169314,
+     "tail": 2954,
+     "waits/idle": 25451
+    },
+    "total_thread_seconds": 209464,
+    "wall_hours_16_cores_at_these_costs": 3.66,
+    "ratio_to_unbatched": 1.0,
+    "aws_1_5_0_wall_hours_scaled": 4.59
+   },
+   {
+    "run": "tim_legacy_batch_r1",
+    "thread_seconds": {
+     "null fits": 1068,
+     "null state (per tile)": 5615,
+     "propensity + sampler": 739,
+     "generation": 3172,
+     "scoring": 74904,
+     "tail": 3040,
+     "waits/idle": 1064
+    },
+    "total_thread_seconds": 89602,
+    "wall_hours_16_cores_at_these_costs": 1.58,
+    "ratio_to_unbatched": 0.432,
+    "aws_1_5_0_wall_hours_scaled": 1.98
+   },
+   {
+    "run": "tim_legacy_batchfits_r1",
+    "thread_seconds": {
+     "null fits": 1027,
+     "null state (per tile)": 5570,
+     "propensity + sampler": 561,
+     "generation": 2950,
+     "scoring": 74135,
+     "tail": 3015,
+     "waits/idle": 1651
+    },
+    "total_thread_seconds": 88908,
+    "wall_hours_16_cores_at_these_costs": 1.57,
+    "ratio_to_unbatched": 0.429,
+    "aws_1_5_0_wall_hours_scaled": 1.97
+   }
+  ],
+  "default": [
+   {
+    "run": "tim_default_base_r1",
+    "thread_seconds": {
+     "null fits": 1026,
+     "null state (per tile)": 87,
+     "propensity + sampler": 18325,
+     "generation": 538760,
+     "scoring": 213860,
+     "tail": 3204,
+     "waits/idle": 31723
+    },
+    "total_thread_seconds": 806985,
+    "wall_hours_16_cores_at_these_costs": 14.04,
+    "ratio_to_unbatched": 1.0,
+    "aws_1_5_0_wall_hours_scaled": 9.57
+   },
+   {
+    "run": "tim_default_batch_r1",
+    "thread_seconds": {
+     "null fits": 1026,
+     "null state (per tile)": 86,
+     "propensity + sampler": 21416,
+     "generation": 562305,
+     "scoring": 71189,
+     "tail": 3219,
+     "waits/idle": 1482
+    },
+    "total_thread_seconds": 660723,
+    "wall_hours_16_cores_at_these_costs": 11.5,
+    "ratio_to_unbatched": 0.819,
+    "aws_1_5_0_wall_hours_scaled": 7.83
+   },
+   {
+    "run": "tim_default_batchfits_r1",
+    "thread_seconds": {
+     "null fits": 1025,
+     "null state (per tile)": 96,
+     "propensity + sampler": 16365,
+     "generation": 560878,
+     "scoring": 70624,
+     "tail": 3215,
+     "waits/idle": 2251
+    },
+    "total_thread_seconds": 654453,
+    "wall_hours_16_cores_at_these_costs": 11.39,
+    "ratio_to_unbatched": 0.811,
+    "aws_1_5_0_wall_hours_scaled": 7.76
+   }
+  ]
+ },
+ "choice": "Batch scoring, on by default for CRT with complement controls: cell blocks of 32,768, two draws at a time with AVX2 (the generic loop otherwise), one response per thread, targets prepared in parallel first. Batch fits not adopted.",
+ "reason": [
+  "Records are byte-identical to the pair pipeline in both modes, at 1, 3 and 8 threads, so it can be the default.",
+  "Panel wall time: legacy 844.8 to 439.0 s (1.92x), default 2657.0 to 2179.4 s (1.22x), two alternating rounds each; scoring thread time 2.26x (legacy) and 3.04x (default) less.",
+  "Extrapolated to the full test set on 16 cores: legacy 4.59 to about 1.98 h, default 9.57 to about 7.83 h.",
+  "Of the kernels measured, blocks of 32,768 cells with two draws at a time were fastest; a cell-major layout of stored draws was 1.37x faster for stored first-stage draws only and needs a transposed copy of them (a possible follow-up).",
+  "Dense matrix products do not fit: about 0.4% of the cells per draw are treated."
+ ],
+ "batch_fits_decision": {
+  "adopted": false,
+  "gain": "null-fit thread time 4% less at 8 threads; wall 0.7% less in legacy (439.0 to 435.8 s) and 0.45% less by default (2179.4 to 2169.7 s), consistent in both rounds (round-to-round spread of each variant 0.1%)",
+  "why_not": [
+   "null fits are about 0.5% of the full test set's thread time, so the gain there is negligible",
+   "it moves results within rounding (statistics by up to 1.2e-12, skew-normal p-values by about 1e-14 relative), so records are no longer byte-identical",
+   "about 700 lines (lockstep IRLS with every step-control path of fit())",
+   "the cross products it replaces are not what costs: theta estimation (about 40% of a null fit) and the per-gene elementwise passes are"
+  ]
+ },
+ "remaining_costs_after_batch_scoring_full_set": {
+  "legacy": "scoring 84%, score state rebuilt per tile 6% (60 tiles), generation 3.5%, stage rule 3.4%",
+  "default": "draw generation 85%, scoring 11%, propensity fits repeated per tile 3% (29 tiles)"
+ },
+ "notes": [
+  "Dependency installs and a compile pinned to core 9 and its sibling ran during tim_default_base_r2 (about 06:05-06:25 UTC); that run was 0.9% slower than r1.",
+  "The stage timers of the prototype binary are not part of the release branch."
+ ]
+}

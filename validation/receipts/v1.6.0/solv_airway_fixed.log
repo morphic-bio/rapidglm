@@ -1,0 +1,9 @@
+{"timed_command_ready_utc": "2026-10-30T14:12:32Z", "load_average": [4.26953125, 4.234375, 4.0693359375], "cpus": "6", "waited_for_quiet_seconds": 20.1}
+rapidglm_newton: 0.17715 s
+rapidglm_newton_plain: 0.192994 s
+ceres_levenberg_marquardt/ceres_default: 0.246088 s
+ceres_dogleg/ceres_default: 0.25658 s
+ceres_lbfgs/ceres_default: 0.368647 s
+ceres_levenberg_marquardt/tight: 0.353071 s
+ceres_dogleg/tight: 0.547474 s
+ceres_lbfgs/tight: 0.504408 s

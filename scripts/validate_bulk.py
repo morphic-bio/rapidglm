@@ -98,12 +98,16 @@ def run_bulk(binary, d, coefficient, threads, prefix, **extra):
     command = [str(binary), "bulk-de", str(path)]
     if os.environ.get("RAPIDGLM_QUIET_LOAD"):
         from quiet_run import wait_quiet
-        cpus = "16" if threads == 1 else "16-23"
+        cpus = os.environ.get("RAPIDGLM_TIMED_FIRST_CPU", "16") if threads == 1 else os.environ.get("RAPIDGLM_TIMED_EIGHT_CPUS", "16-23")
         wait_quiet(cpus, label=f"bulk validation {prefix.name} threads={threads}")
         command = ["taskset", "-c", cpus, *command]
     t0 = time.perf_counter()
     subprocess.run(command, check=True, env=ENV, stdout=subprocess.DEVNULL)
-    return time.perf_counter() - t0
+    elapsed = time.perf_counter() - t0
+    if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+        from quiet_run import finish_measurement
+        finish_measurement()
+    return elapsed
 
 
 def compare(d, prefix):
@@ -296,9 +300,13 @@ def main(args):
                        str(d / "deseq2_timing"), args.r_library]
             if os.environ.get("RAPIDGLM_QUIET_LOAD"):
                 from quiet_run import wait_quiet
-                wait_quiet("16", label=f"bulk validation {name} DESeq2")
-                command = ["taskset", "-c", "16", *command]
+                cpu = os.environ.get("RAPIDGLM_TIMED_FIRST_CPU", "16")
+                wait_quiet(cpu, label=f"bulk validation {name} DESeq2")
+                command = ["taskset", "-c", cpu, *command]
             subprocess.run(command, check=True, env=ENV, stdout=subprocess.DEVNULL)
+            if os.environ.get("RAPIDGLM_QUIET_LOAD"):
+                from quiet_run import finish_measurement
+                finish_measurement()
             timing = json.loads((d / "deseq2_timing/reference.json").read_text())
             deseq2_seconds.append(timing["seconds"])
             deseq2_shrink_seconds.append(timing["shrink_seconds"])

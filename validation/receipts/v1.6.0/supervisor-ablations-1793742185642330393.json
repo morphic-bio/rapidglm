@@ -1,0 +1,14 @@
+{
+  "label": "ablations-1793742185642330393",
+  "stages": [
+    "ablations"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T21:43:05.749659+00:00",
+  "finished_utc": "2026-11-03T23:04:31.794196+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 4808,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0647600200027227,
+  "cpu_policy_observed_quiet_starts": 5,
+  "error": null
+}

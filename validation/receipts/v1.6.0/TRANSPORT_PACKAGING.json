@@ -1,0 +1,49 @@
+{
+  "recorded_utc": "2026-11-05T10:18:13.332173+00:00",
+  "lossless": true,
+  "compressed_support": [
+    {
+      "original": "support/work/guarded-command-retries/692-1999958-1793479606908503159/result.tsv",
+      "compressed": "support/work/guarded-command-retries/692-1999958-1793479606908503159/result.tsv.gz",
+      "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+    },
+    {
+      "original": "support/work/guarded-command-retries/692-2001688-1793481993568475970/result.tsv",
+      "compressed": "support/work/guarded-command-retries/692-2001688-1793481993568475970/result.tsv.gz",
+      "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+    },
+    {
+      "original": "support/work/guarded-command-retries/692-2001688-1793484264872741855/result.tsv",
+      "compressed": "support/work/guarded-command-retries/692-2001688-1793484264872741855/result.tsv.gz",
+      "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+    },
+    {
+      "original": "support/work/guarded-command-retries/692-2001688-1793486152845672162/result.tsv",
+      "compressed": "support/work/guarded-command-retries/692-2001688-1793486152845672162/result.tsv.gz",
+      "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+    },
+    {
+      "original": "support/work/guarded-command-retries/692-2001688-1793488037188594722/result.tsv",
+      "compressed": "support/work/guarded-command-retries/692-2001688-1793488037188594722/result.tsv.gz",
+      "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+    },
+    {
+      "original": "support/work/guarded-command-retries/692-2001688-1793489935503856676/result.tsv",
+      "compressed": "support/work/guarded-command-retries/692-2001688-1793489935503856676/result.tsv.gz",
+      "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+    },
+    {
+      "original": "support/work/guarded-command-retries/692-2001688-1793491826982633680/result.tsv",
+      "compressed": "support/work/guarded-command-retries/692-2001688-1793491826982633680/result.tsv.gz",
+      "sha256": "b55c4bb82ad76df2b36a47b5147c030fd4d5f0ab99312368fcb237e3b7c1ff89"
+    },
+    {
+      "original": "support/work/stage-reruns/batch-1793359199112530918/validation/work/benchmark/runs-v1.6.0-gpu/glm-compare/batch-v1.6.0/Y.f64",
+      "compressed": "support/work/stage-reruns/batch-1793359199112530918/validation/work/benchmark/runs-v1.6.0-gpu/glm-compare/batch-v1.6.0/Y.f64.gz",
+      "sha256": "b343dd532f82d234abbb68522a5b43c6735adae4ed73fb8437d46111fabebf08"
+    }
+  ],
+  "host_load_parts_manifest": "HOST_LOAD_PARTS.json",
+  "complete_host_archive_retained_on_gpu_server": true,
+  "reason": "Keep each tracked Git blob below 50 MiB without removing evidence."
+}

@@ -1,0 +1,14 @@
+{
+  "label": "preprint_crt-1793478882992898038",
+  "stages": [
+    "preprint_crt"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-31T20:34:43.106945+00:00",
+  "finished_utc": "2026-11-01T01:16:54.040779+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 16629,
+  "cpu_policy_maximum_poll_gap_seconds": 1.1591743435710669,
+  "cpu_policy_observed_quiet_starts": 11,
+  "error": null
+}

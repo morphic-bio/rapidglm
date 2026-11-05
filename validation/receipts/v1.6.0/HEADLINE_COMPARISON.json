@@ -1,0 +1,1656 @@
+{
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "note": "The 1.4.0 and 1.6.0 runs use different hosts. Each ratio divides reference-tool time by RapidGLM time within the same run; changes compare ratios, not cross-host seconds.",
+  "bulk": [
+    {
+      "dataset": "airway",
+      "tool": "rapidglm-cli",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 5.982191474337764,
+      "reference_over_rapidglm_1_6_0": 5.771258063536856,
+      "ratio_change_percent": -3.5260223900516086,
+      "old_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      },
+      "new_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      }
+    },
+    {
+      "dataset": "airway",
+      "tool": "rapidglm-cli",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 9.76805916167418,
+      "reference_over_rapidglm_1_6_0": 9.272838296063746,
+      "ratio_change_percent": -5.06979797535908,
+      "old_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      },
+      "new_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      }
+    },
+    {
+      "dataset": "airway",
+      "tool": "rapidglm-python",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 6.0382948660323414,
+      "reference_over_rapidglm_1_6_0": 5.866760801052774,
+      "ratio_change_percent": -2.8407699323282576,
+      "old_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      },
+      "new_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      }
+    },
+    {
+      "dataset": "airway",
+      "tool": "rapidglm-python",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 10.312529496347565,
+      "reference_over_rapidglm_1_6_0": 8.832201977863809,
+      "ratio_change_percent": -14.354650030412518,
+      "old_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      },
+      "new_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      }
+    },
+    {
+      "dataset": "airway",
+      "tool": "rapidglm-r",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 6.282608695652174,
+      "reference_over_rapidglm_1_6_0": 6.050767414403778,
+      "ratio_change_percent": -3.6902072447841494,
+      "old_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      },
+      "new_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      }
+    },
+    {
+      "dataset": "airway",
+      "tool": "rapidglm-r",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 11.054621848739496,
+      "reference_over_rapidglm_1_6_0": 10.147540983606557,
+      "ratio_change_percent": -8.205444542061546,
+      "old_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      },
+      "new_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "rapidglm-cli",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 6.425821483962142,
+      "reference_over_rapidglm_1_6_0": 6.249940818111847,
+      "ratio_change_percent": -2.737092312465672,
+      "old_agreement": {
+        "discoveries": 1623,
+        "jaccard": 0.9852851011649295,
+        "spearman": 0.9999769429895039
+      },
+      "new_agreement": {
+        "discoveries": 1620,
+        "jaccard": 0.9871007371007371,
+        "spearman": 0.9999769429895039
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "rapidglm-cli",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 8.75854539123975,
+      "reference_over_rapidglm_1_6_0": 9.36320651021961,
+      "ratio_change_percent": 6.9036705522430575,
+      "old_agreement": {
+        "discoveries": 1623,
+        "jaccard": 0.9852851011649295,
+        "spearman": 0.9999769429895039
+      },
+      "new_agreement": {
+        "discoveries": 1620,
+        "jaccard": 0.9871007371007371,
+        "spearman": 0.9999769429895039
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "rapidglm-python",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 6.576022504366502,
+      "reference_over_rapidglm_1_6_0": 6.49889888669128,
+      "ratio_change_percent": -1.172800391483031,
+      "old_agreement": {
+        "discoveries": 1623,
+        "jaccard": 0.9852851011649295,
+        "spearman": 0.9999769429895039
+      },
+      "new_agreement": {
+        "discoveries": 1620,
+        "jaccard": 0.9871007371007371,
+        "spearman": 0.9999769429895039
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "rapidglm-python",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 9.542235979834416,
+      "reference_over_rapidglm_1_6_0": 9.47613957675076,
+      "ratio_change_percent": -0.6926720657855934,
+      "old_agreement": {
+        "discoveries": 1623,
+        "jaccard": 0.9852851011649295,
+        "spearman": 0.9999769429895039
+      },
+      "new_agreement": {
+        "discoveries": 1620,
+        "jaccard": 0.9871007371007371,
+        "spearman": 0.9999769429895039
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "rapidglm-r",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 6.448247591719615,
+      "reference_over_rapidglm_1_6_0": 6.369315342328836,
+      "ratio_change_percent": -1.2240883785563428,
+      "old_agreement": {
+        "discoveries": 1623,
+        "jaccard": 0.9852851011649295,
+        "spearman": 0.9999769429895039
+      },
+      "new_agreement": {
+        "discoveries": 1620,
+        "jaccard": 0.9871007371007371,
+        "spearman": 0.9999769429895039
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "rapidglm-r",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 9.345663265306122,
+      "reference_over_rapidglm_1_6_0": 10.233283803863298,
+      "ratio_change_percent": 9.49767302072917,
+      "old_agreement": {
+        "discoveries": 1623,
+        "jaccard": 0.9852851011649295,
+        "spearman": 0.9999769429895039
+      },
+      "new_agreement": {
+        "discoveries": 1620,
+        "jaccard": 0.9871007371007371,
+        "spearman": 0.9999769429895039
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "rapidglm-cli",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 11.928193329230448,
+      "reference_over_rapidglm_1_6_0": 11.58349044526118,
+      "ratio_change_percent": -2.889816374157528,
+      "old_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      },
+      "new_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "rapidglm-cli",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 17.636314031682076,
+      "reference_over_rapidglm_1_6_0": 17.002765940650423,
+      "ratio_change_percent": -3.592293094200638,
+      "old_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      },
+      "new_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "rapidglm-python",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 12.226065816608536,
+      "reference_over_rapidglm_1_6_0": 12.03673490660174,
+      "ratio_change_percent": -1.5485840894918002,
+      "old_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      },
+      "new_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "rapidglm-python",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 19.908715772294713,
+      "reference_over_rapidglm_1_6_0": 19.203118744623872,
+      "ratio_change_percent": -3.5441614403514676,
+      "old_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      },
+      "new_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "rapidglm-r",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 11.996250886614654,
+      "reference_over_rapidglm_1_6_0": 11.593013417140096,
+      "ratio_change_percent": -3.361362423025749,
+      "old_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      },
+      "new_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "rapidglm-r",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 17.88164665523156,
+      "reference_over_rapidglm_1_6_0": 17.37632275132275,
+      "ratio_change_percent": -2.8259360765355956,
+      "old_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      },
+      "new_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-cli",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 13.638662215279117,
+      "reference_over_rapidglm_1_6_0": 13.632349730769034,
+      "ratio_change_percent": -0.04628375137124552,
+      "old_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "new_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-cli",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 13.484876521822997,
+      "reference_over_rapidglm_1_6_0": 13.280060718461604,
+      "ratio_change_percent": -1.5188556085770077,
+      "old_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "new_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-python",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 13.829220984414489,
+      "reference_over_rapidglm_1_6_0": 13.893306937463018,
+      "ratio_change_percent": 0.46340971136953346,
+      "old_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "new_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-python",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 14.52973387624617,
+      "reference_over_rapidglm_1_6_0": 14.377803784209148,
+      "ratio_change_percent": -1.0456495165778845,
+      "old_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "new_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-r",
+      "reference": "deseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 13.754452347083927,
+      "reference_over_rapidglm_1_6_0": 13.37949316438813,
+      "ratio_change_percent": -2.7260931459426097,
+      "old_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "new_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-r",
+      "reference": "deseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 12.867219917012449,
+      "reference_over_rapidglm_1_6_0": 12.676114822170067,
+      "ratio_change_percent": -1.4852088957437615,
+      "old_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "new_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      }
+    }
+  ],
+  "edger": [
+    {
+      "dataset": "airway",
+      "tool": "rapidglm-edger-cli",
+      "reference": "edger",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 2.7550144658112123,
+      "reference_over_rapidglm_1_6_0": 2.4430960169808817,
+      "ratio_change_percent": -11.32184432064266,
+      "old_agreement": {
+        "discoveries": 6568,
+        "jaccard": 1.0,
+        "spearman": 0.9999999743705779
+      },
+      "new_agreement": {
+        "discoveries": 6568,
+        "jaccard": 1.0,
+        "spearman": 0.9999999743705779
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "rapidglm-edger-cli",
+      "reference": "edger",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 3.987214204766624,
+      "reference_over_rapidglm_1_6_0": 4.437230333107398,
+      "ratio_change_percent": 11.28647986362985,
+      "old_agreement": {
+        "discoveries": 1364,
+        "jaccard": 0.9834174477289113,
+        "spearman": 0.9988326384876176
+      },
+      "new_agreement": {
+        "discoveries": 1364,
+        "jaccard": 0.9834174477289113,
+        "spearman": 0.9988326384876176
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "rapidglm-edger-cli",
+      "reference": "edger",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 6.169631096394457,
+      "reference_over_rapidglm_1_6_0": 7.562904419278551,
+      "ratio_change_percent": 22.58276550275957,
+      "old_agreement": {
+        "discoveries": 822,
+        "jaccard": 0.9903614457831326,
+        "spearman": 0.9994798503757538
+      },
+      "new_agreement": {
+        "discoveries": 822,
+        "jaccard": 0.9903614457831326,
+        "spearman": 0.9994798503757538
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-edger-cli",
+      "reference": "edger",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 6.966856940323129,
+      "reference_over_rapidglm_1_6_0": 9.515023470986156,
+      "ratio_change_percent": 36.575554119887556,
+      "old_agreement": {
+        "discoveries": 7481,
+        "jaccard": 0.9994653835872761,
+        "spearman": 0.9998382529170946
+      },
+      "new_agreement": {
+        "discoveries": 7481,
+        "jaccard": 0.9994653835872761,
+        "spearman": 0.9998382529170946
+      }
+    }
+  ],
+  "perturbation": [
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-cli",
+      "reference": "sceptre",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 3.5442591971149353,
+      "reference_over_rapidglm_1_6_0": 5.30268271123323,
+      "ratio_change_percent": 49.6132877513493,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805139193702
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-cli",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 3.654350816231876,
+      "reference_over_rapidglm_1_6_0": 5.753504103375062,
+      "ratio_change_percent": 57.4425771554055,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805139193702
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-python",
+      "reference": "sceptre",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 3.596454400304467,
+      "reference_over_rapidglm_1_6_0": 5.233044793573106,
+      "ratio_change_percent": 45.505662274769556,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805139193702
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-python",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 3.76662453219105,
+      "reference_over_rapidglm_1_6_0": 5.802844957801719,
+      "ratio_change_percent": 54.059554070450375,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805139193702
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-r",
+      "reference": "sceptre",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 3.5577458212718276,
+      "reference_over_rapidglm_1_6_0": 4.599345917149505,
+      "ratio_change_percent": 29.27696772630388,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805139193702
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-r",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 3.333665550417265,
+      "reference_over_rapidglm_1_6_0": 4.859549240107279,
+      "ratio_change_percent": 45.7719488236912,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805139193702
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-cli-ks",
+      "reference": "sceptre",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 4.504391966756529,
+      "reference_over_rapidglm_1_6_0": 6.211609935900991,
+      "ratio_change_percent": 37.90118581473663,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805088342487
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-cli-ks",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 4.645485236400423,
+      "reference_over_rapidglm_1_6_0": 6.675953813560988,
+      "ratio_change_percent": 43.70842815838727,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805088342487
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-python-ks",
+      "reference": "sceptre",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 4.603906516297024,
+      "reference_over_rapidglm_1_6_0": 6.196283447437425,
+      "ratio_change_percent": 34.587516612330525,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805088342487
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-python-ks",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 4.908078281584506,
+      "reference_over_rapidglm_1_6_0": 6.8254846978540265,
+      "ratio_change_percent": 39.06633729669269,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805088342487
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-r-ks",
+      "reference": "sceptre",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 4.577746805481296,
+      "reference_over_rapidglm_1_6_0": 5.601212298373182,
+      "ratio_change_percent": 22.357407178274038,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805088342487
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-r-ks",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 4.211829690070851,
+      "reference_over_rapidglm_1_6_0": 5.747036892771688,
+      "ratio_change_percent": 36.44988795059783,
+      "old_agreement": {
+        "pairs": 8546,
+        "discoveries": 28,
+        "jaccard": 0.7931034482758621,
+        "spearman": 0.9852805088342487
+      },
+      "new_agreement": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini",
+      "tool": "rapidglm-cli",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 3.6671564151338045,
+      "reference_over_rapidglm_1_6_0": 4.978141467360128,
+      "ratio_change_percent": 35.74936282554202,
+      "old_agreement": {
+        "pairs": 9718,
+        "discoveries": 96,
+        "jaccard": 0.8942307692307693,
+        "spearman": 0.9864242786660802
+      },
+      "new_agreement": {
+        "pairs": 9718,
+        "discoveries": 98,
+        "jaccard": 0.8952380952380953,
+        "spearman": 0.9861502876057746
+      }
+    },
+    {
+      "dataset": "gasperini",
+      "tool": "rapidglm-python",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 3.7469933196249534,
+      "reference_over_rapidglm_1_6_0": 5.337188120358613,
+      "ratio_change_percent": 42.439221666208525,
+      "old_agreement": {
+        "pairs": 9718,
+        "discoveries": 96,
+        "jaccard": 0.8942307692307693,
+        "spearman": 0.9864242786660802
+      },
+      "new_agreement": {
+        "pairs": 9718,
+        "discoveries": 98,
+        "jaccard": 0.8952380952380953,
+        "spearman": 0.9861502876057746
+      }
+    },
+    {
+      "dataset": "gasperini",
+      "tool": "rapidglm-r",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 3.33902198437624,
+      "reference_over_rapidglm_1_6_0": 4.648128261489672,
+      "ratio_change_percent": 39.206279061321766,
+      "old_agreement": {
+        "pairs": 9718,
+        "discoveries": 96,
+        "jaccard": 0.8942307692307693,
+        "spearman": 0.9864242786660802
+      },
+      "new_agreement": {
+        "pairs": 9718,
+        "discoveries": 98,
+        "jaccard": 0.8952380952380953,
+        "spearman": 0.9861502876057746
+      }
+    },
+    {
+      "dataset": "gasperini",
+      "tool": "rapidglm-cli-ks",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 5.096466088593916,
+      "reference_over_rapidglm_1_6_0": 7.243616045251912,
+      "ratio_change_percent": 42.13017254178144,
+      "old_agreement": {
+        "pairs": 9718,
+        "discoveries": 96,
+        "jaccard": 0.8942307692307693,
+        "spearman": 0.9864243280764232
+      },
+      "new_agreement": {
+        "pairs": 9718,
+        "discoveries": 98,
+        "jaccard": 0.8952380952380953,
+        "spearman": 0.9861502410059442
+      }
+    },
+    {
+      "dataset": "gasperini",
+      "tool": "rapidglm-python-ks",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 5.230971950922013,
+      "reference_over_rapidglm_1_6_0": 7.266280549932929,
+      "ratio_change_percent": 38.908803528418275,
+      "old_agreement": {
+        "pairs": 9718,
+        "discoveries": 96,
+        "jaccard": 0.8942307692307693,
+        "spearman": 0.9864243280764232
+      },
+      "new_agreement": {
+        "pairs": 9718,
+        "discoveries": 98,
+        "jaccard": 0.8952380952380953,
+        "spearman": 0.9861502410059442
+      }
+    },
+    {
+      "dataset": "gasperini",
+      "tool": "rapidglm-r-ks",
+      "reference": "sceptre",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 4.5558226669265585,
+      "reference_over_rapidglm_1_6_0": 6.09536435498688,
+      "ratio_change_percent": 33.79283612676094,
+      "old_agreement": {
+        "pairs": 9718,
+        "discoveries": 96,
+        "jaccard": 0.8942307692307693,
+        "spearman": 0.9864243280764232
+      },
+      "new_agreement": {
+        "pairs": 9718,
+        "discoveries": 98,
+        "jaccard": 0.8952380952380953,
+        "spearman": 0.9861502410059442
+      }
+    }
+  ],
+  "qtl": {
+    "matched_gaussian_speedup": {
+      "v1_4_0": 1.293028415393805,
+      "v1_6_0": 2.9827105409927497,
+      "ratio_change_percent": 130.67633359660812
+    },
+    "matched_nb_score_speedup": {
+      "v1_4_0": 2.8484989932271647,
+      "v1_6_0": 4.531662851865237,
+      "ratio_change_percent": 59.089501616118056
+    }
+  },
+  "full_screen_against_1_4_1": {
+    "REPLOGLE_PSEUDOBULK_FULL.json": {
+      "deseq2_over_rapidglm_screen": 5.1227765184005225,
+      "edger_over_rapidglm_edger_ql_screen": 7.543543113529511,
+      "v1_4_1": {
+        "deseq2_over_rapidglm_screen": 5.87195056220314,
+        "edger_over_rapidglm_edger_ql_screen": 6.196434659782768
+      }
+    },
+    "EQTL_GENOME_WIDE.json": {
+      "rapidglm_seconds_1_4_1": 3987.0,
+      "tensorqtl_seconds_1_4_1": 4683.0,
+      "rapidglm_peak_gib_1_4_1": 25.89,
+      "speedup_1_4_1": 1.1745673438675697,
+      "speedup_1_6_0": 2.53106571101012,
+      "egenes_1_4_1": 9575,
+      "egenes_1_6_0": 9575,
+      "rapidglm_rows_against_1_4_1": {
+        "genes": 20427,
+        "status_identical": 20427,
+        "lead_identical": 20427,
+        "statistic_identical": 20427,
+        "no_cis_variants_both": 179,
+        "permutation_p_changed": 2860,
+        "permutation_p_count_change_range": [
+          0.0,
+          5.0
+        ],
+        "beta_p_max_relative": 4.835372962452796e-05,
+        "egene_identity": {
+          "count_1_4_1": 9575,
+          "count_1_6_0": 9575,
+          "sorted_ids_sha256_1_4_1": "f70dbf1c919806303f1bc74c630aa61dc210b0ca813e0cad8c6dd67702156324",
+          "sorted_ids_sha256_1_6_0": "f70dbf1c919806303f1bc74c630aa61dc210b0ca813e0cad8c6dd67702156324",
+          "identical": true,
+          "lost": [],
+          "gained": [],
+          "rule": "Storey q < 0.05 using the same qvalue interface"
+        }
+      }
+    }
+  },
+  "glm_engine": {
+    "scope": "Same n >= 100,000 problems in both receipts, one thread; median per-problem reference/RapidGLM ratios.",
+    "references": {
+      "glm.fit": {
+        "problems": [
+          "speed-binomial-n100000-p20",
+          "speed-binomial-n100000-p5",
+          "speed-binomial-n100000-p50",
+          "speed-binomial-n1000000-p20",
+          "speed-binomial-n1000000-p5",
+          "speed-binomial-n1000000-p50",
+          "speed-gaussian-n100000-p20",
+          "speed-gaussian-n100000-p5",
+          "speed-gaussian-n100000-p50",
+          "speed-gaussian-n1000000-p20",
+          "speed-gaussian-n1000000-p5",
+          "speed-gaussian-n1000000-p50",
+          "speed-poisson-n100000-p20",
+          "speed-poisson-n100000-p5",
+          "speed-poisson-n100000-p50",
+          "speed-poisson-n1000000-p20",
+          "speed-poisson-n1000000-p5",
+          "speed-poisson-n1000000-p50"
+        ],
+        "median_reference_over_rapidglm": {
+          "v1_4_0": 5.3803576199552,
+          "v1_6_0": 6.525229798848729,
+          "ratio_change_percent": 21.278737581444673
+        }
+      },
+      "statsmodels": {
+        "problems": [
+          "speed-binomial-n100000-p20",
+          "speed-binomial-n100000-p5",
+          "speed-binomial-n100000-p50",
+          "speed-binomial-n1000000-p20",
+          "speed-binomial-n1000000-p5",
+          "speed-binomial-n1000000-p50",
+          "speed-gaussian-n100000-p20",
+          "speed-gaussian-n100000-p5",
+          "speed-gaussian-n100000-p50",
+          "speed-gaussian-n1000000-p20",
+          "speed-gaussian-n1000000-p5",
+          "speed-gaussian-n1000000-p50",
+          "speed-poisson-n100000-p20",
+          "speed-poisson-n100000-p5",
+          "speed-poisson-n100000-p50",
+          "speed-poisson-n1000000-p20",
+          "speed-poisson-n1000000-p5",
+          "speed-poisson-n1000000-p50"
+        ],
+        "median_reference_over_rapidglm": {
+          "v1_4_0": 8.308104395213231,
+          "v1_6_0": 8.118670491744524,
+          "ratio_change_percent": -2.280109811545583
+        }
+      },
+      "fastglm": {
+        "problems": [
+          "speed-binomial-n100000-p20",
+          "speed-binomial-n100000-p5",
+          "speed-binomial-n100000-p50",
+          "speed-binomial-n1000000-p20",
+          "speed-binomial-n1000000-p5",
+          "speed-binomial-n1000000-p50",
+          "speed-gaussian-n100000-p20",
+          "speed-gaussian-n100000-p5",
+          "speed-gaussian-n100000-p50",
+          "speed-gaussian-n1000000-p20",
+          "speed-gaussian-n1000000-p5",
+          "speed-gaussian-n1000000-p50",
+          "speed-poisson-n100000-p20",
+          "speed-poisson-n100000-p5",
+          "speed-poisson-n100000-p50",
+          "speed-poisson-n1000000-p20",
+          "speed-poisson-n1000000-p5",
+          "speed-poisson-n1000000-p50"
+        ],
+        "median_reference_over_rapidglm": {
+          "v1_4_0": 3.1625242182898603,
+          "v1_6_0": 2.6947286285257075,
+          "ratio_change_percent": -14.791842132267174
+        }
+      }
+    },
+    "accuracy_before": {
+      "problems": 39,
+      "failures": [],
+      "median_coefficient_error_se": 3.0610649951001033e-15,
+      "max_coefficient_error_se": 6.60155049032778e-07,
+      "median_se_relative_error": 8.384204769531277e-16,
+      "max_se_relative_error": 2.474127834270017e-08
+    },
+    "accuracy_after": {
+      "problems": 39,
+      "failures": [],
+      "median_coefficient_error_se": 3.2522027695526553e-15,
+      "max_coefficient_error_se": 1.7291529432850827e-06,
+      "median_se_relative_error": 8.384204769531277e-16,
+      "max_se_relative_error": 2.07104480759888e-08
+    }
+  },
+  "solvers": [
+    {
+      "dataset": "airway",
+      "mode": "fixed",
+      "reference": "ceres_levenberg_marquardt/tight",
+      "reference_over_rapidglm": {
+        "v1_4_0": 2.3634735131752906,
+        "v1_6_0": 1.993062376517076,
+        "ratio_change_percent": -15.672320192857715
+      },
+      "agreement_before": {
+        "genes": 21688,
+        "cpu_seconds": 0.15468,
+        "converged": 21688,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 2.182787284e-11,
+        "shortfall_max": 1.164153218e-09,
+        "iterations_median": 3,
+        "iterations_99": 4
+      },
+      "agreement_after": {
+        "genes": 21688,
+        "cpu_seconds": 0.142268,
+        "converged": 21688,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 2.182787284e-11,
+        "shortfall_max": 1.396983862e-09,
+        "iterations_median": 3,
+        "iterations_99": 4
+      }
+    },
+    {
+      "dataset": "airway",
+      "mode": "joint",
+      "reference": "ceres_bfgs/tight",
+      "reference_over_rapidglm": {
+        "v1_4_0": 1.7050806451612903,
+        "v1_6_0": 1.7855022735571735,
+        "ratio_change_percent": 4.7165879587047765
+      },
+      "agreement_before": {
+        "genes": 21688,
+        "cpu_seconds": 0.994858,
+        "converged": 21688,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 197,
+        "shortfall_median": 9.968483994e-08,
+        "shortfall_99": 3.654138709e-05,
+        "shortfall_max": 0.0006022511807,
+        "iterations_median": 18,
+        "iterations_99": 21
+      },
+      "agreement_after": {
+        "genes": 21688,
+        "cpu_seconds": 0.885422,
+        "converged": 21688,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 197,
+        "shortfall_median": 9.968482573e-08,
+        "shortfall_99": 3.654138163e-05,
+        "shortfall_max": 0.0006022511225,
+        "iterations_median": 18,
+        "iterations_99": 21
+      }
+    },
+    {
+      "dataset": "sim5000",
+      "mode": "fixed",
+      "reference": "ceres_levenberg_marquardt/tight",
+      "reference_over_rapidglm": {
+        "v1_4_0": 2.774718707745799,
+        "v1_6_0": 3.1107885192160145,
+        "ratio_change_percent": 12.111851573712883
+      },
+      "agreement_before": {
+        "genes": 1000,
+        "cpu_seconds": 1.35923,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 4.547473509e-13,
+        "shortfall_99": 4.729372449e-11,
+        "shortfall_max": 7.639755495e-11,
+        "iterations_median": 4,
+        "iterations_99": 4
+      },
+      "agreement_after": {
+        "genes": 1000,
+        "cpu_seconds": 0.921451,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 4.729372449e-11,
+        "shortfall_max": 7.639755495e-11,
+        "iterations_median": 4,
+        "iterations_99": 4
+      }
+    },
+    {
+      "dataset": "sim5000",
+      "mode": "joint",
+      "reference": "ceres_bfgs/tight",
+      "reference_over_rapidglm": {
+        "v1_4_0": 4.243213937510821,
+        "v1_6_0": 5.271178916587589,
+        "ratio_change_percent": 24.226093574716124
+      },
+      "agreement_before": {
+        "genes": 1000,
+        "cpu_seconds": 2.99734,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 2.356959385e-06,
+        "shortfall_max": 1.265292394e-05,
+        "iterations_median": 4,
+        "iterations_99": 24
+      },
+      "agreement_after": {
+        "genes": 1000,
+        "cpu_seconds": 2.21904,
+        "converged": 1000,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 2.7564638e-06,
+        "shortfall_max": 1.265292303e-05,
+        "iterations_median": 4,
+        "iterations_99": 23
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "mode": "fixed",
+      "reference": "ceres_levenberg_marquardt/tight",
+      "reference_over_rapidglm": {
+        "v1_4_0": 2.1528434208217537,
+        "v1_6_0": 2.2513797288419926,
+        "ratio_change_percent": 4.577030873087229
+      },
+      "agreement_before": {
+        "genes": 28768,
+        "cpu_seconds": 5.72455,
+        "converged": 28768,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 1.964508556e-10,
+        "shortfall_max": 5.484253052e-08,
+        "iterations_median": 3,
+        "iterations_99": 6
+      },
+      "agreement_after": {
+        "genes": 28768,
+        "cpu_seconds": 4.37202,
+        "converged": 28768,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 1.909938874e-10,
+        "shortfall_max": 2.095475793e-08,
+        "iterations_median": 3,
+        "iterations_99": 6
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "mode": "joint",
+      "reference": "ceres_bfgs/tight",
+      "reference_over_rapidglm": {
+        "v1_4_0": 5.848682629935132,
+        "v1_6_0": 6.088033506182689,
+        "ratio_change_percent": 4.092389541236097
+      },
+      "agreement_before": {
+        "genes": 28768,
+        "cpu_seconds": 13.6517,
+        "converged": 28768,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 1.919033821e-10,
+        "shortfall_max": 1.390165494e-05,
+        "iterations_median": 4,
+        "iterations_99": 7
+      },
+      "agreement_after": {
+        "genes": 28768,
+        "cpu_seconds": 11.5106,
+        "converged": 28768,
+        "failed": 0,
+        "shortfall_over_1e-6_relative": 0,
+        "shortfall_median": 0,
+        "shortfall_99": 1.700755092e-10,
+        "shortfall_max": 1.390165448e-05,
+        "iterations_median": 4,
+        "iterations_99": 7
+      }
+    }
+  ],
+  "replogle_single_cell": {
+    "ks": {
+      "sceptre_over_rapidglm": {
+        "v1_4_0": 4.384400072055095,
+        "v1_6_0": 9.515381225209342,
+        "ratio_change_percent": 117.02812400395773
+      },
+      "jaccard_before": 0.9492,
+      "jaccard_after": 0.9492
+    },
+    "strict": {
+      "sceptre_over_rapidglm": {
+        "v1_4_0": 1.6311844309833743,
+        "v1_6_0": 2.0405648072888116,
+        "ratio_change_percent": 25.09712381564595
+      },
+      "jaccard_before": 0.9495,
+      "jaccard_after": 0.9495
+    }
+  },
+  "rust": [
+    {
+      "dataset": "airway",
+      "pydeseq2_with_rapidglm_over_rust": {
+        "v1_4_0": 11.681818181818182,
+        "v1_6_0": 10.5,
+        "ratio_change_percent": -10.116731517509725
+      },
+      "note": "The Rust workflow uses unfloored NB fits; the Python inference backend uses floored fits from 1.4.0. Low-count and boundary-fit results therefore need not match. Dispersion-trend solvers and Cook's handling also differ; these are workflow comparisons, not timings of identical fit semantics."
+    },
+    {
+      "dataset": "thyroid32",
+      "pydeseq2_with_rapidglm_over_rust": {
+        "v1_4_0": 5.40566037735849,
+        "v1_6_0": 5.313953488372094,
+        "ratio_change_percent": -1.6964974227850038
+      },
+      "note": "The Rust workflow uses unfloored NB fits; the Python inference backend uses floored fits from 1.4.0. Low-count and boundary-fit results therefore need not match. Dispersion-trend solvers and Cook's handling also differ; these are workflow comparisons, not timings of identical fit semantics."
+    },
+    {
+      "dataset": "thyroid128",
+      "pydeseq2_with_rapidglm_over_rust": {
+        "v1_4_0": 2.542087542087542,
+        "v1_6_0": 2.5185185185185186,
+        "ratio_change_percent": -0.9271523178807861
+      },
+      "note": "The Rust workflow uses unfloored NB fits; the Python inference backend uses floored fits from 1.4.0. Low-count and boundary-fit results therefore need not match. Dispersion-trend solvers and Cook's handling also differ; these are workflow comparisons, not timings of identical fit semantics."
+    },
+    {
+      "dataset": "thyroid",
+      "pydeseq2_with_rapidglm_over_rust": {
+        "v1_4_0": 1.2451751250893497,
+        "v1_6_0": 1.2041198501872659,
+        "ratio_change_percent": -3.2971486560284258
+      },
+      "note": "The Rust workflow uses unfloored NB fits; the Python inference backend uses floored fits from 1.4.0. Low-count and boundary-fit results therefore need not match. Dispersion-trend solvers and Cook's handling also differ; these are workflow comparisons, not timings of identical fit semantics."
+    }
+  ],
+  "pydeseq2_backend": [
+    {
+      "dataset": "airway",
+      "tool": "rapidglm-deseq",
+      "reference": "pydeseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 48.69332990605683,
+      "reference_over_rapidglm_1_6_0": 43.92382635658874,
+      "ratio_change_percent": -9.79498333482185,
+      "old_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      },
+      "new_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      }
+    },
+    {
+      "dataset": "airway",
+      "tool": "rapidglm-deseq",
+      "reference": "pydeseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 36.576244913827274,
+      "reference_over_rapidglm_1_6_0": 30.62752217513927,
+      "ratio_change_percent": -16.26389683441547,
+      "old_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      },
+      "new_agreement": {
+        "discoveries": 4833,
+        "jaccard": 0.9862338196013971,
+        "spearman": 0.9998132796511495
+      }
+    },
+    {
+      "dataset": "airway",
+      "tool": "pydeseq2-rapidglm",
+      "reference": "pydeseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 17.818237770276678,
+      "reference_over_rapidglm_1_6_0": 17.583870604554924,
+      "ratio_change_percent": -1.3153217997388666,
+      "old_agreement": {
+        "discoveries": 4663,
+        "jaccard": 0.9295002031694433,
+        "spearman": 0.9984386527895031
+      },
+      "new_agreement": {
+        "discoveries": 4663,
+        "jaccard": 0.9295002031694433,
+        "spearman": 0.9984386527895031
+      }
+    },
+    {
+      "dataset": "airway",
+      "tool": "pydeseq2-rapidglm",
+      "reference": "pydeseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 4.854474421479958,
+      "reference_over_rapidglm_1_6_0": 4.717165867182137,
+      "ratio_change_percent": -2.8284947530109794,
+      "old_agreement": {
+        "discoveries": 4663,
+        "jaccard": 0.9295002031694433,
+        "spearman": 0.9984386527895031
+      },
+      "new_agreement": {
+        "discoveries": 4663,
+        "jaccard": 0.9295002031694433,
+        "spearman": 0.9984386527895031
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "rapidglm-deseq",
+      "reference": "pydeseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 21.385767143106193,
+      "reference_over_rapidglm_1_6_0": 19.738771694926903,
+      "ratio_change_percent": -7.701362486359098,
+      "old_agreement": {
+        "discoveries": 1623,
+        "jaccard": 0.9852851011649295,
+        "spearman": 0.9999769429895039
+      },
+      "new_agreement": {
+        "discoveries": 1620,
+        "jaccard": 0.9871007371007371,
+        "spearman": 0.9999769429895039
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "rapidglm-deseq",
+      "reference": "pydeseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 23.116822274120945,
+      "reference_over_rapidglm_1_6_0": 20.208784361601538,
+      "ratio_change_percent": -12.579747674813103,
+      "old_agreement": {
+        "discoveries": 1623,
+        "jaccard": 0.9852851011649295,
+        "spearman": 0.9999769429895039
+      },
+      "new_agreement": {
+        "discoveries": 1620,
+        "jaccard": 0.9871007371007371,
+        "spearman": 0.9999769429895039
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "pydeseq2-rapidglm",
+      "reference": "pydeseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 8.229516333520534,
+      "reference_over_rapidglm_1_6_0": 8.262994086659024,
+      "ratio_change_percent": 0.40680098054035607,
+      "old_agreement": {
+        "discoveries": 1642,
+        "jaccard": 0.9823493609251369,
+        "spearman": 0.9999141091694652
+      },
+      "new_agreement": {
+        "discoveries": 1642,
+        "jaccard": 0.9823493609251369,
+        "spearman": 0.9999142393866565
+      }
+    },
+    {
+      "dataset": "thyroid32",
+      "tool": "pydeseq2-rapidglm",
+      "reference": "pydeseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 3.5827494321071875,
+      "reference_over_rapidglm_1_6_0": 3.39445988588757,
+      "ratio_change_percent": -5.255448358521564,
+      "old_agreement": {
+        "discoveries": 1642,
+        "jaccard": 0.9823493609251369,
+        "spearman": 0.9999141091694652
+      },
+      "new_agreement": {
+        "discoveries": 1642,
+        "jaccard": 0.9823493609251369,
+        "spearman": 0.9999142393866565
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "rapidglm-deseq",
+      "reference": "pydeseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 11.670296289373013,
+      "reference_over_rapidglm_1_6_0": 10.78518462485205,
+      "ratio_change_percent": -7.584311850993419,
+      "old_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      },
+      "new_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "rapidglm-deseq",
+      "reference": "pydeseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 12.582849783391588,
+      "reference_over_rapidglm_1_6_0": 11.372304807125005,
+      "ratio_change_percent": -9.620594675336669,
+      "old_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      },
+      "new_agreement": {
+        "discoveries": 790,
+        "jaccard": 0.9974747474747475,
+        "spearman": 0.9999982186796708
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "pydeseq2-rapidglm",
+      "reference": "pydeseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 5.783873889916074,
+      "reference_over_rapidglm_1_6_0": 5.686604146837631,
+      "ratio_change_percent": -1.6817403859380242,
+      "old_agreement": {
+        "discoveries": 787,
+        "jaccard": 0.9911727616645649,
+        "spearman": 0.9999944286269525
+      },
+      "new_agreement": {
+        "discoveries": 787,
+        "jaccard": 0.9911727616645649,
+        "spearman": 0.9999944286269525
+      }
+    },
+    {
+      "dataset": "thyroid128",
+      "tool": "pydeseq2-rapidglm",
+      "reference": "pydeseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 3.0404812239964567,
+      "reference_over_rapidglm_1_6_0": 2.8578568884906024,
+      "ratio_change_percent": -6.006428655586626,
+      "old_agreement": {
+        "discoveries": 787,
+        "jaccard": 0.9911727616645649,
+        "spearman": 0.9999944286269525
+      },
+      "new_agreement": {
+        "discoveries": 787,
+        "jaccard": 0.9911727616645649,
+        "spearman": 0.9999944286269525
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-deseq",
+      "reference": "pydeseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 4.839124790283937,
+      "reference_over_rapidglm_1_6_0": 4.335926329934518,
+      "ratio_change_percent": -10.398542756321316,
+      "old_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "new_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "rapidglm-deseq",
+      "reference": "pydeseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 5.349614490029121,
+      "reference_over_rapidglm_1_6_0": 4.49715517797653,
+      "ratio_change_percent": -15.934967157754032,
+      "old_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      },
+      "new_agreement": {
+        "discoveries": 7178,
+        "jaccard": 0.9998606854276957,
+        "spearman": 0.9999983696141767
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "pydeseq2-rapidglm",
+      "reference": "pydeseq2",
+      "threads": 1,
+      "reference_over_rapidglm_1_4_0": 2.81985655423681,
+      "reference_over_rapidglm_1_6_0": 2.7867087048408297,
+      "ratio_change_percent": -1.1755154476271512,
+      "old_agreement": {
+        "discoveries": 7176,
+        "jaccard": 0.9998606660164414,
+        "spearman": 0.9999980963746495
+      },
+      "new_agreement": {
+        "discoveries": 7176,
+        "jaccard": 0.9998606660164414,
+        "spearman": 0.9999980963746495
+      }
+    },
+    {
+      "dataset": "thyroid",
+      "tool": "pydeseq2-rapidglm",
+      "reference": "pydeseq2",
+      "threads": 8,
+      "reference_over_rapidglm_1_4_0": 2.0554363602772296,
+      "reference_over_rapidglm_1_6_0": 1.947696437031563,
+      "ratio_change_percent": -5.241705621629411,
+      "old_agreement": {
+        "discoveries": 7176,
+        "jaccard": 0.9998606660164414,
+        "spearman": 0.9999980963746495
+      },
+      "new_agreement": {
+        "discoveries": 7176,
+        "jaccard": 0.9998606660164414,
+        "spearman": 0.9999980963746495
+      }
+    }
+  ],
+  "baseline_receipts_sha256": {
+    "APPLICATIONS_BULK.json": "0eb76c6ea08b212c57332ab606faf0f6dd138421f51d2353f63cc2d6ae4980a2",
+    "APPLICATIONS_PERTURBATION.json": "6f50e39a9512fae9cac7e10ab855184093f8549d531773c161bdcc48d4c74386",
+    "QTL_FINAL.json": "2c70719a1f19fa1972da12ee3bd19b5979364230798d5eb20d40105848874783",
+    "GLM_COMPARISON.json": "2e2b8395794c25349622c1452c214df60d757c5b43c54b3816e325eefb85b445",
+    "SOLVERS.json": "881615b59f7c69b1811c112320e627438c83e298a0a13d0ae2d5eb21eab723aa",
+    "REPLOGLE_SC_KS.json": "a70f099af451c9d4c09399f952bd2a07e6743f776b7439fdac83fc7bf23e3c8d",
+    "REPLOGLE_SC_STRICT.json": "38f1949a616c7654d317ea0b31e5080992a3eb010d5adb8db6cf86c61e8d40b7",
+    "RUST_DESEQ.json": "205c2f325ccc817e9e47233e83f29f6927d36ad51bed1dc82e27853a0af56354"
+  }
+}

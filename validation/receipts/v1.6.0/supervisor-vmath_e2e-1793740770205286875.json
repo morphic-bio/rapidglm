@@ -1,0 +1,14 @@
+{
+  "label": "vmath_e2e-1793740770205286875",
+  "stages": [
+    "vmath_e2e"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T21:19:30.315368+00:00",
+  "finished_utc": "2026-11-03T21:42:59.020272+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 1387,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0412798058241606,
+  "cpu_policy_observed_quiet_starts": 42,
+  "error": null
+}

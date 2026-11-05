@@ -1,0 +1,24 @@
+{
+  "recorded_utc": "2026-11-01T13:23:37.899504+00:00",
+  "after_all_focused_measurements": true,
+  "source_verification_passed_before_change": true,
+  "measured_commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "changes": {
+    "scripts/public_tree.sh": {
+      "before_sha256": "e962fae5731fb327249db0521ef3a4d0f4762ab6ad83a43a11d82e377698ea0e",
+      "after_sha256": "309ea2acca01414a5d9bfd82834f42cb1765dd68337ced0ca828b42b729a00e0",
+      "reason": "Validate public projections of retained private evidence and inspect compressed text; measured source manifest remains unchanged."
+    },
+    "scripts/public_exclude.txt": {
+      "before_sha256": "7e401833c867f4602fef37c8182d5c5d0953afc7abb3633a8a8e37516c2ebb2a",
+      "after_sha256": "f058eace3dfbdaa141ef0725cc042f70d9c897d10aab0d7dd3a324b422622ce1",
+      "reason": "Keep complete raw process snapshots, discarded attempts and operator support private; public receipts retain scientific and summarized acceptance evidence."
+    }
+  },
+  "library_sources_and_measured_artifacts_unchanged": true,
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

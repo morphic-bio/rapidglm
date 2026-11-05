@@ -1,0 +1,14 @@
+{
+  "label": "compress-1793780072608211588",
+  "stages": [
+    "compress"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-04T08:14:32.716695+00:00",
+  "finished_utc": "2026-11-04T08:20:51.027750+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 372,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0719997398555279,
+  "cpu_policy_observed_quiet_starts": 0,
+  "error": null
+}

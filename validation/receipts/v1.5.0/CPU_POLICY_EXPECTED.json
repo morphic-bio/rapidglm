@@ -1,0 +1,346 @@
+{
+  "online": "0-47",
+  "cpufreq/boost": "1",
+  "smt/control": "on",
+  "smt/active": "1",
+  "cpus": {
+    "0": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "1": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "2": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "3": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "4": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "5": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "6": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "7": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "8": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "9": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "10": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "11": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "12": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "13": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "14": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "15": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "16": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "17": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "18": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "19": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "20": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "21": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "22": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "23": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "24": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "25": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "26": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "27": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "28": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "29": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "30": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "31": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "32": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "33": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "34": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "35": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "36": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "37": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "38": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "39": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "40": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "41": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "42": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "43": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "44": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "45": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "46": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    },
+    "47": {
+      "scaling_driver": "acpi-cpufreq",
+      "scaling_governor": "schedutil",
+      "scaling_min_freq": "1800000",
+      "scaling_max_freq": "3800000"
+    }
+  },
+  "siblings": {
+    "0": "0,24",
+    "1": "1,25",
+    "2": "2,26",
+    "3": "3,27",
+    "4": "4,28",
+    "5": "5,29",
+    "6": "6,30",
+    "7": "7,31",
+    "8": "8,32",
+    "9": "9,33",
+    "10": "10,34",
+    "11": "11,35",
+    "12": "12,36",
+    "13": "13,37",
+    "14": "14,38",
+    "15": "15,39",
+    "16": "16,40",
+    "17": "17,41",
+    "18": "18,42",
+    "19": "19,43",
+    "20": "20,44",
+    "21": "21,45",
+    "22": "22,46",
+    "23": "23,47",
+    "24": "0,24",
+    "25": "1,25",
+    "26": "2,26",
+    "27": "3,27",
+    "28": "4,28",
+    "29": "5,29",
+    "30": "6,30",
+    "31": "7,31",
+    "32": "8,32",
+    "33": "9,33",
+    "34": "10,34",
+    "35": "11,35",
+    "36": "12,36",
+    "37": "13,37",
+    "38": "14,38",
+    "39": "15,39",
+    "40": "16,40",
+    "41": "17,41",
+    "42": "18,42",
+    "43": "19,43",
+    "44": "20,44",
+    "45": "21,45",
+    "46": "22,46",
+    "47": "23,47"
+  }
+}

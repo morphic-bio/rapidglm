@@ -1,11 +1,14 @@
 #pragma once
+#include "batch_scoring.hpp"
 #include "hypothesis.hpp"
+#include "mergeable_null.hpp"
 #include "resampling.hpp"
 #include "shrinkage.hpp"
 #include <atomic>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/math/distributions/beta.hpp>
 #include <boost/math/distributions/fisher_f.hpp>
+#include <iterator>
 #include <map>
 #ifdef __GLIBC__
 #include <malloc.h>
@@ -367,16 +370,32 @@ struct CellQC {
     Vector total_counts, detected_features, mitochondrial_fraction;
     std::vector<bool> keep;
 };
+// How a pair's null is started with non-targeting controls and the SCEPTRE
+// null model (SceptreOptions::null_start).
+enum class NullStart { refine, cold };
 struct SceptreOptions {
     bool high_moi = false, nt_controls = true, crt = false, cell_qc = true, assignment_qc = true,
          bonferroni_adjustment = false, parallel_draws = true, parallel_pairs = true,
          warm_start_effects = true;
     // SCEPTRE's documented response model: Poisson coefficients, conditional NB theta.
     FitMethod null_model = FitMethod::sceptre_null;
+    // With non-targeting controls and null_model=sceptre_null, each pair's null
+    // (fitted on its target's and the NT cells) starts by default from the
+    // response's reference: the same null fitted once on all retained cells. The
+    // pair takes one Fisher-scoring step from it using the NT cells' totals and
+    // its target cells' totals at the reference, then exact Newton passes over
+    // its cells to the convergence criteria of the cold fit, with step halving
+    // (mergeable_null.hpp). A pair that does not converge is fitted cold. cold
+    // fits every pair from scratch, as releases before 1.6.0 did. The two agree
+    // to the convergence tolerance; empirical p-values are those of the cold fit
+    // unless a draw lies within rounding of the statistic.
+    NullStart null_start = NullStart::refine;
     Integration integration = Integration::union_guides;
     // significant: pairs with adjusted p <= alpha in their testing family.
     EffectFits effect_fits = EffectFits::significant;
-    CrtDraw crt_draw = CrtDraw::thinned;
+    // hazard is thinned on a processor without AES instructions
+    // (aes_instructions()), so CRT p-values depend on the kind of processor.
+    CrtDraw crt_draw = CrtDraw::hazard;
     // Memory for CRT samplers shared by all pairs of a target (complement
     // controls; 12 bytes per cell per target). By default every target keeps
     // its sampler. Targets beyond a smaller budget rebuild their sampler for
@@ -401,6 +420,13 @@ struct SceptreOptions {
     bool shared_screen = false;
     double shared_screen_p = 0.05;
     std::size_t draw_cache_bytes = std::size_t(8) << 30;
+    // CRT with complement controls: score each response's pairs together, stage
+    // by stage, all their draws of a stage in one pass over the response's score
+    // records in blocks of cells (a sparse x dense product, detail::score_draws),
+    // one response per thread. The records are bit for bit those of scoring the
+    // pairs one by one in the pair pipeline (false), which is also used with
+    // shared_screen, sequential_screen or early_stop.
+    bool batch_scoring = true;
     StreamKeys stream_keys = StreamKeys::identity;
     // With identity keys: one ID per response column (any distinct strings that
     // stay with the response, such as gene or peak names). Empty: the column
@@ -447,10 +473,31 @@ struct SceptreResult {
     // Null models fitted: one per response with a pair that passes pair QC
     // (complement controls), or one per such pair (non-targeting controls).
     std::size_t null_fits = 0;
+    // The null start used (refine only with NT controls and the SCEPTRE null),
+    // the pairs whose null was refined from the reference, and those fitted cold
+    // because refining did not converge.
+    NullStart null_start_used = NullStart::cold;
+    std::size_t null_refined = 0, null_cold_refits = 0;
     // Targets whose CRT sampler was kept for all their pairs, and targets that
     // did not fit SceptreOptions::sampler_cache_bytes and rebuilt it per pair.
     std::size_t samplers_cached = 0, samplers_rebuilt = 0;
 };
+namespace detail {
+// The O(p^2) part of a response's score state with complement controls: the
+// inverse information and nuisance correction of its BinaryScoreWorkspace
+// (score_state()). ready is false until computed.
+struct ScoreState {
+    bool ready = false;
+    Matrix inverse;
+    Vector correction;
+};
+// A target's propensity model: its status and coefficients (O(p)).
+struct PropensityState {
+    bool ready = false;
+    FitStatus status = FitStatus::numerical_failure;
+    Vector coefficients;
+};
+} // namespace detail
 // Splitting a sceptre() run into shards (complement controls only), for
 // checkpoints and for running shards on separate workers. Tasks are numbered as
 // in sceptre_layout(); draws are keyed by task or target, never by schedule, so
@@ -466,6 +513,15 @@ struct SceptreShard {
     // Response null fits from sceptre_nulls(), by response index. Each response's
     // score state is rebuilt from its fit instead of refitting it.
     const std::vector<FitResult> *nulls = nullptr;
+    // Kept by the caller across the shards of one run (sceptre_tiled), and filled
+    // by the first shard that needs an entry: each response's inverse information
+    // and nuisance correction (complement controls), by response index, and each
+    // target's propensity model (CRT), by target context. Later shards then
+    // rebuild only per-cell values (score records, samplers) from these O(p^2)
+    // and O(p) states instead of computing them again. sceptre() sizes them;
+    // the records do not depend on them.
+    std::vector<detail::ScoreState> *score_states = nullptr;
+    std::vector<detail::PropensityState> *propensities = nullptr;
 };
 inline double quantile(Vector values, double p) {
     require(!values.empty() && p >= 0 && p <= 1, "invalid quantile");
@@ -637,8 +693,10 @@ inline void pair_pipeline(const std::vector<std::vector<std::size_t>> &batches, 
         contexts[b].state.store(2, std::memory_order_release);
         return true;
     };
+    const auto division = vmath::division_mode();
 #pragma omp parallel num_threads(threads)
     {
+        const vmath::DivisionScope scope(division);
         DrawScratch scratch;
         const std::size_t offset = static_cast<std::size_t>(omp_get_thread_num()) % slot_count;
         try {
@@ -981,6 +1039,42 @@ inline FitResult sceptre_fit_null(const SceptreOptions &o, const Matrix &x, cons
 // and score residuals) recomputed from its coefficients and dispersion with the
 // fit's own formulas. A fit that still holds these vectors, or is not regular, is
 // returned as it is.
+// The O(p^2) part of the score state of a regular null fit, as ScoreWorkspace and
+// BinaryScoreWorkspace compute it (the same checks and the same arithmetic).
+inline ScoreState score_state(const Matrix &x, const FitResult &null) {
+    x.validate();
+    require(null.ok() && !null.has_boundary() && null.ridge == 0,
+            "score test requires a regular unpenalized null fit");
+    require(x.rows == null.working_weights.size() && x.cols == null.parameters,
+            "score workspace requires retained null observations and matching design");
+    auto ch = Cholesky(crossprod(x, null.working_weights));
+    require(ch.ok && null.scale > 0, "singular score information");
+    ScoreState s;
+    s.inverse = ch.inverse();
+    s.correction = null.method == FitMethod::direct
+                       ? matvec(s.inverse, xtv(x, null.score_residuals))
+                       : Vector(x.cols, 0);
+    s.ready = true;
+    return s;
+}
+// The records of BinaryScoreWorkspace(ScoreWorkspace(x, null)), bit for bit,
+// from the fit's per-cell values and its score state, without the
+// ScoreWorkspace copies and cross products.
+inline std::unique_ptr<BinaryScoreWorkspace> score_records(const Matrix &x, const FitResult &null,
+                                                           const ScoreState &state) {
+    auto w = std::make_unique<BinaryScoreWorkspace>(x.cols, x.rows);
+    w->inverse = state.inverse;
+    w->correction = state.correction;
+    w->scale = null.scale;
+    for (std::size_t i = 0; i < x.rows; ++i) {
+        double *record = &w->cells[i * w->stride];
+        record[0] = null.score_residuals[i];
+        record[1] = null.working_weights[i];
+        for (std::size_t j = 0; j < x.cols; ++j)
+            record[2 + j] = x(i, j) * null.working_weights[i];
+    }
+    return w;
+}
 inline FitResult rebuild_null(const FitResult &fit, const Matrix &x, const Vector &y,
                               const FitOptions &options) {
     FitResult r = fit;
@@ -1100,6 +1194,7 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
                              const SparseCSC &assignments, const std::vector<Guide> &guides,
                              const std::vector<Pair> &pairs, const CellQC &qc = {},
                              const SceptreOptions &o = {}, const SceptreShard &shard = {}) {
+    const vmath::DivisionScope division_scope(o.model.division);
     auto setup = detail::sceptre_setup(design, responses, assignments, guides, pairs, qc, o);
     const auto n = responses.rows;
     const auto &cells = setup.cells;
@@ -1110,6 +1205,10 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     };
     require(!shard.results || shard.results->size() == tasks.size(),
             "shard results must cover every task");
+    if (shard.score_states && shard.score_states->size() < responses.cols)
+        shard.score_states->resize(responses.cols);
+    if (shard.propensities && shard.propensities->size() < setup.target_contexts)
+        shard.propensities->resize(setup.target_contexts);
     const auto shared_null = [&](std::size_t response) -> const FitResult * {
         return shard.nulls && response < shard.nulls->size() && (*shard.nulls)[response].parameters
                    ? &(*shard.nulls)[response]
@@ -1133,11 +1232,18 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         // (state 0 none, 1 being stored, 2 stored, 3 over the budget).
         std::unique_ptr<std::atomic<int>[]> stage_state;
         std::vector<std::shared_ptr<const CachedDraws>> stage_draws;
+        // Batch scoring with reuse_draws: the group whose first-stage draws are
+        // transposed (detail::TransposedDraws), and the index there of this
+        // target's first draw; group is npos when not transposed.
+        std::size_t group = std::numeric_limits<std::size_t>::max(), group_base = 0;
+        std::size_t index = 0; // the target context's number
     };
     std::atomic<std::size_t> sampler_cache_used{0}, draw_cache_used{0}, samplers_cached{0},
         samplers_rebuilt{0}, null_fits{0};
     const bool reuse_draws = o.reuse_draws && o.crt && !o.nt_controls;
     const bool shared_screen = o.shared_screen && o.crt && !o.nt_controls;
+    const bool batch_scoring = o.batch_scoring && o.crt && !o.nt_controls && !shared_screen &&
+                               !o.resampling.sequential_screen && o.resampling.early_stop == 0;
     // Shared screen streams are numbered apart from the pairs' own streams.
     constexpr std::uint64_t screen_streams = std::uint64_t(1) << 31;
     require(!shared_screen || o.stream_keys != StreamKeys::position ||
@@ -1147,6 +1253,7 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     for (std::size_t k = 0; k < setup.target_contexts; ++k) {
         target_contexts.push_back(std::make_unique<TargetContext>());
         auto &target = *target_contexts.back();
+        target.index = k;
         target.stage_state = std::make_unique<std::atomic<int>[]>(o.resampling.budgets.size());
         target.stage_draws.resize(o.resampling.budgets.size());
     }
@@ -1177,6 +1284,22 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     common_options.retain_observations = true;
     if (common_options.weights.empty())
         common_options.design = prepare_design(common_design, common_options.rank_tolerance);
+    // The refine start (SceptreOptions::null_start): the NT cells' positions and
+    // the design's nonzero entries by row.
+    const bool refine = o.nt_controls && o.null_model == FitMethod::sceptre_null &&
+                        o.null_start == NullStart::refine;
+    std::vector<std::size_t> nt_positions;
+    detail::mergeable::Rows design_rows;
+    detail::mergeable::Cells refine_cells;
+    if (refine) {
+        for (std::size_t i = 0; i < cells.size(); ++i)
+            if (nt[cells[i]])
+                nt_positions.push_back(i);
+        design_rows = detail::mergeable::Rows(common_design);
+        refine_cells = {&design_rows, &common_options.offset, &common_options.weights,
+                        common_design.cols};
+    }
+    std::atomic<std::size_t> null_refined{0}, null_cold_refits{0};
     // The target's treated cells, built on first use.
     auto membership = [&](const detail::SceptreTask &task) -> TargetContext & {
         auto &target = *target_contexts[task.target_context];
@@ -1200,7 +1323,10 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         std::size_t nonzero = 0, nt_nonzero = 0;
         FitResult common_fit;
         std::once_flag common_score_ready;
-        std::unique_ptr<ResamplingWorkspace> common_score;
+        // The response's score records (complement controls).
+        std::unique_ptr<BinaryScoreWorkspace> common_binary;
+        // The refine start's reference, with NT controls.
+        std::unique_ptr<detail::mergeable::Reference> reference;
     };
     // The cells and the nonzero counts of a pair's two arms, from the target's
     // treated cells alone, so that pair QC is decided before anything is
@@ -1248,6 +1374,18 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
                 ++context->nonzero;
                 context->nt_nonzero += nt[cells[i]];
             }
+        if (refine) {
+            // The reference is fitted only when one of the response's pairs
+            // passes pair QC.
+            for (auto task_id : batches[batch])
+                if (passes_pair_qc(pair_counts(tasks[task_id], *context))) {
+                    context->reference =
+                        std::make_unique<detail::mergeable::Reference>(detail::mergeable::reference(
+                            fit_null(common_design, context->common_y, common_options),
+                            refine_cells, nt_positions, context->common_y));
+                    break;
+                }
+        }
         if (!o.nt_controls) {
             // The shared null is fitted only when one of the response's pairs
             // passes pair QC.
@@ -1286,8 +1424,112 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         TargetContext *target = nullptr;
         std::unique_ptr<ResamplingWorkspace> pair_score;
         const ResamplingWorkspace *score = nullptr;
+        // The score records the draws use: score->binary, or a refined pair's own.
+        std::unique_ptr<BinaryScoreWorkspace> pair_binary;
+        const BinaryScoreWorkspace *binary = nullptr;
         ResampleOptions resampling;
         double statistic = nan;
+    };
+    // A pair's null refined from the response's reference: its cells, labels,
+    // null and score records into `job`. False when the pair is to be fitted cold.
+    auto refine_null = [&](PairJob &job, const TargetContext &target,
+                           const ResponseContext &context) {
+        namespace m = detail::mergeable;
+        const auto &reference = *context.reference;
+        std::vector<std::size_t> block, pos;
+        for (auto position : target.positions)
+            if (!nt[cells[position]])
+                block.push_back(position);
+        const auto start =
+            m::one_step(reference, m::pair_totals(reference, refine_cells, block, context.common_y),
+                        common_options);
+        if (!start.ok)
+            return false;
+        pos.reserve(nt_positions.size() + block.size());
+        std::merge(nt_positions.begin(), nt_positions.end(), block.begin(), block.end(),
+                   std::back_inserter(pos));
+        const std::size_t n = pos.size();
+        Vector a(n);
+        job.pair_y.resize(n);
+        job.g.assign(n, 0);
+        for (std::size_t k = 0; k < n; ++k) {
+            job.pair_y[k] = context.common_y[pos[k]];
+            a[k] = refine_cells.a(pos[k]);
+        }
+        for (std::size_t k = 0, t = 0; t < target.positions.size(); ++k)
+            if (pos[k] == target.positions[t]) {
+                job.g[k] = 1;
+                job.pair_treated.push_back(k);
+                ++t;
+            }
+        auto refined = m::refine(refine_cells, pos, job.pair_y, a, start, common_options);
+        if (!refined.ok)
+            return false;
+        if (refined.fit.ok()) {
+            job.pair_binary = m::score_records(refine_cells, pos, job.pair_y, refined.fit.fitted,
+                                               refined.fit.theta);
+            if (!job.pair_binary)
+                return false;
+        }
+        job.pair_fit = std::move(refined.fit);
+        job.null = &job.pair_fit;
+        job.y = &job.pair_y;
+        job.treated = &job.pair_treated;
+        return true;
+    };
+    // A target's propensity model, fitted once from the first pair's design and
+    // labels; false when the fit failed.
+    auto fit_propensity = [&](TargetContext &target, const Matrix &x, const FitOptions &options,
+                              const std::function<Vector()> &labels) {
+        std::call_once(target.propensity_ready, [&] {
+            // Kept from an earlier shard of the run (SceptreShard::propensities).
+            auto *kept = shard.propensities ? &(*shard.propensities)[target.index] : nullptr;
+            if (kept && kept->ready) {
+                target.propensity_status = kept->status;
+                target.propensity_coefficients = kept->coefficients;
+                return;
+            }
+            auto po = options;
+            po.family = Family::binomial;
+            po.offset.clear();
+            po.weights.clear();
+            po.start.clear();
+            po.retain_observations = false;
+            auto propensity = fit(x, labels(), po);
+            target.propensity_status = propensity.status;
+            target.propensity_coefficients = std::move(propensity.coefficients);
+            if (kept) {
+                kept->status = target.propensity_status;
+                kept->coefficients = target.propensity_coefficients;
+                kept->ready = true;
+            }
+        });
+        return target.propensity_status == FitStatus::converged ||
+               target.propensity_status == FitStatus::converged_boundary;
+    };
+    // Retain only O(p) propensity parameters per target, not O(n) probabilities;
+    // reconstruct the same fitted values when a sampler is built.
+    auto build_sampler = [&](const TargetContext &target, const Matrix &x) {
+        return std::make_shared<const Sampler>(crt_sampler(
+            detail::means(x, target.propensity_coefficients, Vector(x.rows, 0), Family::binomial),
+            o.crt_draw));
+    };
+    // With complement controls the sampler is shared by the target's pairs while
+    // the cache budget allows (12 bytes per cell each); null beyond the budget.
+    auto shared_sampler = [&](TargetContext &target, const Matrix &x) {
+        std::call_once(target.sampler_ready, [&] {
+            const std::size_t bytes = crt_sampler_bytes_per_observation * x.rows;
+            if (bytes <= o.sampler_cache_bytes &&
+                sampler_cache_used.fetch_add(bytes) + bytes <= o.sampler_cache_bytes) {
+                target.sampler = build_sampler(target, x);
+                ++samplers_cached;
+            } else {
+                if (bytes <= o.sampler_cache_bytes)
+                    sampler_cache_used -= bytes;
+                ++samplers_rebuilt;
+            }
+        });
+        return target.sampler;
     };
     // Everything before the null draws; nullptr when the pair ends early (its
     // status is then recorded).
@@ -1312,13 +1554,32 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         }
         auto job = std::make_unique<PairJob>();
         job->task_id = task_id;
+        // With NT controls the pair's null is refined from the response's
+        // reference unless null_start is cold; a pair that cannot be refined is
+        // fitted cold below.
+        bool refined = false;
+        if (refine && context.reference && context.reference->ok) {
+            refined = refine_null(*job, target, context);
+            if (refined)
+                ++null_refined;
+            else {
+                ++null_cold_refits;
+                job = std::make_unique<PairJob>();
+                job->task_id = task_id;
+            }
+        }
+        // A refined pair needs its design rows only for CRT propensities and
+        // effect fits made with the draws.
+        const bool gather = !refined || o.crt || o.effect_fits == EffectFits::all;
         std::vector<std::size_t> pair_cells;
-        if (o.nt_controls)
+        if (o.nt_controls && gather)
             for (auto i : cells)
                 if (treatment[i] || nt[i])
                     pair_cells.push_back(i);
         const auto &use = o.nt_controls ? pair_cells : cells;
-        job->y = o.nt_controls ? &(job->pair_y = subset(context.full_y, use)) : &context.common_y;
+        if (!refined)
+            job->y =
+                o.nt_controls ? &(job->pair_y = subset(context.full_y, use)) : &context.common_y;
         const auto &y = *job->y;
         // The numerical APIs still consume exact double-valued 0/1 labels; with
         // complement controls the treated positions are the target's and the
@@ -1329,7 +1590,9 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
                 g[i] = treatment[use[i]];
             return g;
         };
-        if (o.nt_controls) {
+        if (refined) {
+            // The labels and treated positions are the refined null's.
+        } else if (o.nt_controls) {
             job->g = indicator();
             for (std::size_t i = 0; i < use.size(); ++i)
                 if (job->g[i])
@@ -1337,16 +1600,20 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
             job->treated = &job->pair_treated;
         } else
             job->treated = &target.positions;
-        job->x = o.nt_controls ? &(job->pair_design = subset_rows(design, use)) : &common_design;
+        // A refined pair without CRT or effect fits made with the draws needs no
+        // design rows of its own; x is then the common design, unused.
+        job->x = o.nt_controls && gather ? &(job->pair_design = subset_rows(design, use))
+                                         : &common_design;
         const auto &x = *job->x;
         job->options = common_options;
         auto &options = job->options;
-        if (o.nt_controls) {
+        if (o.nt_controls && gather) {
             options.offset = subset(o.model.offset, use);
             options.weights = subset(o.model.weights, use);
         }
-        job->null =
-            o.nt_controls ? &(job->pair_fit = fit_null(x, y, options)) : &context.common_fit;
+        if (!refined)
+            job->null =
+                o.nt_controls ? &(job->pair_fit = fit_null(x, y, options)) : &context.common_fit;
         null_fits += o.nt_controls;
         const auto &null = *job->null;
         if (!null.ok() || null.has_boundary()) {
@@ -1354,49 +1621,15 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
             return nullptr;
         }
         if (o.crt) {
-            std::call_once(target.propensity_ready, [&] {
-                auto po = options;
-                po.family = Family::binomial;
-                po.offset.clear();
-                po.weights.clear();
-                po.start.clear();
-                po.retain_observations = false;
-                auto propensity = fit(x, job->g.empty() ? indicator() : job->g, po);
-                target.propensity_status = propensity.status;
-                target.propensity_coefficients = std::move(propensity.coefficients);
-            });
-            if (target.propensity_status != FitStatus::converged &&
-                target.propensity_status != FitStatus::converged_boundary) {
+            if (!fit_propensity(target, x, options,
+                                [&] { return job->g.empty() ? indicator() : job->g; })) {
                 r.status = std::string("propensity_") + status_name(target.propensity_status);
                 return nullptr;
             }
-            // Retain only O(p) propensity parameters per target, not O(n)
-            // probabilities; reconstruct the same fitted values when a sampler is
-            // built. With complement controls the sampler is shared by the target's
-            // pairs while the cache budget allows (12 bytes per cell each).
-            auto build = [&] {
-                return std::make_shared<const Sampler>(
-                    crt_sampler(detail::means(x, target.propensity_coefficients, Vector(x.rows, 0),
-                                              Family::binomial),
-                                o.crt_draw));
-            };
-            if (!o.nt_controls) {
-                std::call_once(target.sampler_ready, [&] {
-                    const std::size_t bytes = crt_sampler_bytes_per_observation * x.rows;
-                    if (bytes <= o.sampler_cache_bytes &&
-                        sampler_cache_used.fetch_add(bytes) + bytes <= o.sampler_cache_bytes) {
-                        target.sampler = build();
-                        ++samplers_cached;
-                    } else {
-                        if (bytes <= o.sampler_cache_bytes)
-                            sampler_cache_used -= bytes;
-                        ++samplers_rebuilt;
-                    }
-                });
-                job->sampler = target.sampler;
-            }
+            if (!o.nt_controls)
+                job->sampler = shared_sampler(target, x);
             if (!job->sampler)
-                job->sampler = build();
+                job->sampler = build_sampler(target, x);
         } else {
             if (job->g.empty())
                 job->g = indicator();
@@ -1436,14 +1669,30 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         job->resampling.parallel_draws = o.parallel_draws;
         detail::check_budgets(job->resampling);
         job->target = &target;
-        if (o.nt_controls)
+        if (refined)
+            ; // the refined null's own records
+        else if (o.nt_controls)
             job->pair_score = std::make_unique<ResamplingWorkspace>(x, null);
         else
             std::call_once(context.common_score_ready, [&] {
-                context.common_score = std::make_unique<ResamplingWorkspace>(x, null);
+                // The O(p^2) part of the state is kept across the shards of a run
+                // (SceptreShard::score_states); the records are built here.
+                const auto response = task.pair.response;
+                auto *kept = shard.score_states ? &(*shard.score_states)[response] : nullptr;
+                detail::ScoreState computed;
+                if (!kept || !kept->ready) {
+                    computed = detail::score_state(x, null);
+                    if (kept)
+                        *kept = computed;
+                }
+                context.common_binary =
+                    detail::score_records(x, null, kept && kept->ready ? *kept : computed);
             });
-        job->score = o.nt_controls ? job->pair_score.get() : context.common_score.get();
-        job->statistic = detail::observed_statistic_of(job->score->binary, *job->treated);
+        job->score = o.nt_controls ? job->pair_score.get() : nullptr;
+        job->binary = refined         ? job->pair_binary.get()
+                      : o.nt_controls ? &job->score->binary
+                                      : context.common_binary.get();
+        job->statistic = detail::observed_statistic_of(*job->binary, *job->treated);
         if (!std::isfinite(job->statistic)) {
             r.status = "invalid_score";
             return nullptr;
@@ -1456,8 +1705,43 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     // another thread, or over the budget, is drawn afresh from the same stream,
     // so results do not depend on the cache. Stored draws are used only for
     // their own stream (draw_statistics checks it).
-    auto stored_draws = [&](const PairJob &job, std::size_t first) -> const CachedDraws * {
-        auto &target = *job.target;
+    // The stored draws of a target's stage, stored on first use within the
+    // budget. With `wait` (batch scoring), a stage being stored by another thread
+    // is waited for instead of being drawn afresh.
+    auto stage_draws = [&](TargetContext &target, const Stream &stream,
+                           const std::vector<std::size_t> &budgets, std::size_t stage,
+                           const Sampler &sampler, std::size_t rows,
+                           bool wait) -> const CachedDraws * {
+        auto &state = target.stage_state[stage];
+        if (state.load(std::memory_order_acquire) == 2)
+            return target.stage_draws[stage].get();
+        int idle = 0;
+        if (!state.compare_exchange_strong(idle, 1)) {
+            if (!wait)
+                return nullptr;
+            int now;
+            while ((now = state.load(std::memory_order_acquire)) == 1)
+                std::this_thread::yield();
+            return now == 2 ? target.stage_draws[stage].get() : nullptr;
+        }
+        const std::size_t begin = stage == 0 ? 0 : budgets[stage - 1];
+        auto draws = std::make_shared<const CachedDraws>(sampler, stream.seed, stream.test, begin,
+                                                         budgets[stage] - begin, rows);
+        // Batch scoring does not check each cell as it adds it: check once here.
+        if (batch_scoring)
+            detail::check_draws(*draws, rows);
+        const auto bytes = draws->bytes();
+        if (draw_cache_used.fetch_add(bytes) + bytes > o.draw_cache_bytes) {
+            draw_cache_used -= bytes;
+            state.store(3, std::memory_order_release);
+            return nullptr;
+        }
+        target.stage_draws[stage] = std::move(draws);
+        state.store(2, std::memory_order_release);
+        return target.stage_draws[stage].get();
+    };
+    auto stored_draws = [&](const PairJob &job, std::size_t first,
+                            bool wait = false) -> const CachedDraws * {
         const auto &budgets = job.resampling.budgets;
         std::size_t stage = 0;
         while (stage + 1 < budgets.size() && first >= budgets[stage])
@@ -1469,24 +1753,7 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
                                                                    : job.resampling.seed,
                                    job.resampling.prescreen_test_id}
                           : Stream{job.resampling.seed, job.resampling.test_id};
-        auto &state = target.stage_state[stage];
-        if (state.load(std::memory_order_acquire) == 2)
-            return target.stage_draws[stage].get();
-        int idle = 0;
-        if (!state.compare_exchange_strong(idle, 1))
-            return nullptr;
-        const std::size_t begin = stage == 0 ? 0 : budgets[stage - 1];
-        auto draws = std::make_shared<const CachedDraws>(
-            *job.sampler, stream.seed, stream.test, begin, budgets[stage] - begin, job.x->rows);
-        const auto bytes = draws->bytes();
-        if (draw_cache_used.fetch_add(bytes) + bytes > o.draw_cache_bytes) {
-            draw_cache_used -= bytes;
-            state.store(3, std::memory_order_release);
-            return nullptr;
-        }
-        target.stage_draws[stage] = std::move(draws);
-        state.store(2, std::memory_order_release);
-        return target.stage_draws[stage].get();
+        return stage_draws(*job.target, stream, budgets, stage, *job.sampler, job.x->rows, wait);
     };
     auto cache_of = [&](const PairJob &job) -> std::function<const CachedDraws *(std::size_t)> {
         if (!reuse_draws && !shared_screen)
@@ -1532,13 +1799,248 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         result.statistic = job.statistic;
         detail::staged_null(
             result, job.resampling,
-            [&] { return detail::BinaryDrawBatch(job.score->binary, *job.sampler, cache_of(job)); },
-            256);
+            [&] { return detail::BinaryDrawBatch(*job.binary, *job.sampler, cache_of(job)); }, 256);
         finish_pair(job, result);
     };
+    // Batch scoring: one response per thread, its pairs scored stage by stage
+    // together (SceptreOptions::batch_scoring).
+    const bool batched = batch_scoring && !batches.empty();
+    if (batched) {
+        // Every target's propensity model and sampler, and with reuse_draws its
+        // first-stage draws, once and in parallel before the responses, so that
+        // the responses' threads do not wait for them one at a time.
+        std::vector<std::size_t> first_task(setup.target_contexts, tasks.size());
+        for (const auto &batch : batches)
+            for (auto i : batch)
+                if (first_task[tasks[i].target_context] == tasks.size())
+                    first_task[tasks[i].target_context] = i;
+        std::vector<std::size_t> used;
+        for (std::size_t k = 0; k < first_task.size(); ++k)
+            if (first_task[k] < tasks.size())
+                used.push_back(k);
+        parallel_for(used.size(), o.threads, [&](std::size_t q) {
+            const auto &task = tasks[first_task[used[q]]];
+            auto &target = membership(task);
+            const bool fitted = fit_propensity(target, common_design, common_options, [&] {
+                Vector g(cells.size());
+                for (std::size_t i = 0; i < cells.size(); ++i)
+                    g[i] = target.treatment[cells[i]];
+                return g;
+            });
+            if (!fitted)
+                return;
+            const auto sampler = shared_sampler(target, common_design);
+            if (!reuse_draws || !sampler)
+                return;
+            // The target's stream, as prepare_pair keys it with reuse_draws.
+            const std::uint32_t domain = o.integration == Integration::union_guides ? 0 : 3;
+            const Stream stream =
+                o.stream_keys == StreamKeys::position
+                    ? Stream{o.resampling.seed, task.target_context}
+                    : keyed_stream(o.resampling.seed, domain + 2, 0, task.target_key);
+            stage_draws(target, stream, o.resampling.budgets, 0, *sampler, cells.size(), true);
+        });
+        // The stored first-stage draws in cell-major form, by groups of about
+        // 2,048 draws of consecutive targets, within the draw budget.
+        std::vector<detail::TransposedDraws> draw_groups;
+        std::vector<std::vector<std::size_t>> group_targets;
+        if (reuse_draws && o.resampling.budgets[0] <= 65535) {
+            const std::size_t per =
+                std::max<std::size_t>(1, detail::transposed_group_draws / o.resampling.budgets[0]);
+            for (auto k : used)
+                if (target_contexts[k]->stage_state[0].load(std::memory_order_acquire) == 2) {
+                    if (group_targets.empty() || group_targets.back().size() == per)
+                        group_targets.emplace_back();
+                    group_targets.back().push_back(k);
+                }
+            draw_groups.resize(group_targets.size());
+            parallel_for(group_targets.size(), o.threads, [&](std::size_t g) {
+                std::vector<const CachedDraws *> group;
+                for (auto k : group_targets[g])
+                    group.push_back(target_contexts[k]->stage_draws[0].get());
+                auto transposed = detail::transpose_draws(group, cells.size());
+                const auto bytes = transposed.bytes();
+                if (draw_cache_used.fetch_add(bytes) + bytes > o.draw_cache_bytes) {
+                    draw_cache_used -= bytes;
+                    return; // over the budget: these targets keep score_draws
+                }
+                draw_groups[g] = std::move(transposed);
+                std::size_t base = 0;
+                for (std::size_t q = 0; q < group.size(); ++q) {
+                    auto &target = *target_contexts[group_targets[g][q]];
+                    target.group = g;
+                    target.group_base = base;
+                    base += group[q]->count;
+                }
+            });
+        }
+        std::atomic<std::size_t> released{0};
+        parallel_for(batches.size(), o.threads, [&](std::size_t b) {
+            thread_local detail::BatchScoreScratch scratch;
+            thread_local detail::DrawScratch draw_scratch;
+            thread_local std::vector<detail::ScoreDraw> list;
+            // A round's draws: a stored stage's (whole), or up to `chunk` drawn
+            // for the pair into `pool`.
+            struct Piece {
+                std::size_t job, first, count, offset;
+                const CachedDraws *stored;
+            };
+            thread_local std::vector<Piece> pieces;
+            thread_local std::vector<std::uint32_t> pool;
+            thread_local std::vector<std::size_t> pool_offsets;
+            thread_local std::vector<char> handled;
+            thread_local std::vector<std::pair<std::size_t, std::size_t>> in_groups;
+            constexpr std::size_t chunk = 8192;
+            const std::size_t rows = cells.size();
+            auto context = prepare_response(b);
+            std::vector<std::unique_ptr<PairJob>> jobs;
+            std::vector<std::unique_ptr<detail::NullStages>> stages;
+            for (auto task_id : batches[b]) {
+                auto job = prepare_pair(task_id, *context);
+                if (!job)
+                    continue;
+                stages.push_back(
+                    std::make_unique<detail::NullStages>(job->resampling, job->statistic));
+                jobs.push_back(std::move(job));
+            }
+            std::vector<std::size_t> active(jobs.size()), next, next_draw(jobs.size()),
+                stage_end(jobs.size());
+            std::iota(active.begin(), active.end(), 0);
+            for (std::size_t k = 0; k < jobs.size(); ++k) {
+                next_draw[k] = stages[k]->begin();
+                stage_end[k] = stages[k]->end();
+            }
+            // Each round takes every active pair's next draws and scores them all
+            // in one pass; a pair whose stage is complete then applies its stage
+            // rule. Draw k of a pair is its stream's draw k, written to slot k.
+            while (!active.empty()) {
+                pieces.clear();
+                pool.clear();
+                pool_offsets.assign(1, 0);
+                for (auto k : active) {
+                    const Stream stream = stages[k]->stream();
+                    const std::size_t first = next_draw[k];
+                    const CachedDraws *c =
+                        reuse_draws ? stored_draws(*jobs[k], first, true) : nullptr;
+                    if (c && c->seed == stream.seed && c->test == stream.test &&
+                        first >= c->first && first < c->first + c->count) {
+                        const std::size_t count =
+                            std::min(stage_end[k], c->first + c->count) - first;
+                        pieces.push_back({k, first, count, 0, c});
+                        next_draw[k] += count;
+                        continue;
+                    }
+                    // Drawn for the pair (its own stream, or a stored stage beyond
+                    // the draw budget), in batches of 256 as CachedDraws draws them.
+                    const std::size_t count = std::min(chunk, stage_end[k] - first);
+                    pieces.push_back({k, first, count, pool_offsets.size() - 1, nullptr});
+                    for (std::size_t done = 0; done < count; done += 256) {
+                        const std::size_t size = std::min<std::size_t>(256, count - done);
+                        jobs[k]->sampler->batch(stream.seed, stream.test, first + done, size,
+                                                draw_scratch.selected, draw_scratch.sampler);
+                        for (std::size_t d = 0; d < size; ++d) {
+                            const auto &s = draw_scratch.selected[d];
+                            for (std::size_t j = 0; j < s.size(); ++j) {
+                                require(s[j] < rows && (j == 0 || s[j - 1] < s[j]),
+                                        "sampler indices must be sorted, unique and in range");
+                                pool.push_back(static_cast<std::uint32_t>(s[j]));
+                            }
+                            pool_offsets.push_back(pool.size());
+                        }
+                    }
+                    next_draw[k] += count;
+                }
+                // A target's whole stored first stage whose group is transposed is
+                // scored with its group in cell-major form, when at least half of
+                // the group's targets are scored here; other draws by score_draws.
+                handled.assign(pieces.size(), 0);
+                in_groups.clear();
+                for (std::size_t q = 0; q < pieces.size(); ++q) {
+                    const auto &piece = pieces[q];
+                    const auto &target = *jobs[piece.job]->target;
+                    if (piece.stored && target.group < draw_groups.size() &&
+                        piece.stored == target.stage_draws[0].get() && piece.first == 0 &&
+                        piece.count == piece.stored->count)
+                        in_groups.push_back({target.group, q});
+                }
+                std::sort(in_groups.begin(), in_groups.end());
+                for (std::size_t from = 0, to; from < in_groups.size(); from = to) {
+                    const auto g = in_groups[from].first;
+                    to = from;
+                    while (to < in_groups.size() && in_groups[to].first == g)
+                        ++to;
+                    if (2 * (to - from) < group_targets[g].size())
+                        continue;
+                    const auto &binary = *jobs[active.front()]->binary;
+                    detail::transposed_sums(binary, draw_groups[g], scratch);
+                    for (auto k = from; k < to; ++k) {
+                        const auto q = in_groups[k].second;
+                        const auto &piece = pieces[q];
+                        double *null = stages[piece.job]->null();
+                        const auto base = jobs[piece.job]->target->group_base;
+                        for (std::size_t d = 0; d < piece.count; ++d)
+                            null[d] = detail::statistic_of_sums(binary, base + d, scratch);
+                        handled[q] = 1;
+                    }
+                }
+                list.clear();
+                for (std::size_t q = 0; q < pieces.size(); ++q) {
+                    const auto &piece = pieces[q];
+                    if (handled[q])
+                        continue;
+                    double *null = stages[piece.job]->null() + piece.first;
+                    for (std::size_t d = 0; d < piece.count; ++d) {
+                        std::size_t from, to;
+                        const std::uint32_t *base;
+                        if (piece.stored) {
+                            const auto &c = *piece.stored;
+                            from = c.offsets[piece.first - c.first + d];
+                            to = c.offsets[piece.first - c.first + d + 1];
+                            base = c.cells.data();
+                        } else {
+                            from = pool_offsets[piece.offset + d];
+                            to = pool_offsets[piece.offset + d + 1];
+                            base = pool.data();
+                        }
+                        list.push_back(
+                            {base + from, static_cast<std::uint32_t>(to - from), null + d});
+                    }
+                }
+                if (!list.empty())
+                    detail::score_draws(*jobs[active.front()]->binary, list.data(), list.size(),
+                                        scratch);
+                next.clear();
+                for (auto k : active) {
+                    if (next_draw[k] < stage_end[k]) {
+                        next.push_back(k);
+                        continue;
+                    }
+                    if (stages[k]->next())
+                        finish_pair(*jobs[k], stages[k]->result());
+                    else {
+                        next_draw[k] = stages[k]->begin();
+                        stage_end[k] = stages[k]->end();
+                        next.push_back(k);
+                    }
+                }
+                active.swap(next);
+            }
+            // As in the pair pipeline, return freed pages now and then (glibc keeps
+            // a thread's freed blocks in its arena).
+            jobs.clear();
+            stages.clear();
+            context.reset();
+#ifdef __GLIBC__
+            if (++released % 256 == 0)
+                malloc_trim(0);
+#else
+            (void)released;
+#endif
+        });
+    }
     bool pipelined = false;
 #if defined(_OPENMP) && _OPENMP >= 201511
-    pipelined = o.parallel_pairs && o.threads > 1 && !batches.empty();
+    pipelined = !batched && o.parallel_pairs && o.threads > 1 && !batches.empty();
     if (pipelined)
         detail::pair_pipeline(
             batches, o.threads, o.parallel_draws,
@@ -1548,12 +2050,12 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
                 return prepare_pair(task_id, context);
             },
             [&](PairJob &job) -> const detail::PairDraws {
-                return {&job.score->binary, job.sampler.get(), &job.resampling, job.statistic,
+                return {job.binary, job.sampler.get(), &job.resampling, job.statistic,
                         cache_of(job)};
             },
             [&](PairJob &job, const ResampleResult &result) { finish_pair(job, result); });
 #endif
-    if (!pipelined)
+    if (!pipelined && !batched)
         parallel_for(batches.size(), o.threads, [&](auto batch) {
             auto context = prepare_response(batch);
             task_for(batches[batch].size(), o.parallel_pairs, [&](std::size_t pair_index) {
@@ -1567,6 +2069,9 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     result.samplers_cached = samplers_cached;
     result.samplers_rebuilt = samplers_rebuilt;
     result.null_fits = null_fits;
+    result.null_start_used = refine ? NullStart::refine : NullStart::cold;
+    result.null_refined = null_refined;
+    result.null_cold_refits = null_cold_refits;
     if (shard.tasks) {
         for (auto i : *shard.tasks)
             result.tests.push_back(std::move(raw[i]));
@@ -1890,6 +2395,7 @@ inline SceptreGridResult sceptre_grid(const Matrix &design, const Responses &res
                                       const SparseCSC &assignments,
                                       const std::vector<Guide> &guides, const SceptreGrid &grid,
                                       const CellQC &qc = {}, const SceptreOptions &o = {}) {
+    const vmath::DivisionScope division_scope(o.model.division);
     require(o.stream_keys == StreamKeys::identity,
             "a grid request needs identity stream keys (a list has the positions)");
     auto checked = sceptre_pair_qc(design, responses, assignments, guides, grid, qc, o);

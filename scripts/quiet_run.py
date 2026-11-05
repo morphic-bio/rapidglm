@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
-"""Run a timed command under the shared lock after quiet host and CPU samples."""
+"""Run a timed command under the shared lock after quiet host and CPU samples.
+
+The lock path is RAPIDGLM_TIMING_LOCK (default: pikachu's shared lock). With
+RAPIDGLM_QUIET_SIBLINGS=1 the per-CPU idle check also covers the SMT siblings of
+the selected CPUs (from sysfs), which must be idle for one thread per core.
+"""
 import argparse
+import importlib
 import fcntl
 import json
 import os
@@ -8,7 +14,7 @@ import subprocess
 import sys
 import time
 
-LOCK = '/mnt/pikachu/e2e_bench_20260926/pikachu_timed.lock'
+LOCK = os.environ.get('RAPIDGLM_TIMING_LOCK', '/mnt/pikachu/e2e_bench_20260926/pikachu_timed.lock')
 
 
 def cpu_set(value):
@@ -19,6 +25,18 @@ def cpu_set(value):
         limits = [int(v) for v in part.split('-')]
         result.update(range(limits[0], limits[-1] + 1))
     return result
+
+
+def thread_siblings(cpus):
+    """The SMT siblings of the selected CPUs (sysfs thread_siblings_list), not the CPUs themselves."""
+    result = set()
+    for cpu in cpus:
+        try:
+            with open(f'/sys/devices/system/cpu/cpu{cpu}/topology/thread_siblings_list') as source:
+                result |= cpu_set(source.read().strip())
+        except OSError:
+            pass
+    return result - set(cpus)
 
 
 def cpu_snapshot(cpus):
@@ -43,22 +61,32 @@ def audit(record):
             output.write(json.dumps(record) + '\n')
 
 
+def finish_measurement():
+    """Close an optional release contention audit after a timed command."""
+    module = os.environ.get('RAPIDGLM_MEASUREMENT_GUARD')
+    return importlib.import_module(module).finish() if module else None
+
+
 def wait_quiet(cpus=None, label=None):
+    if os.environ.get('RAPIDGLM_MIN_AVAILABLE_GIB'):
+        wait_memory(float(os.environ['RAPIDGLM_MIN_AVAILABLE_GIB']))
     threshold = float(os.environ.get('RAPIDGLM_QUIET_LOAD', '4'))
     cpus = cpu_set(cpus) if cpus is not None else set()
+    siblings = thread_siblings(cpus) if os.environ.get('RAPIDGLM_QUIET_SIBLINGS') == '1' else set()
+    checked = cpus | siblings
     quiet = 0
     start = time.monotonic()
     samples = []
     while quiet < 2:
         load_before = os.getloadavg()[0]
-        before = cpu_snapshot(cpus) if cpus else None
+        before = cpu_snapshot(checked) if checked else None
         time.sleep(10)
         load_after = os.getloadavg()[0]
         idle = True
         fractions = {}
-        if cpus:
-            after = cpu_snapshot(cpus)
-            for cpu in cpus:
+        if checked:
+            after = cpu_snapshot(checked)
+            for cpu in sorted(checked):
                 if cpu not in before or cpu not in after:
                     idle = False
                     break
@@ -73,9 +101,15 @@ def wait_quiet(cpus=None, label=None):
                             busy_fractions=fractions, passed=quiet > 0))
         samples = samples[-2:]
     waited = round(time.monotonic() - start, 2)
-    audit(dict(event='quiet_ready', utc=time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
-               label=label or ' '.join(sys.argv), cpus=sorted(cpus),
-               waited_seconds=waited, load_one_minute=load_after, samples=samples))
+    record = dict(event='quiet_ready', utc=time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+                  label=label or ' '.join(sys.argv), cpus=sorted(cpus),
+                  waited_seconds=waited, load_one_minute=load_after, samples=samples)
+    if siblings:
+        record['sibling_cpus'] = sorted(siblings)
+    audit(record)
+    module = os.environ.get("RAPIDGLM_MEASUREMENT_GUARD")
+    if module:
+        importlib.import_module(module).begin(cpus, record["label"])
     return waited
 
 
@@ -132,6 +166,7 @@ def main():
                           'waited_for_quiet_seconds': waited}), file=sys.stderr, flush=True)
 
     if args.wait_only:
+        os.environ.pop("RAPIDGLM_MEASUREMENT_GUARD", None)
         ready()
         return
     if not command:
@@ -139,7 +174,9 @@ def main():
     with open(LOCK, 'a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         ready()
-        raise SystemExit(subprocess.call(command))
+        code = subprocess.call(command)
+        finish_measurement()
+        raise SystemExit(code)
 
 
 if __name__ == '__main__':

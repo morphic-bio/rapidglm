@@ -1,0 +1,14 @@
+{
+  "label": "cooks-1793712393446249459",
+  "stages": [
+    "cooks"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T13:26:33.554244+00:00",
+  "finished_utc": "2026-11-03T13:31:27.072361+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 289,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0840039364993572,
+  "cpu_policy_observed_quiet_starts": 0,
+  "error": null
+}

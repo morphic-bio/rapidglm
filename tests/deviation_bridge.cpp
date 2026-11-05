@@ -147,7 +147,7 @@ Rcpp::DataFrame audit_tails(Rcpp::NumericVector y, Rcpp::NumericMatrix X, Rcpp::
         ro.budgets = {static_cast<std::size_t>(draws)};
         ro.approximate = false;
         ro.retain_null = true;
-        auto bank = resample(score, vector(g), crt_sampler(probabilities), ro);
+        auto bank = resample(score, vector(g), crt_sampler(probabilities, CrtDraw::thinned), ro);
         require(bank.valid && bank.null_statistics.size() == static_cast<std::size_t>(draws),
                 "invalid score bank");
         bool stopped = false;

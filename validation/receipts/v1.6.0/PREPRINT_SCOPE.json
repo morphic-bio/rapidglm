@@ -1,0 +1,23 @@
+{
+  "recorded_utc": "2026-10-31T19:18:19.273374+00:00",
+  "user_instruction": "Narrow the release gate. We want to get the preprint out first",
+  "scope": "changed-path agreement plus five paired ablations",
+  "required_commands": 13,
+  "required_groups": [
+    "preprint_qtl",
+    "preprint_crt",
+    "preprint_replogle"
+  ],
+  "full_run_status": "deferred",
+  "full_job_cancelled": "691",
+  "full_stages_complete": 7,
+  "partial_bulk_accepted": 157,
+  "partial_bulk_planned": 198,
+  "partial_bulk_used_for_headlines": false,
+  "manuscript_available": false,
+  "publication_authorized": false,
+  "release_authorized": false,
+  "untimed_build_and_functional_checks_retained": true,
+  "source_commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "protected_processes_untouched": true
+}

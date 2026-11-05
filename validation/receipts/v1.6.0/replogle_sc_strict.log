@@ -1,0 +1,1 @@
+{"load_before": 6.49, "wall_seconds": 1058.06, "cpu_seconds": 12020.6, "peak_rss_gb": 1.56, "load_average": 16.14, "workflow_wall_seconds": 1057.974471749, "null_fits": 174761, "null_start_used": "refine", "null_refined": 174761, "null_cold_refits": 0, "crt_draw_used": "hazard"}

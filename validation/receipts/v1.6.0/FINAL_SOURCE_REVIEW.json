@@ -1,0 +1,15 @@
+{
+  "recorded_utc": "2026-11-01T13:24:38.421626+00:00",
+  "measured_library_binaries_images_and_harness_verified": true,
+  "documented_post_measurement_exceptions": [
+    "scripts/public_tree.sh",
+    "scripts/public_exclude.txt"
+  ],
+  "protected_receipts_unchanged": true,
+  "full_suite_claimed": false,
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

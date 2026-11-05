@@ -1,0 +1,47 @@
+{"timed_command_ready_utc": "2026-11-04T00:22:49Z", "load_average": [6.71484375, 15.24072265625, 18.2119140625], "cpus": "6-21", "waited_for_quiet_seconds": 90.4}
+{
+ "tool": "deseq2",
+ "binary": "/data/lhhung/rapidglm-1.6.0/build/rapidglm",
+ "version": "1.6.0",
+ "threads_per_job": 1,
+ "workers": 16,
+ "cpus": [
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21
+ ],
+ "started_utc": "2026-11-04T00:22:49.451427+00:00",
+ "finished_utc": "2026-11-04T05:57:16.803840+00:00",
+ "load_before": [
+  6.71484375,
+  15.24072265625,
+  18.2119140625
+ ],
+ "load_after": [
+  10.32275390625,
+  16.68798828125,
+  18.810546875
+ ],
+ "wall_seconds": 20067.35,
+ "command_cpu_seconds": 319817.4,
+ "cpus_busy_seconds": 319820.8,
+ "others_cpu": 0.0,
+ "contended": false,
+ "targets": 2057,
+ "succeeded": 2057,
+ "failed": {},
+ "skipped_at_prepare": {}
+}

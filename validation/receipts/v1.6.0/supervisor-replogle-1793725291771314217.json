@@ -1,0 +1,14 @@
+{
+  "label": "replogle-1793725291771314217",
+  "stages": [
+    "replogle"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T17:01:31.880068+00:00",
+  "finished_utc": "2026-11-03T19:44:39.307350+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 9631,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0634218323975801,
+  "cpu_policy_observed_quiet_starts": 83,
+  "error": null
+}

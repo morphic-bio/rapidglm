@@ -1,0 +1,30 @@
+gasperini50k rapidglm-cli t1 repeat 0: 260.18 s {'load': 5.2412109375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.05, 'others_cpu': 0.0, 'contended': False}
+gasperini50k rapidglm-cli t8 repeat 0: 35.90 s {'load': 4.66650390625, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0, 'contended': False}
+gasperini50k rapidglm-python t1 repeat 0: 263.64 s {'load': 6.65673828125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.07, 'others_cpu': 0.0001, 'contended': False}
+{"event": "application_command_retry", "label": "run threads=8", "audit": "commands/2032268-1793714288012935263.json", "utc": "2026-11-03T13:58:08.029604+00:00"}
+gasperini50k rapidglm-python t8 repeat 0: 35.60 s {'load': 6.73974609375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0, 'contended': False}
+gasperini50k rapidglm-r t1 repeat 0: 299.96 s {'load': 6.55810546875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 40.2, 'others_cpu': 0.0001, 'contended': False}
+gasperini50k rapidglm-r t8 repeat 0: 42.51 s {'load': 4.671875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0, 'contended': False}
+gasperini50k rapidglm-cli-ks t1 repeat 0: 222.10 s {'load': 6.7802734375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0, 'contended': False}
+gasperini50k rapidglm-cli-ks t8 repeat 0: 30.94 s {'load': 4.69580078125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0, 'contended': False}
+gasperini50k rapidglm-python-ks t1 repeat 0: 222.65 s {'load': 6.55859375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0, 'contended': False}
+gasperini50k rapidglm-python-ks t8 repeat 0: 30.26 s {'load': 4.7900390625, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0, 'contended': False}
+gasperini50k rapidglm-r-ks t1 repeat 0: 246.31 s {'load': 6.40087890625, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0001, 'contended': False}
+gasperini50k rapidglm-r-ks t8 repeat 0: 35.94 s {'load': 4.73486328125, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0001, 'contended': False}
+gasperini50k sceptre t1 repeat 0: 1379.63 s {'load': 6.41162109375, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0001, 'contended': False}
+gasperini50k sceptre t8 repeat 0: 206.56 s {'load': 4.65576171875, 'waited_for_idle_seconds': 0.0, 'waited_for_quiet_host_seconds': 20.1, 'others_cpu': 0.0001, 'contended': False}
+     dataset               tool  threads     seconds  contended
+gasperini50k       rapidglm-cli        1  260.175665      False
+gasperini50k       rapidglm-cli        8   35.901599      False
+gasperini50k    rapidglm-python        1  263.637911      False
+gasperini50k    rapidglm-python        8   35.596333      False
+gasperini50k         rapidglm-r        1  299.962000      False
+gasperini50k         rapidglm-r        8   42.506000      False
+gasperini50k    rapidglm-cli-ks        1  222.104899      False
+gasperini50k    rapidglm-cli-ks        8   30.940897      False
+gasperini50k rapidglm-python-ks        1  222.654275      False
+gasperini50k rapidglm-python-ks        8   30.263052      False
+gasperini50k      rapidglm-r-ks        1  246.309000      False
+gasperini50k      rapidglm-r-ks        8   35.942000      False
+gasperini50k            sceptre        1 1379.629000      False
+gasperini50k            sceptre        8  206.560000      False

@@ -1,0 +1,1 @@
+{"load_before": 6.51, "wall_seconds": 2159.04, "cpu_seconds": 33839.3, "peak_rss_gb": 3.0, "load_average": 15.89, "version": "0.99.0", "workers": 16, "formula": "~ log_umi + log_detected + mito + batch", "setup_seconds": 4.796, "calibration_seconds": 71.506, "power_seconds": 4.482, "discovery_seconds": 2064.574, "seconds": 2140.562}

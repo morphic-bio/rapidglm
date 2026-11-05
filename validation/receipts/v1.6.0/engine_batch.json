@@ -1,0 +1,180 @@
+{
+  "n": 5000,
+  "p": 5,
+  "m": 1000,
+  "cpus_allowed": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "cpus_by_threads": {
+    "1": [
+      6
+    ],
+    "4": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "16": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ]
+  },
+  "results": [
+    {
+      "tool": "rapidglm fit_batch",
+      "family": "poisson",
+      "load": 4.11083984375,
+      "seconds": 0.721486,
+      "threads": 1,
+      "failed": 0,
+      "max_rel_coef_diff_vs_R": 1.8416019657968127e-06
+    },
+    {
+      "tool": "rapidglm fit_batch",
+      "family": "poisson",
+      "load": 3.96826171875,
+      "seconds": 0.183255,
+      "threads": 4,
+      "failed": 0,
+      "max_rel_coef_diff_vs_R": 1.8416019657968127e-06
+    },
+    {
+      "tool": "rapidglm fit_batch",
+      "family": "poisson",
+      "load": 2.89990234375,
+      "seconds": 0.0584362,
+      "threads": 16,
+      "failed": 0,
+      "max_rel_coef_diff_vs_R": 1.8416019657968127e-06
+    },
+    {
+      "tool": "R glm.fit",
+      "family": "poisson",
+      "threads": 1,
+      "load": 2.72314453125,
+      "seconds": 4.168,
+      "max_rel_coef_diff_vs_R": 0.0
+    },
+    {
+      "tool": "R rapidglm::glm_fit",
+      "family": "poisson",
+      "threads": 1,
+      "load": 3.23974609375,
+      "seconds": 2.074,
+      "max_rel_coef_diff_vs_R": 1.8416019677704892e-06
+    },
+    {
+      "tool": "Python statsmodels",
+      "family": "poisson",
+      "threads": 1,
+      "load": 3.5,
+      "seconds": 3.884462496265769,
+      "responses_timed": 1000,
+      "max_rel_coef_diff_vs_R": 1.8416020289544639e-06
+    },
+    {
+      "tool": "Python rapidglm.fit",
+      "family": "poisson",
+      "threads": 1,
+      "load": 3.67138671875,
+      "seconds": 0.7734883092343807,
+      "responses_timed": 1000,
+      "max_rel_coef_diff_vs_R": 1.8416019657968127e-06
+    },
+    {
+      "tool": "rapidglm fit_batch",
+      "family": "nb",
+      "load": 3.70361328125,
+      "seconds": 2.22143,
+      "threads": 1,
+      "failed": 0,
+      "max_rel_coef_diff_vs_R": 0.0009165957712626074
+    },
+    {
+      "tool": "rapidglm fit_batch",
+      "family": "nb",
+      "load": 3.8056640625,
+      "seconds": 0.557508,
+      "threads": 4,
+      "failed": 0,
+      "max_rel_coef_diff_vs_R": 0.0009165957712626074
+    },
+    {
+      "tool": "rapidglm fit_batch",
+      "family": "nb",
+      "load": 2.53857421875,
+      "seconds": 0.15092,
+      "threads": 16,
+      "failed": 0,
+      "max_rel_coef_diff_vs_R": 0.0009165957712626074
+    },
+    {
+      "tool": "R glm.nb",
+      "family": "nb",
+      "threads": 1,
+      "load": 4.8212890625,
+      "seconds": 103.274,
+      "max_rel_coef_diff_vs_R": 0.0
+    },
+    {
+      "tool": "R rapidglm::glm_nb",
+      "family": "nb",
+      "threads": 1,
+      "load": 4.65185546875,
+      "seconds": 8.156,
+      "max_rel_coef_diff_vs_R": 0.0009165957712589645
+    },
+    {
+      "tool": "R glmGamPoi::glm_gp",
+      "family": "nb",
+      "threads": 1,
+      "load": 4.4814453125,
+      "seconds": 4.441,
+      "glmgampoi_version": "1.25.1",
+      "max_rel_coef_diff_vs_R": 0.029732091914182555
+    },
+    {
+      "tool": "Python statsmodels",
+      "family": "nb",
+      "threads": 1,
+      "load": 4.37158203125,
+      "seconds": 18.894335078075528,
+      "responses_timed": 200,
+      "max_rel_coef_diff_vs_R": 0.009014687415194516
+    },
+    {
+      "tool": "Python rapidglm.fit",
+      "family": "nb",
+      "threads": 1,
+      "load": 4.32421875,
+      "seconds": 2.3378291614353657,
+      "responses_timed": 1000,
+      "max_rel_coef_diff_vs_R": 0.0009165957712626074
+    }
+  ],
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

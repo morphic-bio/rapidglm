@@ -1,0 +1,39 @@
+{
+  "recorded_utc": "2026-11-01T02:12:34.291610+00:00",
+  "measured_commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "focused_checks_passed": true,
+  "commands": 13,
+  "paired_ablations": 5,
+  "full_run_complete": false,
+  "prior_complete_stages": 7,
+  "partial_bulk_used_for_claims": false,
+  "deferred": [
+    "remaining bulk timing",
+    "cooks",
+    "rust",
+    "staging",
+    "pert50k",
+    "pertfull",
+    "seeds",
+    "untestable",
+    "reference-tool reruns",
+    "other CRT panels",
+    "Replogle pseudobulk",
+    "special",
+    "vmath_e2e",
+    "replogle_full",
+    "eqtl_gw",
+    "compress"
+  ],
+  "inputs_checked": 18,
+  "protected_receipts_unchanged": true,
+  "documentation": "docs/PREPRINT_EVIDENCE.md",
+  "evidence_packaged": true,
+  "final_source_review_passed": true,
+  "scientific_gate_complete": true,
+  "publication_remaining": [
+    "manuscript claim review when draft is available",
+    "user approval before release or publication"
+  ],
+  "private_delivery_verification": "Recorded separately in the final delivery report against the exact pushed commit"
+}

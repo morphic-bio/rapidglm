@@ -1,0 +1,14 @@
+{
+  "label": "seeds-1793720570048974863",
+  "stages": [
+    "seeds"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T15:42:50.168444+00:00",
+  "finished_utc": "2026-11-03T16:06:58.153175+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 1412,
+  "cpu_policy_maximum_poll_gap_seconds": 1.111998436972499,
+  "cpu_policy_observed_quiet_starts": 0,
+  "error": null
+}

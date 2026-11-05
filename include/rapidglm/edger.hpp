@@ -4,9 +4,7 @@
 #include "kernels.hpp"
 #include "sparse.hpp"
 #include <boost/math/distributions/fisher_f.hpp>
-#include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/special_functions/trigamma.hpp>
 #include <functional>
 #include <string>
 
@@ -44,6 +42,7 @@ struct QlOptions {
     // Prior count (per average library) of the reported log fold changes.
     double prior_count = 0.125;
     int threads = 1;
+    DivisionMode division = DivisionMode::inherit;
 };
 struct QlGene {
     bool kept = false;
@@ -288,6 +287,60 @@ inline double nb_unit_deviance(double y, double m, double phi) {
     }
     return std::isnan(t) ? t : 2 * std::max(0.0, t);
 }
+// out[i] = nb_unit_deviance(y[i], m[i], phi) for n observations, the same
+// arithmetic with the logarithms of all of them taken at once (vmath): the
+// arguments each observation needs, log(1 + (m - y)/y) or log(y/m),
+// log(1 + (m - y)/(y + 1/phi)), log1p(phi m) or log1p((m - y)/(y + 1/phi)),
+// are gathered in observation order and evaluated as two arrays.
+inline void nb_unit_deviances(const double *y, const double *m, std::size_t n, double phi,
+                              double *out) {
+    thread_local Vector scratch;
+    scratch.resize(3 * n);
+    double *logs = scratch.data(), *log1ps = logs + 2 * n;
+    std::size_t a = 0, b = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        if (y[i] == 0) {
+            if (phi > 0)
+                log1ps[b++] = phi * m[i];
+            continue;
+        }
+        const double difference = m[i] - y[i];
+        if (std::abs(difference) < 0.125 * y[i]) {
+            logs[a++] = 1 + difference / y[i];
+            if (phi > 0)
+                logs[a++] = 1 + difference / (y[i] + 1 / phi);
+        } else {
+            logs[a++] = y[i] / m[i];
+            if (phi > 0) {
+                const double k = 1 / phi;
+                log1ps[b++] = (m[i] - y[i]) / (y[i] + k);
+            }
+        }
+    }
+    vmath::log_array(logs, logs, a);
+    vmath::log1p_array(log1ps, log1ps, b);
+    a = b = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        double t;
+        if (y[i] == 0)
+            t = phi > 0 ? log1ps[b++] / phi : m[i];
+        else {
+            const double difference = m[i] - y[i];
+            if (std::abs(difference) < 0.125 * y[i]) {
+                t = y[i] * log1pmx_from_log(difference / y[i], logs[a++]);
+                if (phi > 0)
+                    t -= (y[i] + 1 / phi) *
+                         log1pmx_from_log(difference / (y[i] + 1 / phi), logs[a++]);
+            } else if (phi > 0) {
+                const double k = 1 / phi;
+                const double first = logs[a++];
+                t = y[i] * first + (y[i] + k) * log1ps[b++];
+            } else
+                t = y[i] * logs[a++] + difference;
+        }
+        out[i] = std::isnan(t) ? t : 2 * std::max(0.0, t);
+    }
+}
 // The factor of a symmetric matrix scaled to unit diagonal, as detail::Cholesky
 // computes it (without a condition estimate), refactored in place for each
 // Newton step: reciprocals of the scales and pivots are kept so that factoring
@@ -397,10 +450,13 @@ inline FixedFit nb_fixed_fit(const Matrix &x, const Vector &y, const Vector &off
         exp_array(log_mu.data(), mu.data(), n);
         return finite;
     };
+    thread_local Vector unit;
     const auto deviance = [&](const Vector &mu) {
+        unit.resize(n);
+        nb_unit_deviances(y.data(), mu.data(), n, phi, unit.data());
         double total = 0;
         for (std::size_t i = 0; i < n; ++i)
-            total += nb_unit_deviance(y[i], mu[i], phi);
+            total += unit[i];
         return total;
     };
     f.mu.resize(n);
@@ -933,22 +989,22 @@ inline SqueezedVariances squeeze_variances(const Vector &s2, const Vector &d,
         x[i] = std::max(s2[i], floor);
         const double half = d[i] / 2;
         if (half > 0) {
-            e[i] = std::log(x[i]) - boost::math::digamma(half) + std::log(half);
-            w[i] = 1 / boost::math::trigamma(half);
+            e[i] = std::log(x[i]) - detail::digamma(half) + std::log(half);
+            w[i] = 1 / detail::trigamma(half);
         }
     }
     const double span =
         g <= 500 ? 1 : 0.3 + 0.7 * std::pow(500.0 / static_cast<double>(g), 1.0 / 3);
     const auto trend = weighted_lowess(covariate, e, w, span, delta);
     const auto log_scale = [&](double d0, std::size_t i) {
-        return trend[i] + boost::math::digamma(d0 / 2) - std::log(d0 / 2);
+        return trend[i] + detail::digamma(d0 / 2) - std::log(d0 / 2);
     };
     Vector lgamma_half(g);
     for (std::size_t i = 0; i < g; ++i)
         if (d[i] > 0)
             lgamma_half[i] = log_gamma(d[i] / 2);
     const auto objective = [&](double log_d0) {
-        const double d0 = std::exp(log_d0), shift = boost::math::digamma(d0 / 2) - std::log(d0 / 2),
+        const double d0 = std::exp(log_d0), shift = detail::digamma(d0 / 2) - std::log(d0 / 2),
                      lgamma_d0 = log_gamma(d0 / 2);
         long double total = 0;
         for (std::size_t i = 0; i < g; ++i)
@@ -1032,6 +1088,7 @@ inline FitOptions fixed_dispersion_options(double phi, const Vector &offset,
 //    library, offsets log(library + 2 x that), at phi / a (one-row hypotheses).
 inline QlResult edger_ql(const Matrix &design, const SparseCSC &counts,
                          const Hypothesis &hypothesis, const QlOptions &o = {}) {
+    const vmath::DivisionScope division(o.division);
     design.validate();
     counts.validate();
     const std::size_t n = counts.rows, genes = counts.cols, p = design.cols;
@@ -1326,10 +1383,12 @@ inline QlResult edger_ql(const Matrix &design, const SparseCSC &counts,
                 w[i] = f.mu[i] / (1 + working * f.mu[i]);
             const auto leverage = detail::fit_leverage(tested.x, tested_transpose, w);
             const double log_a = std::log(a);
+            Vector unit(n);
+            detail::nb_unit_deviances(v.data(), f.mu.data(), n, working, unit.data());
             double dev = 0, adj = 0, df = 0;
             for (std::size_t i = 0; i < n; ++i) {
                 const double h = std::clamp(leverage[i], 0.0, 1.0);
-                const double d = detail::nb_unit_deviance(v[i], f.mu[i], working);
+                const double d = unit[i];
                 dev += d;
                 const auto [inverse_scale, k] = moments.factors(f.mu[i] / a, f.log_mu[i] - log_a);
                 adj += d * inverse_scale;

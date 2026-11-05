@@ -534,7 +534,8 @@ impl DeseqDataSet {
             kept.retain(|&j| {
                 let ratio =
                     self.genewise_dispersions[j] / (coeffs[0] + coeffs[1] / self.normed_means[j]);
-                !(ratio < 1e-4 || ratio >= 15.0)
+                // Kept unless below 1e-4 or at least 15, as before; NaN is kept.
+                ratio.is_nan() || (1e-4..15.0).contains(&ratio)
             });
         }
         self.trend_coeffs = Some(coeffs);

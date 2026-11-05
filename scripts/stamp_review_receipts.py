@@ -5,7 +5,7 @@ p=argparse.ArgumentParser(description=__doc__);p.add_argument('directory',type=p
 root=pathlib.Path(__file__).resolve().parents[1]
 source=json.loads((a.directory/'source.json').read_text())
 for path in a.directory.glob('*.json'):
-    if path.name=='source.json': continue
+    if path.name in ('source.json', 'CPU_POLICY_EXPECTED.json'): continue
     value=json.loads(path.read_text())
     if isinstance(value,dict):
         value['_provenance']={k:value.get(k,source[k]) for k in ('version','commit','worktree_dirty')}

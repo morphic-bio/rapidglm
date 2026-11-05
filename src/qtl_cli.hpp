@@ -5,6 +5,7 @@
 #include "io.hpp"
 #include <rapidglm/qtl.hpp>
 #include <set>
+#include <string_view>
 namespace rapidglm::cli {
 inline std::vector<std::string> fields(const std::string &line) {
     std::istringstream in(line);
@@ -14,15 +15,54 @@ inline std::vector<std::string> fields(const std::string &line) {
         out.push_back(cell);
     return out;
 }
+// The .bim ID and alleles of each variant, packed as "ID<TAB>allele 1<TAB>allele
+// 2" into one string (record v from start[v] to start[v + 1]): about 31 bytes
+// per Geuvadis variant, against 128 for three strings.
+struct VariantLabels {
+    std::string text;
+    std::vector<std::size_t> start{0};
+    void add(const std::string &id, const std::string &allele1, const std::string &allele2) {
+        text.append(id).append(1, '\t').append(allele1).append(1, '\t').append(allele2);
+        start.push_back(text.size());
+    }
+    // Field k of variant v: 0 the ID, 1 allele 1, 2 allele 2.
+    std::string_view field(std::size_t v, int k) const {
+        std::string_view record(text.data() + start[v], start[v + 1] - start[v]);
+        for (; k > 0; --k)
+            record.remove_prefix(record.find('\t') + 1);
+        return record.substr(0, record.find('\t'));
+    }
+    // Keeps the variants whose flag is set, in order, and releases the spare
+    // capacity. Records only move toward the front, and start[kept] (kept <= v)
+    // is overwritten only after start[v] and start[v + 1] are read.
+    void keep(const std::vector<unsigned char> &flags) {
+        std::size_t kept = 0, end = 0;
+        for (std::size_t v = 0; v < flags.size(); ++v) {
+            if (!flags[v])
+                continue;
+            const std::size_t first = start[v], length = start[v + 1] - first;
+            std::memmove(text.data() + end, text.data() + first, length);
+            start[kept++] = end;
+            end += length;
+        }
+        start[kept] = end;
+        start.resize(kept + 1);
+        text.resize(end);
+        start.shrink_to_fit();
+        text.shrink_to_fit();
+    }
+};
 // PLINK 1 binary genotypes as the PLINK documentation describes them: prefix.bim
 // (chromosome, ID, cM, position, allele 1, allele 2), prefix.fam (family ID,
 // sample ID, ...) and a variant-major prefix.bed that starts with 0x6c 0x1b 0x01
 // and holds two bits per sample, the first sample in the lowest bits: 00 two
 // copies of allele 1, 01 missing, 10 one copy, 11 none. The dosage counts allele
-// 1. Samples are taken in the order of `samples` (IDs from the .fam).
+// 1. Samples are taken in the order of `samples` (IDs from the .fam). The calls
+// stay in these codes (Genotypes::hard_calls): each variant's .bed bytes as read
+// when `samples` are the .fam's samples in its order, else repacked in the order
+// of `samples`. IDs and alleles go to `labels`.
 inline Genotypes read_plink(const std::string &prefix, const std::vector<std::string> &samples,
-                            std::vector<std::pair<std::string, std::string>> *alleles = nullptr,
-                            const std::set<std::string> &chromosomes = {}) {
+                            VariantLabels &labels, const std::set<std::string> &chromosomes = {}) {
     std::vector<std::string> fam;
     {
         auto f = input(prefix + ".fam");
@@ -58,12 +98,15 @@ inline Genotypes read_plink(const std::string &prefix, const std::vector<std::st
             if (!keep)
                 continue;
             g.chrom.push_back(row[0]);
-            g.id.push_back(row[1]);
             g.position.push_back(std::stoll(row[3]));
-            if (alleles)
-                alleles->push_back({row[4], row[5]});
+            labels.add(row[1], row[4], row[5]);
         }
     }
+    // Without the spare capacity of their growth.
+    g.chrom.shrink_to_fit();
+    g.position.shrink_to_fit();
+    labels.text.shrink_to_fit();
+    labels.start.shrink_to_fit();
     g.variants = g.chrom.size();
     std::ifstream bed(prefix + ".bed", std::ios::binary);
     require(bed.good(), "cannot open the .bed file");
@@ -76,21 +119,29 @@ inline Genotypes read_plink(const std::string &prefix, const std::vector<std::st
     require(static_cast<std::uint64_t>(bed.tellg()) == 3 + std::uint64_t(bytes) * selected.size(),
             "the .bed length does not match .fam and .bim");
     bed.seekg(3);
+    bool same_samples = take.size() == fam.size();
+    for (std::size_t i = 0; i < take.size() && same_samples; ++i)
+        same_samples = take[i] == i;
+    const std::size_t stride = g.call_bytes();
     std::vector<unsigned char> block(bytes);
-    g.dosage.resize(g.samples * g.variants);
-    static constexpr double code[4] = {2, std::numeric_limits<double>::quiet_NaN(), 1, 0};
+    g.hard_calls.resize(stride * g.variants);
     std::size_t kept = 0;
     for (std::size_t v = 0; v < selected.size(); ++v) {
         if (!selected[v]) {
             bed.seekg(static_cast<std::streamoff>(bytes), std::ios::cur);
             continue;
         }
-        bed.read(reinterpret_cast<char *>(block.data()), static_cast<std::streamsize>(bytes));
+        std::uint8_t *out = &g.hard_calls[kept++ * stride];
+        unsigned char *in = same_samples ? out : block.data();
+        bed.read(reinterpret_cast<char *>(in), static_cast<std::streamsize>(bytes));
         require(static_cast<std::size_t>(bed.gcount()) == bytes, "the .bed file is truncated");
-        double *out = &g.dosage[kept++ * g.samples];
+        if (same_samples)
+            continue;
+        std::fill_n(out, stride, 0);
         for (std::size_t i = 0; i < take.size(); ++i) {
             const std::size_t s = take[i];
-            out[i] = code[(block[s / 4] >> (2 * (s % 4))) & 3];
+            out[i / 4] |=
+                static_cast<std::uint8_t>(((block[s / 4] >> (2 * (s % 4))) & 3) << (2 * (i % 4)));
         }
     }
     return g;
@@ -194,46 +245,46 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
     const auto output = config.get<std::string>("output");
     for (const auto &key : {"responses", "design", "pairs", "offset", "weights"})
         require(!config.count(key), (std::string(key) + " is not a qtl setting").c_str());
-    const auto bed = read_phenotype_bed(phenotype_path);
-    std::vector<std::pair<std::string, std::string>> alleles;
+    auto bed = read_phenotype_bed(phenotype_path);
+    VariantLabels labels;
     std::set<std::string> chromosomes;
     for (const auto &ph : bed.phenotypes)
         chromosomes.insert(ph.chrom);
-    auto genotypes = read_plink(genotype_prefix, bed.samples, &alleles, chromosomes);
+    auto genotypes = read_plink(genotype_prefix, bed.samples, labels, chromosomes);
     const auto x = covariate_design(covariate_path, bed.samples);
     const std::size_t n = bed.samples.size();
-    // Variants below min_maf (in these samples) are left out.
+    // Variants below min_maf (in these samples) are left out. The allele
+    // frequency is half the mean dosage (the halving is exact).
     const double min_maf = config.get<double>("min_maf", 0.0);
     require(std::isfinite(min_maf) && min_maf >= 0 && min_maf <= 0.5,
             "min_maf must be in [0, 0.5]");
     if (min_maf > 0) {
+        const std::size_t stride = genotypes.call_bytes();
+        std::vector<unsigned char> keep(genotypes.variants, 0);
         std::size_t kept = 0;
         for (std::size_t v = 0; v < genotypes.variants; ++v) {
-            double s = 0, k = 0;
-            for (std::size_t i = 0; i < n; ++i)
-                if (const double d = genotypes.dosage[v * n + i]; std::isfinite(d)) {
-                    s += d;
-                    ++k;
-                }
-            const double af = k ? s / (2 * k) : 0;
+            const double af = genotypes.mean_dosage(v) / 2;
             if (std::min(af, 1 - af) < min_maf)
                 continue;
+            keep[v] = 1;
             if (kept != v) {
-                std::copy_n(genotypes.dosage.begin() + v * n, n,
-                            genotypes.dosage.begin() + kept * n);
+                std::copy_n(genotypes.hard_calls.begin() + v * stride, stride,
+                            genotypes.hard_calls.begin() + kept * stride);
                 genotypes.chrom[kept] = std::move(genotypes.chrom[v]);
-                genotypes.id[kept] = std::move(genotypes.id[v]);
                 genotypes.position[kept] = genotypes.position[v];
-                alleles[kept] = std::move(alleles[v]);
             }
             ++kept;
         }
+        // The capacity of the unfiltered variants is released (each array briefly
+        // held twice, before the scan allocates its gene buffers).
         genotypes.variants = kept;
-        genotypes.dosage.resize(kept * n);
+        genotypes.hard_calls.resize(kept * stride);
         genotypes.chrom.resize(kept);
-        genotypes.id.resize(kept);
         genotypes.position.resize(kept);
-        alleles.resize(kept);
+        genotypes.hard_calls.shrink_to_fit();
+        genotypes.chrom.shrink_to_fit();
+        genotypes.position.shrink_to_fit();
+        labels.keep(keep);
     }
     SparseCSC responses{n, bed.phenotypes.size(), {0}, {}, {}};
     for (const auto &values : bed.values) {
@@ -244,6 +295,7 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
             }
         responses.column_ptr.push_back(responses.values.size());
     }
+    std::vector<std::vector<double>>().swap(bed.values);
     CisQtlOptions o;
     o.model = fit_options(config);
     require(library_path.empty() || o.model.family != Family::gaussian,
@@ -255,6 +307,20 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
     o.nominal = config.get<bool>("nominal", false);
     o.seed = config.get<std::uint64_t>("seed", 1);
     o.threads = config.get<int>("threads", 1);
+    const auto precision = config.get<std::string>("permutation_precision", "single");
+    require(precision == "single" || precision == "double",
+            "permutation_precision must be single or double");
+    o.permutation_precision = precision == "single" ? PermutationPrecision::single_precision
+                                                    : PermutationPrecision::double_precision;
+    const auto fits = config.get<std::string>("permutation_fits", "lockstep");
+    require(fits == "lockstep" || fits == "separate",
+            "permutation_fits must be lockstep or separate");
+    o.permutation_fits = fits == "lockstep" ? PermutationFits::lockstep : PermutationFits::separate;
+    // The run record states the precision the permutation scores used (null
+    // without permutations). Only projected Gaussian permutations have a
+    // single-precision path; count models refit every permutation in double.
+    const bool single_scores = o.permutation_precision == PermutationPrecision::single_precision &&
+                               detail::qtl_projected_permutations(o.model);
     for (auto path : {phenotype_path, genotype_prefix + ".bed", genotype_prefix + ".bim",
                       genotype_prefix + ".fam", covariate_path, library_path})
         if (!path.empty())
@@ -272,11 +338,11 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
             const auto &g = result.genes[f];
             const bool lead = std::isfinite(g.statistic);
             out << ph.id << '\t' << ph.chrom << '\t' << ph.start << '\t' << ph.end << '\t'
-                << g.variants << '\t' << g.status << '\t' << (lead ? genotypes.id[g.lead] : "NA")
-                << '\t';
+                << g.variants << '\t' << g.status << '\t'
+                << (lead ? labels.field(g.lead, 0) : std::string_view("NA")) << '\t';
             if (lead)
-                out << genotypes.position[g.lead] << '\t' << alleles[g.lead].first << '\t'
-                    << alleles[g.lead].second;
+                out << genotypes.position[g.lead] << '\t' << labels.field(g.lead, 1) << '\t'
+                    << labels.field(g.lead, 2);
             else
                 out << "NA\tNA\tNA";
             for (double v : {g.statistic, g.p_value, g.estimate, g.standard_error, g.theta}) {
@@ -300,7 +366,7 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
                "error\n";
         for (const auto &pair : result.nominal) {
             const auto &ph = bed.phenotypes[pair.phenotype];
-            out << ph.id << '\t' << genotypes.id[pair.variant] << '\t'
+            out << ph.id << '\t' << labels.field(pair.variant, 0) << '\t'
                 << genotypes.position[pair.variant] << '\t'
                 << genotypes.position[pair.variant] - ph.start;
             for (double v : {pair.statistic, pair.p_value, pair.estimate, pair.standard_error}) {
@@ -314,19 +380,36 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
     }
     const double seconds =
         std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
-    std::size_t tested = 0;
-    for (const auto &g : result.genes)
+    std::size_t tested = 0, refitted = 0;
+    for (const auto &g : result.genes) {
         tested += g.status.rfind("ok", 0) == 0;
+        refitted += g.permutations_refitted;
+    }
+    // Refitted permutations of a count model: the fits asked for, and how many
+    // lockstep fits fit() redid.
+    const bool refits = o.permutations > 0 && !detail::qtl_projected_permutations(o.model);
     std::ofstream record(output + ".run.json");
     require(record.good(), "cannot open QTL run record");
     record << "{\"command\": \"qtl\", \"version\": \"" << version << "\", \"config\": ";
     quoted(record, config_path);
+    record << ",\n  \"division\": ";
+    quoted(record, vmath::division_name());
     record << ", \"samples\": " << n << ", \"phenotypes\": " << bed.phenotypes.size()
            << ", \"phenotypes_tested\": " << tested << ", \"variants\": " << genotypes.variants
            << ", \"covariates\": " << x.cols - 1 << ", \"window\": " << o.window
            << ", \"permutations\": " << o.permutations << ", \"seed\": " << o.seed
-           << ", \"threads\": " << o.threads << ", \"min_maf\": ";
+           << ", \"threads\": " << o.threads << ", \"permutation_precision\": "
+           << (o.permutations == 0 ? "null"
+               : single_scores     ? "\"single\""
+                                   : "\"double\"")
+           << ", \"min_maf\": ";
     value(record, min_maf);
+    record << ", \"permutation_fits\": ";
+    if (refits)
+        quoted(record, fits);
+    else
+        record << "null";
+    record << ", \"permutations_refitted\": " << refitted;
     record << ", \"family\": ";
     quoted(record, config.get<std::string>("family", "nb"));
     record << ", \"input_sha1\": {";

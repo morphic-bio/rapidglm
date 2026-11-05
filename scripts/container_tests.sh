@@ -16,11 +16,13 @@ scripts/check_external.sh
 step "Python layer over the C interface"
 python3 bindings/python/tests/test_capi.py "$build/rapidglm"
 python3 bindings/python/tests/test_deseq.py "$build/rapidglm"
+python3 bindings/python/tests/test_special.py
 if [ -x /opt/pydeseq2/bin/python ]; then
   step "RapidGLM as a PyDESeq2 inference back end"
   /opt/pydeseq2/bin/python bindings/python/tests/test_pydeseq2.py
 fi
 step "R package"
 Rscript bindings/r/tests/parity.R
+Rscript bindings/r/tests/special.R
 RAPIDGLM_CLI="$PWD/$build/rapidglm" Rscript bindings/r/tests/applications.R
 step "All test suites passed"

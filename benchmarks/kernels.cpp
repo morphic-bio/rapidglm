@@ -69,7 +69,7 @@ int main() {
             Vector probabilities(n);
             for (std::size_t i = 0; i < n; ++i)
                 probabilities[i] = probability * (0.5 + (i % 101) / 100.0);
-            auto sampler = crt_sampler(probabilities);
+            auto sampler = crt_sampler(probabilities, CrtDraw::thinned);
             std::vector<std::size_t> selected;
             // Bank is for isolating score cost only, not a production draw cache.
             std::vector<std::vector<std::size_t>> bank(128);

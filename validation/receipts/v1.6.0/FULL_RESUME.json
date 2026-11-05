@@ -1,0 +1,80 @@
+{
+  "recorded_utc": "2026-11-03T10:37:19.810272+00:00",
+  "user_instruction": "timed run can go on the free GPU server now",
+  "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "runner_commit": "3e731bd2cd784e829ba30fb228401cea776e12cc",
+  "preprint_delivery_commit": "be1c0ebd838155627fb7f6695cd8d63afe131611",
+  "preparation": {
+    "recorded_utc": "2026-11-03T10:31:55.133499+00:00",
+    "source_verified_with_documented_post_measurement_changes": true,
+    "preprint_snapshot_sha256": "6da90c8a32fdf75ff4cbf2ecd34744b901451ab9583ac45022c74a8ae0dde94f",
+    "restored_audit_streams": [
+      {
+        "file": "CPU_POLICY_AUDIT.jsonl",
+        "uncompressed_sha256": "16f96b7a27096b3141013efde0c31d03f74c8fffc3824c54fde469b7a35318e4"
+      },
+      {
+        "file": "HOST_LOAD.jsonl",
+        "uncompressed_sha256": "2dfe4ee194a94cc25e5d73be7bfc4e1d68839c0d7a45bfa6361f91b857eb7e30"
+      },
+      {
+        "file": "timing-audit.jsonl",
+        "uncompressed_sha256": "3117560c28a604b6a303458f700d728f8945f420460365ba2a0031670136aeba"
+      }
+    ],
+    "interrupted_bulk_archive": {
+      "stage": "bulk",
+      "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+      "prior_exit": 143,
+      "prior_state": "CANCELLED by user preprint scope change at an idle boundary",
+      "invalidated_label": "bulk-1793374540116244725",
+      "started_utc": "2026-10-30T15:35:40.116249+00:00",
+      "finished_utc": "2026-10-31T04:07:18Z",
+      "reason": "User now resumed the full run. Preserve and repeat the entire interrupted bulk stage; none of its 157 partial accepted timings is reused.",
+      "retained_stage_timings": 0,
+      "archive_path": "validation/work/release-1.6.0-gpu/full-resume-20261103/interrupted-bulk",
+      "archive_manifest_sha256": "5382594dbc440a02feaa966feae74161d8cc416b9ee9099d58f1259d0df09f0b",
+      "numerical_source_inputs_and_thresholds_unchanged": true
+    },
+    "seven_complete_stages_retained": true,
+    "library_binaries_images_unchanged": true
+  },
+  "snapshot_manifest": {
+    "file": "validation/work/release-1.6.0-gpu/full-resume-20261103/PREPRINT_SNAPSHOT.json",
+    "sha256": "6da90c8a32fdf75ff4cbf2ecd34744b901451ab9583ac45022c74a8ae0dde94f"
+  },
+  "retained_completed_stages": [
+    "glmacc",
+    "glmspeed",
+    "batch",
+    "solvers",
+    "solvers_control",
+    "bulkval",
+    "edgerval"
+  ],
+  "remaining_stages": 17,
+  "first_stage": "bulk",
+  "quiet_window": {
+    "user_answer": "Arrange a quiet CPU window",
+    "readiness_must_be_verified_by_unchanged_guards": true,
+    "protected_processes_untouched": true
+  },
+  "rust_baseline_decision": {
+    "recorded_utc": "2026-11-03T10:33:38.295018+00:00",
+    "decision": "accepted_documented_reconstruction",
+    "user_answer": "Accept the documented reconstruction",
+    "accepted_evidence": [
+      "exact retained historical scientific diagnostics",
+      "byte comparison of new accepted results against reconstruction from preserved historical binaries"
+    ],
+    "original_historical_raw_tables_available": false,
+    "historical_raw_table_identity_established": false,
+    "scope": "Rust agreement for the resumed full 1.6.0 receipts run; no historical timings inferred from reconstruction"
+  },
+  "release_publication_not_authorized": true,
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

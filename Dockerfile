@@ -32,8 +32,11 @@ RUN R CMD INSTALL bindings/r
 
 # PyDESeq2 (MIT) in its own environment, for the RapidGLM inference back-end test.
 ARG WITH_PYDESEQ2=1
+ARG PYDESEQ2_VERSION=0.5.2
+# PyDESeq2 0.5.2 needs pandas 2.x for its fitted boolean-status columns.
+ARG PANDAS_VERSION=2.3.3
 RUN if [ "$WITH_PYDESEQ2" = 1 ]; then \
-        python3 -m venv /opt/pydeseq2 && /opt/pydeseq2/bin/pip install --no-cache-dir --quiet pydeseq2; \
+        python3 -m venv /opt/pydeseq2 && /opt/pydeseq2/bin/pip install --no-cache-dir --quiet "pydeseq2==$PYDESEQ2_VERSION" "pandas==$PANDAS_VERSION"; \
     fi
 
 CMD ["scripts/container_tests.sh"]

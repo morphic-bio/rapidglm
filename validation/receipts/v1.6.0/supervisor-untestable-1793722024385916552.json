@@ -1,0 +1,14 @@
+{
+  "label": "untestable-1793722024385916552",
+  "stages": [
+    "untestable"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T16:07:04.493828+00:00",
+  "finished_utc": "2026-11-03T16:22:19.654019+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 901,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0557984579354525,
+  "cpu_policy_observed_quiet_starts": 12,
+  "error": null
+}

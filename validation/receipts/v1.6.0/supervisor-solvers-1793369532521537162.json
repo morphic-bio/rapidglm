@@ -1,0 +1,14 @@
+{
+  "label": "solvers-1793369532521537162",
+  "stages": [
+    "solvers"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-30T14:12:12.628154+00:00",
+  "finished_utc": "2026-10-30T14:25:54.926264+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 809,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0697064884006977,
+  "cpu_policy_observed_quiet_starts": 6,
+  "error": null
+}

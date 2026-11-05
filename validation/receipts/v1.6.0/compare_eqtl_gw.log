@@ -1,0 +1,26 @@
+{
+ "gaussian10000": {
+  "genes": 20427,
+  "valid": 20248,
+  "statuses": {
+   "ok": 20248,
+   "no_cis_variants": 179
+  },
+  "pi0": 0.350259,
+  "egenes": 9575,
+  "beta_vs_permutation_spearman": 0.9906960589415256,
+  "wall_seconds": 1212.326266414,
+  "threads": 12,
+  "permutations": 10000,
+  "permutation_precision": "single",
+  "references": {
+   "tensorQTL_perm10000_beta": {
+    "egenes": 9581,
+    "shared": 9556,
+    "jaccard": 0.9954,
+    "spearman_p": 0.9999601516525208,
+    "same_lead": 0.9856282101935994
+   }
+  }
+ }
+}

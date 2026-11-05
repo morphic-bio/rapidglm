@@ -1,0 +1,421 @@
+{
+  "started": "2026-11-03T13:46:31",
+  "finished": "2026-11-03T14:51:39",
+  "host": {
+    "cores": 48,
+    "cpus_allowed": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "cpus_by_threads": {
+      "1": [
+        6
+      ],
+      "8": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    "uname": "Linux biocloudgpu1 5.15.0-157-generic #167-Ubuntu SMP Wed Sep 17 21:35:53 UTC 2025 x86_64"
+  },
+  "binary": "/data/lhhung/rapidglm-1.6.0/build/rapidglm",
+  "version": "1.6.0",
+  "commit": "3e731bd2cd784e829ba30fb228401cea776e12cc",
+  "repeats": 1,
+  "bulk": [],
+  "perturbation": [
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-cli",
+      "threads": 1,
+      "seconds": 260.1756648719311,
+      "all_seconds": [
+        260.1756648719311
+      ],
+      "load": 5.2412109375,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 260.1756648719311,
+          "load": 5.2412109375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.05,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-cli",
+      "threads": 8,
+      "seconds": 35.90159949287772,
+      "all_seconds": [
+        35.90159949287772
+      ],
+      "load": 4.66650390625,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 35.90159949287772,
+          "load": 4.66650390625,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-python",
+      "threads": 1,
+      "seconds": 263.6379114687443,
+      "all_seconds": [
+        263.6379114687443
+      ],
+      "load": 6.65673828125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 263.6379114687443,
+          "load": 6.65673828125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.07,
+          "others_cpu": 0.0001,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-python",
+      "threads": 8,
+      "seconds": 35.596332747489214,
+      "all_seconds": [
+        35.596332747489214
+      ],
+      "load": 6.73974609375,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 35.596332747489214,
+          "load": 6.73974609375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-r",
+      "threads": 1,
+      "seconds": 299.962,
+      "all_seconds": [
+        299.962
+      ],
+      "load": 6.55810546875,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 299.962,
+          "load": 6.55810546875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 40.2,
+          "others_cpu": 0.0001,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-r",
+      "threads": 8,
+      "seconds": 42.506,
+      "all_seconds": [
+        42.506
+      ],
+      "load": 4.671875,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 42.506,
+          "load": 4.671875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.985502562787746
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-cli-ks",
+      "threads": 1,
+      "seconds": 222.10489941202104,
+      "all_seconds": [
+        222.10489941202104
+      ],
+      "load": 6.7802734375,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 222.10489941202104,
+          "load": 6.7802734375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-cli-ks",
+      "threads": 8,
+      "seconds": 30.940897101536393,
+      "all_seconds": [
+        30.940897101536393
+      ],
+      "load": 4.69580078125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 30.940897101536393,
+          "load": 4.69580078125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-python-ks",
+      "threads": 1,
+      "seconds": 222.65427521243691,
+      "all_seconds": [
+        222.65427521243691
+      ],
+      "load": 6.55859375,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 222.65427521243691,
+          "load": 6.55859375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-python-ks",
+      "threads": 8,
+      "seconds": 30.263052243739367,
+      "all_seconds": [
+        30.263052243739367
+      ],
+      "load": 4.7900390625,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 30.263052243739367,
+          "load": 4.7900390625,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-r-ks",
+      "threads": 1,
+      "seconds": 246.309,
+      "all_seconds": [
+        246.309
+      ],
+      "load": 6.40087890625,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 246.309,
+          "load": 6.40087890625,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0001,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "rapidglm-r-ks",
+      "threads": 8,
+      "seconds": 35.942,
+      "all_seconds": [
+        35.942
+      ],
+      "load": 4.73486328125,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 35.942,
+          "load": 4.73486328125,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0001,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 0.8461538461538461,
+        "spearman": 0.9855025007490371
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "sceptre",
+      "threads": 1,
+      "seconds": 1379.629,
+      "all_seconds": [
+        1379.629
+      ],
+      "load": 6.41162109375,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 1379.629,
+          "load": 6.41162109375,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0001,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 1.0,
+        "spearman": 0.9999999999999998
+      }
+    },
+    {
+      "dataset": "gasperini50k",
+      "tool": "sceptre",
+      "threads": 8,
+      "seconds": 206.56,
+      "all_seconds": [
+        206.56
+      ],
+      "load": 4.65576171875,
+      "contended": false,
+      "runs": [
+        {
+          "seconds": 206.56,
+          "load": 4.65576171875,
+          "waited_for_idle_seconds": 0.0,
+          "waited_for_quiet_host_seconds": 20.1,
+          "others_cpu": 0.0001,
+          "contended": false
+        }
+      ],
+      "agreement_with_sceptre": {
+        "pairs": 8546,
+        "discoveries": 24,
+        "jaccard": 1.0,
+        "spearman": 0.9999999999999998
+      }
+    }
+  ],
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "3e731bd2cd784e829ba30fb228401cea776e12cc",
+    "worktree_dirty": true
+  }
+}

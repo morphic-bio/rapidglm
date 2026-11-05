@@ -1,0 +1,14 @@
+{
+  "label": "pert50k-1793713590972543300",
+  "stages": [
+    "pert50k"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T13:46:31.096905+00:00",
+  "finished_utc": "2026-11-03T14:51:40.437802+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 3846,
+  "cpu_policy_maximum_poll_gap_seconds": 1.062400944530964,
+  "cpu_policy_observed_quiet_starts": 15,
+  "error": null
+}

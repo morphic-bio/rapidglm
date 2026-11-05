@@ -1,0 +1,129 @@
+{
+  "measured_commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+  "started_utc": "2026-10-30T07:37:44.826374+00:00",
+  "ported_files": [
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/cpu_policy.py",
+      "source_sha256": "f116c1221a57d45984fe4daeac60c8ffc25edcafc7153ace7a1de02eece6cfc3",
+      "destination": "validation/receipts/v1.6.0/cpu_policy.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/CPU_POLICY_EXPECTED.json",
+      "source_sha256": "e1d794e3a1ecedaa30ce055f914ec21cb1ac97c68e58ff7d6e5da7bc1165c5ae",
+      "destination": "validation/receipts/v1.6.0/CPU_POLICY_EXPECTED.json"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/measurement_guard.py",
+      "source_sha256": "5f6bc4d1cd35b622727b2bd7491f4d64eb28158564551c61376031f6472b5ea8",
+      "destination": "validation/receipts/v1.6.0/measurement_guard.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/measurement_guard_v2.py",
+      "source_sha256": "3344a68ffdf937e72c0adfa8982ad1e405f506fb34a218a0deecbb58a15f6c67",
+      "destination": "validation/receipts/v1.6.0/measurement_guard_v2.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/measurement_guard_v3.py",
+      "source_sha256": "658195c5a8bc398a54d16eaa0fdc289a10bba18abba2a746c8bb7c3c2b672701",
+      "destination": "validation/receipts/v1.6.0/measurement_guard_v3.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/docker_measure.py",
+      "source_sha256": "4106625e87644b1ccf05b49418a99b83908605c11148bb52307bf60293ccadcd",
+      "destination": "validation/receipts/v1.6.0/docker_measure.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/cpu_guard.py",
+      "source_sha256": "7d084fc2ce4a793266edcde52ea244015713408064c0325c33a2e5d464307735",
+      "destination": "validation/receipts/v1.6.0/cpu_guard.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/policy_hook/sitecustomize.py",
+      "source_sha256": "d021ee5bca388f26fe479cbe33d2aef5f4679cdd83d6d0327cb9e6804fd74469",
+      "destination": "validation/receipts/v1.6.0/policy_hook/sitecustomize.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/policy_hook/usercustomize.py",
+      "source_sha256": "10df3902344cfda600ea8efa1fe206435e2df2ebd920ba9f7a6d3763c00dceaa",
+      "destination": "validation/receipts/v1.6.0/policy_hook/usercustomize.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/vmath_e2e.py",
+      "source_sha256": "697d0f779b6edc77626b5da500212176a05caebfab630fdb6fb49e56d719fdd6",
+      "destination": "validation/receipts/v1.6.0/vmath_e2e.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/receipts/v1.5.0/jaxqtl_split.sh",
+      "source_sha256": "a1fd84e721aa94d6f8d04304c6ec63e9fe1fd85dd5d01ec30be1ae1084d3dc42",
+      "destination": "validation/receipts/v1.6.0/jaxqtl_split.sh"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/run_accepted.sh",
+      "source_sha256": "660000c1b149a1d784c9f2251e2882edd2c32da0633d990ae584da54f867e080",
+      "destination": "validation/receipts/v1.6.0/run_accepted.sh"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/supervise_accepted.py",
+      "source_sha256": "193467af35e8e2fb1c85535b32941a277f36aec8822437026e49ef713d7f6b63",
+      "destination": "validation/receipts/v1.6.0/supervise_accepted.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/approved_chain.py",
+      "source_sha256": "b127142d5a2fe3f56b4a76ede3ced87a001e4787e6d5ff06c8b2f69dc2187405",
+      "destination": "validation/receipts/v1.6.0/approved_chain.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/check_run_accepted.py",
+      "source_sha256": "d55c77c1cb804ee39f196db11c5e457ef3b554cf5f736eda7d545ed14c23a07a",
+      "destination": "validation/receipts/v1.6.0/check_run_accepted.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/guarded_retry.py",
+      "source_sha256": "4802c3b92df3bedf107f0898dd5c4330afff6d4dc1884ee18bac9f2e86fe0089",
+      "destination": "validation/receipts/v1.6.0/guarded_retry.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/resume_glm_speed.py",
+      "source_sha256": "5c8359b941aef2972ca808f3da2cc316b3888eb674e8f8fc555272926a48e334",
+      "destination": "validation/receipts/v1.6.0/resume_glm_speed.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/retry_applications.py",
+      "source_sha256": "9ff8fa4eb438ce5fed32874ef4fe66b5dda42a1c6baa6ccdd80cc7880f8679cb",
+      "destination": "validation/receipts/v1.6.0/retry_applications.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/retry_bulk_validation.py",
+      "source_sha256": "5c136a52f5586a370a5400d093de8fd4b72206a9419b7de61cbf00b5a7db96bc",
+      "destination": "validation/receipts/v1.6.0/retry_bulk_validation.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/run_rust_comparison.py",
+      "source_sha256": "4104c453e1341a4c32ec20ab471f1b5e78dd2f0ec4f81624e5945ff2b7ec940b",
+      "destination": "validation/receipts/v1.6.0/run_rust_comparison.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/rust_live_cpu.py",
+      "source_sha256": "ac90750af04273dd91ae4b8861b439d8ceed74ab0c9e117fdb6456dfa99930eb",
+      "destination": "validation/receipts/v1.6.0/rust_live_cpu.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/verify_rust_live_cpu.py",
+      "source_sha256": "e124c6c5a2fb98548bb04f6735baa0b6cad85c6e0e0524a4d55c075cb46f3b27",
+      "destination": "validation/receipts/v1.6.0/verify_rust_live_cpu.py"
+    },
+    {
+      "source": "/data/lhhung/rapidglm/validation/work/release-1.5.0-gpu/stamp_release_receipts.py",
+      "source_sha256": "c3905b186b794370db9803bc31940723391c2de8b57ac7814990920e54e93d38",
+      "destination": "validation/receipts/v1.6.0/stamp_release_receipts.py"
+    }
+  ],
+  "historical_repairs_reference": "/data/lhhung/rapidglm/validation/receipts/v1.5.0",
+  "fresh_run": true,
+  "no_prior_timings_retained": true,
+  "_provenance": {
+    "version": "1.6.0",
+    "commit": "4505ef6afaa00a38c5c871ae0e12d531c91ec1cf",
+    "worktree_dirty": true
+  }
+}

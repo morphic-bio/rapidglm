@@ -1,0 +1,26 @@
+{
+  "checked_utc": "2026-11-05T10:15:02.203538+00:00",
+  "files": [
+    {
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/glm-compare/batch-v1.6.0/X.f64",
+      "sha256": "d8346c2624e456f598e43af9344cfe922dba85046c3637cba251b7f0170ca355",
+      "discarded_attempt_sha256": "d8346c2624e456f598e43af9344cfe922dba85046c3637cba251b7f0170ca355",
+      "identical": true
+    },
+    {
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/glm-compare/batch-v1.6.0/Y.f64",
+      "sha256": "b343dd532f82d234abbb68522a5b43c6735adae4ed73fb8437d46111fabebf08",
+      "discarded_attempt_sha256": "b343dd532f82d234abbb68522a5b43c6735adae4ed73fb8437d46111fabebf08",
+      "identical": true
+    },
+    {
+      "file": "validation/work/benchmark/runs-v1.6.0-gpu/glm-compare/batch-v1.6.0/meta.json",
+      "sha256": "1da2819a2f82b2c71a2534f9ec1540bea036d2e06c70ef3613cbc395f0212854",
+      "discarded_attempt_sha256": "1da2819a2f82b2c71a2534f9ec1540bea036d2e06c70ef3613cbc395f0212854",
+      "identical": true
+    }
+  ],
+  "all_identical": true,
+  "prior_timings_reused": false,
+  "repair": "DRIVER_SCOPE_REPAIR.json"
+}

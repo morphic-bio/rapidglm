@@ -1,0 +1,14 @@
+{
+  "label": "special-1793739004313373804",
+  "stages": [
+    "special"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T20:50:04.431991+00:00",
+  "finished_utc": "2026-11-03T21:19:23.747041+00:00",
+  "cpu_policy_unchanged": true,
+  "cpu_policy_samples": 1732,
+  "cpu_policy_maximum_poll_gap_seconds": 1.0536344479769468,
+  "cpu_policy_observed_quiet_starts": 6,
+  "error": null
+}
