@@ -16,6 +16,10 @@ rapidglm_sceptre_grid_ <- function(design, yp, yi, yx, genes, gp, gi, gx, n_guid
   .Call(`_rapidglm_rapidglm_sceptre_grid_`, design, yp, yi, yx, genes, gp, gi, gx, n_guides, guide_ids, guide_targets, guide_non_targeting, discovery_targets, negative_targets, grid_responses, pair_responses, pair_targets, pair_kinds, o)
 }
 
+rapidglm_qtl_ <- function(phenotypes, samples, phenotype_ids, phenotype_chrom, phenotype_start, phenotype_end, genotypes, variant_ids, variant_chrom, variant_position, allele1, allele2, covariates, library_sizes, o) {
+  .Call(`_rapidglm_rapidglm_qtl_`, phenotypes, samples, phenotype_ids, phenotype_chrom, phenotype_start, phenotype_end, genotypes, variant_ids, variant_chrom, variant_position, allele1, allele2, covariates, library_sizes, o)
+}
+
 rapidglm_fit_ <- function(x, y, weights, offset, start, family, theta, estimate_theta, tolerance, max_iterations, singular_ok, alias_tolerance) {
   .Call(`_rapidglm_rapidglm_fit_`, x, y, weights, offset, start, family, theta, estimate_theta, tolerance, max_iterations, singular_ok, alias_tolerance)
 }

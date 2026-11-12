@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.6.1 (2026-11-12)
+
+RapidGLM 1.6.1 makes cis-QTL mapping available from every interface. The
+numerical code and the results are those of 1.6.0: the fitting, scoring,
+sampling, random streams, defaults and the command-line output are unchanged,
+and the 1.6.0 measurements and receipts describe this release's library. It adds
+two things.
+
+- **Cis-QTL mapping in the C interface and in the R and Python packages.**
+  `rapidglm_qtl` (C API version 5, with `rapidglm_qtl_options`,
+  `rapidglm_qtl_phenotypes` and `rapidglm_qtl_genotypes`), `rapidglm.qtl` and
+  `rapidglm::qtl` run the analysis of `rapidglm qtl` on phenotypes and genotypes
+  held in memory: Gaussian, Poisson and NB families, covariates, library sizes,
+  `window`, `permutations`, `min_maf`, `nominal`, `seed`, `threads`,
+  `permutation_precision`, `permutation_fits` and the generic model controls. The
+  tables have the CLI's columns and equal its output for the same inputs, at any
+  number of threads (checked in `tests/test_c_api.cpp`,
+  `bindings/python/tests/test_capi.py` and `bindings/r/tests/applications.R`).
+  Genotypes are calls (0, 1, 2 copies of allele 1, or missing) kept as PLINK's
+  two-bit codes. The code that the command and the C interface both need (BED
+  anchoring, `min_maf`, the response matrix, library offsets, the run summary and
+  the column names) moved to `src/qtl_run.hpp`; the command's output is byte for
+  byte that of 1.6.0. Nothing of C API version 4 changed.
+
+- **Benchmark of the steps of the CRT null draws.** `benchmarks/crt_steps.cpp`
+  (targets `rapidglm_crt_steps` and `rapidglm_crt_steps_portable`) and
+  `scripts/benchmark_crt_steps.py` time the null draws of a high-MOI screen with
+  the released library, step by step, and check that every mode writes the same
+  table ([docs/CRT_STEPS.md](docs/CRT_STEPS.md)). The library is unchanged.
+
 ## 1.6.0 (2026-11-05)
 
 RapidGLM 1.6.0 has completed the full GPU-host receipts run. The formal

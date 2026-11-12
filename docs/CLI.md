@@ -708,6 +708,11 @@ the C interface are the stable interfaces.
 
 ## Cis-QTL mapping (`qtl`)
 
+From 1.6.1 the same analysis is available with the phenotypes and genotypes in
+memory: `rapidglm_qtl` in the C interface ([C_API.md](C_API.md)), `rapidglm.qtl`
+in Python and `rapidglm::qtl` in R. They share their code with the command and
+give its tables for the same inputs.
+
 Run `rapidglm qtl config.json`, for example:
 
 ```json

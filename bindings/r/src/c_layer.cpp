@@ -1,7 +1,7 @@
-// R entry points for bulk_de, sceptre and sceptre_grid through the RapidGLM C interface
-// (rapidglm_c.h; src/c_api.cpp is compiled into the package by configure).
-// The R layer (R/applications.R) orients inputs and names options; this file
-// fills the C option structs and converts result tables to R lists.
+// R entry points for bulk_de, edger_ql, sceptre, sceptre_grid and qtl through the RapidGLM C
+// interface (rapidglm_c.h; src/c_api.cpp is compiled into the package by configure). The R layer
+// (R/applications.R) orients inputs and names options; this file fills the C option structs and
+// converts result tables to R lists.
 #include <cpp11.hpp>
 #include <rapidglm/rapidglm_c.h>
 
@@ -357,4 +357,129 @@ rapidglm_sceptre_grid_(cpp11::doubles_matrix<> design, cpp11::integers yp, cpp11
     const Grid grid{discovery_targets, negative_targets, grid_responses};
     return run_sceptre(design, yp, yi, yx, genes, gp, gi, gx, n_guides, guide_ids, guide_targets,
                        guide_non_targeting, pair_responses, pair_targets, pair_kinds, o, &grid);
+}
+
+// Cis-QTL mapping. phenotypes: samples x phenotypes and genotypes: samples x
+// variants, as R stores them (column-major), which is the C interface's layout
+// of one phenotype's values and one variant's calls in a row. Genotypes are
+// integer, logical or double calls (0, 1, 2; NA or negative: missing). Empty
+// allele vectors, a covariate matrix without columns and empty library sizes
+// mean "none". Returns list(result, nominal), each as rapidglm_sceptre_ returns
+// its table.
+[[cpp11::register]] cpp11::writable::list
+rapidglm_qtl_(cpp11::doubles phenotypes, int samples, cpp11::strings phenotype_ids,
+              cpp11::strings phenotype_chrom, cpp11::doubles phenotype_start,
+              cpp11::doubles phenotype_end, SEXP genotypes, cpp11::strings variant_ids,
+              cpp11::strings variant_chrom, cpp11::doubles variant_position, cpp11::strings allele1,
+              cpp11::strings allele2, cpp11::doubles_matrix<> covariates,
+              cpp11::doubles library_sizes, cpp11::list o) {
+    using namespace cpp11::literals;
+    const size_t n = static_cast<size_t>(samples), count = phenotype_ids.size(),
+                 variants = variant_ids.size();
+    if (n == 0 || phenotypes.size() != n * count)
+        cpp11::stop("phenotypes need one column per phenotype and one row per sample");
+    const auto integral = [](const cpp11::doubles &v, const char *name) {
+        std::vector<int64_t> out(v.size());
+        for (R_xlen_t i = 0; i < v.size(); ++i) {
+            if (!std::isfinite(v[i]) || std::floor(v[i]) != v[i] || std::fabs(v[i]) > 9e15)
+                cpp11::stop("%s must be integers", name);
+            out[static_cast<size_t>(i)] = static_cast<int64_t>(v[i]);
+        }
+        return out;
+    };
+    if (phenotype_chrom.size() != static_cast<R_xlen_t>(count) ||
+        phenotype_start.size() != static_cast<R_xlen_t>(count) ||
+        phenotype_end.size() != static_cast<R_xlen_t>(count))
+        cpp11::stop("phenotype annotations need one entry per phenotype");
+    if (variant_chrom.size() != static_cast<R_xlen_t>(variants) ||
+        variant_position.size() != static_cast<R_xlen_t>(variants))
+        cpp11::stop("variant annotations need one entry per variant");
+    if ((allele1.size() != 0 && allele1.size() != static_cast<R_xlen_t>(variants)) ||
+        (allele2.size() != 0 && allele2.size() != static_cast<R_xlen_t>(variants)))
+        cpp11::stop("alleles need one entry per variant");
+    const auto starts = integral(phenotype_start, "start"), ends = integral(phenotype_end, "end"),
+               positions = integral(variant_position, "position");
+    // Calls, one byte each: 0, 1, 2 or -1 for missing.
+    std::vector<int8_t> calls(variants * n);
+    {
+        SEXP g = genotypes;
+        const R_xlen_t total = Rf_xlength(g);
+        if (static_cast<size_t>(total) != variants * n)
+            cpp11::stop("genotypes need one column per variant and one row per sample");
+        const auto convert = [&](bool missing, double v, size_t k) {
+            if (missing || v < 0)
+                calls[k] = -1;
+            else if (v == 0 || v == 1 || v == 2)
+                calls[k] = static_cast<int8_t>(v);
+            else
+                cpp11::stop("genotype calls must be 0, 1 or 2 copies of allele 1, or missing");
+        };
+        if (TYPEOF(g) == INTSXP || TYPEOF(g) == LGLSXP) {
+            const int *x = TYPEOF(g) == INTSXP ? INTEGER(g) : LOGICAL(g);
+            for (R_xlen_t k = 0; k < total; ++k)
+                convert(x[k] == NA_INTEGER, x[k], static_cast<size_t>(k));
+        } else if (TYPEOF(g) == REALSXP) {
+            const double *x = REAL(g);
+            for (R_xlen_t k = 0; k < total; ++k)
+                convert(std::isnan(x[k]), x[k], static_cast<size_t>(k));
+        } else {
+            cpp11::stop("genotypes must be numeric");
+        }
+    }
+    const Texts ids(phenotype_ids), chrom(phenotype_chrom), vid(variant_ids), vchrom(variant_chrom),
+        a1(allele1), a2(allele2);
+    rapidglm_qtl_phenotypes p;
+    p.values = {count, n, REAL(phenotypes)};
+    p.id = ids.pointers.data();
+    p.chrom = chrom.pointers.data();
+    p.start = starts.data();
+    p.end = ends.data();
+    rapidglm_qtl_genotypes g;
+    g.variants = variants;
+    g.samples = n;
+    g.calls = calls.data();
+    g.chrom = vchrom.pointers.data();
+    g.position = positions.data();
+    g.id = vid.pointers.data();
+    g.allele1 = allele1.size() ? a1.pointers.data() : nullptr;
+    g.allele2 = allele2.size() ? a2.pointers.data() : nullptr;
+    const auto z = covariates.ncol() ? dense(covariates) : Dense();
+    if (covariates.ncol() && static_cast<size_t>(covariates.nrow()) != n)
+        cpp11::stop("covariates need one row per sample");
+    rapidglm_qtl_options q;
+    rapidglm_qtl_options_init(&q);
+    const auto integer = [&](const char *name, int &field) {
+        if (has(o, name))
+            field = static_cast<int>(number(o, name));
+    };
+    const auto real = [&](const char *name, double &field) {
+        if (has(o, name))
+            field = number(o, name);
+    };
+    integer("family", q.model.family);
+    integer("dispersion", q.model.dispersion);
+    integer("robust", q.model.robust);
+    integer("cox_reid", q.model.cox_reid);
+    integer("nominal", q.nominal);
+    integer("threads", q.threads);
+    integer("permutation_precision", q.permutation_precision);
+    integer("permutation_fits", q.permutation_fits);
+    real("theta", q.model.theta);
+    real("tolerance", q.model.tolerance);
+    real("ridge", q.model.ridge);
+    real("min_maf", q.min_maf);
+    if (has(o, "max_iterations"))
+        q.model.max_iterations = static_cast<size_t>(number(o, "max_iterations"));
+    if (has(o, "window"))
+        q.window = static_cast<int64_t>(number(o, "window"));
+    if (has(o, "permutations"))
+        q.permutations = static_cast<size_t>(number(o, "permutations"));
+    if (has(o, "seed"))
+        q.seed = static_cast<uint64_t>(number(o, "seed"));
+    if (library_sizes.size() != 0 && static_cast<size_t>(library_sizes.size()) != n)
+        cpp11::stop("library_sizes needs one size per sample");
+    rapidglm_table *t = nullptr, *pairs = nullptr;
+    check(rapidglm_qtl(&p, &g, covariates.ncol() ? &z.view : nullptr,
+                       library_sizes.size() ? REAL(library_sizes) : nullptr, &q, &t, &pairs));
+    return cpp11::writable::list({"result"_nm = table(t), "nominal"_nm = table(pairs)});
 }

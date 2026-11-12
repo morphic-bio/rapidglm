@@ -8,4 +8,6 @@ fi
 # The C interface the application functions call, compiled into the package.
 if [ -f ../../src/c_api.cpp ]; then
   cp ../../src/c_api.cpp src/c_api.cpp
+  # ... and the header it shares with the command-line program.
+  cp ../../src/qtl_run.hpp src/qtl_run.hpp
 fi

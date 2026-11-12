@@ -410,6 +410,182 @@ class CAPI(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "grid_responses is empty"):
             rapidglm.sceptre_grid(x, responses, assignments, guides, ["A"], grid_responses=[], **common)
 
+    def qtl_data(self, n=61, per_gene=14):
+        """Synthetic cis-QTL data: three phenotypes on chromosome 1 (a point
+        record, a gene body and a TSS record, one of them with a variant effect),
+        one on chromosome 2 with no variant near it, variants on chromosomes 1
+        and 3 (one with the same call in every sample, one never called, calls
+        missing here and there), covariates and library sizes. Written for the
+        CLI as well."""
+        rng = np.random.default_rng(23)
+        samples = [f"S{i}" for i in range(n)]
+        chrom, position, ids, a1, a2, calls = [], [], [], [], [], []
+        for g in range(3):
+            for k in range(per_gene):
+                chrom.append("1")
+                position.append(1_000_000 * (g + 1) - 150_000 + 22_000 * k)
+                af = rng.uniform(0.1, 0.5)
+                calls.append(rng.binomial(2, af, n).astype(np.int8))
+        for k in range(5):
+            chrom.append("3")
+            position.append(500_000 + 10_000 * k)
+            calls.append(rng.binomial(2, 0.3, n).astype(np.int8))
+        calls = np.array(calls)
+        calls[2] = 1                                  # one call throughout: no variance
+        calls[5] = -1                                 # never called
+        calls[8, [0, 7, 30]] = -1                     # missing calls
+        calls[20, 3] = -1
+        for v in range(len(chrom)):
+            ids.append(f"rs{v}")
+            a1.append("ACGT"[v % 4] * (1 + v % 3))
+            a2.append("ACGT"[(v + 1) % 4])
+        dosage = np.where(calls < 0, np.nan, calls).astype(float)
+        mean = np.array([row[~np.isnan(row)].mean() if (~np.isnan(row)).any() else 0.0 for row in dosage])
+        filled = np.where(np.isnan(dosage), mean[:, None], dosage)
+        covariates = rng.normal(size=(n, 2))
+        library = rng.uniform(5e5, 2e6, n)
+        tss = [1_000_000, 2_000_000, 3_000_000, 9_000_000]
+        genes = ["1", "1", "1", "2"]
+        starts = [tss[0], tss[1] - 20_000, tss[2] - 1, tss[3] - 1]
+        ends = [tss[0], tss[1] + 20_000, tss[2], tss[3]]
+        mu = np.exp(np.log(library)[:, None] - 10 + 0.3 * covariates[:, :1])
+        mu = np.repeat(mu, 4, axis=1)
+        mu[:, 1] *= np.exp(0.5 * filled[per_gene + 6])
+        counts = rng.poisson(mu * rng.gamma(4, 0.25, mu.shape)).astype(float)
+        counts[:, 3] = rng.poisson(5, n)
+        counts[::5, 2] = 0
+        gaussian = rng.normal(size=(n, 4)) + 0.7 * filled[[3, per_gene + 6, 2 * per_gene + 1, 0]].T
+        gaussian[::9, 0] = 0
+        info = pd.DataFrame({"chrom": genes, "start": starts, "end": ends, "id": [f"G{i}" for i in range(4)]})
+        variants = pd.DataFrame({"chrom": chrom, "position": position, "id": ids, "allele1": a1, "allele2": a2})
+        root = self.root
+        (root / "geno.bim").write_text("".join(f"{c}\t{i}\t0\t{p}\t{x}\t{y}\n"
+                                              for c, i, p, x, y in zip(chrom, ids, position, a1, a2)))
+        (root / "geno.fam").write_text("".join(f"F{i} {s} 0 0 0 -9\n" for i, s in enumerate(samples)))
+        code = np.array([1, 3, 2, 0])  # missing, 0, 1, 2 copies: PLINK's 01, 11, 10, 00
+        padded = np.zeros((len(chrom), (n + 3) // 4 * 4), dtype=np.uint8)
+        padded[:, :n] = code[np.where(calls < 0, 0, calls + 1)]
+        shifts = np.array([0, 2, 4, 6], dtype=np.uint8)
+        packed = (padded.reshape(len(chrom), -1, 4) << shifts).sum(axis=2).astype(np.uint8)
+        (root / "geno.bed").write_bytes(bytes([0x6C, 0x1B, 0x01]) + packed.tobytes())
+        (root / "cov.txt").write_text("id\t" + "\t".join(samples) + "\n" + "".join(
+            f"c{k}\t" + "\t".join(f"{x:.17g}" for x in covariates[:, k]) + "\n" for k in range(2)))
+        (root / "lib.tsv").write_text("sample\tsize\n" + "".join(f"{s}\t{x:.17g}\n" for s, x in zip(samples, library)))
+
+        def write_bed(name, values):
+            lines = ["#chr\tstart\tend\tID\t" + "\t".join(samples)]
+            for p in range(4):
+                lines.append(f"{genes[p]}\t{starts[p]}\t{ends[p]}\tG{p}\t" +
+                             "\t".join(f"{v:.17g}" for v in values[:, p]))
+            (root / name).write_text("\n".join(lines) + "\n")
+        write_bed("counts.bed", counts)
+        write_bed("gaussian.bed", gaussian)
+        return dict(counts=counts, gaussian=gaussian, calls=calls, info=info, variants=variants,
+                    covariates=covariates, library=library)
+
+    def run_qtl_cli(self, bed, **config):
+        config = dict(phenotypes=str(self.root / bed), genotypes=str(self.root / "geno"),
+                      output=str(self.root / "qtl"), window=250_000, **config)
+        path = self.root / "qtl.json"
+        path.write_text(json.dumps(config))
+        r = subprocess.run([BINARY, "qtl", path], text=True, capture_output=True)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        read = lambda suffix: pd.read_csv(self.root / ("qtl" + suffix), sep="\t", dtype=str, keep_default_na=False)
+        nominal = read(".nominal.tsv") if config.get("nominal") else None
+        return read(".cis.tsv"), nominal, json.loads((self.root / "qtl.run.json").read_text())
+
+    def test_qtl_matches_cli(self):
+        d = self.qtl_data()
+        cis_text = ("phenotype_id", "chrom", "status", "lead_variant", "allele1", "allele2")
+        nominal_text = ("phenotype_id", "variant")
+        covariates = d["covariates"]
+        cases = [  # family, phenotypes, CLI configuration, Python arguments
+            ("gaussian", "gaussian.bed", dict(), dict()),
+            ("gaussian", "gaussian.bed", dict(permutation_precision="double"), dict(permutation_precision="double")),
+            ("poisson", "counts.bed", dict(library_sizes=str(self.root / "lib.tsv")), dict(library_sizes=d["library"])),
+            ("nb", "counts.bed", dict(library_sizes=str(self.root / "lib.tsv")), dict(library_sizes=d["library"])),
+            ("nb", "counts.bed", dict(permutation_fits="separate", dispersion="moment"),
+             dict(permutation_fits="separate", dispersion="moment")),
+            ("gaussian", "gaussian.bed", dict(covariates=str(self.root / "cov.txt"), permutations=0),
+             dict(covariates=covariates, permutations=0)),
+        ]
+        for family, bed, config, arguments in cases:
+            values = d["gaussian" if bed.startswith("gaussian") else "counts"]
+            for threads in (1, 3):
+                label = {"family": family, **{k: str(v)[:20] for k, v in arguments.items()}, "threads": threads}
+                with self.subTest(**label):
+                    config = {"permutations": 40, "min_maf": 0.1, "nominal": True, "seed": 7, **config}
+                    arguments = {"permutations": 40, "min_maf": 0.1, "nominal": True, "seed": 7, **arguments}
+                    if "covariates" not in config and family != "gaussian":
+                        config["covariates"] = str(self.root / "cov.txt")
+                        arguments["covariates"] = covariates
+                    cis, nominal, record = self.run_qtl_cli(bed, family=family, threads=threads, **config)
+                    frame, pairs = rapidglm.qtl(values, d["info"], d["calls"].T, d["variants"], family=family,
+                                                threads=threads, window=250_000, **arguments)
+                    self.assert_same(cis, frame, text=cis_text)
+                    self.assert_same(nominal, pairs, text=nominal_text)
+                    for key in ("samples", "phenotypes", "phenotypes_tested", "variants", "covariates", "window",
+                                "permutations", "threads", "permutations_refitted", "min_maf"):
+                        self.assertEqual(frame.attrs[key], record[key], key)
+                    self.assertEqual(frame.attrs["permutation_precision_used"], record["permutation_precision"])
+                    self.assertEqual(frame.attrs["permutation_fits_used"], record["permutation_fits"])
+                    self.assertEqual(frame.attrs["division"], record["division"])
+        # The data exercise the statuses the table can hold, a missing lead and a variant with one call.
+        self.assertIn("no_cis_variants", set(frame["status"]))
+        self.assertGreater(len(pairs), 20)
+
+    def test_qtl_inputs_and_errors(self):
+        d = self.qtl_data()
+        common = dict(window=250_000, permutations=20, seed=2)
+        base = rapidglm.qtl(d["gaussian"], d["info"], d["calls"].T, d["variants"], family="gaussian", **common)
+        # The same calls as floats with NaN, as a DataFrame, in Fortran order, with threads: the same table.
+        floats = np.where(d["calls"].T < 0, np.nan, d["calls"].T).astype(float)
+        for genotypes in (floats, pd.DataFrame(floats), np.asfortranarray(d["calls"].T)):
+            other = rapidglm.qtl(pd.DataFrame(d["gaussian"]), d["info"], genotypes, d["variants"],
+                                 family="gaussian", threads=2, **common)
+            pd.testing.assert_frame_equal(base, other, check_exact=True)
+        # Without alleles they are NA.
+        bare = rapidglm.qtl(d["gaussian"], d["info"], d["calls"].T, d["variants"][["chrom", "position", "id"]],
+                            family="gaussian", **common)
+        self.assertEqual(set(bare["allele1"]), {"NA"})
+        self.assertEqual(list(bare["lead_variant"]), list(base["lead_variant"]))
+        # Without nominal=True a table only.
+        self.assertIsInstance(base, pd.DataFrame)
+        bad = d["calls"].T.astype(float)
+        bad[3, 4] = 0.5
+        with self.assertRaisesRegex(ValueError, "genotype calls must be"):
+            rapidglm.qtl(d["gaussian"], d["info"], bad, d["variants"], family="gaussian", **common)
+        bad[3, 4] = 3
+        with self.assertRaisesRegex(ValueError, "genotype calls must be"):
+            rapidglm.qtl(d["gaussian"], d["info"], bad, d["variants"], family="gaussian", **common)
+        with self.assertRaisesRegex(ValueError, "library_sizes is not supported with family gaussian"):
+            rapidglm.qtl(d["gaussian"], d["info"], d["calls"].T, d["variants"], family="gaussian",
+                         library_sizes=d["library"], **common)
+        with self.assertRaisesRegex(ValueError, "missing or invalid library size"):
+            rapidglm.qtl(d["counts"], d["info"], d["calls"].T, d["variants"], library_sizes=-d["library"], **common)
+        with self.assertRaisesRegex(ValueError, "at least 10 permutations"):
+            rapidglm.qtl(d["gaussian"], d["info"], d["calls"].T, d["variants"], family="gaussian", window=250_000,
+                         permutations=5)
+        with self.assertRaisesRegex(ValueError, "min_maf must be in"):
+            rapidglm.qtl(d["gaussian"], d["info"], d["calls"].T, d["variants"], family="gaussian", min_maf=0.7,
+                         **common)
+        with self.assertRaisesRegex(ValueError, "invalid BED coordinates"):
+            rapidglm.qtl(d["gaussian"], d["info"].assign(end=[0, 0, 0, 0]), d["calls"].T, d["variants"],
+                         family="gaussian", **common)
+        with self.assertRaisesRegex(ValueError, "family must be one of"):
+            rapidglm.qtl(d["gaussian"], d["info"], d["calls"].T, d["variants"], family="binomial", **common)
+        with self.assertRaisesRegex(ValueError, "genotypes have"):
+            rapidglm.qtl(d["gaussian"][:-1], d["info"], d["calls"].T, d["variants"], family="gaussian", **common)
+        with self.assertRaisesRegex(ValueError, "variant_info needs the columns"):
+            rapidglm.qtl(d["gaussian"], d["info"], d["calls"].T, d["variants"][["chrom", "id"]], **common)
+        with self.assertRaisesRegex(ValueError, "covariates need one row per sample"):
+            rapidglm.qtl(d["gaussian"], d["info"], d["calls"].T, d["variants"], family="gaussian",
+                         covariates=d["covariates"][:-1], **common)
+        # division is scoped to the call.
+        fast = rapidglm.qtl(d["gaussian"], d["info"], d["calls"].T, d["variants"], family="gaussian",
+                            division="fast", **common)
+        self.assertEqual((fast.attrs["division"], base.attrs["division"]), ("fast", "slow"))
+
     def test_errors_are_python_exceptions(self):
         x, counts = self.bulk_data()
         with self.assertRaisesRegex(ValueError, "likelihood ratio test"):

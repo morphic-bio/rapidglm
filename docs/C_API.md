@@ -1,6 +1,6 @@
 # C interface
 
-`librapidglm_c` exposes the engine and the two applications through a C ABI,
+`librapidglm_c` exposes the engine and the applications through a C ABI,
 declared in [include/rapidglm/rapidglm_c.h](../include/rapidglm/rapidglm_c.h).
 Other languages (Python, Rust, Julia, R) call it through their foreign-function
 interfaces instead of compiling C++. The C++ headers remain the primary API;
@@ -15,6 +15,7 @@ to the C++ calls (`tests/test_c_api.cpp`).
 | `rapidglm_sceptre` | `sceptre` | `sceptre` |
 | `rapidglm_sceptre_grid` | `sceptre_grid` | `sceptre` with `targets` |
 | `rapidglm_scan` | `score_scan` | `scan` |
+| `rapidglm_qtl` | `cis_qtl` | `qtl` |
 | `rapidglm_log_array`, `rapidglm_log1p_array`, `rapidglm_exp_array`, `rapidglm_lgamma_array`, `rapidglm_digamma_array`, `rapidglm_trigamma_array` | `vmath::log_array`, ... (`include/rapidglm/vmath.hpp`) | |
 
 ## Building and linking
@@ -96,12 +97,51 @@ tally of the pairs that fail pair QC by target and kind.
 scores each response's pairs together, with the records of scoring them one by
 one (0). A caller built against an earlier header gets the defaults of both.
 
+## Cis-QTL mapping (`rapidglm_qtl`, since 1.6.1)
+
+`rapidglm_qtl` runs the analysis of `rapidglm qtl` ([CLI.md](CLI.md#cis-qtl-mapping-qtl))
+on inputs in memory, and shares its code with the CLI (`src/qtl_run.hpp`: the
+BED anchoring of phenotypes, the `min_maf` filter, the response matrix, library
+offsets, the run summary and the column names, then `cis_qtl`). The tables equal
+the CLI's for the same inputs.
+
+- **Phenotypes** (`rapidglm_qtl_phenotypes`): a `rapidglm_dense` of phenotypes ×
+  samples, row-major (one phenotype's values are contiguous, as in a phenotype
+  BED), with `id`, `chrom`, `start` and `end` per phenotype. Coordinates are those
+  of a BED (zero-based, half-open; the anchor is `[start + 1, end]`; `start = end`
+  anchors at that coordinate).
+- **Genotypes** (`rapidglm_qtl_genotypes`): `int8` calls, variants × samples,
+  row-major (one variant's calls are contiguous, as in a `.bed`): the number of
+  copies of allele 1 (0, 1, 2), negative for missing; any other value is
+  refused. Missing calls take the variant's mean. The library keeps the calls as
+  PLINK's two-bit codes, as the CLI does, so a call costs a quarter of a byte.
+  `chrom`, `position` (1-based) and `id` per variant; `allele1` and `allele2` are
+  optional (reported as `NA`). Variants on chromosomes without a phenotype are
+  ignored, as in the CLI. Dosages that are not whole numbers are not accepted
+  (neither does the CLI).
+- **Samples** are the same, in the same order, in every input; nothing is
+  matched by ID. `covariates` (samples × covariates, row-major, no intercept; one
+  is added; may be NULL) and `library_sizes` (one positive size per sample, count
+  families only; may be NULL) are separate arguments.
+- **Options** (`rapidglm_qtl_options`): `model` (family gaussian, Poisson or NB;
+  dispersion, theta, tolerance, ridge, max_iterations, robust, cox_reid),
+  `window`, `permutations`, `nominal`, `seed`, `threads`, `min_maf`,
+  `permutation_precision` and `permutation_fits`, with the CLI's defaults.
+  `model.offset` and `model.weights` must be NULL.
+- **Results**: the cis table (the columns of `PREFIX.cis.tsv`, `NaN` where the CLI
+  prints `NA`), the nominal table (those of `PREFIX.nominal.tsv`; no rows unless
+  `nominal`; pass NULL to skip it) and scalars (`samples`, `phenotypes`,
+  `phenotypes_tested`, `variants`, `covariates`, `window`, `permutations`,
+  `min_maf`, `threads`, `permutations_refitted`, `permutation_precision_used`
+  and `permutation_fits_used`). The seed is not echoed (a `double` cannot hold
+  every 64-bit seed).
+
 ## Language bindings
 
 - **Python** ([bindings/python](../bindings/python)) loads the library with
   `ctypes`; nothing is compiled.
-- **R** ([bindings/r](../bindings/r)) compiles `src/c_api.cpp` into the package
-  behind a `cpp11` shim.
+- **R** ([bindings/r](../bindings/r)) compiles `src/c_api.cpp` (and the
+  `src/qtl_run.hpp` it includes) into the package behind a `cpp11` shim.
 - **Rust** ([bindings/rust](../bindings/rust)) declares the functions in an
   `extern "C"` block (`src/ffi.rs`), links `librapidglm_c` from
   `RAPIDGLM_LIB_DIR` in `build.rs`, and wraps result tables in a type that frees
@@ -117,7 +157,8 @@ one (0). A caller built against an earlier header gets the defaults of both.
   error paths.
 - The `c_api_*` Boost cases compare every numeric column with the C++ results
   bit for bit: `fit_batch`; `bulk_de` with shrinkage and a contrast; `score_scan`;
-  `sceptre` with each stream key and adjustment family; and `sceptre_grid`.
+  `sceptre` with each stream key and adjustment family; `sceptre_grid`; and
+  `qtl` against `cis_qtl` (with dosage genotypes) in each family.
 - Both run under ctest, with and without the sanitizers.
 - `vmath_*` Boost cases check the special functions: every path against the
   others bit for bit, known-answer digests, mpmath references and special
@@ -125,7 +166,9 @@ one (0). A caller built against an earlier header gets the defaults of both.
   (`bindings/r/tests/special.R`) layers reproduce the C++ values of RapidGLM's
   functions in `tests/fixtures/vmath_known_values.tsv` bit for bit.
 
-C API feature version 2 adds the 1.4.0 entry points and version 4 (1.6.0) the
+C API feature version 5 (1.6.1) adds `rapidglm_qtl`, `rapidglm_qtl_options`,
+`rapidglm_qtl_genotypes` and `rapidglm_qtl_phenotypes`; nothing of version 4
+changes. C API feature version 2 adds the 1.4.0 entry points and version 4 (1.6.0) the
 `null_start` and `batch_scoring` fields of `rapidglm_sceptre_options`, the
 `null_start_used`, `null_refined` and `null_cold_refits` scalars of the
 `rapidglm_sceptre` table, the `crt_draw_used` scalar of the `rapidglm_sceptre` and `rapidglm_scan` tables

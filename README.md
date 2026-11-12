@@ -20,12 +20,12 @@ implementations are run only through their public interfaces:
 One library serves several interfaces:
 - a C++ header library and a CLI;
 - a stable C ABI;
-- Python and R packages;
+- Python and R packages (every analysis, including `qtl`, is reached from each);
 - an inference back end for PyDESeq2.
 
 ## Benchmarks
 
-The current released version is **1.6.0**. The tables below report the completed 1.6.0 measurements.
+The current released version is **1.6.1**. Its numerical code and results are those of 1.6.0: 1.6.1 adds cis-QTL mapping to the C interface and the R and Python packages, and the CRT-steps benchmark program. The tables below report the completed 1.6.0 measurements.
 
 RapidGLM **1.6.0** measurements on development tag `v1.6.0-dev.2` (`4505ef6afaa00a38c5c871ae0e12d531c91ec1cf`). All 24 stages passed the timing audit; the release library is unchanged from the measured dev.2 source.
 
@@ -83,6 +83,7 @@ Python ([bindings/python](bindings/python)):
 import rapidglm
 res = rapidglm.bulk_de(design, counts, lfc_shrink="normal", threads=8)   # counts: samples x genes
 hits = rapidglm.sceptre(design, responses, assignments, guides, pairs, moi="high", threads=8)
+eqtl = rapidglm.qtl(counts, pheno_info, calls, variant_info, covariates, family="nb")   # calls: samples x variants
 
 from rapidglm.deseq import DeseqDataSet, DeseqStats                      # PyDESeq2-style interface
 from rapidglm.pydeseq2 import RapidGLMInference                          # back end for PyDESeq2 itself
@@ -93,6 +94,7 @@ R ([bindings/r](bindings/r)):
 ```r
 res <- rapidglm::bulk_de(counts, ~ cell + dex, col_data, contrast = c("dex", "trt", "untrt"))
 fit <- glm(y ~ x, family = poisson, data = d, method = rapidglm::glm_fit)
+eqtl <- rapidglm::qtl(counts, pheno_info, calls, variant_info, covariates)   # calls: variants x samples
 ```
 
 C ([docs/C_API.md](docs/C_API.md)) and the CLI ([docs/CLI.md](docs/CLI.md))
@@ -119,8 +121,12 @@ expose the same functions.
 - *Drop-in GLM interfaces:* `glm(..., method = rapidglm::glm_fit)` and
   `rapidglm::glm_nb()` in R, and `rapidglm.statsmodels.GLM` in Python.
   `scripts/check_bindings.sh` builds and tests both.
+- *Cis-QTL mapping* (`qtl`, `cis_qtl`) runs from the CLI with PLINK and BED
+  files, and from the C interface and the Python and R packages (1.6.1) with
+  the phenotypes and genotypes in memory; all give the same tables
+  ([docs/CLI.md](docs/CLI.md#cis-qtl-mapping-qtl)).
 - *C interface* (`librapidglm_c`): a stable C ABI over GLM fitting, `bulk_de`,
-  `sceptre` and `score_scan`. Python, R and Rust build on it; other languages
+  `edger_ql`, `sceptre`, `score_scan` and `qtl`. Python, R and Rust build on it; other languages
   can bind to it the same way ([docs/C_API.md](docs/C_API.md#language-bindings)).
 - *Rust* ([bindings/rust](bindings/rust)): bindings over the C interface and a
   port of PyDESeq2's workflow whose per-gene fits run in RapidGLM.
@@ -230,6 +236,18 @@ The benchmark repeats each case in five processes and records timing ranges,
 checksums and host load. `--baseline /path/to/old/rapidglm_benchmarks` alternates
 the two executables. These measurements exclude setup and are not end-to-end
 workflow timings.
+
+For the steps that made the CRT null draws faster (draws in batches, the pair
+pipeline, the vectorized generator), each timed on a screen with the library as
+built:
+
+```bash
+cmake --build build -j 2 --target rapidglm_crt_steps rapidglm_crt_steps_portable
+python3 scripts/benchmark_crt_steps.py --config panel.json --threads 16
+```
+
+[docs/CRT_STEPS.md](docs/CRT_STEPS.md) describes the configurations, the panel
+and the checks.
 
 - [CLI, file formats and C++ usage](docs/CLI.md)
 - [Statistical contract and clean-room sources](METHODS.md)

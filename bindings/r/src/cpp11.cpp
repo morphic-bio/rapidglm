@@ -33,6 +33,13 @@ extern "C" SEXP _rapidglm_rapidglm_sceptre_grid_(SEXP design, SEXP yp, SEXP yi, 
     return cpp11::as_sexp(rapidglm_sceptre_grid_(cpp11::as_cpp<cpp11::decay_t<cpp11::doubles_matrix<>>>(design), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(yp), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(yi), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(yx), cpp11::as_cpp<cpp11::decay_t<int>>(genes), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(gp), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(gi), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(gx), cpp11::as_cpp<cpp11::decay_t<int>>(n_guides), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(guide_ids), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(guide_targets), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(guide_non_targeting), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(discovery_targets), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(negative_targets), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(grid_responses), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(pair_responses), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(pair_targets), cpp11::as_cpp<cpp11::decay_t<cpp11::integers>>(pair_kinds), cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(o)));
   END_CPP11
 }
+// c_layer.cpp
+cpp11::writable::list rapidglm_qtl_(cpp11::doubles phenotypes, int samples, cpp11::strings phenotype_ids, cpp11::strings phenotype_chrom, cpp11::doubles phenotype_start, cpp11::doubles phenotype_end, SEXP genotypes, cpp11::strings variant_ids, cpp11::strings variant_chrom, cpp11::doubles variant_position, cpp11::strings allele1, cpp11::strings allele2, cpp11::doubles_matrix<> covariates, cpp11::doubles library_sizes, cpp11::list o);
+extern "C" SEXP _rapidglm_rapidglm_qtl_(SEXP phenotypes, SEXP samples, SEXP phenotype_ids, SEXP phenotype_chrom, SEXP phenotype_start, SEXP phenotype_end, SEXP genotypes, SEXP variant_ids, SEXP variant_chrom, SEXP variant_position, SEXP allele1, SEXP allele2, SEXP covariates, SEXP library_sizes, SEXP o) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(rapidglm_qtl_(cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(phenotypes), cpp11::as_cpp<cpp11::decay_t<int>>(samples), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(phenotype_ids), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(phenotype_chrom), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(phenotype_start), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(phenotype_end), cpp11::as_cpp<cpp11::decay_t<SEXP>>(genotypes), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(variant_ids), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(variant_chrom), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(variant_position), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(allele1), cpp11::as_cpp<cpp11::decay_t<cpp11::strings>>(allele2), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles_matrix<>>>(covariates), cpp11::as_cpp<cpp11::decay_t<cpp11::doubles>>(library_sizes), cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(o)));
+  END_CPP11
+}
 // fit.cpp
 cpp11::writable::list rapidglm_fit_(cpp11::doubles_matrix<> x, cpp11::doubles y, cpp11::doubles weights, cpp11::doubles offset, cpp11::doubles start, std::string family, double theta, bool estimate_theta, double tolerance, int max_iterations, bool singular_ok, double alias_tolerance);
 extern "C" SEXP _rapidglm_rapidglm_fit_(SEXP x, SEXP y, SEXP weights, SEXP offset, SEXP start, SEXP family, SEXP theta, SEXP estimate_theta, SEXP tolerance, SEXP max_iterations, SEXP singular_ok, SEXP alias_tolerance) {
@@ -68,6 +75,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rapidglm_rapidglm_division_set_", (DL_FUNC) &_rapidglm_rapidglm_division_set_,  1},
     {"_rapidglm_rapidglm_edger_ql_",     (DL_FUNC) &_rapidglm_rapidglm_edger_ql_,      7},
     {"_rapidglm_rapidglm_fit_",          (DL_FUNC) &_rapidglm_rapidglm_fit_,          12},
+    {"_rapidglm_rapidglm_qtl_",          (DL_FUNC) &_rapidglm_rapidglm_qtl_,          15},
     {"_rapidglm_rapidglm_sceptre_",      (DL_FUNC) &_rapidglm_rapidglm_sceptre_,      16},
     {"_rapidglm_rapidglm_sceptre_grid_", (DL_FUNC) &_rapidglm_rapidglm_sceptre_grid_, 19},
     {"_rapidglm_rapidglm_special_",      (DL_FUNC) &_rapidglm_rapidglm_special_,       2},

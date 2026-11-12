@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(rapidglm VERSION 1.6.0 LANGUAGES C CXX)
+project(rapidglm VERSION 1.6.1 LANGUAGES C CXX)
 set(RAPIDGLM_DIVISION_DEFAULT "slow" CACHE STRING "Default division mode: slow or fast (environment and explicit options override)")
 set_property(CACHE RAPIDGLM_DIVISION_DEFAULT PROPERTY STRINGS slow fast)
 if(NOT RAPIDGLM_DIVISION_DEFAULT STREQUAL "slow" AND NOT RAPIDGLM_DIVISION_DEFAULT STREQUAL "fast")
@@ -122,6 +122,16 @@ if(RAPIDGLM_BENCHMARKS)
   target_link_libraries(rapidglm_glm_batch PRIVATE rapidglm)
   add_executable(rapidglm_special_functions benchmarks/special_functions.cpp)
   target_link_libraries(rapidglm_special_functions PRIVATE rapidglm)
+  # The steps of the CRT null draws (docs/CRT_STEPS.md). The second executable
+  # is the same program with the library's portable code, for the step that
+  # vectorized the random number generator.
+  add_executable(rapidglm_crt_steps benchmarks/crt_steps.cpp)
+  target_include_directories(rapidglm_crt_steps PRIVATE src)
+  target_link_libraries(rapidglm_crt_steps PRIVATE rapidglm)
+  add_executable(rapidglm_crt_steps_portable benchmarks/crt_steps.cpp)
+  target_include_directories(rapidglm_crt_steps_portable PRIVATE src)
+  target_compile_definitions(rapidglm_crt_steps_portable PRIVATE RAPIDGLM_FORCE_PORTABLE)
+  target_link_libraries(rapidglm_crt_steps_portable PRIVATE rapidglm)
 endif()
 if(RAPIDGLM_TESTS)
   add_executable(rapidglm_calibration tests/calibration.cpp)

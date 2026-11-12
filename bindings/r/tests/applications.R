@@ -1,4 +1,4 @@
-# bulk_de(), edger_ql(), sceptre() and sceptre_grid() against the RapidGLM CLI on the same inputs.
+# bulk_de(), edger_ql(), sceptre(), sceptre_grid() and qtl() against the RapidGLM CLI on the same inputs.
 # Usage: RAPIDGLM_CLI=build/rapidglm Rscript bindings/r/tests/applications.R
 library(rapidglm)
 cli <- Sys.getenv("RAPIDGLM_CLI")
@@ -292,6 +292,154 @@ fails(run_r(sceptre_grid, targets[1:3], targets[4], pairs = grid_pairs[1, ]), "r
 fails(run_r(sceptre_grid, c("A", "A")), "grid targets must be distinct known targets")
 fails(run_r(sceptre_grid, "A", grid_responses = character()), "grid_responses is empty")
 fails(run_r(sceptre_grid, "A", grid_responses = "gene99"), "unknown response in grid_responses")
+# Cis-QTL mapping: three phenotypes on chromosome 1 (a point record, a gene body and a TSS record),
+# one on chromosome 2 with no variant near it, variants on chromosomes 1 and 3 (one with the same
+# call in every sample, one never called, missing calls), covariates and library sizes; written for
+# the CLI as well.
+set.seed(23)
+n <- 61
+per_gene <- 14
+sample_names <- paste0("S", seq_len(n) - 1)
+chrom <- c(rep("1", 3 * per_gene), rep("3", 5))
+position <- c(as.vector(sapply(1:3, function(g) 1e6 * g - 150000 + 22000 * (seq_len(per_gene) - 1))),
+              500000 + 10000 * (0:4))
+nv <- length(chrom)
+calls <- t(sapply(seq_len(nv), function(v) rbinom(n, 2, if (v <= 3 * per_gene) runif(1, 0.1, 0.5) else 0.3)))
+calls[3, ] <- 1L                         # one call throughout
+calls[6, ] <- NA                         # never called
+calls[9, c(1, 8, 31)] <- NA              # missing calls
+calls[21, 4] <- -1L                      # missing, as a negative value
+storage.mode(calls) <- "integer"
+variant_info <- data.frame(chrom = chrom, position = position, id = paste0("rs", seq_len(nv) - 1),
+                           allele1 = sapply(seq_len(nv), function(v) strrep(c("A", "C", "G", "T")[v %% 4 + 1], 1 + v %% 3)),
+                           allele2 = c("A", "C", "G", "T")[(seq_len(nv)) %% 4 + 1], stringsAsFactors = FALSE)
+rownames(calls) <- variant_info$id
+colnames(calls) <- sample_names
+filled <- t(apply(calls, 1, function(row) { row[is.na(row) | row < 0] <- if (all(is.na(row) | row < 0)) 0 else mean(row[!(is.na(row) | row < 0)]); row }))
+cov_matrix <- matrix(rnorm(n * 2), n, 2, dimnames = list(sample_names, c("c0", "c1")))
+library_size <- runif(n, 5e5, 2e6)
+tss <- c(1e6, 2e6, 3e6, 9e6)
+pheno_info <- data.frame(chrom = c("1", "1", "1", "2"), start = c(tss[1], tss[2] - 20000, tss[3] - 1, tss[4] - 1),
+                         end = c(tss[1], tss[2] + 20000, tss[3], tss[4]), id = paste0("G", 0:3),
+                         stringsAsFactors = FALSE)
+mean_counts <- outer(library_size * exp(-10 + 0.3 * cov_matrix[, 1]), rep(1, 4))
+mean_counts[, 2] <- mean_counts[, 2] * exp(0.5 * filled[per_gene + 7, ])
+qtl_counts <- matrix(rpois(n * 4, t(mean_counts) * rgamma(n * 4, 4, 4)), 4, n,
+                     dimnames = list(pheno_info$id, sample_names))
+qtl_counts[4, ] <- rpois(n, 5)
+qtl_counts[3, seq(1, n, 5)] <- 0
+qtl_gaussian <- matrix(rnorm(4 * n), 4, n, dimnames = dimnames(qtl_counts)) +
+  0.7 * filled[c(4, per_gene + 7, 2 * per_gene + 2, 1), ]
+qtl_gaussian[1, seq(1, n, 9)] <- 0
+writeLines(sprintf("%s\t%s\t0\t%d\t%s\t%s", chrom, variant_info$id, as.integer(position), variant_info$allele1,
+                   variant_info$allele2), file.path(dir, "geno.bim"))
+writeLines(sprintf("F%d %s 0 0 0 -9", seq_len(n) - 1, sample_names), file.path(dir, "geno.fam"))
+code <- c(1L, 3L, 2L, 0L)               # missing, 0, 1, 2 copies: PLINK's 01, 11, 10, 00
+padded <- matrix(0L, nv, 4 * ((n + 3) %/% 4))
+missing_call <- is.na(calls) | calls < 0
+padded[, seq_len(n)] <- matrix(code[ifelse(missing_call, 1L, calls + 2L)], nv, n)
+packed <- unlist(lapply(seq_len(nv), function(v) {
+  b <- matrix(padded[v, ], 4)
+  as.raw(b[1, ] + 4L * b[2, ] + 16L * b[3, ] + 64L * b[4, ])
+}))
+writeBin(c(as.raw(c(0x6c, 0x1b, 0x01)), packed), file.path(dir, "geno.bed"))
+write.table(cbind(id = colnames(cov_matrix), format(t(cov_matrix), digits = 17)), file.path(dir, "cov.txt"),
+            sep = "\t", quote = FALSE, row.names = FALSE, col.names = c("id", sample_names))
+writeLines(c("sample\tsize", sprintf("%s\t%.17g", sample_names, library_size)), file.path(dir, "lib.tsv"))
+write_bed <- function(values, name)
+  writeLines(c(paste(c("#chr\tstart\tend\tID", sample_names), collapse = "\t"),
+               sapply(1:4, function(p) paste(c(pheno_info$chrom[p], format(pheno_info$start[p], scientific = FALSE),
+                                                format(pheno_info$end[p], scientific = FALSE), pheno_info$id[p],
+                                                sprintf("%.17g", values[p, ])), collapse = "\t"))),
+             file.path(dir, name))
+write_bed(qtl_counts, "counts.bed")
+write_bed(qtl_gaussian, "gaussian.bed")
+run_qtl_cli <- function(bed, config) {
+  config <- c(list(phenotypes = file.path(dir, bed), genotypes = file.path(dir, "geno"),
+                   output = file.path(dir, "qtl"), window = 250000), config)
+  path <- file.path(dir, "qtl.json")
+  writeLines(jsonlite_like(config), path)
+  stopifnot(system2(cli, c("qtl", path), stdout = FALSE, stderr = FALSE) == 0)
+  list(cis = read_cli("qtl.cis.tsv"),
+       nominal = if (isTRUE(config$nominal)) read_cli("qtl.nominal.tsv"),
+       record = readLines(file.path(dir, "qtl.run.json")))
+}
+json_value <- function(lines, key) {
+  m <- regmatches(lines, regexpr(sprintf('"%s": ("[^"]*"|[^,}]+)', key), lines))
+  if (!length(m)) stop("no ", key)
+  gsub('^"|"$', "", sub(sprintf('"%s": ', key), "", m[1]))
+}
+cis_text <- c("phenotype_id", "chrom", "status", "lead_variant", "allele1", "allele2")
+qtl_cases <- list(
+  list(family = "gaussian", bed = "gaussian.bed", values = qtl_gaussian, cli = list(), r = list()),
+  list(family = "gaussian", bed = "gaussian.bed", values = qtl_gaussian,
+       cli = list(permutation_precision = "double"), r = list(permutation_precision = "double")),
+  list(family = "poisson", bed = "counts.bed", values = qtl_counts,
+       cli = list(library_sizes = file.path(dir, "lib.tsv")), r = list(library_sizes = library_size)),
+  list(family = "nb", bed = "counts.bed", values = qtl_counts,
+       cli = list(library_sizes = file.path(dir, "lib.tsv")), r = list(library_sizes = library_size)),
+  list(family = "nb", bed = "counts.bed", values = qtl_counts,
+       cli = list(permutation_fits = "separate", dispersion = "moment"),
+       r = list(permutation_fits = "separate", dispersion = "moment")),
+  list(family = "gaussian", bed = "gaussian.bed", values = qtl_gaussian,
+       cli = list(covariates = file.path(dir, "cov.txt"), permutations = 0),
+       r = list(covariates = cov_matrix, permutations = 0)))
+for (case in qtl_cases) for (threads in c(1, 3)) {
+  config <- modifyList(list(family = case$family, threads = threads, permutations = 40, min_maf = 0.1,
+                            nominal = TRUE, seed = 7), case$cli)
+  arguments <- modifyList(list(family = case$family, threads = threads, window = 250000, permutations = 40,
+                               min_maf = 0.1, nominal = TRUE, seed = 7), case$r)
+  if (is.null(case$cli$covariates) && case$family != "gaussian") {
+    config$covariates <- file.path(dir, "cov.txt")
+    arguments$covariates <- cov_matrix
+  }
+  expected <- run_qtl_cli(case$bed, config)
+  frame <- do.call(qtl, c(list(case$values, pheno_info, calls, variant_info), arguments))
+  same(expected$cis, frame, text = cis_text)
+  same(expected$nominal, attr(frame, "nominal"), text = c("phenotype_id", "variant"))
+  run <- attr(frame, "run")
+  for (key in c("samples", "phenotypes", "phenotypes_tested", "variants", "covariates", "window",
+                "permutations", "threads", "permutations_refitted", "min_maf"))
+    stopifnot(run[[key]] == as.numeric(json_value(expected$record, key)))
+  stopifnot(identical(run$permutation_precision_used,
+                      if (json_value(expected$record, "permutation_precision") == "null") NULL
+                      else json_value(expected$record, "permutation_precision")),
+            identical(run$permutation_fits_used,
+                      if (json_value(expected$record, "permutation_fits") == "null") NULL
+                      else json_value(expected$record, "permutation_fits")))
+}
+stopifnot("no_cis_variants" %in% frame$status, nrow(attr(frame, "nominal")) > 20)
+# Dosages as doubles, a data frame of phenotypes and one thread count or another give the same table.
+qtl_common <- list(window = 250000, permutations = 20, seed = 2, family = "gaussian")
+base_qtl <- do.call(qtl, c(list(qtl_gaussian, pheno_info, calls, variant_info), qtl_common))
+for (other in list(
+  do.call(qtl, c(list(qtl_gaussian, pheno_info, calls + 0, variant_info), qtl_common, threads = 2)),
+  do.call(qtl, c(list(as.data.frame(qtl_gaussian), pheno_info, calls, variant_info), qtl_common)))) {
+  stopifnot(identical(base_qtl[names(base_qtl)], other[names(other)]))
+}
+bare <- do.call(qtl, c(list(qtl_gaussian, pheno_info, calls, variant_info[, c("chrom", "position", "id")]), qtl_common))
+stopifnot(all(bare$allele1 == "NA"), identical(bare$lead_variant, base_qtl$lead_variant), is.null(attr(bare, "nominal")))
+bad <- calls + 0
+bad[3, 4] <- 0.5
+fails(do.call(qtl, c(list(qtl_gaussian, pheno_info, bad, variant_info), qtl_common)), "genotype calls must be")
+bad[3, 4] <- 3
+fails(do.call(qtl, c(list(qtl_gaussian, pheno_info, bad, variant_info), qtl_common)), "genotype calls must be")
+fails(do.call(qtl, c(list(qtl_gaussian, pheno_info, calls, variant_info), qtl_common, list(library_sizes = library_size))),
+      "library_sizes is not supported with family gaussian")
+fails(do.call(qtl, c(list(qtl_counts, pheno_info, calls, variant_info), qtl_common[-4], list(library_sizes = -library_size))),
+      "missing or invalid library size")
+fails(do.call(qtl, c(list(qtl_gaussian, pheno_info, calls, variant_info), replace(qtl_common, "permutations", 5))),
+      "at least 10 permutations")
+fails(do.call(qtl, c(list(qtl_gaussian, pheno_info, calls, variant_info), qtl_common, min_maf = 0.7)), "min_maf must be in")
+fails(do.call(qtl, c(list(qtl_gaussian, transform(pheno_info, end = 0), calls, variant_info), qtl_common)),
+      "invalid BED coordinates")
+fails(do.call(qtl, c(list(qtl_gaussian, pheno_info, calls[, -1], variant_info), qtl_common)), "genotypes have")
+fails(do.call(qtl, c(list(qtl_gaussian, pheno_info, calls, variant_info[, c("chrom", "id")]), qtl_common)),
+      "variant_info needs the columns")
+fails(do.call(qtl, c(list(qtl_gaussian, pheno_info, calls, variant_info), qtl_common, list(covariates = cov_matrix[-1, ]))),
+      "covariates need one row per sample")
+fast <- do.call(qtl, c(list(qtl_gaussian, pheno_info, calls, variant_info), qtl_common, division = "fast"))
+stopifnot(attr(fast, "run")$division_mode == 1, attr(base_qtl, "run")$division_mode == 0)
 cat("applications: ok\n")
 
 # Invalid option vectors must fail before crossing the C ABI.

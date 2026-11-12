@@ -169,7 +169,7 @@ fn outliers_are_replaced_and_refitted() {
 
 #[test]
 fn rapidglm_procedure_through_the_c_layer() {
-    assert_eq!(rapidglm::c_api_version(), 4);
+    assert_eq!(rapidglm::c_api_version(), 5);
     assert!(!rapidglm::version().is_empty());
     let (counts, design) = simulate(12, 1000, 1);
     let table = bulk_de(

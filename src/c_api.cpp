@@ -2,10 +2,13 @@
 #include <rapidglm/rapidglm.hpp>
 #include <rapidglm/rapidglm_c.h>
 
+#include "qtl_run.hpp"
+
 #include <array>
 #include <cstring>
 #include <deque>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -305,6 +308,32 @@ std::unique_ptr<rapidglm_table> sceptre_table(const SceptreResult &r, int crt_dr
     by_kind("pairs_passing_qc_", r.pairs_passing_qc);
     by_kind("family_size_", r.family_size);
     return t;
+}
+// Cis-QTL mapping.
+void fill_qtl_columns(rapidglm_table &t, const char *const *names, std::size_t count,
+                      bool (*is_text)(const std::string &)) {
+    for (std::size_t k = 0; k < count; ++k) {
+        if (is_text(names[k]))
+            t.text(names[k]);
+        else
+            t.numeric(names[k]);
+    }
+}
+Vector &numeric_ref(rapidglm_table &t, const char *name) {
+    for (auto &c : t.columns)
+        if (c.type == RAPIDGLM_COLUMN_NUMERIC && c.name == name)
+            return c.numbers;
+    throw std::logic_error(std::string("no column ") + name);
+}
+std::vector<std::string> &text_ref(rapidglm_table &t, const char *name) {
+    for (auto &c : t.columns)
+        if (c.type == RAPIDGLM_COLUMN_TEXT && c.name == name)
+            return c.text;
+    throw std::logic_error(std::string("no column ") + name);
+}
+// An optional text entry: NA when the array or the entry is missing.
+std::string optional_text(const char *const *values, std::size_t i) {
+    return values && values[i] ? values[i] : "NA";
 }
 } // namespace
 
@@ -652,6 +681,226 @@ int rapidglm_edger_ql(const rapidglm_dense *design, const rapidglm_sparse *count
                       {"norm_factors", r.norm_factors},
                       {"effective_library_sizes", r.effective_library_sizes}};
         *result = t.release();
+    });
+}
+
+void rapidglm_qtl_options_init(rapidglm_qtl_options *o) {
+    if (!o)
+        return;
+    std::memset(o, 0, sizeof *o);
+    o->struct_size = sizeof *o;
+    rapidglm_fit_options_init(&o->model);
+    o->window = 1'000'000;
+    o->permutations = 1000;
+    o->nominal = 0;
+    o->seed = 1;
+    o->threads = 1;
+    o->min_maf = 0;
+    o->permutation_precision = RAPIDGLM_QTL_PRECISION_SINGLE;
+    o->permutation_fits = RAPIDGLM_QTL_FITS_LOCKSTEP;
+}
+
+int rapidglm_qtl(const rapidglm_qtl_phenotypes *phenotypes, const rapidglm_qtl_genotypes *genotypes,
+                 const rapidglm_dense *covariates, const double *library_sizes,
+                 const rapidglm_qtl_options *options, rapidglm_table **result,
+                 rapidglm_table **nominal) {
+    return guarded([&] {
+        require(result != nullptr, "result pointer required");
+        const auto c = effective(options, rapidglm_qtl_options_init);
+        require(phenotypes != nullptr && genotypes != nullptr, "phenotypes and genotypes required");
+        const auto values = dense(&phenotypes->values); // phenotypes x samples
+        const std::size_t n = values.cols, count = values.rows;
+        require(phenotypes->id && phenotypes->chrom && phenotypes->start && phenotypes->end,
+                "phenotype IDs, chromosomes and coordinates required");
+        require(genotypes->samples == n, "QTL input dimensions mismatch");
+        require(genotypes->variants == 0 ||
+                    (genotypes->calls && genotypes->chrom && genotypes->position && genotypes->id),
+                "variant calls, chromosomes, positions and IDs required");
+        std::vector<CisPhenotype> phenotype_list;
+        std::set<std::string> chromosomes;
+        for (std::size_t p = 0; p < count; ++p) {
+            phenotype_list.push_back(qtl_run::bed_phenotype(
+                p, text_or_empty(phenotypes->id, p), text_or_empty(phenotypes->chrom, p),
+                phenotypes->start[p], phenotypes->end[p]));
+            chromosomes.insert(phenotype_list.back().chrom);
+        }
+        // The design: an intercept and the covariates.
+        Matrix x = qtl_run::intercept_design(n);
+        if (covariates) {
+            const auto z = dense(covariates);
+            require(z.rows == n, "covariates need one row per sample");
+            x = Matrix(n, 1 + z.cols);
+            for (std::size_t i = 0; i < n; ++i) {
+                x(i, 0) = 1;
+                for (std::size_t k = 0; k < z.cols; ++k)
+                    x(i, 1 + k) = z(i, k);
+            }
+            x.validate();
+        }
+        // Calls of the variants on the phenotypes' chromosomes, as two-bit codes.
+        Genotypes g;
+        g.samples = n;
+        const std::size_t stride = g.call_bytes();
+        std::vector<std::size_t> origin; // the caller's index of each variant kept
+        for (std::size_t v = 0; v < genotypes->variants; ++v) {
+            const std::string chrom = text_or_empty(genotypes->chrom, v);
+            if (!chromosomes.count(chrom))
+                continue;
+            g.hard_calls.resize(g.hard_calls.size() + stride);
+            require(
+                qtl_run::pack_calls(genotypes->calls + v * n, n,
+                                    g.hard_calls.data() + g.hard_calls.size() - stride),
+                "a genotype call must be 0, 1 or 2 copies of allele 1, or negative for missing");
+            g.chrom.push_back(chrom);
+            g.position.push_back(genotypes->position[v]);
+            origin.push_back(v);
+        }
+        g.variants = origin.size();
+        const auto keep = qtl_run::filter_min_maf(g, c.min_maf);
+        if (!keep.empty()) {
+            std::size_t kept = 0;
+            for (std::size_t v = 0; v < keep.size(); ++v)
+                if (keep[v])
+                    origin[kept++] = origin[v];
+            origin.resize(kept);
+        }
+        const auto responses = qtl_run::nonzero_responses(
+            n, count, [&](std::size_t p, std::size_t i) { return values(p, i); });
+        CisQtlOptions o;
+        require(c.model.family != RAPIDGLM_BINOMIAL,
+                "QTL mapping supports gaussian, poisson and nb");
+        require(c.model.offset == nullptr && c.model.weights == nullptr,
+                "offset and weights are not QTL settings (use library_sizes for offsets)");
+        o.model = fit_options(c.model, n);
+        o.model.singular_ok = false;
+        if (library_sizes) {
+            qtl_run::require_count_family(o.model);
+            o.model.offset = qtl_run::log_library_sizes(Vector(library_sizes, library_sizes + n));
+        }
+        o.window = c.window;
+        o.permutations = c.permutations;
+        o.nominal = c.nominal != 0;
+        o.seed = c.seed;
+        require(c.threads >= 1, "threads must be positive");
+        o.threads = c.threads;
+        require(c.permutation_precision == RAPIDGLM_QTL_PRECISION_SINGLE ||
+                    c.permutation_precision == RAPIDGLM_QTL_PRECISION_DOUBLE,
+                "unknown permutation_precision");
+        o.permutation_precision = c.permutation_precision == RAPIDGLM_QTL_PRECISION_SINGLE
+                                      ? PermutationPrecision::single_precision
+                                      : PermutationPrecision::double_precision;
+        require(c.permutation_fits == RAPIDGLM_QTL_FITS_LOCKSTEP ||
+                    c.permutation_fits == RAPIDGLM_QTL_FITS_SEPARATE,
+                "unknown permutation_fits");
+        o.permutation_fits = c.permutation_fits == RAPIDGLM_QTL_FITS_LOCKSTEP
+                                 ? PermutationFits::lockstep
+                                 : PermutationFits::separate;
+        const auto r = cis_qtl(x, responses, g, phenotype_list, o);
+        const auto info = qtl_run::run_info(o, r);
+
+        auto cis = std::make_unique<rapidglm_table>();
+        cis->rows = r.genes.size();
+        fill_qtl_columns(*cis, qtl_run::cis_columns.data(), qtl_run::cis_columns.size(),
+                         qtl_run::cis_column_is_text);
+        {
+            auto &id = text_ref(*cis, "phenotype_id");
+            auto &chrom = text_ref(*cis, "chrom");
+            auto &status = text_ref(*cis, "status");
+            auto &lead_variant = text_ref(*cis, "lead_variant");
+            auto &allele1 = text_ref(*cis, "allele1");
+            auto &allele2 = text_ref(*cis, "allele2");
+            auto &start = numeric_ref(*cis, "start");
+            auto &end = numeric_ref(*cis, "end");
+            auto &variants = numeric_ref(*cis, "variants");
+            auto &lead_position = numeric_ref(*cis, "lead_position");
+            auto &permutations = numeric_ref(*cis, "permutations");
+            auto &failed = numeric_ref(*cis, "permutations_failed");
+            const std::pair<const char *, double CisQtlGene::*> fields[] = {
+                {"statistic", &CisQtlGene::statistic},
+                {"p_value", &CisQtlGene::p_value},
+                {"estimate", &CisQtlGene::estimate},
+                {"standard_error", &CisQtlGene::standard_error},
+                {"theta", &CisQtlGene::theta},
+                {"permutation_p", &CisQtlGene::permutation_p},
+                {"beta_p", &CisQtlGene::beta_p},
+                {"beta_k", &CisQtlGene::beta_k},
+                {"beta_n", &CisQtlGene::beta_n},
+                {"reference_ncp", &CisQtlGene::reference_ncp}};
+            for (std::size_t f = 0; f < r.genes.size(); ++f) {
+                const auto &ph = phenotype_list[f];
+                const auto &gene = r.genes[f];
+                id[f] = ph.id;
+                chrom[f] = ph.chrom;
+                start[f] = static_cast<double>(ph.start);
+                end[f] = static_cast<double>(ph.end);
+                variants[f] = static_cast<double>(gene.variants);
+                status[f] = gene.status;
+                permutations[f] = static_cast<double>(gene.permutations);
+                failed[f] = static_cast<double>(gene.permutations_failed);
+                if (std::isfinite(gene.statistic)) {
+                    const std::size_t v = origin[gene.lead];
+                    lead_variant[f] = text_or_empty(genotypes->id, v);
+                    lead_position[f] = static_cast<double>(g.position[gene.lead]);
+                    allele1[f] = optional_text(genotypes->allele1, v);
+                    allele2[f] = optional_text(genotypes->allele2, v);
+                } else {
+                    lead_variant[f] = allele1[f] = allele2[f] = "NA";
+                }
+            }
+            for (const auto &[name, field] : fields) {
+                auto &column = numeric_ref(*cis, name);
+                for (std::size_t f = 0; f < r.genes.size(); ++f)
+                    column[f] = r.genes[f].*field;
+            }
+        }
+        cis->scalars = {
+            {"samples", static_cast<double>(n)},
+            {"phenotypes", static_cast<double>(count)},
+            {"phenotypes_tested", static_cast<double>(info.tested)},
+            {"variants", static_cast<double>(g.variants)},
+            {"covariates", static_cast<double>(x.cols - 1)},
+            {"window", static_cast<double>(o.window)},
+            {"permutations", static_cast<double>(o.permutations)},
+            {"min_maf", c.min_maf},
+            {"threads", static_cast<double>(o.threads)},
+            {"permutations_refitted", static_cast<double>(info.refitted)},
+            {"permutation_precision_used", o.permutations == 0 ? rapidglm::nan
+                                           : info.single_scores
+                                               ? double(RAPIDGLM_QTL_PRECISION_SINGLE)
+                                               : double(RAPIDGLM_QTL_PRECISION_DOUBLE)},
+            {"permutation_fits_used", info.refits ? double(c.permutation_fits) : rapidglm::nan}};
+        cis->scalars.emplace_back("division_mode", static_cast<int>(vmath::division_mode()));
+
+        std::unique_ptr<rapidglm_table> pairs;
+        if (nominal) {
+            pairs = std::make_unique<rapidglm_table>();
+            pairs->rows = r.nominal.size();
+            fill_qtl_columns(*pairs, qtl_run::nominal_columns.data(),
+                             qtl_run::nominal_columns.size(), qtl_run::nominal_column_is_text);
+            auto &id = text_ref(*pairs, "phenotype_id");
+            auto &variant = text_ref(*pairs, "variant");
+            auto &position = numeric_ref(*pairs, "position");
+            auto &distance = numeric_ref(*pairs, "distance");
+            auto &statistic = numeric_ref(*pairs, "statistic");
+            auto &p = numeric_ref(*pairs, "p_value");
+            auto &estimate = numeric_ref(*pairs, "estimate");
+            auto &se = numeric_ref(*pairs, "standard_error");
+            for (std::size_t k = 0; k < r.nominal.size(); ++k) {
+                const auto &pair = r.nominal[k];
+                const auto &ph = phenotype_list[pair.phenotype];
+                id[k] = ph.id;
+                variant[k] = text_or_empty(genotypes->id, origin[pair.variant]);
+                position[k] = static_cast<double>(g.position[pair.variant]);
+                distance[k] = static_cast<double>(g.position[pair.variant] - ph.start);
+                statistic[k] = pair.statistic;
+                p[k] = pair.p_value;
+                estimate[k] = pair.estimate;
+                se[k] = pair.standard_error;
+            }
+        }
+        *result = cis.release();
+        if (nominal)
+            *nominal = pairs.release();
     });
 }
 

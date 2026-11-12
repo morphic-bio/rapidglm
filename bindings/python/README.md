@@ -1,7 +1,7 @@
 # rapidglm (Python)
 
-Bulk differential expression, SCEPTRE-method perturbation analysis, score scans
-and batch GLM fits with the RapidGLM engine, plus statsmodels-compatible GLM
+Bulk differential expression, SCEPTRE-method perturbation analysis, score scans,
+cis-QTL mapping and batch GLM fits with the RapidGLM engine, plus statsmodels-compatible GLM
 fitting.
 
 The native fit, application and special-function entry points accept
@@ -26,9 +26,27 @@ res = rapidglm.sceptre(design, responses, assignments, guides, pairs, moi="high"
 # pass pair QC, and a tally of the others by target
 res, tally = rapidglm.sceptre_grid(design, responses, assignments, guides,
                                    discovery_targets, negative_targets, moi="high", threads=8)
+
+# cis-QTL mapping (1.6.1): phenotypes samples x phenotypes, genotypes samples x variants
+# (copies of allele 1: 0, 1, 2, NaN or negative = missing); the tables of `rapidglm qtl`
+res = rapidglm.qtl(phenotypes, pheno_info, genotypes, variant_info, covariates,
+                   family="nb", library_sizes=sizes, permutations=1000, threads=8)
+res, pairs = rapidglm.qtl(..., nominal=True)   # also every variant-phenotype pair
 ```
 
-`bulk_de`, `edger_ql`, `sceptre`, `scan` and `fit_batch` call `librapidglm_c` through
+`qtl` takes the samples in the same order in every input (nothing is matched by
+ID). `pheno_info` has one row per phenotype with the columns `chrom`, `start`,
+`end` and `id` (BED coordinates: zero-based, half-open); `variant_info` one row per
+variant with `chrom`, `position` (1-based), `id` and optionally `allele1` and
+`allele2`. Genotype calls are kept as PLINK's two-bit codes inside the library;
+integer arrays use a byte per call on the way in. Variants on chromosomes without a
+phenotype are ignored. Arguments are the CLI's `qtl` keys (`family`, `window`,
+`permutations`, `min_maf`, `nominal`, `seed`, `threads`, `permutation_precision`,
+`permutation_fits` and the generic model controls); see
+[docs/CLI.md](../../docs/CLI.md#cis-qtl-mapping-qtl). It needs C API version 5
+(`librapidglm_c` 1.6.1 or later).
+
+`bulk_de`, `edger_ql`, `sceptre`, `scan`, `qtl` and `fit_batch` call `librapidglm_c` through
 ctypes ([docs/C_API.md](../../docs/C_API.md)); nothing is compiled for Python.
 Arguments take the CLI configuration keys and values
 ([docs/CLI.md](../../docs/CLI.md)). Results are pandas DataFrames with the
@@ -43,7 +61,9 @@ python3 bindings/python/tests/test_capi.py build/rapidglm
 
 The test checks every column against the CLI bit for bit: bulk-de with
 shrinkage, contrasts, joint LRTs and local trends; fit; permutation and
-asymptotic scans; and three SCEPTRE configurations.
+asymptotic scans; three SCEPTRE configurations; and `qtl` for the Gaussian,
+Poisson and NB families with permutations at one and several threads, including
+the nominal pairs, against PLINK and BED inputs of the CLI.
 
 `rapidglm.special` has the engine's special functions for float64 arrays of any
 shape: `log`, `log1p`, `exp`, `digamma` and `trigamma` (RapidGLM's; digamma and

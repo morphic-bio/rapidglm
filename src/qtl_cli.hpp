@@ -3,6 +3,7 @@
 // binary genotypes and an optional covariate table (the inputs FastQTL and
 // QTLtools take), with count or Gaussian response models.
 #include "io.hpp"
+#include "qtl_run.hpp"
 #include <rapidglm/qtl.hpp>
 #include <set>
 #include <string_view>
@@ -164,16 +165,9 @@ inline PhenotypeBed read_phenotype_bed(const std::string &path) {
     bed.samples.assign(table[0].begin() + 4, table[0].end());
     for (std::size_t r = 1; r < table.size(); ++r) {
         const auto &row = table[r];
-        CisPhenotype ph;
-        ph.response = r - 1;
-        ph.chrom = row[0];
-        const auto start = std::stoll(row[1]), end = std::stoll(row[2]);
-        require(start >= 0 && start <= end && end < std::numeric_limits<long long>::max(),
-                ("invalid BED coordinates for " + row[3]).c_str());
-        // Also accept point records: start=end anchors at that coordinate.
-        ph.start = start == end ? start : start + 1;
-        ph.end = end;
-        ph.id = row[3];
+        // Also accepts point records: start=end anchors at that coordinate.
+        const auto ph =
+            qtl_run::bed_phenotype(r - 1, row[3], row[0], std::stoll(row[1]), std::stoll(row[2]));
         std::vector<double> v;
         for (std::size_t c = 4; c < row.size(); ++c)
             v.push_back(number(row[c]));
@@ -186,12 +180,8 @@ inline PhenotypeBed read_phenotype_bed(const std::string &path) {
 // row per covariate. The design is an intercept and the covariates, sample by
 // sample in the order given.
 inline Matrix covariate_design(const std::string &path, const std::vector<std::string> &samples) {
-    if (path.empty()) {
-        Matrix x(samples.size(), 1);
-        for (std::size_t i = 0; i < samples.size(); ++i)
-            x(i, 0) = 1;
-        return x;
-    }
+    if (path.empty())
+        return qtl_run::intercept_design(samples.size());
     std::vector<std::vector<std::string>> rows;
     {
         auto f = input(path);
@@ -227,13 +217,21 @@ inline Vector library_offsets(const std::string &path, const std::vector<std::st
         } catch (const std::exception &) {
         }
     }
-    Vector offset(samples.size());
+    Vector sizes(samples.size());
     for (std::size_t i = 0; i < samples.size(); ++i) {
         const auto found = size.find(samples[i]);
-        require(found != size.end() && found->second > 0, "missing or invalid library size");
-        offset[i] = std::log(found->second);
+        sizes[i] = found == size.end() ? nan : found->second;
     }
-    return offset;
+    return qtl_run::log_library_sizes(sizes);
+}
+// A header line: the names separated by tabs.
+template <class Names> inline void tab_separated(std::ostream &out, const Names &names) {
+    bool first = true;
+    for (const char *name : names) {
+        out << (first ? "" : "\t") << name;
+        first = false;
+    }
+    out << '\n';
 }
 template <class Hashes>
 inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &hashes,
@@ -253,53 +251,17 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
     auto genotypes = read_plink(genotype_prefix, bed.samples, labels, chromosomes);
     const auto x = covariate_design(covariate_path, bed.samples);
     const std::size_t n = bed.samples.size();
-    // Variants below min_maf (in these samples) are left out. The allele
-    // frequency is half the mean dosage (the halving is exact).
+    // Variants below min_maf (in these samples) are left out.
     const double min_maf = config.get<double>("min_maf", 0.0);
-    require(std::isfinite(min_maf) && min_maf >= 0 && min_maf <= 0.5,
-            "min_maf must be in [0, 0.5]");
-    if (min_maf > 0) {
-        const std::size_t stride = genotypes.call_bytes();
-        std::vector<unsigned char> keep(genotypes.variants, 0);
-        std::size_t kept = 0;
-        for (std::size_t v = 0; v < genotypes.variants; ++v) {
-            const double af = genotypes.mean_dosage(v) / 2;
-            if (std::min(af, 1 - af) < min_maf)
-                continue;
-            keep[v] = 1;
-            if (kept != v) {
-                std::copy_n(genotypes.hard_calls.begin() + v * stride, stride,
-                            genotypes.hard_calls.begin() + kept * stride);
-                genotypes.chrom[kept] = std::move(genotypes.chrom[v]);
-                genotypes.position[kept] = genotypes.position[v];
-            }
-            ++kept;
-        }
-        // The capacity of the unfiltered variants is released (each array briefly
-        // held twice, before the scan allocates its gene buffers).
-        genotypes.variants = kept;
-        genotypes.hard_calls.resize(kept * stride);
-        genotypes.chrom.resize(kept);
-        genotypes.position.resize(kept);
-        genotypes.hard_calls.shrink_to_fit();
-        genotypes.chrom.shrink_to_fit();
-        genotypes.position.shrink_to_fit();
+    if (const auto keep = qtl_run::filter_min_maf(genotypes, min_maf); !keep.empty())
         labels.keep(keep);
-    }
-    SparseCSC responses{n, bed.phenotypes.size(), {0}, {}, {}};
-    for (const auto &values : bed.values) {
-        for (std::size_t i = 0; i < n; ++i)
-            if (values[i] != 0) {
-                responses.row_index.push_back(i);
-                responses.values.push_back(values[i]);
-            }
-        responses.column_ptr.push_back(responses.values.size());
-    }
+    const auto responses = qtl_run::nonzero_responses(
+        n, bed.phenotypes.size(), [&](std::size_t p, std::size_t i) { return bed.values[p][i]; });
     std::vector<std::vector<double>>().swap(bed.values);
     CisQtlOptions o;
     o.model = fit_options(config);
-    require(library_path.empty() || o.model.family != Family::gaussian,
-            "library_sizes is not supported with family gaussian");
+    if (!library_path.empty())
+        qtl_run::require_count_family(o.model);
     if (!library_path.empty())
         o.model.offset = library_offsets(library_path, bed.samples);
     o.window = config.get<long long>("window", 1'000'000);
@@ -316,11 +278,6 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
     require(fits == "lockstep" || fits == "separate",
             "permutation_fits must be lockstep or separate");
     o.permutation_fits = fits == "lockstep" ? PermutationFits::lockstep : PermutationFits::separate;
-    // The run record states the precision the permutation scores used (null
-    // without permutations). Only projected Gaussian permutations have a
-    // single-precision path; count models refit every permutation in double.
-    const bool single_scores = o.permutation_precision == PermutationPrecision::single_precision &&
-                               detail::qtl_projected_permutations(o.model);
     for (auto path : {phenotype_path, genotype_prefix + ".bed", genotype_prefix + ".bim",
                       genotype_prefix + ".fam", covariate_path, library_path})
         if (!path.empty())
@@ -329,10 +286,7 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
     {
         std::ofstream out(output + ".cis.tsv");
         require(out.good(), "cannot open QTL cis.tsv output");
-        out << "phenotype_id\tchrom\tstart\tend\tvariants\tstatus\tlead_variant\tlead_position\t"
-               "allele1\tallele2\tstatistic\tp_value\testimate\tstandard_"
-               "error\ttheta\tpermutations\tpermutations_failed\t"
-               "permutation_p\tbeta_p\tbeta_k\tbeta_n\treference_ncp\n";
+        tab_separated(out, qtl_run::cis_columns);
         for (std::size_t f = 0; f < result.genes.size(); ++f) {
             const auto &ph = bed.phenotypes[f];
             const auto &g = result.genes[f];
@@ -362,8 +316,7 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
     if (o.nominal) {
         std::ofstream out(output + ".nominal.tsv");
         require(out.good(), "cannot open QTL nominal.tsv output");
-        out << "phenotype_id\tvariant\tposition\tdistance\tstatistic\tp_value\testimate\tstandard_"
-               "error\n";
+        tab_separated(out, qtl_run::nominal_columns);
         for (const auto &pair : result.nominal) {
             const auto &ph = bed.phenotypes[pair.phenotype];
             out << ph.id << '\t' << labels.field(pair.variant, 0) << '\t'
@@ -380,14 +333,11 @@ inline int run_qtl(const Tree &config, const std::string &config_path, Hashes &h
     }
     const double seconds =
         std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
-    std::size_t tested = 0, refitted = 0;
-    for (const auto &g : result.genes) {
-        tested += g.status.rfind("ok", 0) == 0;
-        refitted += g.permutations_refitted;
-    }
-    // Refitted permutations of a count model: the fits asked for, and how many
-    // lockstep fits fit() redid.
-    const bool refits = o.permutations > 0 && !detail::qtl_projected_permutations(o.model);
+    // The run record states the precision the permutation scores used (null
+    // without permutations), and the permutation fits of a count model.
+    const auto info = qtl_run::run_info(o, result);
+    const bool single_scores = info.single_scores, refits = info.refits;
+    const std::size_t tested = info.tested, refitted = info.refitted;
     std::ofstream record(output + ".run.json");
     require(record.good(), "cannot open QTL run record");
     record << "{\"command\": \"qtl\", \"version\": \"" << version << "\", \"config\": ";

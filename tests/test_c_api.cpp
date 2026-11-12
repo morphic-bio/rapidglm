@@ -806,3 +806,253 @@ BOOST_AUTO_TEST_CASE(c_api_batch_scoring_defaults_on_and_keeps_the_records) {
         }
     }
 }
+// Cis-QTL mapping through the C interface against cis_qtl() called directly, with
+// the genotypes given as dosages (the other form Genotypes takes) and the
+// phenotypes anchored as a BED record is.
+BOOST_AUTO_TEST_CASE(c_api_qtl_matches_cpp) {
+    std::mt19937_64 rng(31);
+    const std::size_t n = 45, genes = 3, variants = 40;
+    std::vector<std::string> chrom(variants, "1"), id, a1, a2;
+    std::vector<std::int64_t> position(variants);
+    std::vector<std::int8_t> calls(variants * n);
+    for (std::size_t v = 0; v < variants; ++v) {
+        if (v >= 36)
+            chrom[v] = "7"; // no phenotype: ignored
+        position[v] = 100'000 + 9'000 * static_cast<std::int64_t>(v);
+        id.push_back("v" + std::to_string(v));
+        a1.push_back("A");
+        a2.push_back(v % 2 ? "C" : "G");
+        std::binomial_distribution<int> draw(2, 0.1 + 0.01 * static_cast<double>(v));
+        for (std::size_t i = 0; i < n; ++i)
+            calls[v * n + i] = static_cast<std::int8_t>(draw(rng));
+    }
+    calls[3 * n + 2] = -1; // missing calls
+    calls[3 * n + 9] = -1;
+    for (std::size_t i = 0; i < n; ++i)
+        calls[5 * n + i] = -1; // never called
+    // The same calls as dosages for cis_qtl: NaN where missing.
+    Genotypes dosage;
+    dosage.samples = n;
+    dosage.variants = 36;
+    for (std::size_t v = 0; v < 36; ++v) {
+        dosage.chrom.push_back("1");
+        dosage.position.push_back(position[v]);
+        for (std::size_t i = 0; i < n; ++i)
+            dosage.dosage.push_back(calls[v * n + i] < 0 ? rapidglm::nan : calls[v * n + i]);
+    }
+    const std::int64_t start[] = {250'000, 300'000, 99'999}, end[] = {250'001, 340'000, 99'999};
+    const char *const phenotype_chrom[] = {"1", "1", "1"};
+    const char *const phenotype_id[] = {"P0", "P1", "P2"};
+    std::vector<const char *> v_chrom, v_id, v_a1, v_a2;
+    for (std::size_t v = 0; v < variants; ++v) {
+        v_chrom.push_back(chrom[v].c_str());
+        v_id.push_back(id[v].c_str());
+        v_a1.push_back(a1[v].c_str());
+        v_a2.push_back(a2[v].c_str());
+    }
+    Matrix covariates(n, 2);
+    for (auto &v : covariates.values)
+        v = std::normal_distribution<double>()(rng);
+    Vector library(n);
+    for (auto &v : library)
+        v = std::uniform_real_distribution<double>(1e3, 2e3)(rng);
+    // phenotypes x samples
+    std::vector<double> values(genes * n);
+    for (std::size_t p = 0; p < genes; ++p)
+        for (std::size_t i = 0; i < n; ++i) {
+            const double mean =
+                library[i] * 0.01 * std::exp(0.4 * dosage.dosage[(6 + 9 * p) * n + i]);
+            values[p * n + i] = static_cast<double>(std::poisson_distribution<int>(mean)(rng));
+        }
+    std::vector<CisPhenotype> phenotypes;
+    for (std::size_t p = 0; p < genes; ++p)
+        phenotypes.push_back(
+            {p, phenotype_id[p], "1", start[p] == end[p] ? start[p] : start[p] + 1, end[p]});
+    std::vector<Vector> columns_of_values;
+    for (std::size_t p = 0; p < genes; ++p)
+        columns_of_values.emplace_back(values.begin() + p * n, values.begin() + (p + 1) * n);
+    const auto responses = columns(columns_of_values);
+    Matrix design(n, 3);
+    for (std::size_t i = 0; i < n; ++i) {
+        design(i, 0) = 1;
+        design(i, 1) = covariates(i, 0);
+        design(i, 2) = covariates(i, 1);
+    }
+    struct Case {
+        int family;
+        bool library;
+        std::size_t permutations;
+        int threads;
+        int precision, fits;
+    };
+    for (const Case c :
+         {Case{RAPIDGLM_GAUSSIAN, false, 30, 1, 0, 0}, Case{RAPIDGLM_GAUSSIAN, false, 30, 3, 1, 0},
+          Case{RAPIDGLM_POISSON, true, 20, 2, 0, 0},
+          Case{RAPIDGLM_NEGATIVE_BINOMIAL, true, 20, 3, 0, 1},
+          Case{RAPIDGLM_NEGATIVE_BINOMIAL, false, 0, 1, 0, 0}}) {
+        rapidglm_qtl_options q;
+        rapidglm_qtl_options_init(&q);
+        q.model.family = c.family;
+        q.permutations = c.permutations;
+        q.window = 60'000;
+        q.nominal = 1;
+        q.seed = 5;
+        q.threads = c.threads;
+        q.min_maf = 0.06;
+        q.permutation_precision = c.precision;
+        q.permutation_fits = c.fits;
+        // The direct call.
+        CisQtlOptions o;
+        o.model.family = static_cast<Family>(c.family);
+        if (c.library)
+            for (double s : library)
+                o.model.offset.push_back(std::log(s));
+        o.window = q.window;
+        o.permutations = q.permutations;
+        o.nominal = true;
+        o.seed = 5;
+        o.threads = c.threads;
+        o.permutation_precision = c.precision ? PermutationPrecision::double_precision
+                                              : PermutationPrecision::single_precision;
+        o.permutation_fits = c.fits ? PermutationFits::separate : PermutationFits::lockstep;
+        auto filtered = dosage;
+        std::vector<std::size_t> kept;
+        {
+            Genotypes f;
+            f.samples = n;
+            for (std::size_t v = 0; v < dosage.variants; ++v) {
+                double sum = 0;
+                std::size_t k = 0;
+                for (std::size_t i = 0; i < n; ++i)
+                    if (std::isfinite(dosage.dosage[v * n + i])) {
+                        sum += dosage.dosage[v * n + i];
+                        ++k;
+                    }
+                const double af = (k ? sum / static_cast<double>(k) : 0.0) / 2;
+                if (std::min(af, 1 - af) < q.min_maf)
+                    continue;
+                kept.push_back(v);
+                f.chrom.push_back("1");
+                f.position.push_back(position[v]);
+                f.dosage.insert(f.dosage.end(), dosage.dosage.begin() + v * n,
+                                dosage.dosage.begin() + (v + 1) * n);
+            }
+            f.variants = kept.size();
+            filtered = f;
+        }
+        const auto expected = cis_qtl(design, responses.s, filtered, phenotypes, o);
+        // Through the C interface.
+        rapidglm_qtl_phenotypes p{
+            {genes, n, values.data()}, phenotype_id, phenotype_chrom, start, end};
+        rapidglm_qtl_genotypes g{variants,        n,           calls.data(), v_chrom.data(),
+                                 position.data(), v_id.data(), v_a1.data(),  v_a2.data()};
+        const auto z = view(covariates);
+        rapidglm_table *t = nullptr, *pairs = nullptr;
+        BOOST_REQUIRE_EQUAL(
+            rapidglm_qtl(&p, &g, &z, c.library ? library.data() : nullptr, &q, &t, &pairs),
+            RAPIDGLM_OK);
+        BOOST_REQUIRE(t != nullptr && pairs != nullptr);
+        BOOST_REQUIRE_EQUAL(rapidglm_table_rows(t), genes);
+        BOOST_TEST(rapidglm_table_columns(t) == 22u);
+        BOOST_TEST(std::string(rapidglm_table_column_name(t, 0)) == "phenotype_id");
+        BOOST_TEST(std::string(rapidglm_table_column_name(t, 21)) == "reference_ncp");
+        BOOST_TEST(rapidglm_table_scalar(t, "variants") == static_cast<double>(kept.size()));
+        BOOST_TEST(rapidglm_table_scalar(t, "phenotypes") == static_cast<double>(genes));
+        BOOST_TEST(rapidglm_table_scalar(t, "covariates") == 2.0);
+        std::size_t led = 0;
+        for (std::size_t f = 0; f < genes; ++f) {
+            const auto &e = expected.genes[f];
+            BOOST_TEST(std::string(rapidglm_table_text(t, "status", f)) == e.status);
+            BOOST_TEST(rapidglm_table_numeric(t, "variants")[f] == static_cast<double>(e.variants));
+            BOOST_TEST(rapidglm_table_numeric(t, "start")[f] ==
+                       static_cast<double>(phenotypes[f].start));
+            for (const auto &[name, value] : std::vector<std::pair<const char *, double>>{
+                     {"statistic", e.statistic},
+                     {"p_value", e.p_value},
+                     {"estimate", e.estimate},
+                     {"standard_error", e.standard_error},
+                     {"theta", e.theta},
+                     {"permutation_p", e.permutation_p},
+                     {"beta_p", e.beta_p},
+                     {"beta_k", e.beta_k},
+                     {"beta_n", e.beta_n},
+                     {"reference_ncp", e.reference_ncp},
+                     {"permutations", static_cast<double>(e.permutations)}})
+                BOOST_TEST(same(rapidglm_table_numeric(t, name)[f], value),
+                           name << " of phenotype " << f);
+            if (std::isfinite(e.statistic)) {
+                ++led;
+                const std::size_t v = kept[e.lead];
+                BOOST_TEST(std::string(rapidglm_table_text(t, "lead_variant", f)) == id[v]);
+                BOOST_TEST(rapidglm_table_numeric(t, "lead_position")[f] ==
+                           static_cast<double>(position[v]));
+                BOOST_TEST(std::string(rapidglm_table_text(t, "allele2", f)) == a2[v]);
+            } else {
+                BOOST_TEST(std::string(rapidglm_table_text(t, "lead_variant", f)) == "NA");
+                BOOST_TEST(std::isnan(rapidglm_table_numeric(t, "lead_position")[f]));
+            }
+        }
+        BOOST_TEST(led >= 2u);
+        BOOST_REQUIRE_EQUAL(rapidglm_table_rows(pairs), expected.nominal.size());
+        BOOST_TEST(expected.nominal.size() > 10u);
+        for (std::size_t k = 0; k < expected.nominal.size(); ++k) {
+            const auto &e = expected.nominal[k];
+            BOOST_TEST(std::string(rapidglm_table_text(pairs, "variant", k)) ==
+                       id[kept[e.variant]]);
+            BOOST_TEST(same(rapidglm_table_numeric(pairs, "statistic")[k], e.statistic));
+            BOOST_TEST(same(rapidglm_table_numeric(pairs, "p_value")[k], e.p_value));
+            BOOST_TEST(same(rapidglm_table_numeric(pairs, "estimate")[k], e.estimate));
+            BOOST_TEST(same(rapidglm_table_numeric(pairs, "standard_error")[k], e.standard_error));
+        }
+        rapidglm_table_free(t);
+        rapidglm_table_free(pairs);
+    }
+    // Inputs the interface refuses, and a result pointer without the pairs.
+    rapidglm_qtl_options q;
+    rapidglm_qtl_options_init(&q);
+    q.window = 60'000;
+    q.permutations = 0;
+    rapidglm_qtl_phenotypes p{{genes, n, values.data()}, phenotype_id, phenotype_chrom, start, end};
+    rapidglm_qtl_genotypes g{variants,        n,           calls.data(), v_chrom.data(),
+                             position.data(), v_id.data(), nullptr,      nullptr};
+    rapidglm_table *t = nullptr;
+    BOOST_TEST(rapidglm_qtl(&p, &g, nullptr, nullptr, &q, &t, nullptr) == RAPIDGLM_OK);
+    BOOST_TEST(std::string(rapidglm_table_text(t, "allele1", 0)) == "NA");
+    BOOST_TEST(std::isnan(rapidglm_table_scalar(t, "permutation_precision_used")));
+    rapidglm_table_free(t);
+    t = nullptr;
+    auto refused = [&](const char *message) {
+        BOOST_TEST(rapidglm_qtl(&p, &g, nullptr, nullptr, &q, &t, nullptr) ==
+                   RAPIDGLM_ERROR_INVALID);
+        BOOST_TEST(std::string(rapidglm_last_error()).find(message) != std::string::npos, message);
+        BOOST_TEST(t == nullptr);
+    };
+    calls[7] = 3;
+    refused("genotype call");
+    calls[7] = 1;
+    q.model.family = RAPIDGLM_BINOMIAL;
+    refused("supports gaussian, poisson and nb");
+    q.model.family = RAPIDGLM_GAUSSIAN;
+    BOOST_TEST(rapidglm_qtl(&p, &g, nullptr, library.data(), &q, &t, nullptr) ==
+               RAPIDGLM_ERROR_INVALID);
+    BOOST_TEST(std::string(rapidglm_last_error()).find("library_sizes is not supported") !=
+               std::string::npos);
+    q.model.family = RAPIDGLM_NEGATIVE_BINOMIAL;
+    q.model.offset = library.data();
+    refused("not QTL settings");
+    q.model.offset = nullptr;
+    q.permutations = 5;
+    refused("at least 10 permutations");
+    q.permutations = 0;
+    q.min_maf = 0.9;
+    refused("min_maf");
+    q.min_maf = 0;
+    q.threads = 0;
+    refused("threads must be positive");
+    q.threads = 1;
+    g.samples = n - 1;
+    refused("dimensions mismatch");
+    g.samples = n;
+    q.struct_size = 0;
+    refused("_init");
+}

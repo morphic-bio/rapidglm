@@ -29,12 +29,14 @@
 extern "C" {
 #endif
 
-/* Version 4 (1.6.0): the crt_draw_used scalar of the sceptre and scan tables,
+/* Version 5 (1.6.1): rapidglm_qtl, cis-QTL mapping, with rapidglm_qtl_options,
+ * rapidglm_qtl_genotypes and rapidglm_qtl_phenotypes. Nothing of version 4 changed.
+ * Version 4 (1.6.0): the crt_draw_used scalar of the sceptre and scan tables,
  * the special functions rapidglm_<f>_array and rapidglm_special_path,
  * null_start and batch_scoring appended to rapidglm_sceptre_options, and the
  * null_start_used, null_refined and null_cold_refits scalars of the
  * rapidglm_sceptre table. Version 3 was used only by development builds. */
-#define RAPIDGLM_C_API_VERSION 4
+#define RAPIDGLM_C_API_VERSION 5
 
 enum { RAPIDGLM_OK = 0, RAPIDGLM_ERROR_INVALID = 1, RAPIDGLM_ERROR_FAILED = 2 };
 
@@ -383,6 +385,93 @@ int rapidglm_scan(const rapidglm_dense *design, const rapidglm_sparse *responses
                   const rapidglm_sparse *predictors, size_t n_pairs, const size_t *pair_responses,
                   const size_t *pair_predictors, const char *const *pair_families,
                   const rapidglm_scan_options *options, rapidglm_table **result);
+
+/* Cis-QTL mapping (since C API version 5): for each phenotype, the variants
+ * within `window` bases of its anchor are tested one at a time against a
+ * covariate-only null model, and the strongest variant's gene-level p-value is
+ * calibrated by permutations. The same analysis as `rapidglm qtl` (docs/CLI.md,
+ * "Cis-QTL mapping"), with the inputs in memory. Unlike the matrices above,
+ * phenotypes and genotypes are feature-major, as a phenotype BED and a PLINK
+ * .bed store them: the values of one phenotype, or the calls of one variant,
+ * are contiguous. */
+enum { RAPIDGLM_QTL_PRECISION_SINGLE = 0, RAPIDGLM_QTL_PRECISION_DOUBLE = 1 };
+enum { RAPIDGLM_QTL_FITS_LOCKSTEP = 0, RAPIDGLM_QTL_FITS_SEPARATE = 1 };
+
+typedef struct {
+    size_t struct_size;
+    /* Response model: family RAPIDGLM_GAUSSIAN, RAPIDGLM_POISSON or
+     * RAPIDGLM_NEGATIVE_BINOMIAL (the default; binomial is not a QTL family),
+     * dispersion, theta, tolerance, ridge, max_iterations, robust and cox_reid
+     * as for rapidglm_fit_batch. offset and weights must be NULL (offsets come
+     * from library_sizes); singular_ok is not used. */
+    rapidglm_fit_options model;
+    int64_t window;            /* cis window in bases; default 1000000 */
+    size_t permutations;       /* 0: nominal results only; else at least 10; default 1000 */
+    int nominal;               /* also return every variant-phenotype pair; default 0 */
+    uint64_t seed;             /* default 1 */
+    int threads;               /* default 1 */
+    double min_maf;            /* variants below it (in these samples) are left out; default 0 */
+    int permutation_precision; /* RAPIDGLM_QTL_PRECISION_*; default single */
+    int permutation_fits;      /* RAPIDGLM_QTL_FITS_*; default lockstep */
+} rapidglm_qtl_options;
+void rapidglm_qtl_options_init(rapidglm_qtl_options *options);
+
+/* Phenotypes: values has one row per phenotype and one column per sample
+ * (row-major). id, chrom, start and end hold one entry per phenotype, as the
+ * columns of a phenotype BED do: zero-based half-open coordinates, so the anchor
+ * is [start + 1, end]; start = end anchors at that coordinate. */
+typedef struct {
+    rapidglm_dense values;
+    const char *const *id;
+    const char *const *chrom;
+    const int64_t *start;
+    const int64_t *end;
+} rapidglm_qtl_phenotypes;
+
+/* Genotypes: calls has one row per variant and one column (byte) per sample
+ * (row-major): the number of copies of allele 1 (0, 1 or 2), negative for a
+ * missing call (replaced by the variant's mean in these samples). Any other
+ * value is an error. The calls are kept as PLINK's two-bit codes. chrom,
+ * position (1-based, as a .bim) and id hold one entry per variant; allele1 and
+ * allele2 (may be NULL, or hold NULL entries: reported as NA) name the alleles.
+ * Chromosome names must match those of the phenotypes literally; variants on
+ * chromosomes without a phenotype are ignored, as `rapidglm qtl` ignores them
+ * (and so they are not counted in the variants scalar). */
+typedef struct {
+    size_t variants, samples;
+    const int8_t *calls;
+    const char *const *chrom;
+    const int64_t *position;
+    const char *const *id;
+    const char *const *allele1;
+    const char *const *allele2;
+} rapidglm_qtl_genotypes;
+
+/* Samples are the same, in the same order, in phenotypes, genotypes,
+ * covariates and library_sizes. covariates (may be NULL): samples x covariates,
+ * row-major, without an intercept (one is added). library_sizes (may be NULL;
+ * counts only): one positive size per sample, converted to log offsets.
+ *
+ * result: the cis table, one row per phenotype in the order given, with the
+ * columns of PREFIX.cis.tsv: phenotype_id, chrom, start (anchor start, 1-based),
+ * end, variants, status, lead_variant, lead_position, allele1, allele2,
+ * statistic, p_value, estimate, standard_error, theta, permutations,
+ * permutations_failed, permutation_p, beta_p, beta_k, beta_n, reference_ncp.
+ * Text columns: phenotype_id, chrom, status, lead_variant, allele1, allele2
+ * ("NA" without a lead variant or alleles); the others are numeric (NaN where
+ * the CLI prints NA, including lead_position). Scalars: samples, phenotypes,
+ * phenotypes_tested, variants (after min_maf), covariates, window,
+ * permutations, min_maf, threads, permutations_refitted (lockstep fits that
+ * fit() redid), permutation_precision_used (RAPIDGLM_QTL_PRECISION_*; NaN
+ * without permutations) and permutation_fits_used (RAPIDGLM_QTL_FITS_*; NaN when
+ * no count-model refits are made).
+ * nominal (may be NULL): the pairs, with the columns of PREFIX.nominal.tsv:
+ * phenotype_id, variant, position, distance (from the anchor start), statistic,
+ * p_value, estimate, standard_error; no rows unless options->nominal. */
+int rapidglm_qtl(const rapidglm_qtl_phenotypes *phenotypes, const rapidglm_qtl_genotypes *genotypes,
+                 const rapidglm_dense *covariates, const double *library_sizes,
+                 const rapidglm_qtl_options *options, rapidglm_table **result,
+                 rapidglm_table **nominal);
 
 /* Special functions of double over arrays (include/rapidglm/vmath.hpp; since C
  * API version 3): out[i] = f(x[i]) for n values; out may equal x. log, log1p,

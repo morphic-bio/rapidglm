@@ -145,6 +145,77 @@ int main(void) {
         CHECK(rapidglm_bulk_de(&x, &counts, &bulk, &t) != RAPIDGLM_OK);
         CHECK(t == NULL && strlen(rapidglm_last_error()) > 0);
     }
+    /* Cis-QTL mapping: two phenotypes and six variants on one chromosome. */
+    {
+        enum { PHENOTYPES = 2, VARIANTS = 6, N = 16 };
+        double phenotype_values[PHENOTYPES * N];
+        int8_t calls[VARIANTS * N];
+        const char *phenotype_ids[] = {"P0", "P1"}, *phenotype_chrom[] = {"1", "1"};
+        const char *variant_chrom[] = {"1", "1", "1", "1", "1", "1"};
+        const char *variant_ids[] = {"v0", "v1", "v2", "v3", "v4", "v5"};
+        const char *allele1[] = {"A", "A", "A", "A", "A", "A"},
+                   *allele2[] = {"G", "G", "G", "G", "G", "G"};
+        const int64_t start[] = {1000, 5000}, end[] = {1001, 5001};
+        const int64_t position[] = {900, 1200, 4000, 5200, 6000, 90000};
+        unsigned state = 99;
+        size_t p, v, i;
+        rapidglm_qtl_options qtl;
+        rapidglm_qtl_phenotypes phenotypes;
+        rapidglm_qtl_genotypes genotypes;
+        rapidglm_table *cis = NULL, *nominal = NULL;
+        for (v = 0; v < VARIANTS; ++v)
+            for (i = 0; i < N; ++i) {
+                state = state * 1103515245u + 12345u;
+                calls[v * N + i] = (int8_t)((state >> 16) % 3);
+            }
+        calls[3] = -1; /* a missing call */
+        for (p = 0; p < PHENOTYPES; ++p)
+            for (i = 0; i < N; ++i) {
+                state = state * 1103515245u + 12345u;
+                phenotype_values[p * N + i] =
+                    (double)((state >> 16) % 1000) / 500.0 + 0.5 * (double)calls[(2 * p) * N + i];
+            }
+        phenotypes.values.rows = PHENOTYPES;
+        phenotypes.values.cols = N;
+        phenotypes.values.values = phenotype_values;
+        phenotypes.id = phenotype_ids;
+        phenotypes.chrom = phenotype_chrom;
+        phenotypes.start = start;
+        phenotypes.end = end;
+        genotypes.variants = VARIANTS;
+        genotypes.samples = N;
+        genotypes.calls = calls;
+        genotypes.chrom = variant_chrom;
+        genotypes.position = position;
+        genotypes.id = variant_ids;
+        genotypes.allele1 = allele1;
+        genotypes.allele2 = allele2;
+        rapidglm_qtl_options_init(&qtl);
+        CHECK(qtl.permutations == 1000 && qtl.window == 1000000 && qtl.threads == 1);
+        qtl.model.family = RAPIDGLM_GAUSSIAN;
+        qtl.window = 10000;
+        qtl.permutations = 20;
+        qtl.nominal = 1;
+        CHECK(rapidglm_qtl(&phenotypes, &genotypes, NULL, NULL, &qtl, &cis, &nominal) ==
+              RAPIDGLM_OK);
+        CHECK(rapidglm_table_rows(cis) == PHENOTYPES && rapidglm_table_columns(cis) == 22);
+        CHECK(strcmp(rapidglm_table_text(cis, "status", 0), "ok") == 0);
+        CHECK(rapidglm_table_numeric(cis, "variants")[0] == 5);
+        CHECK(rapidglm_table_numeric(cis, "start")[0] == 1001 &&
+              rapidglm_table_numeric(cis, "end")[0] == 1001);
+        CHECK(isfinite(rapidglm_table_numeric(cis, "beta_p")[0]));
+        CHECK(rapidglm_table_scalar(cis, "phenotypes") == PHENOTYPES);
+        CHECK(rapidglm_table_scalar(cis, "variants") == VARIANTS);
+        CHECK(rapidglm_table_rows(nominal) >= 8 &&
+              strlen(rapidglm_table_text(nominal, "variant", 0)) > 0);
+        rapidglm_table_free(cis);
+        rapidglm_table_free(nominal);
+        cis = NULL;
+        calls[5] = 3; /* not a call */
+        CHECK(rapidglm_qtl(&phenotypes, &genotypes, NULL, NULL, &qtl, &cis, NULL) ==
+              RAPIDGLM_ERROR_INVALID);
+        CHECK(cis == NULL && strlen(rapidglm_last_error()) > 0);
+    }
     if (failures)
         fprintf(stderr, "%d C interface checks failed\n", failures);
     else

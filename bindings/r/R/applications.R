@@ -376,3 +376,120 @@ sceptre_grid <- function(responses, assignments, design, guides, discovery_targe
           .grid = list(discovery = discovery_targets, negative = negative_targets,
                        responses = grid_responses))
 }
+
+#' Cis-QTL mapping
+#'
+#' For each phenotype, the variants within `window` bases of it are tested one at a time
+#' against a covariate-only null model by the efficient score statistic, and the strongest
+#' variant's gene-level p-value is calibrated by permutations and a Beta approximation: the
+#' analysis of `rapidglm qtl` (docs/CLI.md), with the inputs in memory. Results do not depend
+#' on `threads`.
+#'
+#' The samples are the same, in the same order, in every input (nothing is matched by ID).
+#'
+#' @param phenotypes phenotypes x samples values (matrix or data frame): counts for the
+#'   "nb" and "poisson" families, continuous values for "gaussian".
+#' @param phenotype_info data frame with one row per phenotype and the columns `chrom`,
+#'   `start`, `end` and `id` (default: the row names of `phenotypes`), with the coordinates
+#'   of a phenotype BED: zero-based, half-open, so the anchor is `[start + 1, end]`, and
+#'   `start == end` anchors at that coordinate.
+#' @param genotypes variants x samples calls: the number of copies of allele 1 (0, 1 or 2;
+#'   `NA` or a negative value for missing, replaced by the variant's mean in these samples),
+#'   as an integer, logical or numeric matrix.
+#' @param variant_info data frame with one row per variant and the columns `chrom`,
+#'   `position` (1-based) and `id` (default: the row names of `genotypes`), and optionally
+#'   `allele1` and `allele2`. Chromosome names must match literally; variants on chromosomes
+#'   without a phenotype are ignored.
+#' @param covariates `NULL`, or samples x covariates (an intercept is added).
+#' @param library_sizes `NULL`, or one positive size per sample, for the count families
+#'   (offsets are their logarithms).
+#' @param family "nb" (default), "poisson" or "gaussian".
+#' @param window cis window in bases.
+#' @param permutations permutations for the gene-level p-value: 0 for nominal results
+#'   only, otherwise at least 10.
+#' @param min_maf variants whose allele frequency in these samples is below it are left out.
+#' @param nominal also return every variant-phenotype pair, in `attr(, "nominal")`.
+#' @param permutation_precision "single" (default) or "double": the arithmetic of the
+#'   Gaussian permutation scores.
+#' @param permutation_fits "lockstep" (default) or "separate": how a Poisson or NB null is
+#'   refitted for each permutation.
+#' @param dispersion,theta,tolerance,ridge,max_iterations,robust,cox_reid the generic model
+#'   controls of the CLI.
+#' @return A data frame with one row per phenotype and the columns of `PREFIX.cis.tsv`:
+#'   phenotype_id, chrom, start (the anchor's, 1-based), end, variants, status,
+#'   lead_variant, lead_position, allele1, allele2, statistic, p_value, estimate,
+#'   standard_error, theta, permutations, permutations_failed, permutation_p, beta_p, beta_k,
+#'   beta_n, reference_ncp (`NaN` where the CLI prints NA), with run-level values in
+#'   `attr(, "run")`: samples, phenotypes, phenotypes_tested, variants (after `min_maf`),
+#'   covariates, window, permutations, min_maf, threads, permutations_refitted,
+#'   permutation_precision_used ("single", "double" or `NULL` without permutations) and
+#'   permutation_fits_used ("lockstep", "separate" or `NULL` when no count-model refits are
+#'   made). With `nominal = TRUE`, `attr(, "nominal")` is a data frame with the columns of
+#'   `PREFIX.nominal.tsv`: phenotype_id, variant, position, distance, statistic, p_value,
+#'   estimate, standard_error.
+qtl <- function(phenotypes, phenotype_info, genotypes, variant_info, covariates = NULL,
+                library_sizes = NULL, family = c("nb", "poisson", "gaussian"), window = 1e6,
+                permutations = 1000, min_maf = 0, nominal = FALSE, seed = 1, threads = 1,
+                permutation_precision = c("single", "double"),
+                permutation_fits = c("lockstep", "separate"),
+                dispersion = c("ml", "moment", "fixed"), theta = 10, tolerance = 1e-9,
+                ridge = 0, max_iterations = 100, robust = FALSE, cox_reid = FALSE,
+                division = NULL) {
+  .division_previous <- .division_set(division)
+  on.exit(.division_restore(.division_previous), add = TRUE)
+  y <- as.matrix(phenotypes)
+  storage.mode(y) <- "double"
+  g <- if (is.data.frame(genotypes)) as.matrix(genotypes) else genotypes
+  if (!is.matrix(g) || !(is.numeric(g) || is.logical(g))) stop("genotypes must be a numeric matrix", call. = FALSE)
+  samples <- ncol(y)
+  if (ncol(g) != samples)
+    stop(sprintf("genotypes have %d samples, phenotypes %d", ncol(g), samples), call. = FALSE)
+  info <- as.data.frame(phenotype_info)
+  if (is.null(info$id)) info$id <- rownames(phenotypes)
+  vars <- as.data.frame(variant_info)
+  if (is.null(vars$id)) vars$id <- rownames(genotypes)
+  for (k in c("chrom", "start", "end", "id"))
+    if (is.null(info[[k]])) stop(sprintf("phenotype_info needs the columns chrom, start, end and id; missing %s", k), call. = FALSE)
+  for (k in c("chrom", "position", "id"))
+    if (is.null(vars[[k]])) stop(sprintf("variant_info needs the columns chrom, position and id; missing %s", k), call. = FALSE)
+  if (nrow(info) != nrow(y))
+    stop(sprintf("phenotype_info has %d rows for %d phenotypes", nrow(info), nrow(y)), call. = FALSE)
+  if (nrow(vars) != nrow(g))
+    stop(sprintf("variant_info has %d rows for %d variants", nrow(vars), nrow(g)), call. = FALSE)
+  z <- if (is.null(covariates)) matrix(0, samples, 0) else {
+    z <- as.matrix(covariates)
+    storage.mode(z) <- "double"
+    if (nrow(z) != samples) stop("covariates need one row per sample", call. = FALSE)
+    z
+  }
+  if (!is.null(library_sizes) && length(library_sizes) != samples)
+    stop("library_sizes needs one size per sample", call. = FALSE)
+  alleles <- function(k) if (is.null(vars[[k]])) character() else as.character(vars[[k]])
+  o <- list(family = choice(match.arg(family), c(gaussian = 0, poisson = 1, nb = 3), "family"),
+            dispersion = choice(match.arg(dispersion), c(ml = 0, moment = 1, fixed = 2), "dispersion"),
+            permutation_precision = choice(match.arg(permutation_precision), c(single = 0, double = 1),
+                                           "permutation_precision"),
+            permutation_fits = choice(match.arg(permutation_fits), c(lockstep = 0, separate = 1),
+                                      "permutation_fits"),
+            window = window, permutations = permutations, min_maf = min_maf,
+            nominal = as.numeric(nominal), seed = seed, threads = threads, theta = theta,
+            tolerance = tolerance, ridge = ridge, max_iterations = max_iterations,
+            robust = as.numeric(robust), cox_reid = as.numeric(cox_reid))
+  # The C interface reads the values of one phenotype, and the calls of one
+  # variant, from a row: R's samples x features matrices, column-major.
+  r <- rapidglm_qtl_(as.numeric(t(y)), samples, as.character(info$id), as.character(info$chrom),
+                     as.numeric(info$start), as.numeric(info$end), t(g),
+                     as.character(vars$id), as.character(vars$chrom), as.numeric(vars$position),
+                     alleles("allele1"), alleles("allele2"), z,
+                     if (is.null(library_sizes)) numeric() else as.numeric(library_sizes), o)
+  frame <- as_frame(r$result)
+  run <- attr(frame, "run")
+  used <- function(code, names) if (is.nan(code)) NULL else names[code + 1]
+  precision <- used(run$permutation_precision_used, c("single", "double"))
+  fits <- used(run$permutation_fits_used, c("lockstep", "separate"))
+  run["permutation_precision_used"] <- list(precision)
+  run["permutation_fits_used"] <- list(fits)
+  attr(frame, "run") <- run
+  if (nominal) attr(frame, "nominal") <- as.data.frame(r$nominal$columns, stringsAsFactors = FALSE)
+  frame
+}

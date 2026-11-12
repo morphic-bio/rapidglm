@@ -1,5 +1,5 @@
 """Bulk differential expression, the SCEPTRE-method perturbation workflow,
-score scans and batch GLM fits through the RapidGLM C interface
+score scans, cis-QTL mapping and batch GLM fits through the RapidGLM C interface
 (``librapidglm_c``; see docs/C_API.md).
 
 Matrices are observations (samples or cells) by features, as in AnnData:
@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 
 __all__ = ["bulk_de", "bulk_adjust", "nb_fixed_fits", "nb_dispersions", "sceptre", "sceptre_grid", "scan",
-           "fit_batch", "library_version"]
+           "qtl", "fit_batch", "library_version"]
 
 _size = ctypes.c_size_t
 _double_p = ctypes.POINTER(ctypes.c_double)
@@ -174,6 +174,35 @@ class _ScanOptions(ctypes.Structure):
     ]
 
 
+class _QtlOptions(ctypes.Structure):
+    _fields_ = [
+        ("struct_size", _size),
+        ("model", _FitOptions),
+        ("window", ctypes.c_int64),
+        ("permutations", _size),
+        ("nominal", ctypes.c_int),
+        ("seed", ctypes.c_uint64),
+        ("threads", ctypes.c_int),
+        ("min_maf", ctypes.c_double),
+        ("permutation_precision", ctypes.c_int),
+        ("permutation_fits", ctypes.c_int),
+    ]
+
+
+_int64_p = ctypes.POINTER(ctypes.c_int64)
+_int8_p = ctypes.POINTER(ctypes.c_int8)
+
+
+class _QtlPhenotypes(ctypes.Structure):
+    _fields_ = [("values", _Dense), ("id", _text_p), ("chrom", _text_p), ("start", _int64_p),
+                ("end", _int64_p)]
+
+
+class _QtlGenotypes(ctypes.Structure):
+    _fields_ = [("variants", _size), ("samples", _size), ("calls", _int8_p), ("chrom", _text_p),
+                ("position", _int64_p), ("id", _text_p), ("allele1", _text_p), ("allele2", _text_p)]
+
+
 # Names used by the CLI configuration, mapped to the C enumerations.
 _FAMILIES = {"gaussian": 0, "poisson": 1, "binomial": 2, "nb": 3, "negative_binomial": 3}
 _DISPERSIONS = {"ml": 0, "moment": 1, "fixed": 2}
@@ -193,6 +222,9 @@ _ADJUSTMENTS = {"BH": 0, "bonferroni": 1}
 _STREAM_KEYS = {"identity": 0, "position": 1}
 _ADJUSTMENT_FAMILIES = {"tested": 0, "listed": 1}
 _NULL_STARTS = {"refine": 0, "cold": 1}
+_QTL_FAMILIES = {"gaussian": 0, "poisson": 1, "nb": 3, "negative_binomial": 3}
+_QTL_PRECISIONS = {"single": 0, "double": 1}
+_QTL_FITS = {"lockstep": 0, "separate": 1}
 
 
 def _choice(name, value, choices):
@@ -384,10 +416,25 @@ def _library():
     # Raw addresses (rapidglm.special passes ndarray.ctypes.data).
     for f in ("log", "log1p", "exp", "lgamma", "digamma", "trigamma"):
         signatures[f"rapidglm_{f}_array"] = (ctypes.c_int, [ctypes.c_void_p, ctypes.c_void_p, _size])
+    if actual >= 5:  # cis-QTL mapping (1.6.1)
+        signatures["rapidglm_qtl_options_init"] = (None, [ctypes.POINTER(_QtlOptions)])
+        signatures["rapidglm_qtl"] = (
+            ctypes.c_int,
+            [
+                ctypes.POINTER(_QtlPhenotypes),
+                ctypes.POINTER(_QtlGenotypes),
+                ctypes.POINTER(_Dense),
+                _double_p,
+                ctypes.POINTER(_QtlOptions),
+                ctypes.POINTER(table_p),
+                ctypes.POINTER(table_p),
+            ],
+        )
     for name, (restype, argtypes) in signatures.items():
         function = getattr(lib, name)
         function.restype = restype
         function.argtypes = argtypes
+    lib.api_version = actual
     _lib = lib
     return lib
 
@@ -1095,3 +1142,171 @@ def scan(design, responses, predictors, pairs=None, family="nb", dispersion="ml"
                   pr[0], pp[0], pf[0], ctypes.byref(o))
     del xa, ya, ga, pr, pp, pf, keep
     return _index(_crt_draw_used(frame), "response", _feature_names(responses))
+
+
+def _annotation(info, columns, name):
+    """The annotation table `info` as a DataFrame holding the required columns."""
+    info = pd.DataFrame(info)
+    missing = [c for c in columns if c not in info.columns]
+    if missing:
+        raise ValueError(f"{name} needs the columns {', '.join(columns)}; missing {', '.join(missing)}")
+    return info
+
+
+def _int64s(values, name):
+    a = np.asarray(values)
+    if a.dtype.kind not in "iu" and not (a.dtype.kind == "f" and np.all(np.isfinite(a)) and
+                                         np.all(np.floor(a) == a)):
+        raise ValueError(f"{name} must be integers")
+    return np.ascontiguousarray(a.astype(np.int64))
+
+
+def _calls(genotypes):
+    """Genotype calls (samples x variants: copies of allele 1, NaN or negative
+    for missing) as the int8 variants x samples array of the C interface,
+    converted a block of variants at a time."""
+    a = genotypes.to_numpy() if isinstance(genotypes, pd.DataFrame) else np.asarray(genotypes)
+    if a.ndim != 2:
+        raise ValueError("genotypes must be a samples x variants matrix")
+    if a.dtype.kind == "b":
+        a = a.astype(np.int8)
+    if a.dtype.kind not in "iuf":
+        raise ValueError("genotypes must be numeric")
+    samples, variants = a.shape
+    out = np.empty((variants, samples), dtype=np.int8)
+    for first in range(0, variants, 4096):
+        block = a[:, first:first + 4096]
+        if block.dtype.kind == "f":
+            missing = np.isnan(block) | (block < 0)
+            bad = ~missing & ~np.isin(block, (0.0, 1.0, 2.0))
+            block = np.where(missing, -1.0, block)
+        else:
+            missing = block < 0
+            bad = ~missing & (block > 2)
+            block = np.where(missing, -1, block)
+        if bad.any():
+            raise ValueError("genotype calls must be 0, 1 or 2 copies of allele 1, or missing (NaN or negative)")
+        out[first:first + block.shape[1]] = block.T.astype(np.int8)
+    return out
+
+
+def _qtl_used(frame):
+    """Name the permutation arithmetic and fits used in ``attrs`` (the C
+    interface gives their codes; None where the CLI's run record has null)."""
+    for key, names in (("permutation_precision_used", _QTL_PRECISIONS), ("permutation_fits_used", _QTL_FITS)):
+        code = frame.attrs[key]
+        by_code = {v: k for k, v in names.items()}
+        frame.attrs[key] = None if np.isnan(code) else by_code[int(code)]
+    return frame
+
+
+@_division_parameter
+def qtl(phenotypes, phenotype_info, genotypes, variant_info, covariates=None, library_sizes=None,
+        family="nb", window=1_000_000, permutations=1000, min_maf=0.0, nominal=False, seed=1, threads=1,
+        permutation_precision="single", permutation_fits="lockstep", dispersion="ml", theta=None,
+        tolerance=None, ridge=None, max_iterations=None, robust=False, cox_reid=False, *, division=None):
+    """Cis-QTL mapping, as ``rapidglm qtl`` does it (docs/CLI.md): for each
+    phenotype, the variants within ``window`` bases of it are tested one at a
+    time against a covariate-only null model by the efficient score statistic,
+    and the strongest variant's gene-level p-value is calibrated by
+    ``permutations`` (0: nominal results only; otherwise at least 10) and a Beta
+    approximation. Results do not depend on ``threads``.
+
+    The samples are the same, in the same order, in every input (nothing is
+    matched by ID). phenotypes: samples x phenotypes values (counts for
+    ``family`` "nb" or "poisson"; "gaussian" for continuous values).
+    phenotype_info: a table with one row per phenotype and the columns chrom,
+    start, end and id, with the coordinates of a phenotype BED (zero-based,
+    half-open; the anchor is [start + 1, end], and start = end anchors at that
+    coordinate). genotypes: samples x variants calls, the number of copies of
+    allele 1 (0, 1 or 2; NaN or a negative value for missing, replaced by the
+    variant's mean in these samples), as a numeric array or DataFrame.
+    variant_info: one row per variant with the columns chrom, position (1-based)
+    and id, and optionally allele1 and allele2. Chromosome names must match
+    literally; variants on chromosomes without a phenotype are ignored.
+    covariates: None or samples x covariates (an intercept is added).
+    library_sizes: None or one positive size per sample, for the count families
+    (offsets are their logarithms). min_maf leaves out variants whose allele
+    frequency in these samples is below it. dispersion, theta, tolerance, ridge,
+    max_iterations, robust and cox_reid are the generic model controls.
+    permutation_precision ("single" or "double") and permutation_fits
+    ("lockstep" or "separate") are the settings of the CLI.
+
+    Returns a DataFrame with one row per phenotype and the columns of
+    PREFIX.cis.tsv: phenotype_id, chrom, start (the anchor's, 1-based), end,
+    variants, status, lead_variant, lead_position, allele1, allele2, statistic,
+    p_value, estimate, standard_error, theta, permutations,
+    permutations_failed, permutation_p, beta_p, beta_k, beta_n, reference_ncp
+    (NaN where the CLI prints NA). ``attrs`` holds samples, phenotypes,
+    phenotypes_tested, variants (after min_maf), covariates, window,
+    permutations, min_maf, threads, permutations_refitted,
+    permutation_precision_used ("single", "double" or None without
+    permutations) and permutation_fits_used ("lockstep", "separate" or None
+    when no count-model refits are made). With ``nominal=True`` it returns
+    ``(cis, pairs)``, the second a DataFrame with the columns of
+    PREFIX.nominal.tsv: phenotype_id, variant, position, distance, statistic,
+    p_value, estimate, standard_error."""
+    lib = _library()
+    if lib.api_version < 5:
+        raise OSError(f"librapidglm_c has C API version {lib.api_version}, qtl needs 5")
+    y = np.asarray(phenotypes.to_numpy() if isinstance(phenotypes, pd.DataFrame) else phenotypes,
+                   dtype=np.float64)
+    if y.ndim == 1:
+        y = y.reshape(-1, 1)
+    if y.ndim != 2:
+        raise ValueError("phenotypes must be a samples x phenotypes matrix")
+    samples, count = y.shape
+    pheno = _annotation(phenotype_info, ("chrom", "start", "end", "id"), "phenotype_info")
+    if len(pheno) != count:
+        raise ValueError(f"phenotype_info has {len(pheno)} rows for {count} phenotypes")
+    variants = _annotation(variant_info, ("chrom", "position", "id"), "variant_info")
+    calls = _calls(genotypes)
+    if calls.shape[1] != samples:
+        raise ValueError(f"genotypes have {calls.shape[1]} samples, phenotypes {samples}")
+    if len(variants) != calls.shape[0]:
+        raise ValueError(f"variant_info has {len(variants)} rows for {calls.shape[0]} variants")
+    yt = np.ascontiguousarray(y.T)
+    ids, ids_keep = _texts(pheno["id"])
+    chrom, chrom_keep = _texts(pheno["chrom"])
+    start = _int64s(pheno["start"], "start")
+    end = _int64s(pheno["end"], "end")
+    p = _QtlPhenotypes(_Dense(count, samples, yt.ctypes.data_as(_double_p)), ids, chrom,
+                       start.ctypes.data_as(_int64_p), end.ctypes.data_as(_int64_p))
+    v_ids, v_ids_keep = _texts(variants["id"])
+    v_chrom, v_chrom_keep = _texts(variants["chrom"])
+    position = _int64s(variants["position"], "position")
+    alleles, alleles_keep = [], []
+    for column in ("allele1", "allele2"):
+        if column in variants:
+            array, kept = _texts(variants[column])
+        else:
+            array, kept = None, None
+        alleles.append(array)
+        alleles_keep.append(kept)
+    g = _QtlGenotypes(calls.shape[0], samples, calls.ctypes.data_as(_int8_p), v_chrom,
+                      position.ctypes.data_as(_int64_p), v_ids, alleles[0], alleles[1])
+    cov, cova = None, None
+    if covariates is not None:
+        cov, cova = _dense(covariates.to_numpy() if isinstance(covariates, pd.DataFrame) else covariates,
+                           "covariates")
+    sizes, sizes_keep = _doubles(library_sizes, samples, "library_sizes")
+    o = _QtlOptions()
+    lib.rapidglm_qtl_options_init(ctypes.byref(o))
+    o.model.family = _choice("family", family, _QTL_FAMILIES)
+    keep = _fit_options(o.model, samples, family, dispersion, theta, tolerance, ridge, max_iterations,
+                        None, None, robust, cox_reid, False)
+    o.model.family = _choice("family", family, _QTL_FAMILIES)
+    o.window = int(window)
+    o.permutations = int(permutations)
+    o.nominal = int(bool(nominal))
+    o.seed = int(seed)
+    o.threads = int(threads)
+    o.min_maf = float(min_maf)
+    o.permutation_precision = _choice("permutation_precision", permutation_precision, _QTL_PRECISIONS)
+    o.permutation_fits = _choice("permutation_fits", permutation_fits, _QTL_FITS)
+    cis, pairs = _call(lib.rapidglm_qtl, ctypes.byref(p), ctypes.byref(g),
+                       None if cov is None else ctypes.byref(cov), sizes, ctypes.byref(o), tables=2)
+    del yt, ids_keep, chrom_keep, start, end, calls, v_ids_keep, v_chrom_keep, position, alleles_keep
+    del cova, sizes_keep, keep
+    _qtl_used(cis)
+    return (cis, pairs) if nominal else cis

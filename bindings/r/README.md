@@ -2,7 +2,7 @@
 
 A fitting method for `stats::glm()` and a `MASS::glm.nb()`-compatible negative
 binomial fit, plus bulk differential expression and SCEPTRE-method
-perturbation analysis, backed by the RapidGLM engine.
+perturbation analysis and cis-QTL mapping, backed by the RapidGLM engine.
 
 ## Applications
 
@@ -17,6 +17,12 @@ grid_res <- rapidglm::sceptre_grid(responses, grna_calls, ~ log_umi + batch, gui
                                    discovery_targets, negative_targets,
                                    cell_data = covariates, moi = "high", threads = 8)
 attr(grid_res, "tally")   # the pairs that failed pair QC, by target and kind
+# cis-QTL mapping (1.6.1): the tables of `rapidglm qtl` from phenotypes x samples values and
+# variants x samples calls (copies of allele 1: 0, 1, 2; NA or negative = missing)
+eqtl <- rapidglm::qtl(counts, pheno_info, calls, variant_info, covariates,
+                      family = "nb", library_sizes = sizes, permutations = 1000, threads = 8)
+eqtl <- rapidglm::qtl(counts, pheno_info, calls, variant_info, nominal = TRUE)
+attr(eqtl, "nominal")     # every variant-phenotype pair
 ```
 
 - `bulk_de()` runs the DESeq2 procedure (written from its paper and
@@ -25,7 +31,13 @@ attr(grid_res, "tally")   # the pairs that failed pair QC, by target and kind
   pairs, and `sceptre_grid()` on targets and responses without a list. A pair's
   draws depend only on the seed, its response and its target (`response_ids`
   names the responses), so its row does not depend on what else is tested.
-- Both call the RapidGLM C interface, which the package compiles in, so they
+- `qtl()` runs cis-QTL mapping as `rapidglm qtl` does ([docs/CLI.md](../../docs/CLI.md#cis-qtl-mapping-qtl)).
+  The samples are in the same order in every input (nothing is matched by ID);
+  `phenotype_info` has the columns `chrom`, `start`, `end` (BED coordinates:
+  zero-based, half-open) and `id`, and `variant_info` the columns `chrom`,
+  `position` (1-based), `id` and optionally `allele1` and `allele2`. Variants on
+  chromosomes without a phenotype are ignored.
+- All call the RapidGLM C interface, which the package compiles in, so they
   run the same code as the CLI and the Python package.
 - Inputs follow R conventions:
   - `counts` and `responses` are genes x observations (dense or `Matrix`);
@@ -33,7 +45,8 @@ attr(grid_res, "tally")   # the pairs that failed pair QC, by target and kind
   - coefficients are given by name or 1-based index;
   - contrasts are `c(variable, tested, reference)` or a weight vector.
 - Results are data frames whose columns match the CLI tables. Run-level values
-  are in `attr(, "run")`.
+  are in `attr(, "run")`. Genotypes of `qtl()` are variants x samples, as
+  phenotypes are.
 - `tests/applications.R` checks both against the CLI:
   - `bulk_de()` bit for bit;
   - `sceptre()` to 1e-10, because R's BLAS can round differently from the
@@ -81,5 +94,5 @@ The package uses R's own LAPACK. Inside the RapidGLM repository, install with
 headers; `--preclean` removes objects of an earlier build, which would
 otherwise be linked in unchanged after the headers change).
 Boost headers are required. The configure script also copies `src/c_api.cpp`
-and the package builds with OpenMP. Tests: `tests/parity.R` and
+(and `src/qtl_run.hpp`, which it includes) and the package builds with OpenMP. Tests: `tests/parity.R` and
 `tests/applications.R` (`RAPIDGLM_CLI=build/rapidglm`).
