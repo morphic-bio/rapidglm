@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.7.0 (2026-11-22)
+
+RapidGLM 1.7.0 extends one option. With default options, the results are those
+of 1.6.1.
+
+- **Shared permutations at low MOI.** `reuse_draws` now also applies to
+  permutation resampling (`moi: low`, `resampling_mechanism: permutations`, NT
+  controls): every pair of a target is scored against the same permutations,
+  drawn from a stream keyed by the target. P-values then come from different
+  permutations than the default's, and the p-values of one target's genes share
+  them. CRT with NT controls still cannot share draws. With the option off (the
+  default) results are identical to 1.6.1; with it on they do not depend on the
+  thread count.
+
 ## 1.6.1 (2026-11-12)
 
 RapidGLM 1.6.1 makes cis-QTL mapping available from every interface. The

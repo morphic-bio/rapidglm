@@ -25,7 +25,7 @@ One library serves several interfaces:
 
 ## Benchmarks
 
-The current released version is **1.6.1**. Its numerical code and results are those of 1.6.0: 1.6.1 adds cis-QTL mapping to the C interface and the R and Python packages, and the CRT-steps benchmark program. The tables below report the completed 1.6.0 measurements.
+The current released version is **1.7.0**. With its default options, its results are those of 1.6.0. 1.6.1 added cis-QTL mapping to the C interface and the R and Python packages, and the CRT-steps benchmark program. 1.7.0 adds shared permutations at low MOI through `reuse_draws`. The tables below report the completed 1.6.0 measurements.
 
 RapidGLM **1.6.0** measurements on development tag `v1.6.0-dev.2` (`4505ef6afaa00a38c5c871ae0e12d531c91ec1cf`). All 24 stages passed the timing audit; the release library is unchanged from the measured dev.2 source.
 

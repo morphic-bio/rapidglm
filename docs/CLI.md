@@ -439,15 +439,18 @@ model and sampler are prepared before the responses, including targets all of
 whose pairs fail pair QC. The run record states `batch_scoring`; tiles of one
 run may be computed with either setting.
 
-`reuse_draws` (default false; CRT with complement controls, i.e. `moi: high`)
-draws each target's CRT resamples once and scores every gene against them: the
+`reuse_draws` (default false; CRT with complement controls, i.e. `moi: high`, or
+permutations, i.e. `moi: low` with `resampling_mechanism: permutations`)
+draws each target's resamples once and scores every gene against them: the
 random stream of a test is keyed by its target instead of by the pair. Draw
 generation then happens once per target rather than once per pair, which on
 the Gasperini panel makes the workflow about five times faster again. P-values
 differ from the default's (they come from different resamples), and the
 p-values of tests that share a target are computed from the same resamples, so
 their errors are correlated across genes; each test's calibration is
-unchanged. Use it for routine discovery; statistics to be reported need the
+unchanged. With permutations, nothing is stored: each pair draws the target's
+permutations again from the target's stream, so the pairs of a target score
+against the same permutations at any number of threads. Use it for routine discovery; statistics to be reported need the
 default's independent draws.
 
 `shared_screen` (default false; same requirement) shares only the first-stage

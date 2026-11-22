@@ -408,6 +408,10 @@ struct SceptreOptions {
     // every pair, and tests that share a target share their resamples. The
     // first stage's draws are kept in memory (about 4 bytes per treated cell
     // per draw per target) within draw_cache_bytes; results do not depend on it.
+    // With permutation resampling (crt false, the low-MOI setting with NT
+    // controls) it shares one set of permutations among all of a target's pairs
+    // in the same way (streams keyed by target); nothing is stored, and the
+    // permutations of a target are those of any of its pairs.
     bool reuse_draws = false;
     // CRT with complement controls only: screen each pair first with its
     // target's shared first-stage draws (ResampleOptions::prescreen). A pair
@@ -876,8 +880,8 @@ inline SceptreSetup sceptre_setup(const Matrix &design, const Responses &respons
                 assignments.cols == guides.size(),
             "perturbation input dimensions mismatch");
     require(!o.high_moi || !o.nt_controls, "high MOI requires complement controls");
-    require(!o.reuse_draws || (o.crt && !o.nt_controls),
-            "reuse_draws requires CRT resampling with complement controls");
+    require(!o.reuse_draws || !o.crt || !o.nt_controls,
+            "reuse_draws requires permutation resampling or CRT with complement controls");
     require(!o.shared_screen || (o.crt && !o.nt_controls),
             "shared_screen requires CRT resampling with complement controls");
     require(!(o.reuse_draws && o.shared_screen), "use reuse_draws or shared_screen, not both");
@@ -1241,6 +1245,9 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
     std::atomic<std::size_t> sampler_cache_used{0}, draw_cache_used{0}, samplers_cached{0},
         samplers_rebuilt{0}, null_fits{0};
     const bool reuse_draws = o.reuse_draws && o.crt && !o.nt_controls;
+    // Permutation resampling (low MOI): the target's permutations are keyed by
+    // the target, so every pair of a target scores against the same ones.
+    const bool shared_permutations = o.reuse_draws && !o.crt;
     const bool shared_screen = o.shared_screen && o.crt && !o.nt_controls;
     const bool batch_scoring = o.batch_scoring && o.crt && !o.nt_controls && !shared_screen &&
                                !o.resampling.sequential_screen && o.resampling.early_stop == 0;
@@ -1639,7 +1646,8 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
         if (o.stream_keys == StreamKeys::position) {
             // Streams are keyed by the pair's place in the list, or by the
             // target's (in order of first appearance) when its draws are reused.
-            job->resampling.test_id = reuse_draws ? task.target_context : task_id;
+            job->resampling.test_id =
+                reuse_draws || shared_permutations ? task.target_context : task_id;
             if (shared_screen) {
                 job->resampling.prescreen = o.shared_screen_p;
                 job->resampling.prescreen_test_id = screen_streams + task.target_context;
@@ -1650,7 +1658,7 @@ inline SceptreResult sceptre(const Matrix &design, const Responses &responses,
             // by the target, in a domain of its own.
             const std::uint32_t domain = o.integration == Integration::union_guides ? 0 : 3;
             const Stream own =
-                reuse_draws
+                reuse_draws || shared_permutations
                     ? keyed_stream(o.resampling.seed, domain + 2, 0, task.target_key)
                     : keyed_stream(o.resampling.seed, domain + 1,
                                    setup.response_keys[task.pair.response], task.target_key);

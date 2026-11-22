@@ -16,7 +16,7 @@ from .capi import bulk_de, edger_ql, fit_batch, library_version, qtl, scan, scep
 
 __all__ = ["bulk_de", "edger_ql", "sceptre", "sceptre_grid", "scan", "qtl", "fit_batch", "fit", "library_version",
            "special"]
-__version__ = "1.6.1"
+__version__ = "1.7.0"
 
 
 def fit(

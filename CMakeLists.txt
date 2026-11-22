@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(rapidglm VERSION 1.6.1 LANGUAGES C CXX)
+project(rapidglm VERSION 1.7.0 LANGUAGES C CXX)
 set(RAPIDGLM_DIVISION_DEFAULT "slow" CACHE STRING "Default division mode: slow or fast (environment and explicit options override)")
 set_property(CACHE RAPIDGLM_DIVISION_DEFAULT PROPERTY STRINGS slow fast)
 if(NOT RAPIDGLM_DIVISION_DEFAULT STREQUAL "slow" AND NOT RAPIDGLM_DIVISION_DEFAULT STREQUAL "fast")

@@ -636,6 +636,131 @@ bool same_record(const PairResult &a, const PairResult &b) {
 }
 } // namespace
 
+BOOST_AUTO_TEST_CASE(shared_permutations_are_shared_by_a_targets_genes_at_low_moi) {
+    // Low MOI: NT controls and permutations. Response 8 is a copy of response 2:
+    // with shared permutations their pairs with a target agree exactly; with
+    // per-pair permutations they do not (all of them). Neither the thread count
+    // nor the default changes anything.
+    auto d = screen_data();
+    const std::size_t copy_of = 3, copy = d.responses.cols;
+    for (auto k = d.responses.column_ptr[copy_of]; k < d.responses.column_ptr[copy_of + 1]; ++k) {
+        d.responses.row_index.push_back(d.responses.row_index[k]);
+        d.responses.values.push_back(d.responses.values[k]);
+    }
+    d.responses.column_ptr.push_back(d.responses.values.size());
+    ++d.responses.cols;
+    for (std::size_t t = 0; t < 6; ++t)
+        d.pairs.push_back({copy, "T" + std::to_string(t)});
+    auto run = [&](bool reuse, int threads, StreamKeys keys) {
+        SceptreOptions o;
+        o.high_moi = false;
+        o.nt_controls = true;
+        o.crt = false;
+        o.cell_qc = false;
+        o.min_nonzero = 3;
+        o.resampling.budgets = {199, 999};
+        o.resampling.screen = 0.5; // some pairs continue to the second stage
+        o.stream_keys = keys;
+        o.threads = threads;
+        o.reuse_draws = reuse;
+        return sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+    };
+    auto find = [](const SceptreResult &r, std::size_t response, const std::string &target) {
+        for (const auto &t : r.tests)
+            if (t.response == response && t.target == target)
+                return t;
+        BOOST_FAIL("pair not found");
+        return PairResult{};
+    };
+    for (auto keys : {StreamKeys::identity, StreamKeys::position}) {
+        const auto shared = run(true, 1, keys), fresh = run(false, 1, keys);
+        std::size_t compared = 0, differ = 0, second_stage = 0;
+        for (std::size_t t = 0; t < 6; ++t) {
+            const std::string target = "T" + std::to_string(t);
+            const auto a = find(shared, copy_of, target), b = find(shared, copy, target);
+            BOOST_TEST(a.status == b.status);
+            if (a.status != "ok")
+                continue;
+            ++compared;
+            BOOST_TEST(a.statistic == b.statistic);
+            BOOST_TEST(a.p_value == b.p_value);
+            BOOST_TEST(a.draws == b.draws);
+            second_stage += a.draws > 199;
+            const auto c = find(fresh, copy_of, target), e = find(fresh, copy, target);
+            BOOST_TEST(c.statistic == a.statistic); // the observed statistic is unchanged
+            differ += c.p_value != e.p_value;
+        }
+        BOOST_TEST(compared >= 4u);
+        BOOST_TEST(differ > 0u);
+        BOOST_TEST(second_stage > 0u);
+        // Genes of one target share a set of permutations, so the p-values of
+        // the shared run differ from the default's.
+        std::size_t moved = 0;
+        for (std::size_t k = 0; k < shared.tests.size(); ++k)
+            moved += shared.tests[k].p_value != fresh.tests[k].p_value &&
+                     !(std::isnan(shared.tests[k].p_value) && std::isnan(fresh.tests[k].p_value));
+        BOOST_TEST(moved > 0u);
+        // The thread count changes nothing, with the option on or off.
+        for (bool reuse : {true, false}) {
+            const auto one = run(reuse, 1, keys);
+            for (int threads : {4, 32}) {
+                const auto other = run(reuse, threads, keys);
+                BOOST_REQUIRE(other.tests.size() == one.tests.size());
+                for (std::size_t k = 0; k < one.tests.size(); ++k)
+                    BOOST_TEST(same_record(other.tests[k], one.tests[k]));
+            }
+        }
+        // Shards of two targets by three responses give the single run's
+        // statuses, statistics, draws and p-values.
+        {
+            SceptreOptions o;
+            o.high_moi = false;
+            o.nt_controls = true;
+            o.crt = false;
+            o.cell_qc = false;
+            o.min_nonzero = 3;
+            o.resampling.budgets = {199, 999};
+            o.resampling.screen = 0.5;
+            o.stream_keys = keys;
+            o.reuse_draws = true;
+            o.threads = 4;
+            const auto layout =
+                sceptre_layout(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o);
+            for (std::size_t tb = 0; tb < layout.targets; tb += 2)
+                for (std::size_t rb = 0; rb < d.responses.cols; rb += 3) {
+                    std::vector<std::size_t> tasks;
+                    for (std::size_t i = 0; i < shared.tests.size(); ++i)
+                        if (layout.task_target[i] / 2 == tb / 2 &&
+                            layout.task_response[i] / 3 == rb / 3)
+                                tasks.push_back(i);
+                    if (tasks.empty())
+                        continue;
+                    SceptreShard shard;
+                    shard.tasks = &tasks;
+                    const auto part =
+                        sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, o, shard);
+                    BOOST_REQUIRE(part.tests.size() == tasks.size());
+                    for (std::size_t k = 0; k < tasks.size(); ++k) {
+                        const auto &a = part.tests[k], &b = shared.tests[tasks[k]];
+                        BOOST_TEST(a.status == b.status);
+                        BOOST_TEST(a.draws == b.draws);
+                        BOOST_TEST((a.p_value == b.p_value ||
+                                    (std::isnan(a.p_value) && std::isnan(b.p_value))));
+                    }
+                }
+        }
+        // The default is off, and unchanged by being stated.
+        BOOST_TEST(!SceptreOptions{}.reuse_draws);
+    }
+    // Low MOI with CRT and NT controls still cannot share draws.
+    SceptreOptions low;
+    low.reuse_draws = true;
+    low.crt = true;
+    low.nt_controls = true;
+    BOOST_CHECK_THROW(sceptre(d.x, d.responses, d.assignments, d.guides, d.pairs, {}, low),
+                      std::invalid_argument);
+}
+
 BOOST_AUTO_TEST_CASE(sharded_runs_equal_a_single_run) {
     const auto d = screen_data();
     // default, reuse_draws, shared_screen, sequential_screen with early_stop
@@ -1889,7 +2014,7 @@ BOOST_AUTO_TEST_CASE(batched_scoring_applies_to_crt_with_complement_controls_onl
     const auto d = screen_data();
     for (int mode : {2, 3})
         for (bool high_moi : {true, false}) {
-            if (mode == 2 && !high_moi)
+            if ((mode == 1 || mode == 2) && !high_moi)
                 continue; // shared_screen needs complement controls
             auto o = screen_options(mode, high_moi);
             o.batch_scoring = false;
