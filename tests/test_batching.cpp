@@ -732,7 +732,7 @@ BOOST_AUTO_TEST_CASE(shared_permutations_are_shared_by_a_targets_genes_at_low_mo
                     for (std::size_t i = 0; i < shared.tests.size(); ++i)
                         if (layout.task_target[i] / 2 == tb / 2 &&
                             layout.task_response[i] / 3 == rb / 3)
-                                tasks.push_back(i);
+                            tasks.push_back(i);
                     if (tasks.empty())
                         continue;
                     SceptreShard shard;
